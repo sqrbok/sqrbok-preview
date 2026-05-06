@@ -38,3 +38,104 @@
 {% if vegalite %}
   {% include vegalite.html %}
 {% endif %}
+
+<style>
+  /* SQRBOK Design System — P1 colour & accessibility overrides
+     Source of truth: DESIGN.md "The Engineering Handbook" */
+
+  /* OKLCH design tokens (CSS custom properties for browsers that support it) */
+  :root {
+    --sqr-ink:           oklch(32%  0.080 250);  /* Deep Ink Navy    #1A4A7A */
+    --sqr-citation:      oklch(42%  0.110 252);  /* Citation Blue    #2563A8 */
+    --sqr-amber:         oklch(70%  0.170  60);  /* Annotation Amber #FF9500 */
+    --sqr-amber-wash:    oklch(97%  0.020  70);  /* Amber Wash       #FFF5E6 */
+    --sqr-sidebar:       oklch(97%  0.008 250);  /* Sidebar Ice      #F0F7FF */
+    --sqr-table-header:  oklch(91%  0.035 250);  /* Table Header     #D9EBFF */
+    --sqr-rule:          oklch(90%  0.005 250);  /* Rule Grey        #E1E4E8 */
+    --sqr-code-canvas:   oklch(97%  0.003 250);  /* Code Canvas      #F6F8FA */
+    --sqr-reading-ink:   oklch(18%  0.010 250);  /* Reading Ink      #24292E */
+    --sqr-secondary-ink: oklch(48%  0.010 250);  /* Secondary Ink    #6A737D */
+  }
+
+  /* --- Accessibility: focus rings (WCAG 2.4.7) --- */
+  :focus-visible {
+    outline: 2px solid var(--sqr-citation, #2563A8);
+    outline-offset: 2px;
+  }
+
+  /* --- Accessibility: motion (WCAG 2.3.3) --- */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* --- Table headers: enforce brand blue, not grey ---
+     custom.scss previously set th { background: $grey-lt-000 } which overrode
+     the $table-header-background-color token. Belt-and-suspenders fix here. */
+  .main-content table th {
+    background-color: var(--sqr-table-header, #D9EBFF);
+    color: var(--sqr-ink, #1A4A7A);
+    font-weight: 600;
+  }
+
+  /* --- Callouts: full-border treatment, no left-stripe ---
+     Just the Docs uses a coloured left border by default.
+     Replace with background-tint + thin full border per DESIGN.md. */
+  .main-content .callout {
+    border-radius: 2px;
+    padding: 1rem;
+    border-left-width: 1px;   /* collapse the default thick left stripe to 1px */
+  }
+
+  /* Amber (highlight) callout */
+  .main-content .callout.highlight {
+    background-color: var(--sqr-amber-wash, #FFF5E6);
+    border: 1px solid #E1E4E8;
+  }
+
+  /* Blue (important / note) callout */
+  .main-content .callout.important,
+  .main-content .callout.note {
+    background-color: var(--sqr-sidebar, #F0F7FF);
+    border: 1px solid var(--sqr-citation, #2563A8);
+  }
+
+  /* --- Breadcrumbs: enforce AA-compliant colour --- */
+  .breadcrumb-nav-list-item a,
+  .breadcrumb-nav-list-item::after {
+    color: var(--sqr-citation, #2563A8);
+  }
+
+  /* --- P2: Typeset — heading weight hierarchy + visual anchors --- */
+  .main-content h1 {
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    padding-bottom: 0.5em;
+    border-bottom: 2px solid var(--sqr-table-header, #D9EBFF);
+    margin-bottom: 1.25rem;
+  }
+  .main-content h2 {
+    font-weight: 700;
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid var(--sqr-rule, #E1E4E8);
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+  }
+  .main-content h3 {
+    font-weight: 600;
+    margin-top: 1.75rem;
+  }
+  .main-content h4 {
+    font-weight: 600;
+  }
+
+  /* --- P2: Body reading rhythm --- */
+  .main-content p,
+  .main-content li {
+    line-height: 1.75;
+  }
+</style>

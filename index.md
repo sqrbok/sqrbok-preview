@@ -4,10 +4,6 @@ layout: home
 nav_order: 1
 ---
 
-<div align="center">
-  <img src="/images/logo/sqr_logo.png" alt="SQRBOK Logo" style="width:180px; margin-bottom: 1em;" />
-</div>
-
 # Software Quality and Reliability
 
 Course handbook for two complementary programs:
@@ -21,15 +17,15 @@ The content reflects current industry practice: continuous integration, automate
 
 ---
 
-## Overview
+## Topic Map
 
-**Course topic map** covers the full scope of both courses across four areas: defining quality, organizing quality assurance, verification methods, and quality attributes. Topics marked in yellow are planned for future editions.
+Full scope of both courses across four areas. Topics in yellow are planned for future editions.
 
-![Software Quality Topic Map](images/overview-asa.png)
+![Software Quality Topic Map](images/overview-asa.png){: loading="lazy"}
 
-**Quality assurance in the development lifecycle** maps course topics onto a modern CI-based development process. The diagram shows where each technique fits: static analysis and unit tests run automatically on every commit; code reviews and integration tests gate the build pipeline; and non-functional attributes — maintainability, reliability, performance, security, usability — are evaluated before release. Students are expected to apply these practices within a CI workflow, treating quality gates as first-class engineering artifacts rather than end-of-cycle activities.
+Quality assurance mapped onto a modern CI-based development process — where each technique fits from commit through release.
 
-![Quality Assurance in Development Lifecycle](images/overview-sqr.png)
+![Quality Assurance in Development Lifecycle](images/overview-sqr.png){: loading="lazy"}
 
 ---
 
