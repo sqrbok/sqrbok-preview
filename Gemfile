@@ -8,6 +8,7 @@ gem "just-the-docs"        # always download the latest release
 
 gem 'jekyll-scholar'
 gem 'jekyll-relative-links'
+gem 'jekyll-redirect-from'
 
 # gem 'jekyll-mathjax'
 # gem "jekyll-mermaid"

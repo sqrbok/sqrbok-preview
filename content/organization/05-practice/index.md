@@ -57,7 +57,7 @@ Pre-submit/post-submit/release gates, deployment strategies, feature flags lifec
 
 ## Study Notes
 
-### [SN: Industry Quality Practices](SN-A3-Practice.md)
+### [SN: Industry Quality Practices](../../material/qam/SN-A3-Practice.md)
 Comprehensive study notes summarizing industry quality practices from Google, Microsoft, Netflix, and Facebook, plus emerging AI/LLM-based approaches. Includes key numbers reference card, exam preparation materials, and anti-patterns summary.
 
 ---

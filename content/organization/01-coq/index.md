@@ -50,10 +50,10 @@ Machine learning approaches to predicting defect-prone modules.
 
 ## Study Materials
 
-### [Study Notes](SN-A1-CoSQ.md)
+### [Study Notes](../../material/qam/SN-A1-CoSQ.md)
 Comprehensive study notes covering all CoSQ concepts for exam preparation.
 
-### [Revision Questions](RQ-A1-CoSQ.md)
+### [Revision Questions](../../material/qam/RQ-A1-CoSQ.md)
 Self-assessment questions to test your understanding of Cost of Quality concepts.
 
 ---

@@ -243,10 +243,10 @@ Metrics operationalize quality models:
 
 ## Study Materials
 
-### [SN: Quality Measurement](SN_L2_Metrics.md)
+### [SN: Quality Measurement](../../material/sqr/SN_L2_Metrics.md)
 Comprehensive study notes covering measurement definitions, NOIR scales, statistical concepts, GQM framework, code metrics (cyclomatic complexity, Maintainability Index), and the Chidamber-Kemerer OO metrics suite.
 
-### [RQ: Quality Measurement](RQ_L2_Metrics.md)
+### [RQ: Quality Measurement](../../material/sqr/RQ_L2_Metrics.md)
 Revision questions for self-study and exam preparation covering measurement definitions, pitfalls, scales, GQM, and code metrics.
 
 ---

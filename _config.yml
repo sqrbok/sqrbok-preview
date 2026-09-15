@@ -4,6 +4,7 @@
 plugins:
   - jekyll-scholar
   - jekyll-relative-links
+  - jekyll-redirect-from
 #  - jekyll-mathjax
 #  - jekyll-mermaid
 

@@ -2,12 +2,21 @@
 title: Selected Materials
 layout: default
 nav_order: 5
-has_children: false
+has_children: true
 ---
 
 # Selected Materials
 
 A curated selection of books and papers from the SQR and QAM courses. Each entry is chosen for its foundational or canonical contribution — not for volume. One annotation line explains what it contributes and why it is here.
+
+---
+
+## Study Notes & Revision Questions
+
+Per-lecture Study Notes (SN) and Revision Questions (RQ), grouped by course:
+
+- [SQR Study Materials](sqr/index.md) — L01–L10 (bachelor track)
+- [QAM Study Materials](qam/index.md) — A01–A10 (master track)
 
 ---
 

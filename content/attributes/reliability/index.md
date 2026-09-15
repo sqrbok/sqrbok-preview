@@ -302,8 +302,8 @@ These cases motivate why reliability engineering matters:
 | [Measurement](measurement.md) | Failure severity, failure intensity, SRGMs, operational profiles |
 | [Fault Tolerance](fault-tolerance.md) | NVP, recovery blocks, voting, empirical limits, modern resilience |
 | [From FIO to SLO](slo-bridge.md) | Musa's FIO → Google's SLO, error budgets, chaos engineering |
-| [Study Notes (L08)](SN_L08_Reliability.md) | Comprehensive study notes for exam preparation |
-| [Revision Questions (L08)](RQ_L08_Reliability.md) | 12 questions with detailed answers |
+| [Study Notes (L08)](../../material/sqr/SN_L08_Reliability.md) | Comprehensive study notes for exam preparation |
+| [Revision Questions (L08)](../../material/sqr/RQ_L08_Reliability.md) | 12 questions with detailed answers |
 
 For SRE operational practices (SLOs, error budgets, toil, on-call), see [Site Reliability Engineering](../../organization/05-practice/06-site-reliability-engineering.md). For operational profile testing, see [Operational Profile](../../verif/operational-profile/index.md).
 
