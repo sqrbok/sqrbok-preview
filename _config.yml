@@ -30,7 +30,8 @@ description: "Software Quality and Reliability Course Handbook (SQRBOK) - Collec
 theme: just-the-docs
 color_scheme: sqrbok
 
-url: https://sqrbok.github.io/
+url: https://sqrbok.github.io
+baseurl: /sqrbok-preview
 
 logo: "/images/logo/sqr_logo.png"
 

@@ -6,7 +6,7 @@ page_type: home
 ---
 
 <div align="center">
-  <img src="/images/logo/sqr_logo.png" alt="SQRBOK Logo" style="width:180px; margin-bottom: 1em;" />
+  <img src="/sqrbok-preview/images/logo/sqr_logo.png" alt="SQRBOK Logo" style="width:180px; margin-bottom: 1em;" />
 </div>
 
 # Software Quality and Reliability
@@ -36,30 +36,30 @@ The content reflects current industry practice: continuous integration, automate
 
 ## Areas Covered
 
-### 1. [Defining Quality](/content/define/)
+### 1. [Defining Quality](/sqrbok-preview/content/define/)
 Quality views, quality models, and the metrics that make quality measurable and comparable across projects and teams.
 
-### 2. [Organizing Quality](/content/organization/)
+### 2. [Organizing Quality](/sqrbok-preview/content/organization/)
 Cost of quality, project-level quality planning, process improvement, and the standards and industry practices that operationalise these — CMMI, ISO 9000, TMMi, DevOps, SRE, PSP/TSP.
 
-### 3. [Verification and Validation](/content/verif/)
+### 3. [Verification and Validation](/sqrbok-preview/content/verif/)
 The full range of V&V methods and when to apply each:
 - Black-box testing: domain and boundary analysis, equivalence partitioning, decision tables, classification trees, combinatorial, random and property-based, exploratory testing, operational profiles
 - White-box testing: statement, branch, MC/DC, and data-flow coverage; mutation testing
 - Inspection: code reviews, Fagan inspection, reading techniques
 - Static analysis: model checking, symbolic execution, dataflow analysis, tooling
 
-### 4. [Quality Attributes](/content/attributes/)
+### 4. [Quality Attributes](/sqrbok-preview/content/attributes/)
 Maintainability, reliability, performance and queuing theory, security, and usability — each treated as an engineering property with models, metrics, and design implications.
 
-### 5. [Selected Materials](/content/material/)
+### 5. [Selected Materials](/sqrbok-preview/content/material/)
 A study note and revision questions for every SQR and QAM lecture, and an annotated reading list.
 
 ---
 
 ## Start here
 
-- **Revising after a lecture or before an exam** → [Selected Materials](/content/material/): the study note follows the lecture and links to the pages that hold the detail.
+- **Revising after a lecture or before an exam** → [Selected Materials](/sqrbok-preview/content/material/): the study note follows the lecture and links to the pages that hold the detail.
 - **Looking up a method** → open its area above, or use the search box.
 - **Wondering whether to believe a page** → its **How solid is this?** section, at the bottom of reviewed pages.
 
