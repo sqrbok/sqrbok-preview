@@ -10,7 +10,7 @@ page_type: question-set
 
 # L04: Adequacy Criteria — Revision Questions
 
-**Format:** Explain in your own words, give brief examples
+**Format:** Explain in your own words, give brief examples. These questions test the lecture summarised in [Study Notes: Adequacy Criteria](SN_L04_Coverage.md).
 
 ---
 
@@ -80,7 +80,7 @@ A function has 5 decision points (if, while, etc.). What is its cyclomatic compl
 
 ## Question 9: Basis Path vs All Paths
 
-Why is basis path coverage preferred over all-path coverage? Complete this table:
+Why is basis path coverage preferred over all-path coverage? Complete this table for a function whose decisions follow one another **in sequence** (not nested):
 
 | Decisions | All Paths | Basis Paths |
 |-----------|-----------|-------------|
@@ -127,13 +127,7 @@ For `if (A && B && C)`, construct a minimal MC/DC test suite showing which pairs
 
 ## Question 15: MC/DC Standards
 
-Which safety-critical standards require or recommend MC/DC? Match standard to domain:
-
-| Standard | Domain |
-|----------|--------|
-| DO-178C | ? |
-| ISO 26262 | ? |
-| IEC 62304 | ? |
+Which standard requires MC/DC, for which domain and which level of software? Why would a standard choose MC/DC over multiple condition coverage?
 
 ---
 
@@ -175,7 +169,7 @@ What does coverage measure, and what does it NOT measure? Complete the table:
 
 ## Question 21: Size Confounding
 
-Inozemtseva & Holmes (2014) found that coverage-effectiveness correlation drops to ~0 when controlling for what variable? What percentage of the coverage effect does test suite size explain?
+Inozemtseva & Holmes (2014) found that the coverage-effectiveness correlation becomes weak when they controlled for which variable? Lu et al. (2025) estimated how much of the apparent effect of statement and of branch coverage that variable explains: what were the figures?
 
 ---
 
@@ -187,7 +181,7 @@ According to Zhang & Mesbah (2015), what has a stronger correlation with test ef
 
 ## Question 23: Coverage Criteria Effectiveness
 
-According to Hemmati (2015), what percentage of faults does statement coverage detect? What about data-flow coverage?
+In Hemmati (2015), a criterion counted as effective for a fault when the test that revealed the fault also increased that criterion's coverage. For what share of faults was statement coverage effective, and what share did control-flow plus def-use coverage reach? Why are these figures upper bounds?
 
 ---
 
@@ -210,15 +204,9 @@ Match each context with the appropriate coverage criterion:
 
 ---
 
-## Question 26: Coverage Targets
+## Question 26: Coverage Gates
 
-What are the recommended minimum and target coverage levels?
-
-| Coverage | Min | Target |
-|----------|-----|--------|
-| Statement | ? | ? |
-| Branch | ? | ? |
-| Mutation | ? | ? |
+A team lead proposes a merge gate: "no pull request below 85% branch coverage." Using Marick (1997) and Inozemtseva & Holmes (2014), explain what this gate is likely to do to the tests people write. What would you use the coverage report for instead?
 
 ---
 
@@ -282,7 +270,7 @@ A project manager claims: "We achieved 95% code coverage, so our software is tho
 | Condition coverage & MC/DC | Q11, Q12, Q13, Q14, Q15, Q31 |
 | Mutation & combinatorial | Q16, Q17, Q18, Q19 |
 | Coverage vs quality | Q20, Q21, Q22, Q23, Q24, Q32 |
-| Practical application | Q25, Q26, Q27 |
+| Practical application | Q25, Q26 (coverage gates), Q27 |
 | Testing theory | Q28, Q29 |
 
 ---

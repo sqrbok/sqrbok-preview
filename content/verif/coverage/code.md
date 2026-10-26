@@ -1,103 +1,53 @@
 ---
-title: Code
+title: Statement and Branch Coverage
 parent: Coverage
 nav_order: 2
 layout: default
 ---
 
-# Code Coverage
+# Statement and Branch Coverage
 
-## Overview
+**Statement coverage** is the fraction of a program's statements that a test suite executes at least once; **branch coverage** is the fraction of decision outcomes (each true and each false edge) that it takes. They are the two criteria every coverage tool reports, and the weakest ones on the [subsumption hierarchy](index.md).
 
-**Code Coverage** is a measure used in software testing to describe the degree to which the source code of a program is tested by a particular test suite. It helps identify untested parts of a codebase.
+## 1. Statement coverage
 
-### Types of Code Coverage
+$$
+\text{statement coverage} = \frac{\text{statements executed}}{\text{all statements}}
+$$
 
-```mermaid
-flowchart TD
+It is also called line coverage, and in some standards C0. A statement that no test has executed may hide any fault at all, so 100% statement coverage is a minimum: if a line never ran, the suite cannot have checked it.
 
-  subgraph DF["Data Flow"]
-    direction TB
-    DU["All DU Paths"]
-    Uses["All Uses"]
-    Defs["All Defs"]
-    DU --> Uses --> Defs
-  end
+## 2. Branch coverage
 
-  subgraph CF["Control Flow"]
-    direction TB
-    Paths["All Paths"]
-    Basis["All Basis Paths"]
-    LCSAJ["All LCSAJ"]
-    Branches["All Branches"]
-    Stmts["All Statements"]
-    Paths --> Basis
-    Paths --> LCSAJ
-    Paths --> Branches
-    Basis --> Branches
-    LCSAJ --> Branches
-    Branches --> Stmts
-  end
+$$
+\text{branch coverage} = \frac{\text{decision outcomes taken}}{\text{all decision outcomes}}
+$$
 
-  subgraph PRED["Predicates"]
-    direction TB
-    Comp["All Compound Conditions"]
-    MCDC["MC/DC"]
-    Basic["All Basic Conditions"]
-    Comp --> MCDC --> Basic
-    MCDC --> Branches
-  end
+It is also called decision coverage or C1. Every `if` needs a test where it is true and a test where it is false, even when the false side has no statements of its own. Branch coverage **subsumes** statement coverage: taking every edge of the graph passes through every node.
 
-  Uses --> Branches
+In Python, `pytest --cov=fn --cov-branch --cov-report=term-missing` reports both. For this function and the single test `first_negative([3, -1])`:
 
-  style DU fill:#f0f0f0,stroke:#999
-  style Uses fill:#f0f0f0,stroke:#999
-  style Defs fill:#f0f0f0,stroke:#999
-  style Comp fill:#f0f0f0,stroke:#999
-  style MCDC fill:#f0f0f0,stroke:#999
-  style Basic fill:#f0f0f0,stroke:#999
+```python
+def first_negative(xs):
+    for x in xs:
+        if x < 0:
+            return x
+    return None
 ```
 
----
-
-### Mutation Testing
-
-```mermaid
-flowchart TD
-
-  subgraph MUT["Mutation Coverage"]
-    direction TB
-    Strong["Strong Mutation"]
-    Firm["Firm Mutation"]
-    Weak["Weak Mutation"]
-    Strong --> Firm --> Weak
-  end
+```text
+Name    Stmts   Miss Branch BrPart  Cover   Missing
+fn.py       5      1      4      1    78%   5
 ```
 
----
+coverage.py counts the `def` line as a statement, because it runs when the module is imported.
 
-## Statement Coverage
+The `for` loop and the `if` are two decisions with two outcomes each (`Branch 4`). The test never leaves the loop by running out of items, so one branch is partial (`BrPart 1`) and `return None` on line 5 never runs. Separately, statement coverage is 4/5 = 80% and branch coverage 3/4 = 75%; coverage.py's `Cover` column combines them: (4 + 3) / (5 + 4) = 78%. Adding `first_negative([])` takes the loop's exit edge and brings both to 100%.
 
-### Definition
+## 3. Example: the missing `else`
 
-Statement coverage requires **every statement (node in the control flow graph)** to be executed **at least once**.
-
-* **Metric**:
-
-  $$
-  \text{Coverage}_{statement} = \frac{\text{Number of executed statements}}{\text{Total number of statements}}
-  $$
-
-* **Pros**: Simple to measure.
-
-* **Cons**: Weak — it doesn’t consider control flow (e.g., decision paths).
-
----
-
-### Example
-
-```fortran
-input (A)
+```text
+input A, z
 x = 0
 if A < 5 then
     x = 4
@@ -105,222 +55,48 @@ end if
 y = z / x
 ```
 
-#### Test case: `A = 2`
+The single test *A = 2* executes every statement, so statement coverage is 100%, and it passes. Branch coverage is 50%, because the false outcome of `A < 5` was never taken. The test that branch coverage asks for, say *A = 6*, skips `x = 4` and divides by zero.
 
-* All statements are executed → ✅ 100% **statement coverage**
-* But if `A >= 5`, `x = 4` is skipped, and division by 0 causes a runtime error ❌
+![Control-flow graph: the path for A = 2 executes all statements; the false branch for A = 6 leads to division by zero](statement-vs-branch.svg)
 
----
+_The false edge has no statements on it, so statement coverage cannot see it._
 
-### CFG for Statement Coverage
+## 4. Where branch coverage still fails
 
-```mermaid
-graph TD
-    A1([Start])
-    A2[x = 0]
-    A3{A < 5?}
-    A4[x = 4]
-    A5[y = z / x]
-    A6([End])
+Branch coverage treats each decision on its own. In this program the specification says *Z* should be 2 whenever *A* is true:
 
-    A1 --> A2 --> A3
-    A3 -->|True| A4 --> A5
-    A3 -->|False| A5 --> A6
-```
-
-✅ For `A=2`: All nodes visited
-❌ For `A=6`: x remains 0 → division by zero not caught with only 100% statement coverage
-
----
-
-### Discussion
-
-Also known as:
-
-* **Line coverage**
-* **C0/C1 coverage**
-* **Basic block coverage** (sequence of statements with no branches)
-
-If some statements are never executed, then the verification process may have ignored some required functionality.
-
----
-
-## Branch Coverage
-
-### Definition
-
-Branch coverage requires **each possible branch (true/false)** of every decision point to be **taken at least once**.
-
-* **Subsumes**: Statement coverage (more thorough)
-
-* **Metric**:
-
-  $$
-  \text{Coverage}_{branch} = \frac{\text{Number of executed branches}}{\text{Total branches}}
-  $$
-
-* **Pros**: Catches more faults than statement coverage
-
-* **Cons**: May miss faults in compound conditions
-
----
-
-### Example 1
-
-Same code:
-
-```fortran
-input (A)
-x = 0
-if A < 5 then
-    x = 4
-end if
-y = z / x
-```
-
-#### Test Suite 1: `A = 2`
-
-* Covers only the **true branch**
-* ❌ Branch coverage is not 100%
-* ❌ Fault not revealed
-
-#### Test Suite 2: `A = 2`, `A = 6`
-
-* Covers **both branches** of the decision
-* ✅ 100% branch coverage
-* ✅ Division by zero fault detected (when `A = 6`)
-
----
-
-### CFG for Branch Coverage
-
-```mermaid
-graph TD
-    B1([Start])
-    B2[x = 0]
-    B3{A < 5?}
-    B4[x = 4]
-    B5[y = z / x]
-    B6([End])
-
-    B1 --> B2 --> B3
-    B3 -->|True| B4 --> B5 --> B6
-    B3 -->|False| B5
-```
-
-Both branches (`True` and `False`) from the condition are executed in full branch coverage.
-
----
-
-### Example 2 – Branch Coverage Misses Faults
-
-#### Requirement:
-
-| A | B | Result |
-| - | - | ------ |
-| F | F | 0      |
-| F | T | 1      |
-| T | F | 2      |
-| T | T | 2      |
-
-#### Buggy implementation:
-
-```fortran
-input (A, B)
+```text
+input A, B
 Z = 0
-if A then
-    Z = Z + 1
-end if
-if B then
-    Z = 2
-end if
-print(Z)
+if A then Z = Z + 1
+if B then Z = 2
+print Z
 ```
 
-#### Test Suite: `(A=T, B=T)` and `(A=F, B=F)`
+The suite *{(A = T, B = T), (A = F, B = F)}* takes all four branches and passes: it prints 2 and 0, as specified. The fault shows only for *(A = T, B = F)*, which prints 1. [Data-flow coverage](data-flow.md) forces that test: the value assigned by `Z = Z + 1` reaches `print Z` only when B is false, and All-Uses requires every assignment to reach every use. [Basis paths](basis.md) may or may not include it: this graph has V(G) = 3, and whether *(T, F)* is among the three independent paths depends on which are chosen.
 
-* ✅ 100% branch coverage
-* ❌ Bug in `Z = 2` overrides previous `Z = Z + 1`
-* ❌ Output wrong for `(A=T, B=F)` (should be `2`, not `1`)
+## 5. All paths, and paths that cannot run
 
----
+**All-paths coverage** runs every start-to-end path. With *n* decisions in sequence there are up to 2<sup>*n*</sup> paths, and a loop makes the number unbounded, so the criterion is a reference point rather than a target. [Basis path](basis.md) coverage is the practical substitute.
 
-### Discussion
+Some paths in the graph can never run. When the same condition is tested twice and nothing in between changes it, the graph shows four paths, but only two are feasible.
 
-Also known as:
+![Control-flow graph that tests condition A twice; the mixed paths are infeasible](infeasible-path.svg)
 
-* **All-edges coverage** {% cite RoperMarc1994testing %}
-* **C2 coverage** {% cite beizer2003testing %}
-* **Decision-decision-path testing**
+_Infeasible paths: the graph promises more paths than the program has._
 
-Each decision divides operational scenarios into distinct cases. Good tests must explore all such cases.
+Deciding in general whether a path is feasible is undecidable, so a tool cannot always tell a missing test from an impossible one. A team must judge each uncovered path by hand, which is one reason 100% is rarely a sensible target.
 
----
+## When to use them — and when not
 
-## All Path Coverage
+- **Use** statement coverage as a floor: code that no test executes is untested, whatever else is true.
+- **Use** branch coverage as the default report: it is cheap, every tool measures it, and it finds the missing-`else` class of fault.
+- **Do not** read either number as test quality. A suite can reach 100% of both while checking no output at all; see [Coverage and Fault Detection](discussion.md).
 
-### Definition
+## How solid is this?
 
-All-path coverage requires that **every feasible path** through a program is executed.
-
-* ✅ **Most thorough**
-* ❌ **Impractical** for large programs:
-
-  * With `n` decisions → up to `2^n` paths
-  * Infeasible for complex software
-  * Instead **basis path** coverage is used
-
----
-
-## Unfeasible Paths
-
-Some paths **can’t be executed** due to **semantic constraints**, even though they appear valid in the CFG.
-
-#### Example:
-
-```mermaid
-flowchart TD
-    Start((Start))
-    A{Condition A?}
-    B[Block S1]
-    C[Block S2]
-    D{Condition A again?}
-    E[Block S3]
-    F[Block S4]
-    End((End))
-
-    Start --> A
-    A -->|True| B --> D
-    A -->|False| C --> D
-    D -->|True| E --> End
-    D -->|False| F --> End
-
-    style A fill:#ffdddd,stroke:#ff0000
-    style D fill:#ffdddd,stroke:#ff0000
-```
-
-Here, Condition A is checked **twice**, making some path combinations logically impossible (e.g., A true first, then false later).
-
----
-
-### Realizable Complexity (rc)
-
-_Reference: Beizer, B. Software Testing Techniques {% cite hopcroft2001automata %}_
-
-* **Realizable complexity (rc)**: Max number of distinct, testable paths
-* May be **less than cyclomatic complexity** due to unfeasible paths
-* **Undecidable** in theory: You can’t always determine which paths are testable (linked to the Halting Problem)
-
----
-
-## Beyond Statement, Branch, and Path
-
-These criteria cover the foundational structural measures. For deeper coverage of specific criteria, see:
-
-- [Basis Path Testing](basis.md) — Cyclomatic complexity and independent paths
-- [Multiple Conditions & MC/DC](conditions.md) — Compound predicate coverage for safety-critical systems
-- [Data Flow Coverage](data-flow.md) — Definition-Use pairs and variable lifecycle testing
-- [Mutation Testing](mutation.md) — Measuring test effectiveness through fault injection
+- **Where it comes from.** Definitions and subsumption follow Ammann and Offutt {% cite ammann2016introduction %}; the naming C0/C1 varies between standards and tools.
+- **What is contested.** On 274 real faults, only 10% of the fault-revealing tests added any statement coverage, and only 19% added branch coverage {% cite hemmati2015coverage %}. Most tests that found a fault ran code the suite already covered, so a coverage gain rarely signalled a newly found fault.
 
 ---
 
@@ -331,4 +107,4 @@ These criteria cover the foundational structural measures. For deeper coverage o
 ---
 
 {: .highlight }
-**Disclaimer:** AI is used for text polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.

@@ -8,77 +8,40 @@ has_children: true
 
 # Test Coverage Criteria
 
-How do you know when you've tested enough? Coverage criteria provide objective measures of test completeness by defining what portions of the software must be exercised by tests.
+A **coverage criterion** names a set of program elements (statements, branches, paths, conditions, definition-use pairs or mutants) and measures what fraction of them a test suite exercises. It answers *"what has this suite not touched yet?"*, not *"is this suite good?"*.
 
----
+A criterion is used in two ways {% cite ammann2016introduction %}. As a **generator**, it points at the next test to write: the branch nobody has taken yet. As a **measure**, it scores an existing suite: 87% of branches taken.
 
-## What is Test Coverage?
+## The criteria at a glance
 
-**Test coverage** measures the degree to which source code, requirements, or design specifications are exercised by a test suite. It answers questions like:
-- Which parts of the code have been executed?
-- Which branches and paths have been taken?
-- Which requirements have been verified?
+The table compares the criteria by what they demand of a test suite and the least number of tests that can satisfy them. One test can take outcomes of several decisions at once, so counts for a whole function are usually smaller than the sum over its decisions.
 
-Coverage serves two purposes:
-1. **Generator** — create test cases by targeting untested elements
-2. **Measure** — evaluate existing tests by computing what percentage of a criterion is covered
+| Criterion | A test suite must… | Fewest tests | Page |
+|---|---|---|---|
+| Statement | execute every statement once | 1, if one path runs every statement | [Statement and Branch Coverage](code.md) |
+| Branch | take every outcome of every decision | 2, since every decision needs a true and a false test | [Statement and Branch Coverage](code.md) |
+| Basis path | run *V(G)* linearly independent paths | exactly *V(G)*: decisions + 1 for two-way decisions | [Basis Path](basis.md) |
+| MC/DC | show that each condition flips its decision on its own | *c* + 1 for a decision with *c* conditions | [Multiple Conditions](conditions.md) |
+| Multiple condition | try every combination of conditions | 2<sup>*c*</sup> for a decision with *c* conditions | [Multiple Conditions](conditions.md) |
+| All-Uses | connect every definition of a variable to each of its uses | grows with data dependencies | [Data Flow](data-flow.md) |
+| Mutation score | make some test fail on every non-equivalent mutant | one suite run per mutant | [Mutation](mutation.md) |
 
-**Key insight**: High coverage doesn't guarantee quality, but low coverage almost certainly indicates insufficient testing.
+Criteria are ordered by **subsumption**: criterion A subsumes B when every suite that satisfies A also satisfies B.
 
----
+![Subsumption hierarchy of coverage criteria in three families: data flow, control flow and conditions](subsumption-hierarchy.svg)
 
-## Topics in This Section
+_Subsumption among the criteria on these pages. All-Uses subsumes Branch under the usual assumption that every definition reaches a use. Mutation is not in the diagram: whether it subsumes a criterion depends on which mutation operators are used._ {% cite ammann2016introduction rapps1985dataflow %}
 
-{: .note }
-**Suggested reading order:** Terminology → Code Coverage → Basis Path → Conditions → Data Flow → Mutation → Discussion
+Subsumption is about *requirements*, not bugs: a suite built for a weaker criterion can still find a fault that one built for a stronger criterion misses, because detection depends on the inputs chosen {% cite ammann2016introduction %}.
 
-### [Terminology](terminology.md)
-Fundamental definitions: statements, basic blocks, decisions, branches, conditions, and control-flow graphs.
+## Reading order
 
-### [Code Coverage](code.md)
-Basic structural coverage: **statement coverage**, **branch coverage**, and **all-path coverage** with worked examples.
+Start with [Terminology](terminology.md) for the control-flow graph, then the criteria from statement to mutation. [Coverage and Fault Detection](discussion.md) summarises the evidence on how well coverage predicts found faults, and [Using Coverage in Practice](practice.md) turns it into rules for a team.
 
-### [Basis Path Testing](basis.md)
-Cyclomatic complexity-based testing: calculating V(G), deriving independent paths, McCabe's method with 3 worked examples.
+## How solid is this?
 
-### [Condition Coverage](conditions.md)
-Fine-grained condition testing: **multiple condition coverage** and **MC/DC** for safety-critical systems (DO-178C).
-
-### [Data Flow Coverage](data-flow.md)
-Variable lifecycle testing: **Definition-Use pairs**, All-Defs, All-Uses, and All-DU-Paths criteria.
-
-### [Mutation Testing](mutation.md)
-Measuring test effectiveness: creating mutants, mutation operators, mutation score, equivalent mutants.
-
-### [Discussion: Coverage vs. Quality](discussion.md)
-Research evidence on coverage limitations, anti-patterns, practical guidelines, and tool support.
-
----
-
-## Coverage Hierarchy
-
-Coverage criteria form a hierarchy based on **subsumption** — if criterion A subsumes B, then satisfying A automatically satisfies B:
-
-```
-All Paths
-    ↓ subsumes
-Basis Path / All-DU-Paths / MC/DC
-    ↓ subsumes
-Branch Coverage / All-Uses
-    ↓ subsumes
-Statement Coverage / All-Defs
-```
-
-{: .warning }
-**Subsumption ≠ better fault detection.** If C1 subsumes C2, a test suite satisfying C1 also satisfies C2. However, a *specific* test suite for C2 can detect faults that a *specific* suite for C1 misses — because fault detection depends on the actual test values, not just the criterion {% cite ammann2016introduction %}.
-
-### Selecting Criteria
-
-The right criterion depends on:
-- **Purpose** of the testing activity
-- **Source code** availability and relevance
-- **Targeted faults** (underlying fault model)
-- **Compliance** requirements (e.g., DO-178C mandates MC/DC)
+- **Where it comes from.** The definitions and the subsumption relations are textbook material {% cite ammann2016introduction %}. They are proofs about what a suite must do, not measurements.
+- **What is contested.** Whether higher coverage means *better* testing is an empirical question, and the answer is weaker than most teams assume. See [Coverage and Fault Detection](discussion.md).
 
 ---
 
@@ -89,4 +52,4 @@ The right criterion depends on:
 ---
 
 {: .highlight }
-**Disclaimer:** AI is used for text polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.

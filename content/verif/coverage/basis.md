@@ -7,286 +7,66 @@ layout: default
 
 # Basis Path Coverage
 
-{: .highlight }
-Basis Path coverage is a practical alternative when All Path coverage requires too many test cases (almost everytime).
+**Basis path coverage** requires a test suite to run a set of *linearly independent* start-to-end paths through the control-flow graph, as many as the graph's cyclomatic complexity *V(G)*. It sits between branch coverage, which is too weak for interacting decisions, and all-paths coverage, which is usually impossible.
 
-## Definition
+## 1. Independent paths and V(G)
 
-**Basis Path Coverage** requires exercising a set of paths such that:
-
-* Each path runs **from the entry to the exit** point of the **Control Flow Graph (CFG)**.
-* Each path **introduces at least one edge** that is **not included** in any other path in the set.
-
-This forms a **linearly independent set of paths**, known as a **basis set**.
-
-{: .note }
-Basis Path Coverage **subsumes branch coverage**, since covering all paths in a basis ensures that **all edges** in the CFG are traversed.
-
----
-
-### Rationale
-
-The main idea is to test each decision point **independently**:
-
-* Each new basis path **flips exactly one previously executed decision**, while keeping all other decisions the same.
-* This allows for detecting faults related to **individual decisions**, without relying on the interplay of multiple conditions.
-* **Loop coverage**:
-
-  * **Pre-test loops** (e.g., `while`, `for`) are executed:
-
-    * **Zero times** (to test loop exit immediately).
-    * **Once** (to test minimum loop entry).
-  * **Post-test loops** (e.g., `do-while`) are executed **twice** (to test the loop condition after at least one iteration).
-
----
-
-### Advantages
-
-* ✅ Helps prevent **pathological test suites** that achieve statement or branch coverage without actually testing meaningful scenarios.
-* ✅ Known **upper bound** on number of test cases, McCabe Cyclomatic Complexity {% cite mccabe1976complexity %} :
+A set of paths is **linearly independent** when no path in it can be made by adding and subtracting the edges of the others. The practical test: the paths can be listed in an order where each one takes at least one edge that none of the paths **before it** took. A largest such set, a **basis**, has exactly *V(G)* paths, McCabe's cyclomatic complexity {% cite mccabe1976complexity %}:
 
 $$
-  \text{# basis paths} = \text{Cyclomatic Complexity} = V(G) = e - n + 2
+V(G) = e - n + 2
 $$
 
-Where:
+where *e* is the number of edges and *n* the number of nodes. The counts depend on how the graph is drawn (with or without Start and End nodes, statements merged into blocks or not), but *V(G)* does not. For code built only from two-way decisions there is a shortcut: *V(G)* = number of decisions + 1.
 
-  * $$e$$: number of edges
-  * $$n$$: number of nodes
+Because a basis set reaches every edge, basis path coverage **subsumes branch coverage**.
 
-{: .highlight }
-Alternativly, in simple cases, we may use $$V(G) = n+1$$, where $$n$$ is number of predicates (e.g. IFs).
+## 2. Worked example
 
-* ✅ There is a well-defined **algorithm** to determine basis paths.
-* ✅ More efficient than exhaustive **All Path Coverage**.
-
----
-
-### Disadvantages
-
-* ❌ May **miss faults** in **compound predicates**, where logical sub-conditions are not tested independently (see MCDC for stronger criteria).
-* ❌ **Unfeasible paths** in the CFG (paths that can never be executed due to semantic constraints) reduce the practical applicability of 100% basis path coverage.
-
-  * Causes:
-
-    * **Duplicated decisions** (e.g., same condition used twice in a row).
-    * **Data dependencies** that restrict path execution.
-  * These reduce the effectiveness of the method to detect faults.
-
----
-
-### Philosophical Justification
-
-Every **decision** in a program corresponds to a **real-world situation** where the system must behave differently based on the input or state.
-
-> If a decision (branch outcome) is not tested, the **requirements-based verification process** has failed to check whether the system behaves correctly in that **real-world case**.
-
-* **Basis Path Testing** ensures that **each decision** is tested in **at least one operational context**.
-* It guarantees that **special cases** identified by the developers are validated during testing.
-
-
-## Examples
-
-* Basis path testing uses **cyclomatic complexity** to define the number of **linearly independent paths** through a control flow graph (CFG).
-* It ensures that **each edge** in the graph is exercised at least once, but **not necessarily every possible path**.
-* Compared to **All Path Coverage**, it's much more **scalable**.
-
----
-
-### Example 1 – One Decision Point
-
-```fortran
-input(x)
-
+```text
+input x
 if x > 0 then
-   y = x
+    if x < 10 then y = 1
+    else           y = 2
 else
-   y = -x
-end if
-
-print(y)
+    y = -1
+print y
 ```
 
-**CFG:**
+![Control-flow graph of two nested decisions with V(G) = 3](basis-paths.svg)
 
-```mermaid
-flowchart TD
-  Start((Start))
-  D1{ x > 0 }
-  S1[ y = x ]
-  S2[ y = -x ]
-  P[ print y ]
-  End((End))
+_Seven nodes and eight edges as drawn: V(G) = 8 − 7 + 2 = 3, the same as 2 decisions + 1._
 
-  Start --> D1
-  D1 -->|true| S1 --> P --> End
-  D1 -->|false| S2 --> P
-```
+A basis needs three tests:
 
-**Cyclomatic Complexity:**
+| Path | Decisions | Test input | Expected `y` |
+|---|---|---|---|
+| 1 | x > 0, x < 10 | x = 5 | 1 |
+| 2 | x > 0, x ≥ 10 | x = 15 | 2 |
+| 3 | x ≤ 0 | x = −2 | −1 |
 
-$$
-V(G) = 6 - 6 + 2 = 2
-$$
+Adding a third nested decision (say, `x mod 2 = 0` inside the inner branch) raises *V(G)* to 4 and the basis to four tests. Nested decisions grow the path count linearly; decisions **in sequence** are where basis paths save work: four independent `if` statements in a row have 2<sup>4</sup> = 16 paths but a basis of 5.
 
-same with
+## 3. Building a basis
 
-$$
-V(G) = 1+1 = 2
-$$
+The usual procedure picks a typical first path, then derives each next path by **flipping one decision** of a path already in the set and keeping the earlier decisions. Each flip adds **at least one** new edge, often several: in the example, flipping `x < 10` adds both the false edge and the edge from `y = 2` to `print`. Decisions after the flipped one may change or disappear: once `x > 0` is false, `x < 10` is never reached. Loops get the boundary treatment: a `while` or `for` loop is run zero times and once; a `do … while` loop, which always runs once, is run once and twice.
 
-**Basis Paths:**
+## When to use it — and when not
 
-1. `Start → D1(true) → S1 → P → End`
-2. `Start → D1(false) → S2 → P → End`
-   (3rd path is linear combination but typically not separately tested)
+- **Use it** for functions with several interacting decisions, where branch coverage can be reached by two tests that never combine them.
+- **Use V(G)** as the number of tests basis path coverage needs, and as an upper bound for branch coverage, which may need fewer; McCabe also proposed 10 as a reasonable upper limit for one module {% cite mccabe1976complexity %}, and linters such as flake8 can enforce such a limit.
+- **Do not expect it to test conditions.** These pages count `if (A && B)` as one decision, as the control-flow graph draws it (some tools count each `&&` or `||` as an extra decision, which raises V(G)), so a basis can miss a wrong operator inside it; see [Multiple Conditions](conditions.md).
 
-✅ 2 test cases suffice (e.g., `x = 1` and `x = -1`)
+## Limitations
+
+A basis is **not unique**. For two decisions in sequence, *{TT, FT, FF}* and *{FF, TF, FT}* are both valid bases (check the second in that order: TF adds A-true, FT adds B-true), and a fault that shows only on *TF* is found by the second and missed by the first (the example in [Statement and Branch Coverage](code.md) is one). Some basis paths may also be **infeasible** when decisions share data, and the set must then be rebuilt by hand.
+
+## How solid is this?
+
+- **Where it comes from.** McCabe defined *V(G)* and the basis set in 1976 {% cite mccabe1976complexity %}; the method is standard in testing textbooks {% cite ammann2016introduction %}.
+- **What we do not hold.** The coverage review behind these pages found no study that measures basis path coverage against real faults, so no detection figure is given here.
 
 ---
-
-### Example 2 – Two Decision Points
-
-```fortran
-input(x)
-
-if x > 0 then
-   if x < 10 then
-      y = 1
-   else
-      y = 2
-   end if
-else
-   y = -1
-end if
-
-print(y)
-```
-
-**CFG:**
-
-```mermaid
-flowchart TD
-  Start((Start))
-  D1{ x > 0 }
-  D2{ x < 10 }
-  S1[ y = 1 ]
-  S2[ y = 2 ]
-  S3[ y = -1 ]
-  P[ print y ]
-  End((End))
-
-  Start --> D1
-  D1 -->|true| D2
-  D1 -->|false| S3 --> P
-  D2 -->|true| S1 --> P
-  D2 -->|false| S2 --> P
-  P --> End
-```
-
-**Cyclomatic Complexity:**
-
-$$
-V(G) = 8 - 7 + 2 = 3
-$$
-
-same with
-
-$$
-V(G) = 2+1 = 3
-$$
-
-**Basis Paths:**
-
-1. `x > 0`, `x < 10` ⇒ `Start → D1(true) → D2(true) → S1 → P → End`
-2. `x > 0`, `x ≥ 10` ⇒ `Start → D1(true) → D2(false) → S2 → P → End`
-3. `x ≤ 0` ⇒ `Start → D1(false) → S3 → P → End`
-
-✅ 3 test cases needed (e.g., `x = 5`, `x = 15`, `x = -2`)
-
----
-
-### Example 3 – Three Decision Points
-
-```fortran
-input(x)
-
-if x > 0 then
-   if x < 10 then
-      if x mod 2 = 0 then
-         y = 100
-      else
-         y = 101
-      end if
-   else
-      y = 10
-   end if
-else
-   y = -1
-end if
-
-print(y)
-```
-
-**CFG:**
-
-```mermaid
-flowchart TD
-  Start((Start))
-  D1{ x > 0 }
-  D2{ x < 10 }
-  D3{ x mod 2 = 0 }
-  S1[ y = 100 ]
-  S2[ y = 101 ]
-  S3[ y = 10 ]
-  S4[ y = -1 ]
-  P[ print y ]
-  End((End))
-
-  Start --> D1
-  D1 -->|true| D2
-  D1 -->|false| S4 --> P
-  D2 -->|true| D3
-  D2 -->|false| S3 --> P
-  D3 -->|true| S1 --> P
-  D3 -->|false| S2 --> P
-  P --> End
-```
-
-**Cyclomatic Complexity:**
-
-$$
-V(G) = 12 - 10 + 2 = 4
-$$
-
-same with
-
-$$
-V(G) = 3+1 = 4
-$$
-
-**Basis Paths:**
-
-1. `x > 0`, `x < 10`, `x mod 2 = 0`
-2. `x > 0`, `x < 10`, `x mod 2 ≠ 0`
-3. `x > 0`, `x ≥ 10`
-4. `x ≤ 0`
-
-✅ Only 4 test cases required (e.g., `x = 4`, `x = 5`, `x = 15`, `x = -1`)
-
----
-
-### Comparison: Basis Path vs All Path Coverage
-
-| Property            | Basis Path Coverage                           | All Path Coverage                                            |
-| ------------------- | --------------------------------------------- | ------------------------------------------------------------ |
-| **# of test cases** | Linear in number of decisions (n+1)         | Exponential: $$2^n$$ for n decisions                           |
-| **Goal**            | Cover all **edges** and **independent paths** | Cover **every possible execution path**                      |
-| **Feasibility**     | Practical                                     | Often infeasible (many paths may be redundant or untestable) |
-| **Redundancy**      | Minimal                                       | High (many paths may test the same logic repeatedly)         |
-| **Example (n=3)**   | \~4 tests                                     | 8 tests (if all paths feasible)                              |
-
-So, for **n decision points**, Basis Path typically requires only $$n + 1$$ test cases, while All Path Coverage requires $$2^n$$ — which grows very quickly.
 
 ### References
 
@@ -295,4 +75,4 @@ So, for **n decision points**, Basis Path typically requires only $$n + 1$$ test
 ---
 
 {: .highlight }
-**Disclaimer:** AI is used for text polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.

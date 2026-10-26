@@ -5,243 +5,77 @@ nav_order: 4
 layout: default
 ---
 
-# Multiple Condition Coverage & MC/DC
+# Multiple Condition Coverage and MC/DC
 
-## Motivation
+**Multiple condition coverage** requires every combination of truth values of the conditions inside a decision; **modified condition/decision coverage (MC/DC)** requires only enough tests to show that each condition, changed on its own, changes the decision's outcome. Both look *inside* a decision, which branch and basis-path coverage treat as one unit.
 
-Branch and Basis Path Coverage are not always sufficient. For example, consider a fault in a compound condition:
+## 1. Why decisions are not enough
 
-### Intended behavior
-
-```fortran
-input (A, B)
-if (A .OR. B) then
-    Z = Z + 1
-else
-    Z = Z + 2
-end if
-```
-
-### Actual (Faulty) Implementation
-
-```fortran
-input (A, B)
-if (A .AND. B) then
-    Z = Z + 1
-else
-    Z = Z + 2
-end if
-```
-
-### Test Suite:
+The specification says `A or B`; the code says `A and B`:
 
 ```text
-{ (A=T, B=T), (A=F, B=F) }
+if (A and B) then Z = Z + 1      -- should be (A or B)
+else              Z = Z + 2
 ```
 
-- **Branch coverage**: 100%
-    
-- **Basis path coverage**: 100%
-    
-- ❌ **Fails to detect the bug**
-    
+The suite *{(T, T), (F, F)}* takes both branches and both basis paths, and passes: for these two inputs `and` and `or` agree. The fault appears only when exactly one condition is true. A criterion that never asks for *(T, F)* or *(F, T)* cannot see it.
 
-**Why?**  
-Because the compound predicate uses multiple conditions (`A` and `B`), but the test cases don’t independently evaluate each one. We need **Multiple Condition Coverage** or **MC/DC** to reveal such faults.
+## 2. Multiple condition coverage
 
----
+Every combination of the *c* conditions in a decision is tested: 2<sup>*c*</sup> tests. For `A or B` that is four tests, which include *(T, F)* and expose the fault above. The cost doubles with every condition: 8 tests for three conditions, 64 for six.
 
-## Multiple Condition Coverage
+Some combinations cannot occur. In `y == 2 or (y == 6 and flag)` the conditions `y == 2` and `y == 6` cannot both be true, so two of the eight rows are infeasible and are left out.
 
-### Definition
+## 3. MC/DC
 
-**Multiple Condition Coverage** requires that:
+MC/DC asks three things {% cite chilenski1994mcdc hayhurst2001practical %}:
 
-- Every possible combination of **conditions** in a decision is evaluated **at least once**.
-    
-- Each **decision** in the program takes **all possible outcomes** (true and false).
-    
+1. every decision takes both outcomes;
+2. every condition takes both values;
+3. each condition is shown to **independently affect** the outcome: there is a pair of tests that differ only in that condition and produce different outcomes.
 
-### Pros and Cons
+A decision whose *c* conditions are joined by a chain of `and` or of `or` can be covered with *c* + 1 tests instead of 2<sup>*c*</sup>; decisions that mix `and` and `or` may need a few more.
 
-✅ Very thorough — detects faults missed by simpler coverage  
-❌ Requires **2ⁿ** test cases for **n** conditions — exponential growth
+**Example: `A or B`.** The independence pairs share the row where both conditions are false:
 
-### Example: All Combinations for `A` and `B`
-
-```fortran
-if (A .OR. B) then
-    Z = Z + 1
-else
-    Z = Z + 2
-end if
-```
-
-**All combinations (2² = 4):**
-
-- (A=F, B=F)
-    
-- (A=T, B=F)
-    
-- (A=F, B=T)
-    
-- (A=T, B=T)
-    
-
-This test suite **does** reveal the fault.
-
----
-
-## Unfeasible Combinations
-
-Some combinations are logically or practically impossible.
-
-### Example:
-
-```fortran
-if (y == 2 .OR. (y == 6 .AND. A == .TRUE.)) then
-    ...
-end if
-```
-
-**Conditions:**
-
-- `C1: y == 2`
-- `C2: y == 6`
-- `C3: A == .TRUE.`
-    
-There are 2³ = 8 combinations, but some are **unfeasible**, like `y == 2` and `y == 6` being true at the same time.
-
-|y==2|y==6|A|Feasible?|
+| A | B | A or B | Shows |
 |---|---|---|---|
-|F|F|F|✅|
-|F|F|T|✅|
-|F|T|F|✅|
-|F|T|T|✅|
-|T|F|F|✅|
-|T|F|T|✅|
-|T|T|F|❌|
-|T|T|T|❌|
+| F | F | F | baseline for both pairs |
+| T | F | T | A matters: (F,F) → (T,F) changes the outcome with B fixed |
+| F | T | T | B matters: (F,F) → (F,T) changes the outcome with A fixed |
+
+The row *(T, T)* is not needed: flipping either condition alone leaves `A or B` true. Against the faulty `A and B`, rows 2 and 3 fail, so MC/DC finds the fault with three tests.
+
+**Example: `A and B`.** Here the shared row is *(T, T)*; the set is *{(T, T), (F, T), (T, F)}*, and *(F, F)* is the row left out.
+
+## 4. The criteria compared
+
+The table puts the decision-level and condition-level criteria side by side for one decision with *c* conditions.
+
+| Criterion | Tests for one decision | Finds a wrong `and`/`or`? |
+|---|---|---|
+| Branch | 2 | not reliably |
+| MC/DC | *c* + 1 | yes, for each condition |
+| Multiple condition | 2<sup>*c*</sup> | yes |
+
+## When to use it — and when not
+
+- **Use MC/DC** where a standard demands it: DO-178C requires it for the most critical (Level A) airborne software {% cite hayhurst2001practical %}.
+- **Use multiple condition coverage** for small decisions with two or three conditions, where 2<sup>*c*</sup> tests are cheap.
+- **Do not use either as a general quality score.** They check the logic of decisions, not the computations around them.
+
+## How solid is this?
+
+- **Where it comes from.** MC/DC was defined for avionics; Chilenski and Miller analysed its applicability {% cite chilenski1994mcdc %}, and the NASA tutorial is the standard practical reference {% cite hayhurst2001practical %}.
+- **What is contested.** On 274 real Java faults, MC/DC was no more often effective than branch coverage (19% each), and on randomly built suites it added little beyond statement coverage once suite size was controlled {% cite hemmati2015coverage inozemtseva2014coverage %}. Its value is in logic-heavy code such as control laws, not in typical application code.
 
 ---
 
-## Example: AND Decision
+### References
 
-```fortran
-if (A .AND. B .AND. C) then
-    ...
-end if
-```
-
-**All 2³ = 8 combinations:**
-
-|A|B|C|A AND B AND C|
-|---|---|---|---|
-|T|T|T|T|
-|F|T|T|F|
-|T|F|T|F|
-|T|T|F|F|
-|F|F|T|F|
-|F|T|F|F|
-|T|F|F|F|
-|F|F|F|F|
-
-Notice: once any condition is false, the decision is false — many combinations don't provide new insights.
-
----
-
-## Modified Condition Coverage (MC/DC)
-
-### Definition
-
-**Modified Condition/Decision Coverage (MC/DC)** requires:
-
-1. Every **decision** takes all possible outcomes.
-    
-2. Every **condition** takes all possible outcomes.
-    
-3. Each condition is shown to **independently affect** the decision outcome.
-    
-
-✅ **Required in safety-critical systems**, such as aerospace (DO-178C)  
-✅ Requires **n + 1** test cases instead of 2ⁿ
-
----
-
-### How Does MC/DC Work?
-
-To show that a **condition affects the decision**, we:
-
-- Change that **one condition**
-    
-- Keep **others fixed**
-    
-
----
-
-### Example
-
-```fortran
-input (A, B)
-if (A .OR. B) then
-    Z = Z + 1
-else
-    Z = Z + 2
-end if
-```
-
-Let’s test 3 cases to see the effect of each condition.
-
-| A   | B   | Expected | Faulty Output | Pass | MC/DC role |
-| --- | --- | -------- | ------------- | ---- | ---------- |
-| F   | F   | Z + 2    | Z + 2         | ✅    | anchor: pairs with rows 2 and 3 |
-| T   | F   | Z + 1    | Z + 2         | ❌    | A's independence: (FF→TF) B=F fixed, outcome changes |
-| F   | T   | Z + 1    | Z + 2         | ❌    | B's independence: (FF→FT) A=F fixed, outcome changes |
-| T   | T   | Z + 1    | Z + 1         | ✅    | *(not usable for MC/DC — no single flip changes the outcome)* |
-
-The first 3 tests `{FF, TF, FT}` are the valid MC/DC set — `(TT)` must be omitted. When both conditions are true, flipping either one alone leaves the OR result true, so `(TT)` cannot demonstrate independent effect for any condition. Not all 3-test subsets work: `{FF, TF, TT}`, `{FF, FT, TT}`, and `{TF, FT, TT}` all fail MC/DC.
-
----
-
-### Example for AND
-
-```fortran
-if (A .AND. B) then
-    Z = Z + 1
-else
-    Z = Z + 2
-end if
-```
-
-**Test Suite for MC/DC:**
-
-| A   | B   | Expected | Faulty Output | Pass | MC/DC role |
-| --- | --- | -------- | ------------- | ---- | ---------- |
-| F   | F   | Z + 2    | Z + 2         | ✅    | *(not usable for MC/DC — no single flip changes the outcome)* |
-| T   | F   | Z + 2    | Z + 1         | ❌    | B's independence: (TF→TT) A=T fixed, outcome changes |
-| F   | T   | Z + 2    | Z + 1         | ❌    | A's independence: (FT→TT) B=T fixed, outcome changes |
-| T   | T   | Z + 1    | Z + 1         | ✅    | anchor: pairs with rows 2 and 3 |
-
-The last 3 tests `{TF, FT, TT}` are the valid MC/DC set — `(FF)` must be omitted. When both conditions are false, flipping either one alone leaves the AND result false, so `(FF)` cannot demonstrate independent effect for any condition. Not all 3-test subsets work: `{FF, TF, FT}`, `{FF, TF, TT}`, and `{FF, FT, TT}` all fail MC/DC.
-
-
-## Summary
-
-| Coverage Type              | # Tests Needed | Detects Faults | Strength    |
-| -------------------------- | -------------- | -------------- | ----------- |
-| Branch Coverage            | 2ⁿ             | Sometimes      | Weak        |
-| Basis Path Coverage        | ~n +1          | Sometimes      | Moderate    |
-| Multiple Condition         | 2ⁿ             | Yes            | Very Strong |
-| Modified Condition (MC/DC) | ~n + 1         | Yes            | Strong      |
-
----
-
-## References
-
-* \[RTCA DO-178C] Software Considerations in Airborne Systems and Equipment Certification
-
+{% bibliography --cited %}
 
 ---
 
 {: .highlight }
-**Disclaimer:** AI is used for text polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.
