@@ -21,13 +21,11 @@ layout: default
 - **Key characteristic 2:** Brief explanation
 - **Key characteristic 3:** Brief explanation
 
-[Optional: Simple diagram if helpful]
+[Optional: a diagram, drawn in draw.io beside this page (see page-standard.md §5d)]
 
-```mermaid
-flowchart LR
-    A[Step 1] --> B[Step 2]
-    B --> C[Step 3]
-```
+![What the diagram shows](method-name.svg)
+
+_Caption: what the reader should notice._ {% cite key %}
 
 ---
 

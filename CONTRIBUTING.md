@@ -16,7 +16,7 @@ We accept several types of contributions:
 **How to contribute:** Submit a pull request with your changes. See [Quick Fixes](#quick-fixes) below.
 
 ### 2. Method/Technique Descriptions
-Short focused pages (1-2 pages, ~100-180 lines) describing:
+Short focused pages (400-800 words, see the [page standard](templates/page-standard.md)) describing:
 - A specific testing or quality assurance technique
 - A particular aspect of software quality or reliability
 - A practical tool or framework
@@ -24,7 +24,7 @@ Short focused pages (1-2 pages, ~100-180 lines) describing:
 **Template:** See [templates/method-template.md](templates/method-template.md)
 
 ### 3. Comparative Analysis Papers
-Student papers or practitioner analyses (3-4 pages, ~200-300 lines) that:
+Student papers or practitioner analyses (up to 1,200 words, declared as `page_type: deep-dive`) that:
 - Compare different approaches to a problem
 - Analyze trade-offs between methods
 - Provide empirical evidence or case studies
@@ -54,11 +54,10 @@ Student papers or practitioner analyses (3-4 pages, ~200-300 lines) that:
    - Include examples, checklists, or decision rules
    - Explain WHEN to use (and when NOT to use) a method
 
-4. **Appropriate Length**
-   - Short methods: 100-180 lines
-   - Medium topics: 170-250 lines
-   - Comparative analyses: 200-300 lines
-   - If longer, consider splitting into multiple pages
+4. **Appropriate Length** — follow the [page standard](templates/page-standard.md):
+   - Method page: 400-800 words; topic hub: 250-500; hub: 100-250
+   - Over 1,500 words: split into a hub plus one page per method
+   - Check with `python scripts/check_pages.py` and `python scripts/check_citations.py`
 
 5. **Visual Support**
    - Use Mermaid diagrams for processes and flows

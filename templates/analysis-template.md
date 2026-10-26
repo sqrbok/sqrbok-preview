@@ -125,16 +125,11 @@ This analysis compares [Approach A] and [Approach B] across the following dimens
 - [Condition 2]
 - [Condition 3]
 
-[Optional: Decision flowchart]
+[Optional: decision flowchart, drawn in draw.io beside this page (see page-standard.md §5d)]
 
-```mermaid
-flowchart TD
-    A[Start: Need to choose approach] --> B{Question 1?}
-    B -->|Yes| C[Approach A]
-    B -->|No| D{Question 2?}
-    D -->|Yes| E[Approach B]
-    D -->|No| F{Question 3?}
-```
+![Which approach to choose](decision-flow.svg)
+
+_Caption: the questions that decide between the approaches._
 
 ---
 
