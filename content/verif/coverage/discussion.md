@@ -13,7 +13,7 @@ page_type: deep-dive   # the area's evidence page: seven studies, each needs its
 
 ## 1. Faults keep coming after coverage stops rising
 
-Wei, Oriol and Meyer ran random testing on 14 Eiffel library classes: 30 runs of 6 hours per class, 2,520 hours in all. Within each run they recorded, over time, the branch coverage reached and the real faults found {% cite wei2010coverage %}.
+Wei, Oriol and Meyer ran random testing on 14 classes of a widely used library in Eiffel, an object-oriented language: 30 runs of 6 hours per class, 2,520 hours in all. Within each run they recorded, over time, the branch coverage reached and the real faults found {% cite wei2010coverage %}.
 
 ```vega-lite
 {
@@ -29,7 +29,7 @@ Wei, Oriol and Meyer ran random testing on 14 Eiffel library classes: 30 runs of
   ]},
   "mark": {"type": "line", "point": {"size": 70}, "strokeWidth": 3},
   "encoding": {
-    "x": {"field": "min", "type": "quantitative", "title": "Minutes into a 6-hour run", "scale": {"domain": [0, 60]}},
+    "x": {"field": "min", "type": "quantitative", "title": "Minutes into a 6-hour run (first data point at 10)", "scale": {"domain": [0, 60]}},
     "y": {"field": "pct", "type": "quantitative", "title": "% of the run's final total", "scale": {"domain": [0, 100]}},
     "color": {"field": "measure", "type": "nominal", "title": null,
               "scale": {"range": ["#019546", "#b42318"]}, "legend": {"orient": "bottom"}}
@@ -54,7 +54,7 @@ Later work quantified the effect: on 565 faults from Defects4J, a public collect
 
 ## 3. Reaching a fault is not revealing it
 
-The **oracle** is the check that decides whether a test passes, usually its assertions. A test reveals a fault only if it **reaches** the faulty code, **infects** the program state, **propagates** the wrong state to an output, and an assertion **checks** that output. Coverage measures only the first step.
+The **oracle** is the check that decides whether a test passes, usually its assertions. A test reveals a fault only if it **reaches** the faulty code, **infects** the program state, **propagates** the wrong state to an output, and an assertion **reveals** the fault by checking that output. Coverage measures only the first step.
 
 ![Reach, infect, propagate, reveal; coincidental correctness and weak oracles break the chain](reach-infect-propagate.svg)
 
@@ -62,7 +62,7 @@ _Where coverage-based confidence breaks down._ {% cite masri2009factors schwartz
 
 **Coincidental correctness** is common. Masri and Abou Assi seeded faults into programs, giving 148 faulty versions, and ran each version's tests {% cite masri2009factors %}. On average, 56.4% of the tests **reached** the faulty statement and still passed (*weak* coincidental correctness), and 15.7% reached it, **infected** the state, and still passed (*strict* coincidental correctness). The strict cases are a subset of the weak ones, which is why the second number is smaller. Such tests count towards coverage and pass.
 
-**Example.** A test calls `order.total()` on a cart with one item at 10.00 and a 0% discount, and asserts that the result is 10.00. A fault that applies the discount as `price - discount` instead of `price * (1 - discount)` reaches the faulty line, but with a discount of 0 both formulas give 10.00: the test passes, and the line counts as covered. Schwartz et al. looked at the mutants that suites with at least 80% statement coverage still missed: arithmetic-deletion faults were detected only 12.12% of the time, and the main cause was oracles that did not check the affected values {% cite schwartz2018faults %}.
+**Example.** A test calls `order.total()` on a cart with one item at 10.00 and a 0% discount, and asserts that the result is 10.00. A fault that applies the discount as `price - discount` instead of `price * (1 - discount)` reaches the faulty line, but with a discount of 0 both formulas give 10.00: the test passes, and the line counts as covered. Schwartz et al. looked at the mutants that suites with at least 80% statement coverage still missed: unary arithmetic-operator deletions (for example, `-x` mutated to `x`) were detected only 12.12% of the time, and the main cause was oracles that did not check the affected values {% cite schwartz2018faults %}.
 
 ## 4. What the criteria catch on real faults
 
@@ -77,7 +77,7 @@ Hemmati compared criteria on 274 real faults from Defects4J {% cite hemmati2015c
 | All four control-flow criteria together | 28% |
 | Control flow + def-use pairs | 85% |
 
-About 15% of faults were missed by every criterion: they were faults of omission or wrong behaviour that no structural measure can point at.
+Because of this counting rule, a stronger criterion need not score higher than a weaker one: MC/DC only ties branch at 19% because, for the extra faults, the fault-revealing tests added no new condition outcomes. About 15% of faults were missed by every criterion: they were faults of omission or wrong behaviour that no structural measure can point at.
 
 ## 5. Which metric to trust
 

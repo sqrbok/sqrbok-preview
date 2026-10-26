@@ -67,7 +67,7 @@ Mutation testing is **expensive**, because cost grows with mutants × tests, and
 ## How solid is this?
 
 - **Where it comes from.** DeMillo et al. 1978 {% cite demillo1978hints %}; Jia and Harman survey the field {% cite jia2011mutation %}.
-- **What the evidence says.** After removing the effect of suite size, the mutation score predicted real-fault detection better than statement coverage on 565 Defects4J faults {% cite lu2025confounding %}. Zhang et al. caution that using mutants as the ground truth itself inflates how good other metrics look {% cite zhang2024assessing %}.
+- **What the evidence says.** After removing the effect of suite size, the mutation score predicted real-fault detection better than statement coverage on 565 Defects4J faults {% cite lu2025confounding %}. Zhang et al. caution that using mutants as the ground truth inflates how good other metrics look {% cite zhang2024assessing %}; Lu et al. avoid that trap by using real faults, as [Coverage and Fault Detection](discussion.md) explains.
 
 ---
 

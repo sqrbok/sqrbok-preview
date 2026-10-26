@@ -11,7 +11,7 @@ layout: default
 
 ## 1. Design tests from the specification, then measure
 
-Marick's 1991 study is the positive half of the story. Seven units were first tested with a methodical black-box technique derived from the specification; the suites reached nearly 100% of feasible branch coverage, loop coverage (each loop run zero, one and several times) and [multiple condition coverage](conditions.md), and closing the remaining gap took only a few percent of the total testing time {% cite marick1991cost %}. His conclusion: reaching full coverage *after* measuring matters less than nearly reaching it with the first specification-based suite, and **low initial coverage signals a problem in the testing process** {% cite marick1991cost %}.
+Marick's 1991 study shows what works, as a counterweight to his 1997 critique below. Seven units were first tested with a methodical black-box technique derived from the specification; the suites reached nearly 100% of feasible branch coverage, loop coverage (each loop run zero, one and several times) and [multiple condition coverage](conditions.md) (every combination of the conditions in a decision), and closing the remaining gap took only a few percent of the total testing time {% cite marick1991cost %}. His conclusion: reaching full coverage *after* measuring matters less than nearly reaching it with the first specification-based suite, and **low initial coverage signals a problem in the testing process** {% cite marick1991cost %}.
 
 The reverse order fails. A suite designed *to reach* coverage is uniformly weak in exactly the way coverage cannot detect: it misses faults of omission, and the tool can no longer show where it is weak {% cite marick1997coverage %}.
 
@@ -23,7 +23,7 @@ Marick's procedure for a missed coverage condition has three steps {% cite maric
 2. Rethink how that feature should have been tested, without aiming at the missed condition itself.
 3. Run the new tests and check that the condition is now covered as a side effect.
 
-**Example.** A pull request report shows that `if retries > MAX_RETRIES: raise TimeoutError` was never taken. The quick fix is a test that sets `retries` to 99. The useful question is "how do we test the timeout feature?", which also produces tests for a server that recovers on the last retry and for a timeout during the first request, neither of which the coverage report asked for.
+**Example.** A pull request report shows that `if retries > MAX_RETRIES: raise TimeoutError` was never taken. The quick fix is a test that sets `retries` to 99. The useful question is "how do we test the timeout feature?", which also yields tests the report never asked for, such as a server that recovers on the last retry.
 
 ## 3. Do not make a percentage a gate
 
@@ -31,14 +31,9 @@ A fixed threshold changes behaviour. In organisations with an 85% shipping gate,
 
 Better uses of the number, in order of value:
 
-- **Review uncovered code in every change**: a diff-coverage report, which shows only the changed lines that no test ran, is a list of questions for the reviewer. In Python, the command below lists missed lines and missed branches (shown as `12->15`, a jump from line 12 to line 15 never taken), and the `diff-cover` tool limits the report to the lines a pull request changed.
-
-  ```bash
-  pytest --cov=pkg --cov-branch --cov-report=term-missing
-  ```
-
+- **Review uncovered code in every change**: a diff-coverage report, which shows only the changed lines and jumps that no test ran, is a list of questions for the reviewer. [Measuring Coverage in Python](python.md) shows the commands and how to read the report.
 - **Watch the trend**: a drop in coverage on a module signals tests that were deleted or never written.
-- **Use a low floor, not a target**: a floor is set well *below* where the code already is, so nobody writes tests to reach it; it only fires when a module is neglected. A target sits *above* current coverage and invites tests written to reach the number. The exact floor is a team choice.
+- **Use a low floor, not a target**: a floor *is* a gate, but a deliberately low one, set well *below* where the code already is. Nobody writes tests to reach it, so it does not distort test design; it only fires when a module is neglected. A target sits *above* current coverage and invites tests written to reach the number. The exact floor is a team choice.
 
 ## 4. Strengthen the checks, not only the reach
 
@@ -51,7 +46,7 @@ Because assertions explain most of what coverage seems to explain {% cite zhang2
 
 ## Limitations
 
-Marick's 1991 cost figures come from seven units in one company and from a tester trained in the technique; they show what is possible, not what a typical team achieves. The 85% anecdote is an experienced consultant's observation, not a measurement.
+Marick's 1991 figures come from seven units tested by one trained tester: they show what is possible, not what a typical team achieves. The 85% story is a consultant's observation, not a measurement.
 
 ## How solid is this?
 

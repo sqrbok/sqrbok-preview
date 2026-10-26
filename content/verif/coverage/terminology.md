@@ -21,7 +21,7 @@ _The elements of a control-flow graph, adapted from Hass._ {% cite hass2014guide
 - A **basic block** is a sequence of statements that always run together: control enters at the first and leaves at the last, with no branch in between.
 - A **decision** is a point where the outcome selects the next block: `if`, `while`, `for`, `case`.
 - A **branch** is one outgoing edge of a decision, such as its true or its false outcome.
-- A **condition** is a Boolean expression with no logical operator inside it. The decision `a > b && c == 1` is made of two conditions.
+- A **condition** is a Boolean expression with no logical operator inside it. The decision `a > b and c == 1` (written `&&` in C or Java, as in the figure) is made of two conditions.
 
 Data-flow criteria add two labels to the graph: a **definition** is a node that assigns a variable, and a **use** is a node that reads it. [Mutation](mutation.md) works on copies of the code rather than the graph.
 
@@ -29,17 +29,17 @@ The difference between a decision and a condition matters later: branch coverage
 
 ## 2. The control-flow graph
 
-A CFG has one start node and one end node. A node with more than one outgoing edge is a decision. Merging consecutive non-branching statements into one basic-block node gives a smaller graph with the same paths, which is how the graphs on these pages are drawn.
+A CFG has one start node and one end node; in small examples the first and last statements (`input x`, `print y`) often play those roles. A node with more than one outgoing edge is a decision. Merging consecutive non-branching statements into one basic-block node gives a smaller graph with the same paths, which is how the graphs on these pages are drawn.
 
 A **path** is a sequence of edges from start to end. A **test case** executes one path; a **test suite** is a set of test cases, so it executes a set of paths.
 
 ![A control-flow graph with two decisions; the path for A = true, B = false is highlighted](cfg-path.svg)
 
-_One test case, one path._
+_One test case, one path. Start and End are nodes but not statements, and one block node can hold several statements, so counting nodes is not the same as counting statements._
 
 ## 3. Worked example
 
-Take the graph above, with eight nodes and four branches (two per decision). The suite *{(A = true, B = false)}* executes 6 of the 8 nodes (Start, A?, S1, B?, S4, End) and 2 of the 4 branches. Adding *(A = false, B = true)* reaches all 8 nodes and all 4 branches, yet two of the four start-to-end paths, S1 → S3 and S2 → S4, are still never run. Each of the following pages turns one of these counts into a criterion: statements, branches, independent paths, conditions and data dependencies.
+Take the graph above, with eight nodes and four branches (two per decision). The suite *{(A = true, B = false)}* executes 6 of the 8 nodes (Start, A?, S1, B?, S4, End) and 2 of the 4 branches. Adding *(A = false, B = true)* reaches all 8 nodes and all 4 branches, yet two of the four start-to-end paths, the one through S1 and S3 and the one through S2 and S4, are still never run. Each of the following pages turns one of these counts into a criterion: statements, branches, independent paths, conditions and data dependencies.
 
 ## 4. Where the model stops
 

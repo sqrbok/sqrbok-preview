@@ -44,7 +44,7 @@ def process(flag, value):
     return result
 ```
 
-Each definition of `x` reaches the c-use, and reaches the p-use with two outcomes. All-Uses therefore needs each definition to reach `x > 20` both true and false: 2 definitions × (1 c-use + 2 p-use outcomes) = 6 DU pairs for `x`. The table tracks variable `x` only; `result` has DU pairs of its own that All-Uses would also count.
+Each definition of `x` reaches the c-use, and reaches the p-use with two outcomes. All-Uses therefore needs each definition to reach `x > 20` both true and false: 2 definitions × (1 c-use + 2 p-use outcomes) = 6 DU pairs for `x`. The table tracks variable `x` only; All-Uses would also count the pairs of `result`, defined at `result = x + 1` and `result = result * 2` and used at `result * 2` and `return result`.
 
 | Test | flag | value | x | Covers |
 |---|---|---|---|---|
@@ -68,7 +68,7 @@ The number of DU pairs grows quickly with aliasing, arrays and pointers, and sta
 ## How solid is this?
 
 - **Where it comes from.** Rapps and Weyuker defined the criteria family {% cite rapps1985dataflow %}; Su et al. survey 97 papers on data-flow testing {% cite su2017dataflow %}.
-- **What the evidence says.** On 274 real faults from Defects4J, all four control-flow criteria together (statement, branch, MC/DC and loop) were effective for 28% of faults; adding def-use pair coverage raised this to 85%, and def-use coverage was effective for 79% of the faults that control flow missed {% cite hemmati2015coverage %}. These are upper bounds: a criterion counted as effective when the fault-revealing test increased it.
+- **What the evidence says.** On 274 real faults from Defects4J, all four control-flow criteria together (statement, branch, MC/DC and loop coverage, which runs each loop zero, one and several times) were effective for 28% of faults; adding def-use pair coverage raised this to 85%, and def-use coverage was effective for 79% of the faults that control flow missed {% cite hemmati2015coverage %}. These are upper bounds: a criterion counted as effective when the fault-revealing test increased it.
 - **What is weaker than it looks.** The often-quoted claim that 90% data-flow coverage finds twice as many defects as 90% branch coverage comes from a practitioner website quoted in the survey, not from a controlled study {% cite su2017dataflow %}.
 
 ---

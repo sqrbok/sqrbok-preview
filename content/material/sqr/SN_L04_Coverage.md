@@ -50,7 +50,7 @@ McCabe's cyclomatic complexity *V(G) = e − n + 2* (for two-way decisions, simp
 
 ## 5. MC/DC looks inside a decision
 
-Branch and basis-path coverage treat `A and B` as one decision, so they can be satisfied without ever trying the input that tells `and` from `or`. Multiple condition coverage tries all 2<sup>*c*</sup> combinations of the *c* conditions; MC/DC needs as few as *c* + 1 tests for a chain of `and` or `or`, because it asks that each condition be shown to change the decision's outcome on its own {% cite chilenski1994mcdc %}. DO-178C requires MC/DC for the most critical airborne software {% cite hayhurst2001practical %}.
+Branch and basis-path coverage treat `A and B` as one decision, so they can be satisfied without ever trying the input that tells `and` from `or`. Multiple condition coverage tries all 2<sup>*c*</sup> combinations of the *c* conditions; MC/DC usually needs only *c* + 1 tests, because it asks that each condition be shown to change the decision's outcome on its own {% cite chilenski1994mcdc %}. DO-178C requires MC/DC for the most critical airborne software {% cite hayhurst2001practical %}.
 
 → [Multiple Condition Coverage and MC/DC](../../verif/coverage/conditions.md)
 
@@ -62,13 +62,13 @@ Data-flow criteria require that each definition of a variable reaches its uses a
 
 ## 7. Input-space criteria cover combinations and transitions, not code
 
-For many inputs, exhaustive combinations explode: four parameters with three values each give 81 combinations. Pairwise testing covers every pair of values in far fewer tests, and NIST's fault studies found most failures triggered by one or two parameters {% cite kuhn2004fault %}. For state machines, N-switch coverage asks for every sequence of N + 1 transitions: 0-switch covers every transition, 1-switch every pair of consecutive transitions.
+For many inputs, exhaustive combinations explode: four parameters with three values each give 81 combinations. Pairwise testing covers every pair of values in far fewer tests, and NIST's fault studies found most failures triggered by one or two parameters {% cite kuhn2004fault %}. For state machines, N-switch coverage asks for every sequence of N + 1 transitions: 0-switch covers every transition, 1-switch every pair of consecutive transitions. For a door with states *open* and *closed*, 0-switch needs `open→closed` and `closed→open`; 1-switch adds the sequences `open→closed→open` and `closed→open→closed`.
 
 → [Combinatorial Testing](../../verif/combinatorial/index.md)
 
 ## 8. Coverage predicts fault detection only weakly
 
-The research half of the lecture reverses the popular belief. Once suite size is held constant, the correlation between coverage and effectiveness becomes weak {% cite inozemtseva2014coverage %}; the number of assertions explains far more {% cite zhang2015assertions %}. On 274 real faults, only 10% of the fault-revealing tests added any statement coverage; counting all four control-flow criteria the share was 28%, and adding def-use pairs raised it to 85% {% cite hemmati2015coverage %}. Of the metrics compared, mutation score is the most reliable and statement coverage the least {% cite zhang2024assessing %}.
+The research half of the lecture reverses the popular belief. Once suite size is held constant, the correlation between coverage and effectiveness becomes weak {% cite inozemtseva2014coverage %}; the number of assertions explains far more {% cite zhang2015assertions %}. On 274 real faults, statement coverage was effective for only 10% of them: only that often did the test that exposed the fault add any statement coverage. All four control-flow criteria together reached 28%, and adding def-use pairs raised it to 85% {% cite hemmati2015coverage %}. Of the metrics compared, mutation score is the most reliable and statement coverage the least {% cite zhang2024assessing %}.
 
 → [Coverage and Fault Detection](../../verif/coverage/discussion.md)
 
@@ -80,7 +80,7 @@ Marick's rule closes the lecture: coverage tools give clues, not commands {% cit
 
 ## Where this goes next
 
-The next lecture moves from code to the input space: [Input Domain Testing](SN_L05_Domain.md) designs tests from equivalence classes and boundaries, and its effectiveness is again something coverage alone cannot show. The coverage lab applies this lecture: measure statement and branch coverage on a small program with pytest-cov, then add the tests the report points to.
+The next lecture moves from code to the input space: [Input Domain Testing](SN_L05_Domain.md) designs tests from equivalence classes and boundaries, and its effectiveness is again something coverage alone cannot show. The coverage lab applies this lecture: measure statement and branch coverage on a small program with pytest-cov, then add the tests the report points to; [Measuring Coverage in Python](../../verif/coverage/python.md) shows how to read the report.
 
 ---
 

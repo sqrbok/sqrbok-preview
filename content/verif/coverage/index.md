@@ -14,17 +14,17 @@ A criterion is used in two ways {% cite ammann2016introduction %}. As a **genera
 
 ## The criteria at a glance
 
-The table compares the criteria by what they demand of a test suite and the least number of tests that can satisfy them. One test can take outcomes of several decisions at once, so counts for a whole function are usually smaller than the sum over its decisions.
+The table compares the criteria by what they demand of a test suite and what drives the number of tests. Exact counts depend on how the decisions in a function are arranged, so each criterion's page works them out on an example.
 
-| Criterion | A test suite must… | Fewest tests | Page |
+| Criterion | A test suite must… | The number of tests grows with… | Page |
 |---|---|---|---|
-| Statement | execute every statement once | 1, if one path runs every statement | [Statement and Branch Coverage](code.md) |
-| Branch | take every outcome of every decision | 2, since every decision needs a true and a false test | [Statement and Branch Coverage](code.md) |
-| Basis path | run *V(G)* linearly independent paths | exactly *V(G)*: decisions + 1 for two-way decisions | [Basis Path](basis.md) |
-| MC/DC | show that each condition flips its decision on its own | *c* + 1 for a decision with *c* conditions | [Multiple Conditions](conditions.md) |
+| Statement | execute every statement once | the paths needed to reach every statement | [Statement and Branch Coverage](code.md) |
+| Branch | take the true and the false outcome of every decision | the decisions, and how they are nested | [Statement and Branch Coverage](code.md) |
+| Basis path | run *V(G)* linearly independent paths | *V(G)*, minus any paths that cannot run | [Basis Path](basis.md) |
+| MC/DC | show that each condition flips its decision on its own | the conditions: *c* + 1 for most decisions with *c* conditions | [Multiple Conditions](conditions.md) |
 | Multiple condition | try every combination of conditions | 2<sup>*c*</sup> for a decision with *c* conditions | [Multiple Conditions](conditions.md) |
-| All-Uses | connect every definition of a variable to each of its uses | grows with data dependencies | [Data Flow](data-flow.md) |
-| Mutation score | make some test fail on every non-equivalent mutant | one suite run per mutant | [Mutation](mutation.md) |
+| All-Uses | make every assignment of a variable reach each place that reads it | the data dependencies | [Data Flow](data-flow.md) |
+| Mutation score | make some test fail on every planted fault (mutant) that changes behaviour | the mutants: one suite run each | [Mutation](mutation.md) |
 
 Criteria are ordered by **subsumption**: criterion A subsumes B when every suite that satisfies A also satisfies B.
 
@@ -36,7 +36,7 @@ Subsumption is about *requirements*, not bugs: a suite built for a weaker criter
 
 ## Reading order
 
-Start with [Terminology](terminology.md) for the control-flow graph, then the criteria from statement to mutation. [Coverage and Fault Detection](discussion.md) summarises the evidence on how well coverage predicts found faults, and [Using Coverage in Practice](practice.md) turns it into rules for a team.
+Start with [Terminology](terminology.md) for the control-flow graph, then the criteria from statement to mutation. [Coverage and Fault Detection](discussion.md) summarises the evidence on how well coverage predicts found faults, [Using Coverage in Practice](practice.md) turns it into rules for a team, and [Measuring Coverage in Python](python.md) reads a real pytest-cov report.
 
 ## How solid is this?
 

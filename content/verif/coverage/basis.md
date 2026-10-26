@@ -7,7 +7,7 @@ layout: default
 
 # Basis Path Coverage
 
-**Basis path coverage** requires a test suite to run a set of *linearly independent* start-to-end paths through the control-flow graph, as many as the graph's cyclomatic complexity *V(G)*. It sits between branch coverage, which is too weak for interacting decisions, and all-paths coverage, which is usually impossible.
+**Basis path coverage** requires a test suite to run a set of *linearly independent* start-to-end paths through the control-flow graph, as many as the graph's cyclomatic complexity *V(G)*. It sits between branch coverage, too weak for interacting decisions, and all-paths coverage, usually impossible.
 
 ## 1. Independent paths and V(G)
 
@@ -45,21 +45,33 @@ A basis needs three tests:
 | 2 | x > 0, x ≥ 10 | x = 15 | 2 |
 | 3 | x ≤ 0 | x = −2 | −1 |
 
-Adding a third nested decision (say, `x mod 2 = 0` inside the inner branch) raises *V(G)* to 4 and the basis to four tests. Nested decisions grow the path count linearly; decisions **in sequence** are where basis paths save work: four independent `if` statements in a row have 2<sup>4</sup> = 16 paths but a basis of 5.
+Each two-way decision adds one basis path, nested or not; the saving shows with decisions **in sequence**, where the number of all paths doubles with each one: four independent `if` statements in a row have 2<sup>4</sup> = 16 paths but a basis of 5.
 
 ## 3. Building a basis
 
 The usual procedure picks a typical first path, then derives each next path by **flipping one decision** of a path already in the set and keeping the earlier decisions. Each flip adds **at least one** new edge, often several: in the example, flipping `x < 10` adds both the false edge and the edge from `y = 2` to `print`. Decisions after the flipped one may change or disappear: once `x > 0` is false, `x < 10` is never reached. Loops get the boundary treatment: a `while` or `for` loop is run zero times and once; a `do … while` loop, which always runs once, is run once and twice.
 
+## 4. All paths, and paths that cannot run
+
+**All-paths coverage** runs every start-to-end path; with a loop their number is unbounded, so it is a reference point, not a target.
+
+Some paths can never run. When the same condition is tested twice and nothing in between changes it, the graph shows four paths but only two are feasible.
+
+![Control-flow graph that tests condition A twice; the mixed paths are infeasible](infeasible-path.svg)
+
+_Same shape as the graph on [Terminology](terminology.md), but the second decision repeats A: the graph promises more paths than the program has._
+
+In this graph *V(G)* = 3, but only two independent paths can run, so the achievable target is those two: 2 of 3 basis paths, and full branch coverage. Feasibility is undecidable in general, so each uncovered path needs a person's judgement.
+
 ## When to use it — and when not
 
 - **Use it** for functions with several interacting decisions, where branch coverage can be reached by two tests that never combine them.
-- **Use V(G)** as the number of tests basis path coverage needs, and as an upper bound for branch coverage, which may need fewer; McCabe also proposed 10 as a reasonable upper limit for one module {% cite mccabe1976complexity %}, and linters such as flake8 can enforce such a limit.
+- **Use V(G)** as the number of tests basis path coverage needs when every path can run, and as an upper bound for branch coverage. McCabe proposed 10 as an upper limit for one module {% cite mccabe1976complexity %}.
 - **Do not expect it to test conditions.** These pages count `if (A && B)` as one decision, as the control-flow graph draws it (some tools count each `&&` or `||` as an extra decision, which raises V(G)), so a basis can miss a wrong operator inside it; see [Multiple Conditions](conditions.md).
 
 ## Limitations
 
-A basis is **not unique**. For two decisions in sequence, *{TT, FT, FF}* and *{FF, TF, FT}* are both valid bases (check the second in that order: TF adds A-true, FT adds B-true), and a fault that shows only on *TF* is found by the second and missed by the first (the example in [Statement and Branch Coverage](code.md) is one). Some basis paths may also be **infeasible** when decisions share data, and the set must then be rebuilt by hand.
+A basis is **not unique**. For two decisions in sequence, *{TT, FT, FF}* and *{FF, TF, FT}* are both valid bases (check the second in that order: TF adds A-true, FT adds B-true), and a fault that shows only on *TF* is found by the second and missed by the first (the example in [Statement and Branch Coverage](code.md) is one). Basis paths can also be infeasible (section 4), and the set must then be rebuilt by hand.
 
 ## How solid is this?
 
