@@ -53,7 +53,33 @@ The full range of V&V methods and when to apply each:
 Maintainability, reliability, performance and queuing theory, security, and usability — each treated as an engineering property with models, metrics, and design implications.
 
 ### 5. [Selected Materials](/content/material/)
-Curated textbooks and key research papers, one annotation per entry explaining the core contribution and why it earns a place in the list.
+A study note and revision questions for every SQR and QAM lecture, and an annotated reading list.
+
+---
+
+## Start here
+
+- **Revising after a lecture or before an exam** → [Selected Materials](/content/material/): the study note follows the lecture and links to the pages that hold the detail.
+- **Looking up a method** → open its area above, or use the search box.
+- **Wondering whether to believe a page** → its **How solid is this?** section, at the bottom of reviewed pages.
+
+---
+
+## How this handbook is built
+
+Each area is re-grounded one topic at a time. A topic gets a literature search, a summary of every paper it keeps, and a synthesis of what the papers agree and disagree on. The review so far covers **21 topics, 326 papers and 393 bibliography entries**. What survives becomes a short page: one method per page, under 800 words, with a worked software example and at least one limitation. Sources are cited where the claim is made, and the evidence behind a page is summarised in **How solid is this?**
+
+---
+
+## Contributing
+
+Corrections and additions are welcome, from students and practitioners alike.
+
+- **Fix a content issue** (a typo, a wrong fact, a citation that does not check out) → [guidelines](https://github.com/sqrbok/sqrbok.github.io/blob/main/CONTRIBUTING.md)
+- **Add a method page** → [method template](https://github.com/sqrbok/sqrbok.github.io/blob/main/templates/method-template.md)
+- **Write an analysis** → [analysis template](https://github.com/sqrbok/sqrbok.github.io/blob/main/templates/analysis-template.md)
+
+Every page is held to [the page standard](https://github.com/sqrbok/sqrbok.github.io/blob/main/templates/page-standard.md).
 
 ---
 
