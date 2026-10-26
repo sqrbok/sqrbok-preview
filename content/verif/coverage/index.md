@@ -18,7 +18,7 @@ The table compares the criteria by what they demand of a test suite and what dri
 
 | Criterion | A test suite must… | The number of tests grows with… | Page |
 |---|---|---|---|
-| Statement | execute every statement once | the paths needed to reach every statement | [Statement and Branch Coverage](code.md) |
+| Statement | execute every statement at least once | the paths needed to reach every statement | [Statement and Branch Coverage](code.md) |
 | Branch | take the true and the false outcome of every decision | the decisions, and how they are nested | [Statement and Branch Coverage](code.md) |
 | Basis path | run *V(G)* linearly independent paths | *V(G)*, minus any paths that cannot run | [Basis Path](basis.md) |
 | MC/DC | show that each condition flips its decision on its own | the conditions: *c* + 1 for most decisions with *c* conditions | [Multiple Conditions](conditions.md) |
@@ -36,7 +36,7 @@ Subsumption is about *requirements*, not bugs: a suite built for a weaker criter
 
 ## Reading order
 
-Start with [Terminology](terminology.md) for the control-flow graph, then the criteria from statement to mutation. [Coverage and Fault Detection](discussion.md) summarises the evidence on how well coverage predicts found faults, [Using Coverage in Practice](practice.md) turns it into rules for a team, and [Measuring Coverage in Python](python.md) reads a real pytest-cov report.
+Start with [Terminology](terminology.md), then the criteria from statement to mutation. [Coverage and Fault Detection](discussion.md) summarises how well coverage predicts found faults, [Using Coverage in Practice](practice.md) turns it into rules for a team, and [Measuring Coverage in Python](python.md) reads a real pytest-cov report.
 
 ## How solid is this?
 

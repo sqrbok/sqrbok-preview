@@ -44,13 +44,13 @@ Coverage tracks fault detection while it is still climbing; once it flattens, te
 
 ## 2. Suite size is the hidden variable
 
-Inozemtseva and Holmes generated 31,000 test suites for five large Java programs and measured their effectiveness as the mutation score, the share of planted faults each suite detected {% cite inozemtseva2014coverage %}. Ignoring suite size, coverage correlated strongly with effectiveness (0.79 to 0.95). With size held constant, the correlation became weak, and for two of the five programs it was close to zero.
+Inozemtseva and Holmes generated 31,000 test suites for five large Java programs and measured their effectiveness as the mutation score, the share of planted faults each suite detected {% cite inozemtseva2014coverage %}. Using mutants as the yardstick is common; section 5 shows the main result holds with real faults too. Ignoring suite size, coverage correlated strongly with effectiveness (0.79 to 0.95). With size held constant, the correlation became weak, and for two of the five programs it was close to zero.
 
 ![More tests raise both coverage and the number of assertions; the assertions, not the coverage, find the faults](confounding-size.svg)
 
 _Why coverage looks predictive: size drives both coverage and checking._ {% cite inozemtseva2014coverage zhang2015assertions %}
 
-Later work quantified the effect: on 565 faults from Defects4J, a public collection of real, reproducible Java bugs, suite size explained up to 69% of the apparent effect of statement coverage and up to 82% for branch coverage {% cite lu2025confounding %}. Zhang and Mesbah found the missing link: the number of **assertions** correlated with effectiveness at 0.927 to 0.973, and size mattered because larger suites contain more assertions {% cite zhang2015assertions %}.
+Later work quantified the effect: on 565 faults from Defects4J, a public collection of real, reproducible Java bugs, up to 69% of the apparent link between statement coverage and fault detection, and up to 82% for branch coverage, was due to suite size rather than coverage {% cite lu2025confounding %}. Zhang and Mesbah found the missing link: the number of **assertions** correlated with effectiveness at 0.927 to 0.973, and size mattered because larger suites contain more assertions {% cite zhang2015assertions %}.
 
 ## 3. Reaching a fault is not revealing it
 
@@ -60,7 +60,7 @@ The **oracle** is the check that decides whether a test passes, usually its asse
 
 _Where coverage-based confidence breaks down._ {% cite masri2009factors schwartz2018faults %}
 
-**Coincidental correctness** is common. Masri and Abou Assi seeded faults into programs, giving 148 faulty versions, and ran each version's tests {% cite masri2009factors %}. On average, 56.4% of the tests **reached** the faulty statement and still passed (*weak* coincidental correctness), and 15.7% reached it, **infected** the state, and still passed (*strict* coincidental correctness). The strict cases are a subset of the weak ones, which is why the second number is smaller. Such tests count towards coverage and pass.
+**Coincidental correctness** is common. Masri and Abou Assi seeded faults into programs, giving 148 faulty versions, and ran each version's tests {% cite masri2009factors %}. On average, 56.4% of a version's tests **reached** the faulty statement and still passed (*weak* coincidental correctness), and 15.7% reached it, **infected** the state, and still passed (*strict* coincidental correctness). The strict cases are a subset of the weak ones, which is why the second number is smaller. Such tests count towards coverage and pass.
 
 **Example.** A test calls `order.total()` on a cart with one item at 10.00 and a 0% discount, and asserts that the result is 10.00. A fault that applies the discount as `price - discount` instead of `price * (1 - discount)` reaches the faulty line, but with a discount of 0 both formulas give 10.00: the test passes, and the line counts as covered. Schwartz et al. looked at the mutants that suites with at least 80% statement coverage still missed: unary arithmetic-operator deletions (for example, `-x` mutated to `x`) were detected only 12.12% of the time, and the main cause was oracles that did not check the affected values {% cite schwartz2018faults %}.
 

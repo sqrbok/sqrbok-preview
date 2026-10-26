@@ -56,7 +56,7 @@ if B then Z = 2
 print Z
 ```
 
-The suite *{(A = T, B = T), (A = F, B = F)}* takes all four branches and passes: it prints 2 and 0, as specified. The fault shows only for *(A = T, B = F)*, which prints 1. [Data-flow coverage](data-flow.md) forces that test: the value assigned by `Z = Z + 1` reaches `print Z` without being overwritten only when B is false, and All-Uses requires every assignment to reach every use it can reach without being reassigned. [Basis paths](basis.md) may or may not include it: this graph has V(G) = 3, and whether *(T, F)* is among the three independent paths depends on which are chosen.
+The suite *{(A = T, B = T), (A = F, B = F)}* takes all four branches and passes: it prints 2 and 0, as specified. The fault shows only for *(A = T, B = F)*, which prints 1. [Data-flow coverage](data-flow.md), which follows each assigned value to the places that read it, forces that test: the value assigned by `Z = Z + 1` reaches `print Z` without being overwritten only when B is false, and All-Uses requires every assignment to reach every use it can reach without being reassigned. [Basis paths](basis.md) may or may not include it: the program has V(G) = 3 (2 decisions + 1, see Basis Path), and whether *(T, F)* is among the three independent paths depends on which are chosen.
 
 ## When to use them — and when not
 

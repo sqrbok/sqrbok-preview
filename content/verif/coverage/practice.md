@@ -25,7 +25,7 @@ Marick's procedure for a missed coverage condition has three steps {% cite maric
 
 **Example.** A pull request report shows that `if retries > MAX_RETRIES: raise TimeoutError` was never taken. The quick fix is a test that sets `retries` to 99. The useful question is "how do we test the timeout feature?", which also yields tests the report never asked for, such as a server that recovers on the last retry.
 
-## 3. Do not make a percentage a gate
+## 3. Do not make a high percentage a target
 
 A fixed threshold changes behaviour. In organisations with an 85% shipping gate, Marick found most developers clustered just above 85%, and when he traced the number back he found someone who had "pulled 85% out of a hat" {% cite marick1997coverage %}. Inozemtseva and Holmes concluded that a fixed coverage value used as a quality target "is unlikely to produce an effective test suite" {% cite inozemtseva2014coverage %}.
 

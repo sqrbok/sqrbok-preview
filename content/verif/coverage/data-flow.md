@@ -58,7 +58,7 @@ Two tests (T1 and T4) already give 100% branch coverage. All-Uses asks for two m
 ## When to use it — and when not
 
 - **Use All-Uses** on code that transforms data through several assignments: calculations, parsers, state updates.
-- **Use it after branch coverage**, to find the tests that branch coverage lets you skip.
+- **Use it after branch coverage**, to find the tests that branch coverage does not require but that can still catch bugs.
 - **Do not expect wide tool support.** Mainstream coverage tools report statements and branches; data-flow coverage mostly needs research tools or static analysers {% cite su2017dataflow %}.
 
 ## Limitations
@@ -68,7 +68,7 @@ The number of DU pairs grows quickly with aliasing, arrays and pointers, and sta
 ## How solid is this?
 
 - **Where it comes from.** Rapps and Weyuker defined the criteria family {% cite rapps1985dataflow %}; Su et al. survey 97 papers on data-flow testing {% cite su2017dataflow %}.
-- **What the evidence says.** On 274 real faults from Defects4J, all four control-flow criteria together (statement, branch, MC/DC and loop coverage, which runs each loop zero, one and several times) were effective for 28% of faults; adding def-use pair coverage raised this to 85%, and def-use coverage was effective for 79% of the faults that control flow missed {% cite hemmati2015coverage %}. These are upper bounds: a criterion counted as effective when the fault-revealing test increased it.
+- **What the evidence says.** On 274 real faults from Defects4J (a public collection of real, reproducible Java bugs), all four control-flow criteria together (statement, branch, MC/DC and loop coverage, which runs each loop zero, one and several times) were effective for 28% of faults; adding def-use pair coverage raised this to 85%, and def-use coverage was effective for 79% of the faults that control flow missed {% cite hemmati2015coverage %}. These are upper bounds: a criterion counted as effective when the fault-revealing test increased it.
 - **What is weaker than it looks.** The often-quoted claim that 90% data-flow coverage finds twice as many defects as 90% branch coverage comes from a practitioner website quoted in the survey, not from a controlled study {% cite su2017dataflow %}.
 
 ---
