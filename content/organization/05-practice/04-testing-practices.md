@@ -11,11 +11,11 @@ Modern software testing has evolved from a reactive, late-stage verification act
 
 ## Shift-Left Testing: Early Verification and Validation
 
-Shift-left testing refers to the practice of moving testing activities earlier in the SDLC to identify defects as close to their point of origin as possible {% cite magori2024earlyvv %} {% cite keating2024shift %}.
+Shift-left testing refers to the practice of moving testing activities earlier in the SDLC to identify defects as close to their point of origin as possible {% cite magori2024early %} {% cite keating2024shift %}.
 
 ### Core Principles
 
-The primary goal is **defect prevention** rather than mere detection, adhering to the principle that quality cannot be "tested in" but must be "built in" through iterative verification {% cite magori2024earlyvv %}.
+The primary goal is **defect prevention** rather than mere detection, adhering to the principle that quality cannot be "tested in" but must be "built in" through iterative verification {% cite magori2024early %}.
 
 ### Techniques
 
@@ -29,7 +29,7 @@ The primary goal is **defect prevention** rather than mere detection, adhering t
 
 ### Key Findings
 
-Research indicates that early-phase V&V techniques consistently outperform traditional post-development testing in terms of defect prevention {% cite magori2024earlyvv %}. Case studies show that code reviews catch a substantial portion of defects before they propagate to the testing phase, resulting in:
+Research indicates that early-phase V&V techniques consistently outperform traditional post-development testing in terms of defect prevention {% cite magori2024early %}. Case studies show that code reviews catch a substantial portion of defects before they propagate to the testing phase, resulting in:
 - Shorter development cycles
 - Lower overall costs
 - Higher defect detection efficiency

@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 1
 redirect_from: /content/define/foundations/SN-L1-QM.html
 layout: default
+page_type: study-notes
 ---
 
 # Study Notes: Quality Models

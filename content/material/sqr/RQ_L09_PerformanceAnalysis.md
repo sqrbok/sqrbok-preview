@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 18
 redirect_from: /content/attributes/performance/RQ_L09_PerformanceAnalysis.html
 layout: default
+page_type: question-set
 ---
 
 # Performance Analysis — Revision Questions
@@ -233,3 +234,8 @@ Explain why Dean & Barroso claim that the "physics hasn't changed" even though t
 | Tail latency amplification | Q12 |
 | Per-service SLOs | Q13 |
 | Classical PE → cloud-native convergence | Q14 |
+
+---
+
+{: .highlight }
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.

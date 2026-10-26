@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 14
 redirect_from: /content/verif/exploratory/RQ_L07_Exploratory_OP.html
 layout: default
+page_type: question-set
 ---
 
 # Exploratory Testing & Operational Profile — Revision Questions
@@ -211,3 +212,8 @@ Explain the entire L07 lecture in 5 minutes. Cover ET, OP, and how they bridge t
 | Evidence & modern OP | Q20, Q21, Q22 |
 | ET + OP integration | Q23, Q24 |
 | Cross-cutting & practical | Q25, Q26, Q27, Q28, Q29, Q30 |
+
+---
+
+{: .highlight }
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.

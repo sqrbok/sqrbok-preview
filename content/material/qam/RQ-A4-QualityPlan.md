@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 8
 redirect_from: /content/organization/02-plan/RQ-A4-QualityPlan.html
 layout: default
+page_type: question-set
 ---
 
 # Quality Planning — Revision Questions
@@ -165,3 +166,8 @@ Which technique is strongest for Maintainability? Which for Usability? Explain w
 | Metrics & dashboards | Q15 |
 | Defect triage & bug bar | Q16 |
 | V&V technique selection | Q17 |
+
+---
+
+{: .highlight }
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.

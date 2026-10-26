@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 15
 redirect_from: /content/verif/domain/SN_A08_ClassificationTree.html
 layout: default
+page_type: study-notes
 ---
 
 # Study Notes: Classification Tree Method

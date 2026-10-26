@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 15
 redirect_from: /content/attributes/reliability/SN_L08_Reliability.html
 layout: default
+page_type: study-notes
 ---
 
 # Study Notes: Software Reliability (L08)

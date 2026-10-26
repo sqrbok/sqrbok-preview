@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 10
 redirect_from: /content/verif/inspection/RQ_A05_Inspection.html
 layout: default
+page_type: question-set
 ---
 
 # A05: Software Inspection — Revision Questions
@@ -276,3 +277,8 @@ Describe, in your own words:
 | LLM code review | Q20, Q21 |
 | Inspection vs testing | Q22 |
 | Practical application | Q23, Q24, Q25, Q26, Q27, Q28 |
+
+---
+
+{: .highlight }
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.

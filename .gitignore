@@ -20,3 +20,7 @@ vendor/
 content/verif/.DS_Store
 
 .claude/
+
+# macOS metadata on exFAT volumes
+._*
+Gemfile.lock

@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 17
 redirect_from: /content/attributes/queuing/SN-A09-Queuing.html
 layout: default
+page_type: study-notes
 ---
 
 # Study Notes: Performance Analysis — Queuing Theory

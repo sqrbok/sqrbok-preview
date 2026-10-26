@@ -2,7 +2,7 @@
 title: Exploratory Testing
 parent: Verification and Validation
 has_children: true
-nav_order: 7
+nav_order: 8
 layout: default
 ---
 

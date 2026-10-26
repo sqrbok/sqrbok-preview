@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 17
 redirect_from: /content/attributes/performance/SN_L09_PerformanceAnalysis.html
 layout: default
+page_type: study-notes
 ---
 
 # Study Notes: Performance Analysis (L09)

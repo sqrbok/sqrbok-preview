@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 11
 redirect_from: /content/verif/static/SN_A06_Static.html
 layout: default
+page_type: study-notes
 ---
 
 # Study Notes: Static Analysis

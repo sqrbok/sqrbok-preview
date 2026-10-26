@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 19
 redirect_from: /content/attributes/maintainability/SN_A10_MaintainabilityDSM.html
 layout: default
+page_type: study-notes
 ---
 
 # Study Notes: Software Maintainability and Design Structure Matrix
@@ -14,7 +15,7 @@ layout: default
 These study notes explain software maintainability concepts, measurement approaches, and the Design Structure Matrix (DSM) technique for analyzing and improving system modularity. Organized by concept (not slide-by-slide), with concrete examples, visual diagrams, and practice questions.
 
 **Primary Sources:**
-- ISO/IEC 25010:2011 {% cite iso25010_2011 %}
+- ISO/IEC 25010:2011 {% cite iso25010 %}
 - Building Maintainable Software {% cite visser2016building %}
 - Managing and Leading Software Projects {% cite fairley2009maint %}
 
@@ -164,7 +165,7 @@ Consider a payment processing system. Lack of Movement: not updating to support 
 ### 2.1 Five Sub-Characteristics
 
 **What is it?**
-ISO 25010 {% cite iso25010_2011 %} decomposes maintainability into five sub-characteristics:
+ISO 25010 {% cite iso25010 %} decomposes maintainability into five sub-characteristics:
 
 | Sub-characteristic | Definition | Practical Example |
 |-------------------|------------|-------------------|

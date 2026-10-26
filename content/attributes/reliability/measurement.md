@@ -1,5 +1,5 @@
 ---
-title: Measurement
+title: Reliability Measurement
 parent: Reliability
 grand_parent: Quality Attributes
 nav_order: 1

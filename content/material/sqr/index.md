@@ -22,3 +22,8 @@ Study Notes (SN) and Revision Questions (RQ) for the Software Quality and Reliab
 | L08 | Software Reliability | [SN](SN_L08_Reliability.md) | [RQ](RQ_L08_Reliability.md) |
 | L09 | Performance Analysis | [SN](SN_L09_PerformanceAnalysis.md) | [RQ](RQ_L09_PerformanceAnalysis.md) |
 | L10 | Security | [SN](SN_L10_Security.md) | [RQ](RQ_L10_Security.md) |
+
+---
+
+{: .highlight }
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.

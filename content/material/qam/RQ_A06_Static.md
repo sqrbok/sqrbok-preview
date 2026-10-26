@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 12
 redirect_from: /content/verif/static/RQ_A06_Static.html
 layout: default
+page_type: question-set
 ---
 
 # Static Analysis — Revision Questions
@@ -264,3 +265,8 @@ d) Is the counterexample real or spurious?
 | Abstraction | Q19 |
 | LLM augmentation | Q20 |
 | Practical problems | Q9, Q21, Q22 |
+
+---
+
+{: .highlight }
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.

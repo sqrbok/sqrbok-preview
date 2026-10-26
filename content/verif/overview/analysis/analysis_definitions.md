@@ -1,7 +1,7 @@
 ---
 parent: Analysis
 nav_order: 1
-title: Definitions
+title: Analysis Definitions
 layout: default
 ---
 

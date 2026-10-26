@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 16
 redirect_from: /content/attributes/reliability/RQ_L08_Reliability.html
 layout: default
+page_type: question-set
 ---
 
 # Software Reliability — Revision Questions
@@ -164,3 +165,8 @@ For each of the following pairs, explain the equivalence:
 | Software Reliability Growth Models | Q8 |
 | Redundancy, Voting & Independence | Q9, Q10 |
 | SLO & Error Budgets | Q11, Q12 |
+
+---
+
+{: .highlight }
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.

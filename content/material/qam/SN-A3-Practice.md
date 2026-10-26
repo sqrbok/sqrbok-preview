@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 5
 redirect_from: /content/organization/05-practice/SN-A3-Practice.html
 layout: default
+page_type: study-notes
 ---
 
 # Study Notes: Industry Quality Practices

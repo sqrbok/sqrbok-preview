@@ -2,6 +2,7 @@
 title: Home
 layout: home
 nav_order: 1
+page_type: home
 ---
 
 <div align="center">
@@ -59,3 +60,8 @@ Curated textbooks and key research papers, one annotation per entry explaining t
 ## Acknowledgements
 
 The material and structure of these courses are inspired by the lectures of **Prof. Claire Le Goues** (Carnegie Mellon University) and **Prof. Eduardo Miranda** (Carnegie Mellon University). Their work laid the conceptual foundations on which these notes are built.
+
+---
+
+{: .highlight }
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.

@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 4
 redirect_from: /content/define/measurement/RQ_L2_Metrics.html
 layout: default
+page_type: question-set
 ---
 
 # L02: Quality Measurement and Metrics — Revision Questions
@@ -119,3 +120,8 @@ Give an example showing how "Maintainability" leads to a specific measurable met
 | Code metrics (MI, CK) | Q9, Q10 |
 | Operational definitions | Q11 |
 | Quality models & metrics | Q12 |
+
+---
+
+{: .highlight }
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.

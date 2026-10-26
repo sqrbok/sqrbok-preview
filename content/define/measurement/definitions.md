@@ -1,7 +1,7 @@
 ---
 parent: Measurement
 nav_order: 1
-title: Definitions
+title: Measurement Definitions
 layout: default
 ---
 

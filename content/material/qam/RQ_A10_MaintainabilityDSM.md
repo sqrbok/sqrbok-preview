@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 20
 redirect_from: /content/attributes/maintainability/RQ_A10_MaintainabilityDSM.html
 layout: default
+page_type: question-set
 ---
 
 # Revision Questions: Software Maintainability and Design Structure Matrix (A10)

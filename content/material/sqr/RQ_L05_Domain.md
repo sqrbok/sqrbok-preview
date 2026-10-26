@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 10
 redirect_from: /content/verif/domain/RQ_L05_Domain.html
 layout: default
+page_type: question-set
 ---
 
 # L05: Input Domain Testing — Revision Questions
@@ -253,3 +254,8 @@ A team decides to use only pairwise testing for a safety-critical medical device
 | Combinatorial testing | Q18, Q19, Q20, Q21, Q26 |
 | Technique selection | Q22, Q23 |
 | Practical problems | Q24, Q25, Q26 |
+
+---
+
+{: .highlight }
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.

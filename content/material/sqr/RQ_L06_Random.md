@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 12
 redirect_from: /content/verif/random/RQ_L06_Random.html
 layout: default
+page_type: question-set
 ---
 
 # Random Testing — Revision Questions
@@ -235,3 +236,8 @@ Explain how the "pesticide paradox" applies across all four testing techniques c
 | Comparisons | Q24, Q25, Q26, Q27, Q28 |
 | Cross-cutting | Q29, Q30, Q31 |
 | Practical problems | Q32, Q33, Q34 |
+
+---
+
+{: .highlight }
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.

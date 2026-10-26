@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 6
 redirect_from: /content/organization/05-practice/RQ-A3-Practice.html
 layout: default
+page_type: question-set
 ---
 
 # Industry Quality Practices — Revision Questions
@@ -121,3 +122,8 @@ What are the requirements for an AI agent to reach T3? Why does research show a 
 | Monitoring & on-call | Q8, Q9 |
 | AI/LLM in quality | Q10, Q12 |
 | Chaos engineering | Q11 |
+
+---
+
+{: .highlight }
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.

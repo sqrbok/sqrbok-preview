@@ -1,5 +1,5 @@
 ---
-title: Industrial Evidence
+title: Combinatorial Testing: Industrial Evidence
 parent: Combinatorial Testing
 nav_order: 6
 layout: default

@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 9
 redirect_from: /content/verif/domain/SN_L05_Domain.html
 layout: default
+page_type: study-notes
 ---
 
 # Study Notes: Input Domain Testing (L05)

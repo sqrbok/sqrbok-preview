@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 7
 redirect_from: /content/verif/coverage/SN_L04_Coverage.html
 layout: default
+page_type: study-notes
 ---
 
 # Study Notes: Adequacy Criteria (L04)

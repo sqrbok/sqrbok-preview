@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 2
 redirect_from: /content/organization/01-coq/RQ-A1-CoSQ.html
 layout: default
+page_type: question-set
 ---
 
 # Cost of Quality — Revision Questions
@@ -107,3 +108,8 @@ Explain how technical debt relates to the CoQ framework. What are the implicatio
 | Defect injection/removal | Q7, Q8 |
 | CoQ implementation | Q9 |
 | Technical debt | Q10 |
+
+---
+
+{: .highlight }
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.

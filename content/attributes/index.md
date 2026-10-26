@@ -1,7 +1,7 @@
 ---
 title: Quality Attributes
 layout: default
-nav_order: 4
+nav_order: 5
 has_children: true
 ---
 
@@ -21,3 +21,8 @@ Dive into key software quality attributes and how to measure, achieve, and maint
 ---
 
 Browse the topics above for detailed coverage of each attribute, including measurement techniques, industry standards, and real-world examples.
+
+---
+
+{: .highlight }
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.

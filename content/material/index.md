@@ -1,7 +1,7 @@
 ---
 title: Selected Materials
 layout: default
-nav_order: 5
+nav_order: 6
 has_children: true
 ---
 
@@ -145,3 +145,8 @@ SIG's ten guidelines with industry-calibrated thresholds; translates abstract ma
 ---
 
 {% bibliography --cited %}
+
+---
+
+{: .highlight }
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.

@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 20
 redirect_from: /content/attributes/security/RQ_L10_Security.html
 layout: default
+page_type: question-set
 ---
 
 # Software Security Analysis — Revision Questions
@@ -262,3 +263,8 @@ Using the lecture's frameworks, create a **remediation plan** with three horizon
 | Supply chain security (dependencies, build, humans) | Q10 |
 | CVSS v3.1 analysis and prioritization | Q11 |
 | Comprehensive security architecture planning | Q12 |
+
+---
+
+{: .highlight }
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.

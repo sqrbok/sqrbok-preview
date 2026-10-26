@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 2
 redirect_from: /content/define/foundations/RQ-L1-QM.html
 layout: default
+page_type: question-set
 ---
 
 # Quality Models — Revision Questions
@@ -116,3 +117,8 @@ Give two software examples of each type for a video streaming application (like 
 | ISO 25010 | Q6, Q9 |
 | Quality Requirements | Q7, Q8 |
 | Kano Model | Q10 |
+
+---
+
+{: .highlight }
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.

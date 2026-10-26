@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 3
 redirect_from: /content/organization/03-process/SN-A2-Proc.html
 layout: default
+page_type: study-notes
 ---
 
 # Study Notes: Process Improvement

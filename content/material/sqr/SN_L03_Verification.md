@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 5
 redirect_from: /content/verif/overview/SN_L03_Verification.html
 layout: default
+page_type: study-notes
 ---
 
 # Study Notes: Verification Methods

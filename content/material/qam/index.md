@@ -22,3 +22,8 @@ Study Notes (SN) and Revision Questions (RQ) for the Quality Assurance and Manag
 | A08 | Classification Tree Method | [SN](SN_A08_ClassificationTree.md) | [RQ](RQ_A08_ClassificationTree.md) |
 | A09 | Queuing Theory | [SN](SN-A09-Queuing.md) | [RQ](RQ-A09-Queuing.md) |
 | A10 | Maintainability & DSM | [SN](SN_A10_MaintainabilityDSM.md) | [RQ](RQ_A10_MaintainabilityDSM.md) |
+
+---
+
+{: .highlight }
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.

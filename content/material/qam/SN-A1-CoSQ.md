@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 1
 redirect_from: /content/organization/01-coq/SN-A1-CoSQ.html
 layout: default
+page_type: study-notes
 ---
 
 # Study Notes: Cost of Quality

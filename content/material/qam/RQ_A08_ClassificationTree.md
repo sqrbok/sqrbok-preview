@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 16
 redirect_from: /content/verif/domain/RQ_A08_ClassificationTree.html
 layout: default
+page_type: question-set
 ---
 
 # Revision Questions: Classification Tree Method
@@ -108,3 +109,8 @@ layout: default
 ---
 
 *For detailed explanations, see study notes: `sn_classification_tree.md`*
+
+---
+
+{: .highlight }
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.

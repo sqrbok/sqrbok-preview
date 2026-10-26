@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 3
 redirect_from: /content/define/measurement/SN_L2_Metrics.html
 layout: default
+page_type: study-notes
 ---
 
 # Study Notes: Quality Measurement and Metrics

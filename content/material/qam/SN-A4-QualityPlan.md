@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 7
 redirect_from: /content/organization/02-plan/SN-A4-QualityPlan.html
 layout: default
+page_type: study-notes
 ---
 
 # Study Notes: Project Quality Planning

@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 13
 redirect_from: /content/verif/exploratory/SN_L07_Exploratory_OP.html
 layout: default
+page_type: study-notes
 ---
 
 # Study Notes: Exploratory Testing & Operational Profile

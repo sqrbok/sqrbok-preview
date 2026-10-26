@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 8
 redirect_from: /content/verif/coverage/RQ_L04_Coverage.html
 layout: default
+page_type: question-set
 ---
 
 # L04: Adequacy Criteria — Revision Questions
@@ -283,3 +284,8 @@ A project manager claims: "We achieved 95% code coverage, so our software is tho
 | Coverage vs quality | Q20, Q21, Q22, Q23, Q24, Q32 |
 | Practical application | Q25, Q26, Q27 |
 | Testing theory | Q28, Q29 |
+
+---
+
+{: .highlight }
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.

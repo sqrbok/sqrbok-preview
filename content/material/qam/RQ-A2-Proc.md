@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 4
 redirect_from: /content/organization/03-process/RQ-A2-Proc.html
 layout: default
+page_type: question-set
 ---
 
 # Revision Questions: Process Improvement
@@ -265,3 +266,8 @@ Level 2 Process Areas (7 total):
 ---
 
 *For detailed explanations, see [Study Notes: Process Improvement](SN-A2-Proc.md)*
+
+---
+
+{: .highlight }
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.

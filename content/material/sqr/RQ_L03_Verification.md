@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 6
 redirect_from: /content/verif/overview/RQ_L03_Verification.html
 layout: default
+page_type: question-set
 ---
 
 # L03: Verification Methods — Revision Questions
@@ -113,3 +114,8 @@ For the following quality characteristics, identify which verification technique
 | Testing Fundamentals | Q6, Q7, Q8 |
 | Test Pyramid | Q9 |
 | Demonstration | Q10 |
+
+---
+
+{: .highlight }
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.

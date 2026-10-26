@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 18
 redirect_from: /content/attributes/queuing/RQ-A09-Queuing.html
 layout: default
+page_type: question-set
 ---
 
 # Queuing Theory — Revision Questions

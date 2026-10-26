@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 11
 redirect_from: /content/verif/random/SN_L06_Random.html
 layout: default
+page_type: study-notes
 ---
 
 # Study Notes: Random Testing

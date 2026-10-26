@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 19
 redirect_from: /content/attributes/security/SN_L10_Security.html
 layout: default
+page_type: study-notes
 ---
 
 # Study Notes: Software Security Analysis (L10)

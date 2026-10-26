@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 14
 redirect_from: /content/verif/combinatorial/RQ_A07_Combinatorial.html
 layout: default
+page_type: question-set
 ---
 
 # A07: Combinatorial Testing — Revision Questions
@@ -213,3 +214,8 @@ c) What additional technique would you combine with CT for maximum effectiveness
 | Tool selection | Q12 |
 | Calculation problems | Q13 |
 | Algorithm taxonomy | Q14 |
+
+---
+
+{: .highlight }
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.

@@ -5,6 +5,7 @@ grand_parent: Selected Materials
 nav_order: 13
 redirect_from: /content/verif/combinatorial/SN_A07_Combinatorial.html
 layout: default
+page_type: study-notes
 ---
 
 # Study Notes: Combinatorial Testing (A07)
@@ -57,7 +58,7 @@ Kuhn, Wallace, and Gallo {% cite kuhn2004fault %} analyzed 329 error reports fro
 
 ### 1.3 Why Code Limits Interaction Depth
 
-A NASA study of 7,685 conditions found that most `if`/`while` statements have only 1-3 boolean operands {% cite hayhurst2001mcdc %}:
+A NASA study of 7,685 conditions found that most `if`/`while` statements have only 1-3 boolean operands {% cite hayhurst2001practical %}:
 
 | Operands | % of Conditions |
 |----------|-----------------|
