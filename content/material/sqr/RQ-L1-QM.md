@@ -1,5 +1,5 @@
 ---
-title: "Revision Questions: Quality Models"
+title: "RQ L01: Quality Models"
 parent: SQR Study Materials
 grand_parent: Selected Materials
 nav_order: 2
@@ -8,7 +8,7 @@ layout: default
 page_type: question-set
 ---
 
-# Revision Questions: Quality Models
+# RQ L01: Quality Models
 
 These questions test the lecture summarised in the [study notes](SN-L1-QM.md). Answer in your own words, with a short software example where asked.
 

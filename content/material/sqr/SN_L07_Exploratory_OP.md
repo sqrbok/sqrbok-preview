@@ -1,5 +1,5 @@
 ---
-title: "Study Notes: Exploratory Testing & Operational Profile"
+title: "SN L07: Exploratory Testing & Operational Profile"
 parent: SQR Study Materials
 grand_parent: Selected Materials
 nav_order: 13
@@ -8,7 +8,7 @@ layout: default
 page_type: study-notes
 ---
 
-# Study Notes: Exploratory Testing & Operational Profile
+# SN L07: Exploratory Testing & Operational Profile
 
 The lecture asks: *how do you test well when nobody has written the test cases?* and *which tests matter most, given how people actually use the system?* Exploratory testing (ET) answers the first, the operational profile (OP) the second. The difference: in ET the tester's judgement during the session decides what to test next; in OP-based testing, measured or estimated usage frequencies decide it before testing starts. [Revision questions](RQ_L07_Exploratory_OP.md) test it.
 

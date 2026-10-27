@@ -1,5 +1,5 @@
 ---
-title: "Revision Questions: Quality Measurement"
+title: "RQ L02: Quality Measurement"
 parent: SQR Study Materials
 grand_parent: Selected Materials
 nav_order: 4
@@ -8,9 +8,9 @@ layout: default
 page_type: question-set
 ---
 
-# L02: Quality Measurement — Revision Questions
+# RQ L02: Quality Measurement
 
-**Format:** Explain in your own words, give brief examples. These questions test the lecture summarised in [Study Notes: Quality Measurement](SN_L2_Metrics.md).
+**Format:** Explain in your own words, give brief examples. These questions test the lecture summarised in [SN L02: Quality Measurement](SN_L2_Metrics.md).
 
 ---
 

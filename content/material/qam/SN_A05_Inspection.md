@@ -1,5 +1,5 @@
 ---
-title: "Study Notes: Software Inspection"
+title: "SN A05: Software Inspection"
 parent: QAM Study Materials
 grand_parent: Selected Materials
 nav_order: 9
@@ -8,7 +8,7 @@ layout: default
 page_type: study-notes
 ---
 
-# Study Notes: Software Inspection
+# SN A05: Software Inspection
 
 ## Purpose
 These study notes explain how software inspection works, covering 50 years of evolution from Fagan's formal process to modern code review practices and emerging LLM-based tools.

@@ -1,5 +1,5 @@
 ---
-title: "Revision Questions: Security"
+title: "RQ L10: Security"
 parent: SQR Study Materials
 grand_parent: Selected Materials
 nav_order: 20
@@ -8,7 +8,7 @@ layout: default
 page_type: question-set
 ---
 
-# Software Security Analysis — Revision Questions
+# RQ L10: Software Security Analysis
 
 **Format:** Explain in your own words, give brief examples
 

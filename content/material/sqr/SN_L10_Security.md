@@ -1,5 +1,5 @@
 ---
-title: "Study Notes: Security"
+title: "SN L10: Security"
 parent: SQR Study Materials
 grand_parent: Selected Materials
 nav_order: 19
@@ -8,7 +8,7 @@ layout: default
 page_type: study-notes
 ---
 
-# Study Notes: Software Security Analysis (L10)
+# SN L10: Software Security Analysis
 
 ## Purpose
 These study notes cover software security analysis: the dependability framework and CIA triad, vulnerability finding techniques (SAST, DAST, fuzzing, penetration testing), threat modeling (STRIDE and alternatives), secure design principles (Saltzer & Schroeder), DevSecOps pipeline integration, and supply chain security — illustrated with six major case studies.

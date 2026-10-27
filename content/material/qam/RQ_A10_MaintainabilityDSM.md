@@ -1,5 +1,5 @@
 ---
-title: "Revision Questions: Maintainability & DSM"
+title: "RQ A10: Maintainability & DSM"
 parent: QAM Study Materials
 grand_parent: Selected Materials
 nav_order: 20
@@ -8,7 +8,7 @@ layout: default
 page_type: question-set
 ---
 
-# Revision Questions: Software Maintainability and Design Structure Matrix (A10)
+# RQ A10: Software Maintainability and Design Structure Matrix
 
 ---
 

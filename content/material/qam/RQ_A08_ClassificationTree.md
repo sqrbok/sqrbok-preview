@@ -1,5 +1,5 @@
 ---
-title: "Revision Questions: Classification Tree Method"
+title: "RQ A08: Classification Tree Method"
 parent: QAM Study Materials
 grand_parent: Selected Materials
 nav_order: 16
@@ -8,10 +8,10 @@ layout: default
 page_type: question-set
 ---
 
-# Revision Questions: Classification Tree Method
+# RQ A08: Classification Tree Method
 
 ## Purpose
-QAM lecture A08, optional for bachelor students and not examined in the bachelor course. 27 reflection questions for exam preparation, testing the lecture summarised in [Study Notes: Classification Tree Method](SN_A08_ClassificationTree.md). Questions focus on understanding and application, not memorization.
+QAM lecture A08, optional for bachelor students and not examined in the bachelor course. 27 reflection questions for exam preparation, testing the lecture summarised in [SN A08: Classification Tree Method](SN_A08_ClassificationTree.md). Questions focus on understanding and application, not memorization.
 
 ---
 
@@ -107,7 +107,7 @@ QAM lecture A08, optional for bachelor students and not examined in the bachelor
 
 ---
 
-*For detailed explanations, see [Study Notes: Classification Tree Method](SN_A08_ClassificationTree.md).*
+*For detailed explanations, see [SN A08: Classification Tree Method](SN_A08_ClassificationTree.md).*
 
 ---
 

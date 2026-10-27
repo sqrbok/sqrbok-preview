@@ -1,5 +1,5 @@
 ---
-title: "Revision Questions: Software Reliability"
+title: "RQ L08: Software Reliability"
 parent: SQR Study Materials
 grand_parent: Selected Materials
 nav_order: 16
@@ -8,9 +8,9 @@ layout: default
 page_type: question-set
 ---
 
-# Software Reliability — Revision Questions
+# RQ L08: Software Reliability
 
-**Format:** Explain in your own words, give brief examples, and show every calculation step. These questions test the lecture summarised in [Study Notes: Software Reliability](SN_L08_Reliability.md).
+**Format:** Explain in your own words, give brief examples, and show every calculation step. These questions test the lecture summarised in [SN L08: Software Reliability](SN_L08_Reliability.md).
 
 ---
 

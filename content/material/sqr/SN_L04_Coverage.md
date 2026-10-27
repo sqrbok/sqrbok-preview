@@ -1,5 +1,5 @@
 ---
-title: "Study Notes: Adequacy Criteria"
+title: "SN L04: Adequacy Criteria"
 parent: SQR Study Materials
 grand_parent: Selected Materials
 nav_order: 7
@@ -8,7 +8,7 @@ layout: default
 page_type: study-notes
 ---
 
-# Study Notes: Adequacy Criteria
+# SN L04: Adequacy Criteria
 
 The lecture asks *"how do you know when you have tested enough?"* Adequacy criteria give a measurable answer: they name the elements a test suite should exercise and count how many it does. The lecture builds the criteria up from statements to mutants, then asks what the research says a coverage number actually tells you. The [revision questions](RQ_L04_Coverage.md) test this lecture.
 

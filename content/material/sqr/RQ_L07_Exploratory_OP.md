@@ -1,5 +1,5 @@
 ---
-title: "Revision Questions: Exploratory Testing & OP"
+title: "RQ L07: Exploratory Testing & OP"
 parent: SQR Study Materials
 grand_parent: Selected Materials
 nav_order: 14
@@ -8,9 +8,9 @@ layout: default
 page_type: question-set
 ---
 
-# Exploratory Testing & Operational Profile — Revision Questions
+# RQ L07: Exploratory Testing & Operational Profile
 
-**Format:** Explain in your own words, give brief examples. These questions test the lecture summarised in [Study Notes: Exploratory Testing & Operational Profile](SN_L07_Exploratory_OP.md).
+**Format:** Explain in your own words, give brief examples. These questions test the lecture summarised in [SN L07: Exploratory Testing & Operational Profile](SN_L07_Exploratory_OP.md).
 
 ---
 

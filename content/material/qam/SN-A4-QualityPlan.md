@@ -1,5 +1,5 @@
 ---
-title: "Study Notes: Quality Planning"
+title: "SN A04: Quality Planning"
 parent: QAM Study Materials
 grand_parent: Selected Materials
 nav_order: 7
@@ -8,7 +8,7 @@ layout: default
 page_type: study-notes
 ---
 
-# Study Notes: Project Quality Planning
+# SN A04: Project Quality Planning
 
 ## Purpose
 These study notes explain how to create effective quality plans for software projects, covering the theoretical frameworks and practical applications from industry leaders.

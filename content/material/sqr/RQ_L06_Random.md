@@ -1,5 +1,5 @@
 ---
-title: "Revision Questions: Random Testing"
+title: "RQ L06: Random Testing"
 parent: SQR Study Materials
 grand_parent: Selected Materials
 nav_order: 12
@@ -8,9 +8,9 @@ layout: default
 page_type: question-set
 ---
 
-# Random Testing — Revision Questions
+# RQ L06: Random Testing
 
-**Format:** Explain in your own words, give brief examples. These questions test the lecture summarised in [Study Notes: Random Testing](SN_L06_Random.md).
+**Format:** Explain in your own words, give brief examples. These questions test the lecture summarised in [SN L06: Random Testing](SN_L06_Random.md).
 
 ---
 

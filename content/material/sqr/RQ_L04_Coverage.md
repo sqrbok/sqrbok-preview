@@ -1,5 +1,5 @@
 ---
-title: "Revision Questions: Adequacy Criteria"
+title: "RQ L04: Adequacy Criteria"
 parent: SQR Study Materials
 grand_parent: Selected Materials
 nav_order: 8
@@ -8,9 +8,9 @@ layout: default
 page_type: question-set
 ---
 
-# L04: Adequacy Criteria — Revision Questions
+# RQ L04: Adequacy Criteria
 
-**Format:** Explain in your own words, give brief examples. These questions test the lecture summarised in [Study Notes: Adequacy Criteria](SN_L04_Coverage.md).
+**Format:** Explain in your own words, give brief examples. These questions test the lecture summarised in [SN L04: Adequacy Criteria](SN_L04_Coverage.md).
 
 ---
 

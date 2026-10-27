@@ -1,5 +1,5 @@
 ---
-title: "Revision Questions: Industry Practices"
+title: "RQ A03: Industry Practices"
 parent: QAM Study Materials
 grand_parent: Selected Materials
 nav_order: 6
@@ -8,7 +8,7 @@ layout: default
 page_type: question-set
 ---
 
-# Industry Quality Practices — Revision Questions
+# RQ A03: Industry Quality Practices
 
 **Purpose:** Self-study and exam preparation
 **Format:** Explain in your own words, give brief examples

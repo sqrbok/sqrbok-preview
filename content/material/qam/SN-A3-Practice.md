@@ -1,5 +1,5 @@
 ---
-title: "SN: Industry Quality Practices"
+title: "SN A03: Industry Quality Practices"
 parent: QAM Study Materials
 grand_parent: Selected Materials
 nav_order: 5
@@ -8,7 +8,7 @@ layout: default
 page_type: study-notes
 ---
 
-# Study Notes: Industry Quality Practices
+# SN A03: Industry Quality Practices
 
 ## Purpose
 These study notes explain software quality practices used by industry leaders (Google, Microsoft, Netflix, Facebook) alongside emerging AI/LLM-based approaches. Designed for MS students preparing for exams.
