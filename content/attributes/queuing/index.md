@@ -4,118 +4,53 @@ parent: Quality Attributes
 has_children: true
 nav_order: 4
 layout: default
+page_type: topic-hub
 ---
 
-# Queuing Theory for Software Quality
+# Queuing Theory
 
-Queuing theory provides the mathematical framework for understanding **why systems slow down under load** and **how to predict when they will fail**. Every software system is a network of queues — from thread pools and connection pools to message brokers and load balancers. Understanding queuing behavior is essential for performance engineering, capacity planning, and SLA management.
+**Queuing theory** models a system as requests that arrive, wait for a busy resource, are served and leave, and predicts waiting time, queue length and utilization from the arrival and service rates. Every thread pool, disk and message broker is a queue {% cite shortle2018fundamentals %}.
 
----
+Queues form because of **variability**, not only overload. If requests arrive exactly once a minute and each takes exactly one minute, nobody waits; if both times vary around those averages, a queue builds, although the server keeps up on average {% cite dobson2012queuing %}. A queue is described by the arrival rate λ, the service rate μ of one server, the number of servers *c*, and the **utilization** ρ = λ / (*c* μ).
 
-## Origins and Foundations
+**Kendall notation** names a queue as *A*/*S*/*c*: the inter-arrival distribution, the service-time distribution and the number of servers, where M means exponential (memoryless), D deterministic and G general {% cite kendall1953stochastic %}. Later authors added the capacity *K*, population and discipline: M/M/4/104 holds at most 104 requests.
 
-Queuing theory began with Agner Krarup Erlang's 1909 study of telephone exchange congestion {% cite erlang1909theory %}. His work showed that service quality depends on the statistical relationship between arrival rates and service capacity — a principle that applies to any system where demand competes for limited resources.
+## Symbols
 
-In 1953, David Kendall created the **universal notation** for classifying queuing systems {% cite kendall1953stochastic %}, and in 1961, John Little proved the law that connects every performance metric {% cite little1961proof %}:
+The pages use one set of symbols.
 
-**L = &lambda;W**
+| Symbol | Meaning |
+|---|---|
+| λ, *X* | arrival rate and throughput; equal when no requests are lost |
+| *S* = 1/μ | mean service time per visit, measured as *B*/*C* (busy time over completions, see [Operational Laws](operational-laws.md)) |
+| *D* = *V* · *S* | service demand: total service per request at one resource (*D* = *S* with one visit) |
+| *U* = ρ | utilization, the fraction of time a server is busy |
+| *c* | number of servers (written *m* in M/G/m/m+r, see [Queuing Models](models.md)) |
+| *R*, *R*<sub>k</sub> | response time of the whole system; residence time at resource *k* |
+| *W*<sub>q</sub>, *W* | mean wait in the queue before service; total time all requests spent in the system in a window |
+| *N*, *M*, *Z* | requests in the system; users; think time |
 
-The average number of items in a system (L) equals the arrival rate (&lambda;) times the average time each item spends in the system (W). This holds regardless of arrival distributions, number of servers, or queue discipline {% cite little2008littles %}.
+Letters reused elsewhere: M and D in Kendall names; *S* (speedup), *N* (nodes, leaves) and *p* (a fraction) on the performance pages; *W* in Little's original L = λW is the mean time per request; *E*<sub>c</sub> is a term of the Erlang C formula.
 
----
+## The pages at a glance
 
-## Kendall Notation: The Language of Queuing Theory
+Each page adds one step.
 
-```mermaid
-%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#019546', 'lineColor': '#2D6E2A'}}}%%
-graph LR
-    Source["📥 Source"] -->|"λ"| Queue["▐▐▐▐ Queue"]
-    Queue --> Server(("🔧 Server"))
-    Server -->|"μ"| Out["📤 Output"]
+| Page | What it gives you | Needs | Main limit |
+|---|---|---|---|
+| [Operational Laws](operational-laws.md) | throughput, utilization, bottleneck from measured counters | a window and four counters | averages only |
+| [Queuing Models](models.md) | response time as utilization rises (the hockey stick) | arrival and service rates | assumed distributions |
+| [Queuing Networks and MVA](networks.md) | response time and throughput of a multi-tier system for M users | service demand per resource | product-form assumptions |
+| [Capacity Planning](applications.md) | how many servers, and when to add them | the above plus a growth forecast | the forecast |
 
-    style Source fill:#f0f8f0,stroke:#019546,color:#282828
-    style Queue fill:#c8e6c9,stroke:#019546,color:#282828
-    style Server fill:#c8e6c9,stroke:#019546,color:#282828
-    style Out fill:#f0f8f0,stroke:#019546,color:#282828
-```
+## Reading order
 
-Kendall notation classifies queuing systems using a six-position descriptor {% cite kendall1953stochastic %}:
+Read the pages in table order; each builds on the one before. [Performance Measurement](../performance/measurement.md) covers the metrics these pages assume.
 
-| Position | Meaning | Common Values |
-|----------|---------|---------------|
-| **a** | Arrival process | M (Markov/Poisson), G (General), D (Deterministic) |
-| **s** | Service time distribution | M (Exponential), G (General), D (Deterministic) |
-| **m** | Number of servers | 1, c, &infin; |
-| **b** | Buffer/queue capacity | K (finite), &infin; (default) |
-| **N** | Population size | Finite or &infin; (default) |
-| **Q** | Service discipline | FIFO (default), LIFO, PS |
+## How solid is this?
 
-Common shorthand omits the last three positions when they take default values (infinite buffer, infinite population, FIFO). A web server handling requests with exponential inter-arrival and service times, 4 CPU cores, and a bounded request queue of 100 could be modeled as **M/M/4/104**.
-
----
-
-## Why Queuing Theory Matters for Software Quality
-
-### The Hockey Stick Curve
-
-The most important insight from queuing theory is the **non-linear relationship** between utilization and response time {% cite sharma2007queuing %}:
-
-For an M/M/1 queue: **R = S / (1 - U)**
-
-Where R is response time, S is service time, and U is utilization. This produces the characteristic "hockey stick" curve:
-
-```vega-lite
-{
-  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "width": 500,
-  "height": 280,
-  "title": {"text": "Response Time vs Utilization (M/M/1)", "subtitle": "R = S / (1 − ρ) — the hockey stick curve", "subtitleFontSize": 12, "subtitleColor": "#666"},
-  "data": {"sequence": {"start": 0.01, "stop": 0.99, "step": 0.01, "as": "u"}},
-  "transform": [{"calculate": "1 / (1 - datum.u)", "as": "rt"}],
-  "mark": {"type": "line", "strokeWidth": 3, "color": "#019546"},
-  "encoding": {
-    "x": {"field": "u", "type": "quantitative", "title": "Utilization (ρ)", "axis": {"format": "%"}},
-    "y": {"field": "rt", "type": "quantitative", "title": "Response Time (× service time)", "scale": {"domain": [0, 25]}}
-  },
-  "config": {"font": "Tahoma, sans-serif", "view": {"stroke": null}}
-}
-```
-
-| Utilization | Response Time (× service time) | Character |
-|-------------|-------------------------------|-----------|
-| 30% | 1.4× | Comfortable |
-| 50% | 2.0× | Acceptable |
-| 70% | 3.3× | **Threshold** |
-| 80% | 5.0× | Warning |
-| 90% | 10.0× | Danger |
-| 95% | 20.0× | Crisis |
-
-Liu recommends keeping CPU utilization below 70% to ensure response times do not exceed 3× the base service time {% cite liu2011performance %}. Gunther warns that systems operating past the "knee" are unstable and prone to cascading failures {% cite gunther2007guerrilla %}.
-
-### From Theory to Practice
-
-Queuing theory connects to software quality through three practical applications:
-
-1. **[Operational Laws](operational-laws.md)** — Measurable relationships between throughput, utilization, and response time
-2. **[Queuing Models](models.md)** — Mathematical models for single queues and queuing networks (MVA)
-3. **[Applications](applications.md)** — Capacity planning, cloud scaling, and tail latency management
-
----
-
-## Sub-Pages
-
-| Page | Content |
-|------|---------|
-| [Operational Laws](operational-laws.md) | The six operational laws, bottleneck identification, service demand |
-| [Queuing Models](models.md) | M/M/1, M/M/c, queuing networks, Mean-Value Analysis |
-| [Applications](applications.md) | Capacity planning, cloud queuing, tail latency, simulation tools |
-
-## Study Materials
-
-| Page | Content |
-|------|---------|
-| [Study Notes](../../material/qam/SN-A09-Queuing.md) | Comprehensive study notes covering queuing theory for exam preparation |
-| [Revision Questions](../../material/qam/RQ-A09-Queuing.md) | 30 self-assessment questions with hidden answers, including problem-solving exercises |
+- **Where it comes from.** Erlang's telephone work {% cite erlang1909theory %}, Kendall {% cite kendall1953stochastic %} and Little {% cite little1961proof %}.
+- **What is assumed.** The single-queue formulas assume distributions; the operational laws do not.
 
 ---
 

@@ -1,5 +1,5 @@
 ---
-title: "Revision Questions: Performance Analysis"
+title: "RQ L09: Performance Analysis"
 parent: SQR Study Materials
 grand_parent: Selected Materials
 nav_order: 18
@@ -8,112 +8,82 @@ layout: default
 page_type: question-set
 ---
 
-# Performance Analysis — Revision Questions
+# RQ L09: Performance Analysis
 
-**Format:** Explain in your own words, give brief examples
-
----
-
-## Part 1: Performance Fundamentals
-
-### Q1: Business Impact of Latency
-
-A cloud-based e-commerce platform processes 50,000 orders per day with an average order value of $80. The platform's current average response time is 1.2 seconds.
-
-A proposed infrastructure upgrade would reduce response time to 0.4 seconds, but costs $200,000/year. Using the "100ms latency = 1% sales" rule of thumb:
-
-1. Estimate the annual revenue impact of the 800ms improvement
-2. Is the infrastructure investment justified?
-3. What assumptions make this calculation unreliable?
+**Format:** Explain in your own words and show your calculations. These questions test the lecture summarized in [SN L09: Performance Analysis](SN_L09_PerformanceAnalysis.md).
 
 ---
 
-### Q2: Performance Engineering vs Testing
+## Part 1: Why performance matters
 
-Explain why finding a performance problem during the **design phase** costs 10–100× less than finding it in **production**. Give a concrete example of a performance issue that:
+### Q1: The business value of latency
 
-(a) Could have been caught during design review
-(b) Was only discovered under production load
-(c) Required architectural redesign to fix
+Google's experiments found that adding 100–400 ms of delay to search pages reduced searches per user by 0.2–0.6%. A shop processes 50,000 orders a day at an average of 80 USD, and an upgrade costing 200,000 USD a year would cut its response time by 800 ms.
 
----
+1. Why can you not simply scale the Google result ("0.2–0.6% per 100–400 ms") to estimate the shop's revenue gain?
+2. What would you measure in the shop itself to decide whether the upgrade pays off?
 
-## Part 2: Performance Metrics
+### Q2: Why late fixes are expensive
 
-### Q3: Little's Law — Cloud Service
-
-A Kubernetes deployment shows the following metrics during peak hour:
-- Average active pod connections: **250**
-- Average response time: **125 milliseconds**
-
-1. Calculate the throughput (requests per second)
-2. The SRE team wants to reduce response time to 80ms without changing throughput. How many concurrent connections will the system handle?
-3. If the team adds a caching layer that reduces response time by 40%, what happens to concurrency at the same throughput? Explain using Little's Law.
+Explain why a performance problem caused by an anti-pattern cannot be fixed by tuning. Give one example of a problem that a design review could have caught, and say what the redesign would be.
 
 ---
 
-### Q4: Percentiles vs Averages
+## Part 2: Metrics
 
-Two API endpoints both report **mean response time = 500ms**:
+### Q3: Little's law
 
-- **Endpoint A:** p50 = 450ms, p90 = 550ms, p99 = 600ms
-- **Endpoint B:** p50 = 100ms, p90 = 200ms, p99 = **8000ms**
+A Kubernetes deployment shows on average 250 active connections and a mean response time of 125 ms.
 
-1. Which endpoint provides a better user experience for the majority of users?
-2. Which endpoint is more problematic from an SLA perspective (SLA: p99 < 1000ms)?
-3. Wilson recommends reporting the 90th percentile instead of the mean. How would this change the team's priorities?
+1. What is the throughput in requests per second?
+2. The team wants a mean response time of 80 ms at the same throughput. How many requests will be in the system?
+3. A cache cuts response time by 40%. At the same throughput, what happens to concurrency?
 
----
+### Q4: Averaging rates
 
-### Q5: Hockey Stick Curve — Three Zones
+Two benchmark runs of the same workload achieve 40 and 60 requests per second. What is the average throughput, and why is it not 50? When would 50 be the right answer?
 
-Sketch the hockey stick curve (from memory) with all three metrics (U, X, R) and the three zones (Light Load, Heavy Load, Buckle Zone).
+### Q5: Percentiles versus means
 
-For each zone, explain:
-1. What happens to **Utilization** (U)?
-2. What happens to **Throughput** (X)?
-3. What happens to **Response Time** (R)?
-4. What is the user experience like?
+Two endpoints both report a mean response time of 500 ms.
 
-What happens if you add a faster CPU? Draw how the curve shifts.
+- Endpoint A: p50 = 450 ms, p90 = 550 ms, p99 = 600 ms.
+- Endpoint B: p50 = 100 ms, p90 = 200 ms, p99 = 8,000 ms.
 
----
+1. Which endpoint serves most users better?
+2. Which one violates a target of "p99 < 1,000 ms"?
+3. Why can two endpoints with such different percentiles have the same mean?
 
-## Part 3: Scalability Laws
+### Q6: Behavior under rising load
 
-### Q6: Amdahl's Law — Optimization Decision
-
-Your application profile shows:
-- Database queries: 45% of execution time
-- Business logic: 35% of execution time
-- Network I/O: 20% of execution time
-
-A new database index would make queries **3× faster** (q = 3).
-
-1. Calculate the overall speedup using Amdahl's Law
-2. What is the maximum possible speedup even with infinitely fast queries?
-3. A colleague suggests also optimizing network I/O to be 2× faster. If both optimizations are applied, what is the combined speedup?
+Sketch utilization, throughput and response time against the number of users, and mark the light-load, heavy-load and buckle zones. For each zone, say what happens to each metric and to the user. What changes if the bottleneck resource is replaced by one twice as fast?
 
 ---
 
-### Q7: Gustafson vs Amdahl — When Each Applies
+## Part 3: Scalability laws
 
-A data science team runs machine learning training jobs. Their pipeline has two phases:
-- **Data loading** (serial): 10 minutes, cannot be parallelized
-- **Model training** (parallel): 50 minutes on 1 GPU
+### Q7: Amdahl's law
 
-1. Using Amdahl's Law with 10 GPUs, what is the expected training time?
-2. Under Gustafson's assumption, what could the team accomplish with 10 GPUs in the original 60-minute window?
-3. Which law is more appropriate for this scenario and why?
+An application spends 45% of its time in database queries, 35% in business logic and 20% in network I/O. A new index makes queries 3 times faster.
 
----
+1. What is the overall speedup?
+2. What is the most you could gain from making queries infinitely fast?
+3. If network I/O is also made 2 times faster, what is the combined speedup?
 
-### Q8: USL — Diagnosing Retrograde Throughput
+### Q8: Amdahl or Gustafson?
 
-A microservice cluster shows the following throughput measurements:
+A training pipeline loads data for 10 minutes (serial) and trains for 50 minutes on one GPU (parallel).
 
-| Instances | Throughput (rps) |
-|-----------|-----------------|
+1. With 10 GPUs and the same data, how long does the pipeline take?
+2. Under Gustafson's view (loading still takes 10 minutes), what could the team do with 10 GPUs in the original 60 minutes, and what is the scaled speedup?
+3. Which view fits a team that wants better models rather than faster training runs?
+
+### Q9: Retrograde throughput
+
+A service cluster measures:
+
+| Instances | Throughput (req/s) |
+|---|---|
 | 1 | 100 |
 | 2 | 185 |
 | 4 | 330 |
@@ -121,119 +91,87 @@ A microservice cluster shows the following throughput measurements:
 | 16 | 450 |
 | 32 | 320 |
 
-1. What USL parameter (α or β) is likely causing the degradation?
-2. Explain physically what is happening as instances increase beyond 8
-3. What architectural change would you propose to address this?
-4. Why does simply "adding more servers" make the problem worse?
+1. Which USL parameter, α or β, explains the decline beyond 8 instances?
+2. What is physically happening in the cluster?
+3. Propose one architectural change that would reduce that parameter.
 
 ---
 
-## Part 4: Risk & Anti-Patterns
+## Part 4: Risk, anti-patterns and bugs
 
-### Q9: Identify the Anti-Pattern
+### Q10: Name the anti-pattern
 
-For each scenario, identify the performance anti-pattern and propose a fix:
+For each case, name the anti-pattern and propose a fix.
 
-**(a)** A REST API endpoint calls the database once to get a list of 100 user IDs, then makes 100 separate database calls to get each user's profile. Response time is 3 seconds.
+1. An endpoint fetches 100 user ids with one query, then each profile with a separate query; it takes 3 s.
+2. An `OrderController` class computes every order itself: it asks the cart for each item, each item for its price, and the stock component for each item's availability, then applies the discounts. An order of 20 items takes about 60 calls. After your fix, how many calls does the controller make, and where has the work gone?
+3. A service creates and discards a database connection object on every request, and garbage-collection pauses cause 2 s spikes.
 
-**(b)** A single "OrderService" microservice handles order creation, payment processing, inventory management, shipping, and email notifications. During peak load, payment processing latency causes all other operations to queue.
+### Q11: How performance bugs are found
 
-**(c)** An application creates and destroys database connection objects for every request. During a load test, garbage collection pauses cause 2-second latency spikes every 30 seconds.
+Studies found that 33.9–57.3% of performance bugs were discovered by reasoning about code and only 5.5–10.4% with a profiler.
 
----
+1. Why does a profiler find so few of them?
+2. How would you change your team's code review to catch more?
 
-### Q10: Performance Bug Discovery
+### Q12: Performance budget
 
-Jin et al. (2012) found that **67% of performance bugs** are caused by wrong understanding of workload or API, and that profiling discovers only **5–10%** of performance bugs.
-
-1. Why is profiling such a poor method for discovering performance bugs?
-2. What method discovers the majority (33–57%) of performance bugs?
-3. How would you incorporate this finding into your team's code review process?
-
----
-
-## Part 5: Performance Testing
-
-### Q11: Test Strategy Design
-
-You are launching a ticket sales platform for a major concert. Expected traffic:
-- Normal: 5,000 concurrent users
-- On-sale moment: 200,000 concurrent users (40× spike in first 60 seconds)
-- Duration: 2-hour sale window
-
-Design a performance test strategy:
-1. Which of the 6 test types would you use, and in what order?
-2. What specific metrics would you monitor?
-3. What does "realistic workload" mean for this scenario?
-4. What is the risk if you only run a Load test but skip Stress and Soak tests?
+Explain what a performance budget allocates, how it is tracked during development, and why it is cheaper than load testing alone.
 
 ---
 
-## Part 6: Cloud-Era Performance
+## Part 5: Testing
 
-### Q12: Tail Latency Calculation
+### Q13: A test strategy for a ticket sale
 
-A search service fans out each user query to **80 backend shards**. Each shard has a 0.5% probability of responding slowly (>200ms).
+A concert ticket platform normally has 5,000 concurrent users; at the moment sales open it expects 200,000 within 60 seconds, for a two-hour sale.
 
-1. Calculate the probability that a user query hits at least one slow shard
-2. If the team implements **tied requests** (sending each sub-request to 2 shards simultaneously, cancelling the slower reply), what is the new probability of a slow response per sub-request?
-3. What is the total cost in terms of additional traffic?
-4. How would true **hedged requests** (delayed backup only issued after the 95th-percentile threshold) differ in traffic overhead, and why?
+1. Which of the six test types would you run, and in what order? Where does a spike test fit?
+2. Which metrics would you monitor, and what targets would you write?
+3. What does a realistic workload mean here?
+4. What risk remains if you run only a load test and skip stress and soak tests?
 
----
+### Q14: Reading a run
 
-### Q13: Per-Service SLO Budget
-
-A three-service call chain has a total SLO of p99 < 400ms:
-
-```
-User → API Gateway → Recommendation Engine → Database Service → Response
-```
-
-Current measurements:
-- API Gateway: p99 = 30ms
-- Recommendation Engine: p99 = 280ms
-- Database Service: p99 = 50ms
-- Total: p99 = 360ms (within SLO)
-
-1. Allocate a per-service SLO budget for each service
-2. The Recommendation Engine team wants to add a new ML model that increases their p99 to 350ms. Should this be approved?
-3. What trade-off does the team face? How does error budget thinking apply here?
+During a soak test at constant load, the response time rises slowly but steadily for four hours. What is the likely cause, and what would you look at next?
 
 ---
 
-### Q14: The Convergence of Classical PE and Cloud-Native
+## Part 6: Distributed systems
 
-Map each classical performance engineering concept to its cloud-native equivalent:
+### Q15: Tail amplification
 
-| Classical PE Concept | Cloud-Native Equivalent |
-|---------------------|-------------------------|
-| Performance budget per component | ? |
-| Budget tracking during development | ? |
-| Risk acceptance (some degradation OK) | ? |
-| 1–5% project cost for PE activities | ? |
-| Queuing theory models | ? |
+A search query fans out to 80 shards; each shard is slow (over 200 ms) on 0.5% of requests, independently.
 
-Explain why Dean & Barroso claim that the "physics hasn't changed" even though the tools and scale are completely different.
+1. What share of queries hits at least one slow shard?
+2. With hedged requests, a sub-request is slow only if both the original and its copy are slow. If the two are independent, what is the new probability per sub-request, and for the whole query?
+3. Why does Dean and Barroso's advice to send the copy only after the 95th-percentile expected latency keep the extra load to about 5%?
+
+### Q16: Per-service budgets
+
+A chain of three services has an end-to-end target of p99 < 400 ms. Measured p99s are: gateway 30 ms, recommendation 280 ms, database 50 ms.
+
+1. Propose a per-service budget.
+2. The recommendation team wants a new model that raises its p99 to 350 ms. Should it be approved, and what would have to change elsewhere?
+3. Why is adding the per-service p99s only an approximation of the chain's p99?
+
+### Q17: Classical and cloud performance engineering
+
+Map each classical concept to its cloud-native counterpart: the performance budget per component, tracking the budget during development, accepting some degradation, and queuing models. Explain why Little's law and queuing still apply to microservices.
 
 ---
 
-## Topics Covered
+## Topics covered
 
 | Topic | Questions |
-|-------|-----------|
-| Business impact, PE vs testing | Q1, Q2 |
-| Little's Law, percentiles | Q3, Q4 |
-| Hockey stick curve (3 zones) | Q5 |
-| Amdahl's Law | Q6 |
-| Gustafson vs Amdahl | Q7 |
-| USL, retrograde throughput | Q8 |
-| Performance anti-patterns | Q9 |
-| Performance bug empirical evidence | Q10 |
-| Performance testing methodology | Q11 |
-| Tail latency amplification | Q12 |
-| Per-service SLOs | Q13 |
-| Classical PE → cloud-native convergence | Q14 |
+|---|---|
+| Business impact, design-time fixes | Q1, Q2 |
+| Little's law, harmonic mean, percentiles | Q3, Q4, Q5 |
+| Behavior under load | Q6 |
+| Amdahl, Gustafson, USL | Q7, Q8, Q9 |
+| Anti-patterns, bugs, budgets | Q10, Q11, Q12 |
+| Test types and analysis | Q13, Q14 |
+| Tail latency, per-service SLOs | Q15, Q16, Q17 |
 
 ---
 
