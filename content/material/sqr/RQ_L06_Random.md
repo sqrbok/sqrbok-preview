@@ -10,13 +10,13 @@ page_type: question-set
 
 # Random Testing — Revision Questions
 
-**Format:** Explain in your own words, give brief examples
+**Format:** Explain in your own words, give brief examples. These questions test the lecture summarised in [Study Notes: Random Testing](SN_L06_Random.md).
 
 ---
 
 ## Question 1: What Makes Random Testing "Random"
 
-What makes random testing "random" in the technical sense? What three conditions must be satisfied (Hamlet 1984)?
+What makes random testing "random" in the technical sense? What three conditions must be satisfied (Hamlet)?
 
 ---
 
@@ -28,7 +28,7 @@ When would random testing be a poor choice compared to partition testing?
 
 ## Question 3: Statistical Confidence Limits
 
-A colleague says "we ran 10,000 random tests with no failures, so the software is bug-free." What is wrong with this claim? Use the formula $C = 1-(1-F)^N$.
+A colleague says "we ran 10,000 random tests with no failures, so the software is bug-free." What is wrong with this claim? Use the formula $C = 1-(1-F)^N$ with a true failure rate of $F = 1/10{,}000$.
 
 ---
 
@@ -66,7 +66,7 @@ How does fuzz testing differ from random testing, and when would you choose fuzz
 
 ## Question 9: Three Generations of Fuzzing
 
-Explain the three generations of fuzzing (blackbox, whitebox, greybox) and why greybox fuzzing "won."
+Explain the three generations of fuzzing (blackbox, whitebox, greybox). What does each add, and what does greybox fuzzing trade away compared with whitebox fuzzing?
 
 ---
 
@@ -88,33 +88,33 @@ Why is the finding that "57,142 unique crashes = only 9 actual bugs" (Klees 2018
 
 ---
 
-## Question 13: Multiple Fuzzers
+## Question 13: Evaluating Fuzzers
 
-Why does running multiple different fuzzers on the same target find 50% more bugs than any single tool?
+Klees et al. (2018) found that rankings of two fuzzers reversed between 6 and 24 hours of fuzzing. What should a fair comparison of two fuzzers include, and why?
 
 ---
 
 ## Question 14: QuickCheck Bug Distribution
 
-QuickCheck found bugs equally in implementations, specifications, and generators. Why is this surprising?
+QuickCheck's authors found the errors divided roughly evenly between generators, properties and programs. Why is this surprising, and what does it say about writing properties?
 
 ---
 
-## Question 15: Hypothesis Byte-Stream Representation
+## Question 15: Hypothesis's Universal Representation
 
-What problem does Hypothesis's "universal byte-stream representation" solve?
+What problem does Hypothesis's "single universal representation" of test cases solve?
 
 ---
 
 ## Question 16: JQF Improvement
 
-How does JQF achieve a 1,000x improvement over random PBT?
+On the Trie example, pure random generation found no failure in over 7 million executions while JQF's Zest found one after about 5,000. What does Zest do differently?
 
 ---
 
 ## Question 17: PBT Property Challenge
 
-Why do 16 out of 30 PBT practitioners say "not knowing what properties to test" is the biggest challenge (Goldstein 2024)?
+In Goldstein et al. (2024), 16 of 30 practitioners said writing specifications slowed them down, and one called "not knowing what properties to test" the most common failure mode. Why is finding properties hard, and which kinds of property did practitioners use most?
 
 ---
 
@@ -132,13 +132,13 @@ Explain the coupling effect and why it justifies testing with simple mutations o
 
 ## Question 20: Equivalent Mutant Problem
 
-Why is the equivalent mutant problem considered the most persistent challenge in mutation testing?
+Why is the equivalent mutant problem the most persistent challenge in mutation testing? Use the share of equivalent mutants and the decidability of equivalence.
 
 ---
 
 ## Question 21: Small vs Large LLMs for Mutant Detection
 
-Why does a smaller code-specific model (UniXCoder, 110M parameters) outperform GPT-4 on equivalent mutant detection (Tian 2024)?
+In Tian et al. (2024), a fine-tuned code model of modest size (UniXCoder) outperformed prompting large general models such as GPT-4 on equivalent mutant detection. Suggest reasons why training on code and fine-tuning for the task could matter more than model size.
 
 ---
 
@@ -150,7 +150,7 @@ What is the "crossfire" phenomenon in mutation testing?
 
 ## Question 23: Mutation Score Target
 
-A team achieves 85% mutation score. Should they aim for 100%? Why or why not?
+A team achieves 85% mutation score. Should they aim for 100%? Why or why not? Consider equivalent mutants and the cost of each remaining survivor.
 
 ---
 
@@ -162,19 +162,19 @@ Compare how mutation testing and property-based testing approach test quality. H
 
 ## Question 25: Branch Coverage and Mutation
 
-What is the relation between branch coverage and mutation testing? Does one subsume the other?
+*(Relies on L04, Adequacy Criteria.)* What is the relation between branch coverage and mutation testing? Does one subsume the other?
 
 ---
 
-## Question 26: Random vs Partition — Short Answer
+## Question 26: Plain versus Guided Random Testing
 
-Is random testing better than partition testing? Under what conditions does each approach excel?
+Feedback-directed testing and coverage-guided fuzzing choose later inputs because of earlier results; property-based tools skew their distribution towards edge values. Which of Hamlet's conditions for a reliability figure does each break, and what can you then no longer claim?
 
 ---
 
-## Question 27: Fuzz Testing Definition
+## Question 27: Random Seeds
 
-What is fuzz testing? How is it different from random testing? Compare inputs, focus, and oracle.
+In the AutoTest study, one seed found 5 bugs and another 23 for the same class in 30 minutes. What does this mean for how you run and report random testing?
 
 ---
 
@@ -186,7 +186,7 @@ What is the oracle problem? Why is it the bottleneck of random testing?
 
 ## Question 29: Oracle Evolution
 
-Trace the evolution of oracles across the four techniques: random testing, fuzz testing, property-based testing, and mutation testing.
+Trace the oracles across the four techniques: random testing, fuzz testing, property-based testing and mutation testing. (In mutation testing, the oracle is the test suite's own verdict: a mutant is killed when some test fails.)
 
 ---
 
@@ -198,7 +198,7 @@ If you could only apply one technique from this lecture to a new project, which 
 
 ## Question 31: Bug Classes vs Tool Progress
 
-The same bug classes persisted for 16 years (Miller studies). Meanwhile, LLMs detect 86% of equivalent mutants. What does this contrast tell us?
+The same kinds of programming errors kept appearing across Miller's studies from 1990 to 2006, while recent models reach an F1-score of about 87% on equivalent mutant detection. What does this contrast suggest about where testing tools have improved and where they have not?
 
 ---
 
@@ -218,9 +218,9 @@ Why might JQF's convergence of PBT and fuzzing be the most significant developme
 
 ---
 
-## Question 34: Pesticide Paradox (Practical)
+## Question 34: When Random Testing Stops Finding Bugs (Practical)
 
-Explain how the "pesticide paradox" applies across all four testing techniques covered in this lecture. What is the universal mitigation?
+Randoop stopped finding new errors after about twelve hours, and Miller's fuzz studies kept finding the same kinds of bugs over sixteen years. What do these two observations say about how long a random-testing tool stays useful, and what would you change to keep finding bugs?
 
 ---
 
@@ -228,13 +228,16 @@ Explain how the "pesticide paradox" applies across all four testing techniques c
 
 | Topic | Questions |
 |-------|-----------|
-| Random testing basics | Q1, Q2, Q3 |
-| Random testing theory | Q4, Q5, Q6, Q7 |
+| Random testing basics | Q1, Q2 |
+| Reliability calculation | Q3, Q4 |
+| Random testing theory | Q6, Q26 |
+| Oracles | Q7, Q28, Q29 |
+| Feedback-directed tools | Q5, Q27 |
 | Fuzz testing | Q8, Q9, Q10, Q11, Q12, Q13 |
 | Property-based testing | Q14, Q15, Q16, Q17, Q18 |
 | Mutation testing | Q19, Q20, Q21, Q22, Q23 |
-| Comparisons | Q24, Q25, Q26, Q27, Q28 |
-| Cross-cutting | Q29, Q30, Q31 |
+| Comparisons | Q24, Q25 (uses L04) |
+| Cross-cutting | Q30, Q31 |
 | Practical problems | Q32, Q33, Q34 |
 
 ---

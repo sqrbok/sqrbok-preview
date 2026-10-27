@@ -1,199 +1,84 @@
 ---
 title: Property-Based Testing
 parent: Random Testing
-nav_order: 3
+nav_order: 6
 layout: default
 ---
 
 # Property-Based Testing
 
-Property-based testing (PBT) combines random input generation with executable specifications. Instead of writing individual test cases with expected outputs, developers write **properties** — statements that should hold for all inputs — and the tool generates hundreds or thousands of random inputs to find counterexamples.
+**Property-based testing (PBT)** replaces hand-picked examples with a *property*, a statement that must hold for every input, and lets a tool generate many random inputs to look for one that breaks it. When it finds one, it **shrinks** it to a small failing case before reporting it. QuickCheck introduced the approach for Haskell in 2000 {% cite claessen2000quickcheck %}.
 
----
+## 1. Three parts
 
-## The QuickCheck Paradigm
+Every PBT tool combines the same three ideas {% cite claessen2000quickcheck %}.
 
-Claessen and Hughes introduced PBT in 2000 with QuickCheck, a remarkably lightweight Haskell library of approximately 300 lines {% cite claessen2000quickcheck %}. The core idea has three parts:
+- A **property** is code that returns true or asserts for any valid input: "decoding an encoded string gives the string back". A property may have a *precondition* that filters inputs, such as "for any non-empty list, the first element of the sorted list is its minimum".
+- A **generator** produces random values of the input type, from small to large, with a deliberate bias towards edge values such as 0, empty strings and very large numbers; by default Hypothesis tries 100 of them per test.
+- A **shrinker** reduces a failing input step by step while it keeps failing, so the report shows the essence of the bug.
 
-### 1. Properties as Executable Specifications
+![Property-based testing loop: generate, check the property, repeat or shrink the counterexample](pbt-loop.svg)
 
-A property is a boolean function that should return true for all valid inputs:
+_The property is the oracle; the generator replaces the tester's choice of inputs._
 
-```python
-# Property: reversing a list twice gives back the original
-def prop_reverse_involution(xs):
-    return list(reversed(list(reversed(xs)))) == xs
+## 2. Worked example with Hypothesis
 
-# Property: sorting is idempotent
-def prop_sort_idempotent(xs):
-    return sorted(sorted(xs)) == sorted(xs)
-```
-
-### 2. Generators
-
-Generators produce random values of specific types with controllable distributions. For recursive data structures, generation is bounded by a "size" parameter that increases gradually, preventing non-termination {% cite claessen2000quickcheck %}:
-
-- **Primitive generators**: integers, strings, booleans with uniform distribution
-- **Composite generators**: lists, trees, records built from primitives
-- **Custom generators**: domain-specific types with targeted distributions
-
-### 3. Shrinking
-
-When a counterexample is found, the tool automatically reduces it to a **minimal failing case** by progressively simplifying the input while preserving the failure. This is critical for debugging: a failing input of 500 elements shrinks to the 3 that actually trigger the bug.
-
-### Key Insight: Where Bugs Hide
-
-QuickCheck's case studies revealed that errors are found roughly equally in three places {% cite claessen2000quickcheck %}:
-
-| Location | Proportion | Implication |
-|----------|------------|-------------|
-| **Implementation** | ~1/3 | The bugs you expect to find |
-| **Specification** | ~1/3 | Properties themselves are wrong — forces specification clarity |
-| **Generators** | ~1/3 | Test data generation is biased or incomplete |
-
-### The False Confidence Warning
-
-QuickCheck exposed a critical pitfall: conditional properties can create a "false sense of security" when >95% of generated test cases satisfy preconditions only trivially {% cite claessen2000quickcheck %}. Monitoring test data distribution is essential — the `classify` and `collect` combinators exist precisely for this purpose.
-
----
-
-## Hypothesis: Modern PBT for Python
-
-MacIver and Hatfield-Dodds developed Hypothesis, bringing PBT to the Python ecosystem with over 100,000 weekly downloads and adoption by approximately 4% of Python developers {% cite maciver2019hypothesis %}.
-
-A complete Hypothesis test:
+Hypothesis is the main PBT library for Python {% cite maciver2019hypothesis %}. This run-length encoder has a bug that drops the last run; the round-trip property finds it:
 
 ```python
-from hypothesis import given
-import hypothesis.strategies as st
+from hypothesis import given, strategies as st
 
-@given(st.lists(st.integers()))
-def test_sort_preserves_length(xs):
-    assert len(sorted(xs)) == len(xs)
+def encode(s):
+    out = []
+    for ch in s:
+        if out and out[-1][0] == ch:
+            out[-1] = (ch, out[-1][1] + 1)
+        else:
+            out.append((ch, 1))
+    # bug: drops the last run when there are two or more runs
+    return out[:-1] if len(out) > 1 else out
 
-@given(st.lists(st.integers(), min_size=1))
-def test_sort_min_is_first(xs):
-    assert sorted(xs)[0] == min(xs)
+def decode(runs):
+    return "".join(ch * n for ch, n in runs)
+
+@given(st.text())
+def test_round_trip(s):
+    assert decode(encode(s)) == s
 ```
 
-When Hypothesis finds a failure, it **shrinks** automatically:
-
-```
-Falsifying example: test_encode_decode(s='\x00\x01\xc0')
-  → After shrinking: test_encode_decode(s='\x80')    # minimal counterexample
-```
-
-### Key Innovation: Universal Test Representation
-
-Instead of requiring separate generators, shrinkers, and validity filters for each type, Hypothesis uses a single underlying byte-stream representation. All test cases are sequences of choices from this stream, and shrinking operates uniformly by reducing the byte stream {% cite maciver2019hypothesis %}:
-
-- **No custom shrinker code** needed per type
-- **Automatic validity preservation** during shrinking
-- **Transparent targeted PBT** — can optimize toward specific goals without generator changes
-
-### Impact
-
-Hypothesis has found bugs in NumPy, Astropy, and other scientific Python libraries, demonstrating that PBT catches real bugs in mature, widely-used software {% cite maciver2019hypothesis %}.
-
----
-
-## JQF: Where PBT Meets Fuzzing
-
-Padhye et al. bridged the gap between QuickCheck-style PBT and AFL-style coverage-guided fuzzing with JQF {% cite padhye2019jqf %}.
-
-### The Insight
-
-Traditional PBT generates structured inputs but ignores code coverage. Fuzzers track coverage but mutate raw bytes. JQF maps byte-level mutations to structural mutations in complex inputs:
-
-```
-Random bytes → Generator → Structured input → Program → Coverage feedback
-     ↑                                                        |
-     └────────── Evolutionary mutation ←──────────────────────┘
+```text
+E       AssertionError: assert '0' == '01'
+E       Failing test case: test_round_trip(
+E           s='01',
+E       )
 ```
 
-### Zest Algorithm
+Hypothesis tried random strings, found a failing one, and shrank it to `'01'`: `encode('01')` returns `[('0', 1)]`, which decodes to `'0'`, not `'01'`. Shrinking removes and simplifies characters while the test still fails: a string with one run, such as `'0'`, never fails, because the bug only drops the last run when there are two or more, so the smallest failing input has exactly two different characters. Hypothesis can shrink any input type without a hand-written shrinker because it records every test case in a single universal representation and shrinks that instead {% cite maciver2019hypothesis %}.
 
-JQF's **Zest** algorithm applies AFL-style coverage guidance to parametric generators:
+## 3. Where the bugs turn out to be
 
-1. Generate a structured input using a QuickCheck-style generator backed by a random byte sequence
-2. Execute the program and record code coverage
-3. If new coverage is observed, save the byte sequence as a new seed
-4. Mutate saved seeds at the byte level to produce new structured inputs
+The QuickCheck authors found the errors divided "roughly evenly" between generators, the property and the program {% cite claessen2000quickcheck %}: writing a property checks what you think the code should do. They also warned of false security: in one case study over 95% of generated inputs met a property's precondition only trivially, so tools report how inputs were distributed.
 
-### Results
+## 4. PBT in practice
 
-| Benchmark | Random PBT | Zest (Coverage-Guided) | Improvement |
-|-----------|-----------|----------------------|-------------|
-| Trie bug | Not found in 7M+ executions | Found in ~5K executions | **>1,000x** |
-| Total bugs found | — | 42 bugs in OpenJDK, Apache Commons, Google Closure, Mozilla Rhino | — |
+Interviews with 30 developers at Jane Street show where PBT pays off {% cite goldstein2024pbt %}. The most common properties compared two implementations (*differential*, 17 of 30 participants), checked that a value survives a round trip such as serialise-then-parse (11 of 30), or simply that nothing crashes (7 of 30); one participant could report several kinds, so the counts overlap. Property tests ran within budgets of 50 milliseconds to 30 seconds, and 16 of 30 participants said writing specifications slowed them down. Several valued properties as documentation that "never fall out of date".
 
-Coverage guidance transforms random testing from "hope to stumble on a bug" to "systematically explore program behavior" {% cite padhye2019jqf %}.
+Coverage feedback can also drive PBT generators. Zest, part of the JQF tool for Java, mutates the random choices behind a generator and keeps those that reach new code: on a property about a trie (a prefix tree for string keys), it found a failing input after about 5,000 test executions, where pure random generation found none in over 7 million {% cite padhye2019jqf %}; see [Coverage-Guided Fuzzing](greybox.md).
 
----
+## When to use it — and when not
 
-## PBT in Industry Practice
+- **Use it** for round trips (encode/decode), for a fast implementation checked against a slow obvious one, and for invariants such as "the output is sorted".
+- **Use it** on pure functions and data structures, where properties are easy to state, and on web services (see [Property-Based Testing of Web Services](pbt-web.md)).
+- **Do not force it** where no property is known; a property that restates the code proves nothing.
 
-Goldstein et al. conducted 30 interviews at Jane Street, a company with mature PBT culture, to understand how practitioners actually use PBT {% cite goldstein2024pbt %}:
+## Limitations
 
-### Where PBT Provides High Leverage
+The hardest part is finding properties: one experienced user called "not knowing what properties to test" the most common failure mode {% cite goldstein2024pbt %}. Generators for complex inputs are tedious to write, and a skewed generator can leave most of the input space untried.
 
-| Pattern | Practitioners Using | Description |
-|---------|-------------------|-------------|
-| **Differential testing** | 17/30 | Compare two implementations of the same specification |
-| **Round-trip properties** | 11/30 | encode ∘ decode = identity |
-| **Catastrophic failure** | 7/30 | No crash, no exception, no data loss for any input |
-| **Hard-to-specify behavior** | 4/30 | "I know it when I see it" — at least test what you can |
+## How solid is this?
 
-### Practical Constraints
-
-- **Time budgets are strict**: 50ms to 30s per property (vs. fuzzing campaigns of hours or days)
-- **Generator design is tedious**: 6/30 practitioners cited generator complexity as a major challenge
-- **The primary failure mode**: "not knowing what properties to test" — 16/30 found writing properties challenging
-- **Value beyond bugs**: PBT serves as executable documentation that "never falls out of date" {% cite goldstein2024pbt %}
-
-### Adoption Pattern
-
-PBT is used **opportunistically** in high-leverage scenarios rather than as a universal testing strategy. Practitioners apply it where the payoff is highest: APIs with rich invariants, serialization code, and algorithmic components {% cite goldstein2024pbt %}.
-
----
-
-## The PBT Evolution
-
-```mermaid
-flowchart TD
-    A["QuickCheck (2000)<br>Random generation + shrinking + properties"] --> B["Hypothesis (2019)<br>Universal byte-stream representation"]
-    B --> C["JQF / Zest (2019)<br>Coverage-guided + structured generation"]
-    C --> D["Industry adoption (2024)<br>Opportunistic, high-leverage, time-bounded"]
-
-    A -- "Solved" --> A1(("Manual oracle<br>effort"))
-    B -- "Solved" --> B1(("Custom shrinker<br>per type"))
-    C -- "Solved" --> C1(("Coverage<br>blindness"))
-
-    style A fill:#e1f5fe,stroke:#0288d1
-    style B fill:#e1f5fe,stroke:#0288d1
-    style C fill:#e1f5fe,stroke:#0288d1
-    style D fill:#c8e6c9,stroke:#388e3c
-    style A1 fill:#fff3cd,stroke:#ffc107
-    style B1 fill:#fff3cd,stroke:#ffc107
-    style C1 fill:#fff3cd,stroke:#ffc107
-```
-
-Each generation retains the core PBT idea — properties as specifications, random inputs as exploration — while addressing a key limitation of its predecessor.
-
----
-
-## Getting Started
-
-PBT frameworks exist for most major languages:
-
-| Language | Framework | Key Feature |
-|----------|-----------|-------------|
-| Haskell | QuickCheck | Original, type-class generators |
-| Python | Hypothesis | Universal representation, large ecosystem |
-| Java | JQF | Coverage-guided, JUnit integration |
-| Scala | ScalaCheck | QuickCheck port for JVM |
-| F# | FsCheck | .NET QuickCheck port |
-| Erlang | QuickCheck (Quviq) | Commercial, stateful testing |
+- **Where it comes from.** The QuickCheck paper's case studies {% cite claessen2000quickcheck %}, the Hypothesis paper {% cite maciver2019hypothesis %}, and an interview study at one company {% cite goldstein2024pbt %}.
+- **What is contested.** The Jane Street study describes a company with strong PBT habits and OCaml tooling; the counts describe that culture, not industry in general.
 
 ---
 

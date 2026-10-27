@@ -10,275 +10,102 @@ page_type: study-notes
 
 # Study Notes: Random Testing
 
-## Purpose
-These study notes cover the four pillars of random testing: probabilistic theory, fuzz testing, property-based testing, and mutation testing. The lecture traces the evolution from simple random input generation (1984) to coverage-guided structured fuzzing and LLM-assisted mutation analysis.
+The lecture asks what you gain by letting a program, not a person, choose test inputs. It covers four topics: random testing itself (its theory, and feedback-directed tools such as Randoop), fuzz testing, property-based testing, and mutation testing, which plants many small faults to measure how good tests are. The [revision questions](RQ_L06_Random.md) test this lecture.
 
-**Primary Sources:**
-- Hamlet 1984, Random Testing {% cite hamlet1984random %}
-- Hamlet 2006, When Only Random Testing Will Do {% cite hamlet2006random %}
+## 1. Random testing needs an oracle; predicting reliability needs the operational profile
 
-**Key Research Papers:**
-- Duran & Ntafos 1984: Random vs partition testing {% cite duran1984evaluation %}
-- Miller et al. 1990: Fuzz testing origin {% cite miller1990fuzz %}
-- Manes et al. 2019: Fuzzing survey {% cite manes2019fuzzing %}
-- Claessen & Hughes 2000: QuickCheck {% cite claessen2000quickcheck %}
-- DeMillo et al. 1978: Mutation testing {% cite demillo1978hints %}
-- Jia & Harman 2011: Mutation testing survey {% cite jia2011mutation %}
+Random testing is not haphazard testing: inputs are drawn by a pseudorandom generator from a defined distribution. Any such sampling with an automatic oracle can find bugs. To turn passing tests into a **reliability figure**, Hamlet requires three conditions {% cite hamlet1984random %}: (1) a system-level test; (2) inputs drawn independently from the **operational profile**, how often real users supply each kind of input; and (3) an effective oracle that judges every output automatically. Without an automatic oracle, random inputs only produce outputs that someone must check. This is the **oracle problem**, and it is the bottleneck of every technique in the lecture. Oracles range from cheap and blind to precise and costly: crash or hang detection; **sanitizers** (compiler checks that turn hidden memory errors into crashes); contracts such as pre- and postconditions; properties that every correct output satisfies; and **differential** testing against another implementation {% cite manes2019fuzzing claessen2000quickcheck %}. Only plain random testing on the profile meets all three. The guided tools below (feedback-directed testing, coverage-guided fuzzing) break condition 2 because they choose inputs from earlier results, so draws are not independent. Property-based tools draw independently and have an automatic oracle, but they break condition 2 in another way: their distribution is deliberately skewed towards edge values, so any confidence figure describes the generator, not real use. All of them find bugs faster but lose the statistical claim of section 2.
 
----
+→ [Random Testing Fundamentals](../../verif/random/fundamentals.md)
 
-## Part 1: Random Testing Basics
+## 2. Passing tests buy a statistical claim, and 23,000 buy a strong one
 
-### 1.1 What is Random Testing?
+If the failure rate is *F*, *N* independent tests reveal a failure with probability *C* = 1 − (1 − *F*)<sup>*N*</sup>, so *N* = ln(1 − *C*) / ln(1 − *F*). For example, 90% confidence that the failure rate is below 1 in 10,000 takes about 23,025 passing tests. The reasoning runs backwards: if *F* were 1/10,000 or more, 23,025 tests would have shown a failure with probability at least 90%; since all passed, you can be 90% confident that *F* < 1/10,000. As section 1 explains, property-based tools cannot give this figure; they are for finding bugs, not for estimating reliability. The claim holds only for the profile you sampled: if real use differs, the prediction can be arbitrarily optimistic {% cite hamlet1984random %}.
 
-Random testing selects test inputs independently at random from the program's input domain {% cite hamlet1984random %}. It is not haphazard — it requires:
+→ [Random Testing Fundamentals](../../verif/random/fundamentals.md)
 
-1. A **defined input distribution** (operational profile or uniform)
-2. **Statistical independence** between test selections
-3. An **oracle** to determine pass/fail
+## 3. Random testing misses rare inputs, but partitions gain less than expected
 
-| "Random" in Testing | "Random" Elsewhere |
-|--------------------|--------------------|
-| Systematic exploration | Arbitrary selection |
-| Statistical guarantees | No guarantees |
-| Automated generation | Manual "pick some" |
+A uniform sample almost never hits one exact boundary value, which is what partition testing aims at. Yet the comparisons since 1984, summarised by Hamlet, found the gap small: Duran and Ntafos found random testing often more cost-effective {% cite duran1984evaluation %}, and roughly 20% more random tests wipe out any advantage of partition testing {% cite hamlet1984random %}. Partitions win when some subdomains carry much costlier failures {% cite tsoukalas1993reliability %}; random sampling is the only principled choice for large unstructured domains and for programs with state, where a test is a sequence of inputs from reset {% cite hamlet2006random %}.
 
-### 1.2 Why Use Random Testing?
+→ [Random versus Partition Testing](../../verif/random/partition.md)
 
-| Benefit | Explanation |
-|---------|-------------|
-| **Cheap** | Once the oracle is solved, generating inputs is trivial |
-| **Probabilistic guarantees** | Can calculate reliability bounds {% cite hamlet1984random %} |
-| **Complements partition** | Finds different faults than systematic testing |
-| **Scales well** | Can generate millions of tests automatically |
+## 4. Feedback makes random generation productive
 
-Random testing is particularly useful when domain knowledge is lacking, the state space is large, or reliability calculations are required {% cite hamlet2006random %}.
+Randoop builds random sequences of method calls and executes each at once. A sequence is *valid* if it runs without an error and without being rejected as illegal input; valid sequences are kept and extended, and those that break a contract, such as a failed assertion, are reported. At Microsoft, on a .NET component tested for five years by about 40 testers, it found 30 previously unknown errors. The team spent 15 hours of its own time; the tool used 150 hours of CPU time, partly on many machines in parallel. Measured in the team's hours of using the tool, the rate fell and then hit a **plateau**: 10 errors in the first two hours, about 2 per hour for the next ten (30 in about 12 hours), then none. The cause was unfair selection: methods are picked uniformly, so classes with easy or many constructors are explored far more than classes whose objects are hard to build {% cite pacheco2007randoop %}. With AutoTest, the random seed alone changed the bugs found in 30 minutes from 5 to 23 {% cite meyer2007autotest %}.
 
-{: .highlight }
-> **Exam Tip:** Random testing is NOT haphazard testing. It requires a defined distribution, statistical independence, and an oracle. Memorize these three requirements.
+→ [Feedback-Directed Random Testing](../../verif/random/feedback.md)
 
----
+## 5. Fuzzing turned random bytes into a security tool
 
-## Part 2: Random Testing Theory
+Fuzzing differs from plain random testing in its inputs, its oracle and its goal: it feeds malformed or byte-level inputs, often outside what the program expects, watches for crashes, hangs or sanitizer reports rather than wrong answers, and mainly seeks robustness and security bugs {% cite manes2019fuzzing %}. Because fuzz inputs lie deliberately outside the operational profile, even blackbox fuzzing gives no reliability figure. In 1990, random input crashed or hung 24–33% of UNIX utilities on each system tested {% cite miller1990fuzz %}. Repeated studies found GUI applications worse, not better: 45% of Windows NT applications crashed or hung in 2000, and 73% of macOS GUI applications in 2006, while macOS command-line tools fell to 7% {% cite forrester2000windows miller2006macos %}. The same kinds of simple programming errors behind the 1990 failures were still present in 2006 {% cite miller2006macos %}.
 
-### 2.1 Probabilistic Guarantees
+Three generations of fuzzers followed: blackbox random bytes; whitebox fuzzing, which uses **symbolic execution**: it records the branch conditions along an executed path (the *path constraints*) and asks a solver for an input that takes a different branch (Microsoft's SAGE found one third of Windows 7 file-fuzzing bugs this way {% cite bounimova2010sage %}); and greybox fuzzing, which keeps any mutated input that reaches new coverage. Greybox gives up the ability to solve its way past a hard check in exchange for running thousands of inputs in the time one is analysed symbolically. Directed greybox fuzzing steers inputs towards a target by mutating inputs closer to it more often: AFLGo exposed Heartbleed, the 2014 OpenSSL bug that leaked server memory, in under 20 minutes, where a symbolic-execution tool, slowed by heavy program analysis for every input, failed in 24 hours {% cite bohme2017directed %}. Fuzzers must be evaluated carefully: 57,142 "unique" crashes turned out to be 9 bugs, and one fuzzer that led after 6 hours lost after 24, so comparisons need many runs and long campaigns {% cite klees2018evaluating %}.
 
-The fundamental formula for random testing confidence {% cite hamlet1984random %}:
+→ [Fuzz Testing](../../verif/random/fuzzing.md) · [Coverage-Guided Fuzzing](../../verif/random/greybox.md)
 
-$$C = 1 - (1-F)^N$$
+## 6. Property-based testing replaces examples with rules
 
-Where:
-- **C** = confidence that at least one failure would have been observed
-- **F** = true failure rate in the operational profile
-- **N** = number of successful random tests
+QuickCheck introduced properties, generators and shrinking {% cite claessen2000quickcheck %}; Hypothesis brought them to Python {% cite maciver2019hypothesis %}. A Hypothesis test states a rule and lets the tool choose the inputs, 100 by default:
 
-| Confidence | Target F | Tests Needed |
-|------------|----------|--------------|
-| 90% | 10⁻³ | 2,302 |
-| 90% | 10⁻⁴ | 23,025 |
-| 99% | 10⁻⁴ | 46,050 |
-| 99% | 10⁻⁵ | 460,517 |
+```python
+from hypothesis import given, strategies as st
 
-**Key insight:** 23,000 successful random tests give 90% confidence the failure rate is below 1 in 10,000 {% cite hamlet2006random %}.
+@given(st.text())                    # generator: random strings
+def test_round_trip(s):
+    assert decode(encode(s)) == s    # property: encoding loses nothing
+```
 
-{: .highlight }
-> **Exam Tip:** Know the formula C = 1-(1-F)^N and the planning table. Be able to compute N given C and F: N = ln(1-C) / ln(1-F).
+On a run-length encoder that drops the last run whenever there are two or more runs, Hypothesis reports the failing input `'01'`: `encode('01')` gives `[('0', 1)]`, which decodes to `'0'`, not `'01'`. It found a longer failing string first and **shrank** it: a one-run string such as `'0'` passes, so two different characters are the smallest failing case. Hypothesis can shrink any type of input because it stores every test case in one universal representation and shrinks that, which saves writing a separate shrinker for each type {% cite maciver2019hypothesis %}. For a web service, the generator builds request bodies and the property checks every response:
 
-### 2.2 The Oracle Problem
+```python
+import requests
+from hypothesis import given, strategies as st
 
-The oracle determines what class of bugs random testing can find {% cite manes2019fuzzing %}:
+BASE_URL = "http://localhost:8000"   # the service under test
 
-| Oracle Type | Description | Overhead |
-|-------------|-------------|----------|
-| **Gold standard** | Reference implementation | High |
-| **Crash detection** | Detect crashes/hangs | None |
-| **Sanitizers** | ASan (~73%), UBSan (~20%), TSan (~5-15x) | Variable |
-| **Assertions** | Pre/postconditions | Low |
-| **Properties** | Invariants for all inputs | Medium |
+@given(st.fixed_dictionaries({                 # a dict with exactly these keys
+    "item": st.sampled_from(["book", "pen"]),     # one of the listed values
+    "quantity": st.integers(1, 1000)}))            # the valid range
+def test_orders(body):
+    r = requests.post(f"{BASE_URL}/orders", json=body)
+    assert r.status_code < 500 and 200 <= r.status_code < 300
+    data = r.json()
+    assert data["item"] == body["item"] and data["quantity"] == body["quantity"]
 
-**Key insight:** The oracle is the bottleneck. Random testing is only practical with automated evaluation {% cite manes2019fuzzing %}.
+@given(st.integers(max_value=0))                # the invalid range: 0 and below
+def test_bad_quantity(q):                       # invalid input must be rejected
+    r = requests.post(f"{BASE_URL}/orders", json={"item": "pen", "quantity": q})
+    assert 400 <= r.status_code < 500
+```
 
-### 2.3 Random vs. Partition Testing
+The errors QuickCheck found were split roughly evenly between generators, properties and programs, so writing a property is itself a check of the specification {% cite claessen2000quickcheck %}. At Jane Street, developers mostly wrote differential, round-trip and no-crash properties; 16 of 30 said writing specifications slowed them down, and one called "not knowing what properties to test" the most common failure mode {% cite goldstein2024pbt %}. Property tests run within budgets of 50 milliseconds to 30 seconds inside normal test runs, while fuzzing campaigns run separately for hours or days {% cite goldstein2024pbt %}. Coverage guidance helps here too. JQF is a Java tool whose Zest engine keeps generated inputs that reach new coverage, as greybox fuzzers do. JQF's example property says that a trie (a prefix tree) built from a map contains every key of the map; pure random generation found no failure in over 7 million executions, while the coverage-guided Zest found one after about 5,000 {% cite padhye2019jqf %}.
 
-The debate has been running since 1984 {% cite duran1984evaluation %}:
+→ [Property-Based Testing](../../verif/random/property-based.md)
 
-| Year | Authors | Finding |
-|------|---------|---------|
-| 1984 | Duran & Ntafos | Random often more cost-effective |
-| 2001 | Ntafos | ~20% more random tests erase partition advantage |
-| 2006 | Hamlet | Only random will do for unstructured spaces and state-dependent systems |
+## 7. Mutation testing measures tests with planted faults
 
-**Resolution (Ntafos 2001):** The gap shrinks to <0.05% at scale. Roughly 20% more random tests eliminate any partition testing advantage {% cite ntafos2001comparisons %}.
+A mutant is a copy of the program with one small change made by a mutation operator; a good suite fails on it, and the mutant is *killed*. The **mutation score** is killed mutants ÷ (all mutants − equivalent mutants). The method rests on two hypotheses, as DeMillo et al. stated them {% cite demillo1978hints %}. The **competent programmer hypothesis** says real programs are close to correct, so real faults resemble small changes. The **coupling effect** says tests that catch simple faults also catch complex ones: test data that killed all single-change mutants killed over 99% of **higher-order mutants**, which combine two or three changes {% cite jia2011mutation %}.
 
-### 2.3.1 Hamlet's Two Scenarios (2006)
+With mutmut, the configuration is one section in `pyproject.toml` (`[tool.mutmut]` with `source_paths = ["src/"]`), and the workflow is three commands; mutants that make the tests time out are reported separately and checked by hand:
 
-Hamlet {% cite hamlet2006random %} argues random testing is not merely an alternative but the **only valid choice** in two specific scenarios:
+```bash
+mutmut run                 # create the mutants and run the tests against each
+mutmut results             # list the surviving mutants
+mutmut show <mutant-name>  # print one survivor as a diff
+```
 
-**Scenario 1 — Large, unstructured input domains:**
-When no rational basis exists to partition the input space, systematic subdomain testing relies on subjective judgement. Without meaningful partitions, it is "no more than subjective comfort." Random sampling of the operational profile is the only principled approach.
+For example, if the original line is `cost = 5 + 2 * weight` and the mutant is `cost = 5 + 2 / weight`, a suite whose tests all use weight 1 cannot tell them apart, so the mutant survives and points at the missing test. `mutmut run` shows killed and surviving counts as it goes. As a worked score: of 20 mutants, 3 equivalent and 15 killed, the score is 15 / (20 − 3) = 15/17 ≈ 88%.
 
-**Scenario 2 — Persistent-state systems:**
-Valid tests of stateful programs must be *input sequences from reset*, not individually sampled states. Feasible states are "very sparse in all possible bit patterns" — directly setting a program to an arbitrary state may exercise configurations no real input sequence can reach. Random sequence generation correctly restricts testing to reachable states; state-sampled systematic testing does not.
+The method is expensive, so five selected operators or a 10% sample keep most of its power {% cite jia2011mutation %}. Its most persistent problem is the **equivalent mutant**, a change that does not change behaviour: 10–40% of mutants are equivalent, and deciding equivalence is undecidable in general, so a person must judge each suspect survivor, for example by reading it with `mutmut show`, and set it aside {% cite jia2011mutation %}. Language models now help. Judged by F1-score, which balances finding equivalent mutants against false alarms, a fine-tuned code model of modest size (UniXCoder) reached 86.58%, ahead of prompting large general models such as GPT-4 {% cite tian2024llm_emd %}. Practitioners find mutation analysis "effective but relatively expensive": one new test about every six minutes, and some mutants killed in **crossfire**, by a test written for another mutant {% cite smith2009mutation %}. Crossfire matters because one well-chosen test can remove several survivors, so working through survivors one by one costs less than their number suggests.
 
-> "Valid tests of programs with state are sequences of inputs, and it is here that random testing comes into its own." — Hamlet 2006
+Mutation testing and property-based testing attack the same weakness from two sides: mutation shows where the tests' assertions are too weak, and properties are a way to write stronger ones.
 
-### 2.4 Randoop: Feedback-Directed Random Testing
+→ [Mutation Testing](../../verif/random/mutation.md) · [Mutation Coverage](../../verif/coverage/mutation.md)
 
-Randoop builds test sequences incrementally {% cite pacheco2007randoop %}:
+## Where this goes next
 
-| Metric | Value |
-|--------|-------|
-| Errors found | **30** in 15 human hours (on code tested by 40 engineers for 5 years) |
-| Productivity | **100x** faster than manual testing |
-| Tests generated | 4,000,000 sequences |
-
-The **"plateau effect"** — error-finding rate drops from 5/hour to zero after ~12 hours {% cite pacheco2007randoop %}.
-
-{: .highlight }
-> **Exam Tip:** Know the "20% rule" — 20% more random tests erase partition advantage (Ntafos 2001). Know the two scenarios where only random testing will do (Hamlet 2006).
-
----
-
-## Part 3: Fuzz Testing
-
-### 3.1 What is Fuzz Testing?
-
-Fuzz testing feeds programs with malformed and unexpected input to find security defects, crashes, or denial of service {% cite miller1990fuzz %}.
-
-### 3.2 Three Generations of Fuzzing
-
-| Generation | Era | Approach | Example |
-|------------|-----|----------|---------|
-| **1. Blackbox** | 1990-2000 | Random bytes, no program knowledge | Miller's `cat /dev/urandom \| prog` |
-| **2. Whitebox** | 2000-2013 | Symbolic execution + constraint solving | SAGE (Microsoft) |
-| **3. Greybox** | 2013-present | Lightweight coverage feedback + evolution | AFL, AFLGo, libFuzzer |
-
-**Greybox won:** Best throughput-to-insight ratio with ~5-20% overhead {% cite manes2019fuzzing %}.
-
-### 3.3 Miller's Fuzz Studies (16-Year Longitudinal)
-
-| Year | Target | Crash Rate |
-|------|--------|------------|
-| 1990 | UNIX utilities | **25-33%** {% cite miller1990fuzz %} |
-| 2000 | Windows NT apps | **21%** (+24% hang) {% cite forrester2000windows %} |
-| 2006 | macOS CLI | 7% (improved) {% cite miller2006macos %} |
-| 2006 | macOS GUI | **73%** (worst ever) {% cite miller2006macos %} |
-
-### 3.4 SAGE and AFL
-
-**SAGE** found **one-third of all file-fuzzing bugs** during Windows 7 development: **400 machine-years**, **3.4 billion** constraints {% cite bounimova2010sage %}.
-
-**AFL** introduced edge-based coverage with evolutionary mutation {% cite manes2019fuzzing %}. **A 1% increase in coverage correlates with 0.92% more bugs found.**
-
-**AFLGo** found **Heartbleed in <20 min** (symbolic execution failed in 24h) {% cite bohme2017directed %}.
-
-### 3.5 Evaluating Fuzzers
-
-Klees et al. {% cite klees2018evaluating %}: 57,142 "unique crashes" = only **9 actual bugs**. Standards: 30+ trials, 24h minimum, Mann-Whitney U test.
-
-{: .highlight }
-> **Exam Tip:** Memorize the three generations of fuzzing (Blackbox → Whitebox → Greybox) with one example each. Know that 57,142 "unique crashes" turned out to be only 9 actual bugs (Klees 2018).
-
----
-
-## Part 4: Property-Based Testing
-
-### 4.1 QuickCheck: The PBT Paradigm
-
-Claessen and Hughes introduced PBT in 2000 {% cite claessen2000quickcheck %}. Three core ideas:
-
-1. **Properties** — boolean functions that must hold for all inputs
-2. **Generators** — produce random values of specific types
-3. **Shrinking** — reduce counterexample to minimal failing case
-
-**Where bugs hide:** ~1/3 implementation, ~1/3 specification, ~1/3 generators {% cite claessen2000quickcheck %}.
-
-### 4.2 Hypothesis: Modern PBT for Python
-
-MacIver and Hatfield-Dodds developed Hypothesis {% cite maciver2019hypothesis %}:
-
-**Key innovation:** Universal byte-stream representation — no custom shrinker needed per type.
-
-**Impact:** 100,000+ weekly downloads, ~4% of Python developers, found bugs in NumPy and Astropy.
-
-### 4.3 JQF: Where PBT Meets Fuzzing
-
-JQF bridges PBT and coverage-guided fuzzing {% cite padhye2019jqf %}:
-
-| Benchmark | Random PBT | Zest (Coverage-Guided) |
-|-----------|-----------|----------------------|
-| Trie bug | Not found in **7M+** executions | Found in **~5K** executions |
-
-**1,000x improvement** with coverage guidance. Found **42 bugs** in OpenJDK, Apache Commons, Google Closure, Mozilla Rhino {% cite padhye2019jqf %}.
-
-### 4.4 PBT in Industry Practice
-
-Goldstein et al. conducted 30 interviews at Jane Street {% cite goldstein2024pbt %}:
-
-| High-Leverage Pattern | Usage |
-|-----------------------|-------|
-| **Differential testing** | 17/30 |
-| **Round-trip** (encode-decode = identity) | 11/30 |
-| **Catastrophic failure** detection | 7/30 |
-
-**Primary challenge:** "Not knowing what properties to test" — 16/30 practitioners {% cite goldstein2024pbt %}.
-
-{: .highlight }
-> **Exam Tip:** Know the PBT evolution: QuickCheck (2000, properties) → Hypothesis (2019, universal byte-stream) → JQF (2019, coverage-guided). The key number is 1,000x improvement from coverage guidance.
-
----
-
-## Part 5: Mutation Testing
-
-### 5.1 What is Mutation Testing?
-
-Mutation testing introduces small deliberate changes (mutants) into the program and checks whether existing tests catch them {% cite demillo1978hints %}.
-
-$$\text{Mutation Score} = \frac{\text{Killed}}{\text{Total} - \text{Equivalent}} \times 100\%$$
-
-### 5.2 Theoretical Foundations
-
-**Competent Programmer Hypothesis:** Programmers create programs "close to correct" {% cite demillo1978hints %}.
-
-**Coupling Effect:** Tests that catch all simple errors also implicitly catch >99% of complex errors.
-
-### 5.3 Mutation Operators: The Essential Five
-
-Five operators achieve 99.5% of the effectiveness of the full operator set {% cite jia2011mutation %}:
-
-| Operator | Name | Example |
-|----------|------|---------|
-| **ABS** | Absolute value insertion | `x` → `abs(x)` |
-| **UOI** | Unary operator insertion | `x` → `−x`, `++x` |
-| **LCR** | Logical connector replacement | `&&` → `\|\|` |
-| **AOR** | Arithmetic operator replacement | `+` → `−`, `*` → `/` |
-| **ROR** | Relational operator replacement | `>` → `>=`, `==` → `!=` |
-
-### 5.4 The Equivalent Mutant Problem
-
-10-40% of mutants are equivalent — undecidable to detect {% cite jia2011mutation %}.
-
-**LLM-Assisted Detection:** Fine-tuned UniXCoder (110M params) achieves **86.58% F1-score** vs GPT-4 at 55.90% {% cite tian2024llm_emd %}.
-
-### 5.5 Mutation Testing in Practice
-
-Smith and Williams {% cite smith2009mutation %}: 2-9% coverage gain in 60 minutes, ~1 new test every 6 minutes. **"Crossfire"** — one test kills multiple mutants.
-
-{: .highlight }
-> **Exam Tip:** Know the mutation score formula. Know the 5 essential operators (ABS, UOI, LCR, AOR, ROR) and that they achieve 99.5% effectiveness. Know that 10-40% of mutants are equivalent and detection is undecidable.
-
----
-
-## Part 6: Summary — Choosing the Right Technique
-
-| Technique | Purpose | Oracle | Key Result |
-|-----------|---------|--------|------------|
-| **Random** | Find faults | Required | 90% confidence @ 23K tests |
-| **Fuzz** | Security bugs | Crash / sanitizers | 25-33% of apps crash |
-| **PBT** | Specification bugs | Properties | 1,000x with coverage guidance |
-| **Mutation** | Test quality | Existing tests | 5 operators cover 99.5% |
-
-**The oracle determines the ceiling** — from crash detection to properties to differential testing.
+The next lecture adds the human side of random exploration: [Exploratory Testing and Operational Profile](SN_L07_Exploratory_OP.md), where the operational profile behind the reliability formula is built from real usage. The random testing lab has two separate tasks. First, mutation testing with mutmut on a local Python project: mutmut changes the source and reruns the project's own tests, so the tests must call the code directly; tests against a separately running server would never execute the mutants. Second, property-based tests with Hypothesis against a web service, searching for inputs where it misbehaves. The [Property-Based Testing](../../verif/random/property-based.md) page has a full template.
 
 ---
 
