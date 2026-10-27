@@ -1,197 +1,92 @@
 ---
 title: Queuing Models
 parent: Queuing Theory
-grand_parent: Quality Attributes
 nav_order: 2
 layout: default
+vegalite: true
+page_type: deep-dive   # carries the M/M/1 and Erlang C formulas with a worked case each; every number must be reproducible on the page
 ---
 
 # Queuing Models
 
-Queuing models predict **how response time, throughput, and queue length change as load increases**. They transform the [operational laws](operational-laws.md) from statements about averages into predictions about system behavior under varying workloads {% cite shortle2018fundamentals %}.
+A **queuing model** predicts the mean waiting time, response time and queue length of a resource from its arrival rate, service rate and number of servers, under stated assumptions about how inter-arrival and service times are distributed {% cite shortle2018fundamentals %}. Its central lesson is that response time grows sharply, not linearly, as utilization approaches 100%.
 
----
+![An M/M/1 queue with one server, and an M/M/c queue in which c servers share one queue](queue-configurations.svg)
 
-## Single-Queue Models
+_A single server, and a pool of c servers fed from one queue, such as a thread pool._ {% cite kendall1953stochastic %}
 
-### M/M/1: The Foundational Model
+## 1. M/M/1: the hockey stick
 
-The simplest useful model: Poisson arrivals (M), exponential service (M), one server (1) {% cite kendall1953stochastic %}:
+Plotted against utilization, response time stays nearly flat and then bends sharply upwards, like a hockey stick lying on its blade. With exponential inter-arrival and service times and one server (written M/M/1), let *S* = 1/μ be the mean service time and ρ the utilization, the same quantity written *U* on [Operational Laws](operational-laws.md). The mean response time *R*, the mean wait in the queue before service starts *W*<sub>q</sub> = *R* − *S*, and the mean number in the system *N* are
 
-```mermaid
-%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#019546', 'lineColor': '#2D6E2A'}}}%%
-graph LR
-    Src["📥 Source"] --> Q["▐▐▐▐ Queue"] --> S(("Server")) --> Out["📤"]
+**R = S / (1 − ρ)**,  **W<sub>q</sub> = ρ S / (1 − ρ)**  and  **N = ρ / (1 − ρ)**
 
-    style Src fill:#f0f8f0,stroke:#019546,color:#282828
-    style Q fill:#c8e6c9,stroke:#019546,color:#282828
-    style S fill:#c8e6c9,stroke:#019546,color:#282828
-    style Out fill:#f0f8f0,stroke:#019546,color:#282828
+| Utilization ρ | 50% | 75% | 80% | 90% | 99% |
+|---|---|---|---|---|---|
+| Response time *R* | 2 *S* | 4 *S* | 5 *S* | 10 *S* | 100 *S* |
+
+For example, an API server with *S* = 20 ms at ρ = 60% answers in 20 / 0.4 = 50 ms on average, with 1.5 requests in the system. If load grows by half, to ρ = 90%, response time quadruples to 200 ms. Below 67% utilization response time stays within three times the service time. The **rule of thumb** used on these pages is to keep utilization at about 70%, left of the bend (the capacity example uses 75%) {% cite liu2011performance sharma2007queuing %}.
+
+```vega-lite
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 420, "height": 230,
+  "data": {"values": [
+    {"u":0.05,"c":"1 server (M/M/1)","R":1.05},{"u":0.05,"c":"4 servers (M/M/4)","R":1.00},
+    {"u":0.1,"c":"1 server (M/M/1)","R":1.11},{"u":0.1,"c":"4 servers (M/M/4)","R":1.00},
+    {"u":0.2,"c":"1 server (M/M/1)","R":1.25},{"u":0.2,"c":"4 servers (M/M/4)","R":1.00},
+    {"u":0.3,"c":"1 server (M/M/1)","R":1.43},{"u":0.3,"c":"4 servers (M/M/4)","R":1.01},
+    {"u":0.4,"c":"1 server (M/M/1)","R":1.67},{"u":0.4,"c":"4 servers (M/M/4)","R":1.04},
+    {"u":0.5,"c":"1 server (M/M/1)","R":2.00},{"u":0.5,"c":"4 servers (M/M/4)","R":1.09},
+    {"u":0.6,"c":"1 server (M/M/1)","R":2.50},{"u":0.6,"c":"4 servers (M/M/4)","R":1.18},
+    {"u":0.7,"c":"1 server (M/M/1)","R":3.33},{"u":0.7,"c":"4 servers (M/M/4)","R":1.36},
+    {"u":0.75,"c":"1 server (M/M/1)","R":4.00},{"u":0.75,"c":"4 servers (M/M/4)","R":1.51},
+    {"u":0.8,"c":"1 server (M/M/1)","R":5.00},{"u":0.8,"c":"4 servers (M/M/4)","R":1.75},
+    {"u":0.85,"c":"1 server (M/M/1)","R":6.67},{"u":0.85,"c":"4 servers (M/M/4)","R":2.15},
+    {"u":0.9,"c":"1 server (M/M/1)","R":10.00},{"u":0.9,"c":"4 servers (M/M/4)","R":2.97},
+    {"u":0.92,"c":"1 server (M/M/1)","R":12.50},{"u":0.92,"c":"4 servers (M/M/4)","R":3.59},
+    {"u":0.94,"c":"1 server (M/M/1)","R":16.67},{"u":0.94,"c":"4 servers (M/M/4)","R":4.63},
+    {"u":0.95,"c":"1 server (M/M/1)","R":20.00},{"u":0.95,"c":"4 servers (M/M/4)","R":5.46}]},
+  "mark": {"type": "line", "strokeWidth": 3},
+  "encoding": {
+    "x": {"field": "u", "type": "quantitative", "title": "utilization of each server", "axis": {"format": "%"}, "scale": {"domain": [0, 1]}},
+    "y": {"field": "R", "type": "quantitative", "title": "response time (× service time)", "scale": {"domain": [0, 21]}},
+    "color": {"field": "c", "type": "nominal", "title": null, "scale": {"range": ["#b42318", "#019546"]}, "legend": {"orient": "top"}}},
+  "config": {"font": "Tahoma, sans-serif", "view": {"stroke": null}}
+}
 ```
 
-| Metric | Formula |
-|--------|---------|
-| **Response time** | R = S / (1 &minus; U) |
-| **Queue length** | L = U / (1 &minus; U) |
-| **Wait time** | W = R &minus; S = U &middot; S / (1 &minus; U) |
+_Mean response time as each server gets busier. A pool of four servers sharing one queue bends much later than a single server._
 
-Where S is mean service time and U is utilization (&lambda;/&mu;). The key insight is the **1/(1-U) multiplier** — it creates the hockey stick curve {% cite sharma2007queuing %}:
+## 2. The mean hides a long tail
 
-- At U = 0.5: response time is 2&times; service time
-- At U = 0.8: response time is 5&times; service time
-- At U = 0.9: response time is 10&times; service time
-- At U &rarr; 1.0: response time &rarr; &infin;
+In an M/M/1 queue the response time of a single request is exponentially distributed with mean *R*: a request takes longer than time *t* with probability e<sup>−t/R</sup>. So 37% of requests take longer than the mean, and the p95 is *R* · ln 20 ≈ 3 *R*. At ρ = 90%, where *R* = 10 *S*, one request in twenty takes about 30 service times.
 
-### M/M/c: Multiple Servers
+## 3. M/M/c: share one queue among c servers
 
-When *c* parallel servers share a single queue (e.g., thread pool of size *c*), the model becomes M/M/c {% cite hillier2001operations %}.
+With *c* servers fed from one queue, each at utilization ρ = λ / (*c* μ), a request waits only when all *c* are busy. In words, the **Erlang C formula** gives that probability as the weight of the "all busy" states divided by the weight of all states. With the offered load *a* = λ/μ = *c*ρ (the average number of busy servers) {% cite sharma2007queuing %}:
 
-```mermaid
-%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#019546', 'lineColor': '#2D6E2A'}}}%%
-graph LR
-    Src["📥 Source"] --> Q["▐▐▐▐ Queue"]
-    Q --> S1(("Server 1"))
-    Q --> S2(("Server 2"))
-    Q --> Sn(("Server n"))
+**P<sub>wait</sub> = E<sub>c</sub> / (Σ<sub>k=0..c−1</sub> a<sup>k</sup>/k! + E<sub>c</sub>)**, where **E<sub>c</sub> = a<sup>c</sup> / (c! (1 − ρ))**, and then **W<sub>q</sub> = P<sub>wait</sub> · S / (c (1 − ρ))** and **R = S + W<sub>q</sub>**.
 
-    style Src fill:#f0f8f0,stroke:#019546,color:#282828
-    style Q fill:#c8e6c9,stroke:#019546,color:#282828
-    style S1 fill:#c8e6c9,stroke:#019546,color:#282828
-    style S2 fill:#c8e6c9,stroke:#019546,color:#282828
-    style Sn fill:#c8e6c9,stroke:#019546,color:#282828
-```
+For example, four servers at ρ = 0.75 give *a* = 3; the sum is 1 + 3 + 4.5 + 4.5 = 13 and *E*<sub>c</sub> = 81 / (24 × 0.25) = 13.5, so P<sub>wait</sub> = 13.5 / 26.5 ≈ 0.51 and *W*<sub>q</sub> = 0.51 *S* / (4 × 0.25) ≈ 0.51 *S*, giving *R* ≈ 1.51 *S*. Two consequences follow. First, a pool can run each server busier for the same response time: *R* reaches 3 *S* at 67% utilization with one server, 82% with two, 90% with four and 95% with eight. Second, one shared queue beats separate queues: four separate M/M/1 servers at 75% each make requests wait 3 *S* on average, while one queue feeding the same four servers cuts the wait to about 0.5 *S*.
 
-Multiple servers delay the hockey stick — a 4-server system can sustain higher total utilization before response time explodes:
+## 4. When the assumptions fail
 
-| Servers (c) | Total utilization at 3&times; service time |
-|-------------|-------------------------------------------|
-| 1 | 67% |
-| 2 | 80% |
-| 4 | 88% |
-| 8 | 93% |
+The letter M is a convenient assumption, not a fact. Variability drives waiting: with constant service times (M/D/1) the mean wait is half the M/M/1 value, and with more variable service times it grows beyond it. Khazaei and colleagues showed that modelling cloud servers as M/M/m, when task durations are highly variable, underestimates waiting and blocking; they used M/G/m/m+r instead: general service times, *m* servers (the *c* of the other models), and room for *m* + *r* requests, that is *r* waiting places {% cite khazaei2012cloud %}. A finite capacity turns overload into **rejected** requests rather than unbounded waiting; M/M/c/c, with no waiting places at all, models a connection pool that refuses a request when all *c* connections are in use.
 
-The **Erlang C formula** gives the probability of waiting in an M/M/c queue and is widely used for staffing decisions (call centers, support teams) {% cite sharma2007queuing %}.
+## When to use it — and when not
 
-### M/G/m/m+r: General Service with Finite Buffer
+- Use M/M/1 and M/M/c for back-of-the-envelope estimates of a single resource, and to explain the utilization rule of thumb of section 1.
+- Do not use them as precise predictions for multi-tier systems; use [Queuing Networks and MVA](networks.md) or measurement.
 
-For systems where service times are **not exponential** and queue capacity is **finite**, the M/G/m/m+r model captures realistic behavior {% cite khazaei2012cloud %}:
+## Limitations
 
-- **G** (General service): task durations follow arbitrary distributions — critical for cloud workloads with high variability
-- **m+r** (finite capacity): m servers processing + r positions in buffer; arrivals beyond capacity are **rejected** (blocking)
+The formulas describe a steady state at a fixed arrival rate. Bursts, warm-up, and service times that change with load (caches, garbage collection) are outside them; simulate or measure instead.
 
-Khazaei et al. showed that using M/M/m instead of M/G/m significantly underestimates performance degradation when task durations are variable {% cite khazaei2012cloud %}. The coefficient of variation of service time has a major impact on both response time and blocking probability.
+## How solid is this?
 
----
-
-## Queuing Networks
-
-Real software systems are not single queues — they are **networks of interconnected queues** {% cite balsamo2003queueing %}. A three-tier web application has at least three queuing centers (web, app, database), each with its own service demand.
-
-### Open vs. Closed Networks
-
-| Type | Population | Use Case | Solvability |
-|------|-----------|----------|-------------|
-| **Open** | Infinite (requests arrive from outside) | OLTP, API traffic | Analytically tractable {% cite liu2011performance %} |
-| **Closed** | Fixed (N users cycle through system) | Interactive users, batch jobs | Requires iterative solution (MVA) |
-
-**Open network** — requests arrive from outside and exit after service:
-
-```mermaid
-%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#019546', 'lineColor': '#2D6E2A'}}}%%
-graph LR
-    Src["📥 Source"] --> Q1["▐▐▐▐"] --> S1(("Server 1")) --> Q2["▐▐▐▐"] --> S2(("Server 2")) --> Q3["▐▐▐▐"] --> S3(("Server 3")) --> Out["📤 Exit"]
-
-    style Src fill:#f0f8f0,stroke:#019546,color:#282828
-    style Q1 fill:#c8e6c9,stroke:#019546,color:#282828
-    style Q2 fill:#c8e6c9,stroke:#019546,color:#282828
-    style Q3 fill:#c8e6c9,stroke:#019546,color:#282828
-    style S1 fill:#c8e6c9,stroke:#019546,color:#282828
-    style S2 fill:#c8e6c9,stroke:#019546,color:#282828
-    style S3 fill:#c8e6c9,stroke:#019546,color:#282828
-    style Out fill:#f0f8f0,stroke:#019546,color:#282828
-```
-
-**Closed network** — fixed population recirculates through the system:
-
-```mermaid
-%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#019546', 'lineColor': '#2D6E2A'}}}%%
-graph LR
-    Src["📥 Source"] --> Q1["▐▐▐▐"] --> S1(("Server 1")) --> Q2["▐▐▐▐"] --> S2(("Server 2")) --> Q3["▐▐▐▐"] --> S3(("Server 3")) --> Src
-
-    style Src fill:#f0f8f0,stroke:#019546,color:#282828
-    style Q1 fill:#c8e6c9,stroke:#019546,color:#282828
-    style Q2 fill:#c8e6c9,stroke:#019546,color:#282828
-    style Q3 fill:#c8e6c9,stroke:#019546,color:#282828
-    style S1 fill:#c8e6c9,stroke:#019546,color:#282828
-    style S2 fill:#c8e6c9,stroke:#019546,color:#282828
-    style S3 fill:#c8e6c9,stroke:#019546,color:#282828
-```
-
-Open networks are simpler for back-of-the-envelope calculations. Closed networks model the **think time** between requests and the feedback effect where slow responses reduce the arrival rate {% cite denning1978operational %}.
-
-### Finite Capacity Networks
-
-When queues have bounded sizes (thread pools, connection limits, container memory), **blocking** occurs — requests are rejected or stalled when a downstream queue is full {% cite balsamo2003queueing %}. Balsamo et al. surveyed blocking mechanisms for software architectures:
-
-- **BAS (Blocking After Service):** A completed job at node *i* is blocked if the destination queue is full
-- **BBS (Blocking Before Service):** A job cannot begin service until the downstream queue has space
-
-This models real software constraints: a web server with a connection pool of 100 to the database will block application threads when all 100 connections are in use.
-
----
-
-## Mean-Value Analysis (MVA)
-
-MVA is the standard algorithm for solving closed queuing networks {% cite reiser1980mva %}. It computes performance metrics **recursively** without solving global balance equations — avoiding the exponential state space explosion.
-
-### The Arrival Theorem
-
-MVA relies on a key insight: in a closed system, a job arriving at a resource **sees the system as if it were in steady state with one fewer job** {% cite reiser1980mva %}. This allows computing performance for *n* users from the solution for *n &minus; 1* users.
-
-### The Three Recursive Equations
-
-Starting from n = 1 and iterating to N users:
-
-**1. Residence Time:**
-
-R'<sub>i</sub>[n] = D<sub>i</sub> &middot; (1 + Q<sub>i</sub>[n&minus;1])
-
-Time at resource *i* = service demand + waiting for jobs already in queue.
-
-**2. System Throughput:**
-
-X[n] = n / (Z + &Sigma; R'<sub>i</sub>[n])
-
-Where Z is think time.
-
-**3. Queue Length:**
-
-Q<sub>i</sub>[n] = X[n] &middot; R'<sub>i</sub>[n]
-
-This is Little's Law applied per resource.
-
-### Why MVA Matters
-
-| Advantage | Explanation |
-|-----------|-------------|
-| **Intuitive inputs** | Requires only service demand D<sub>i</sub> — measured from system counters |
-| **Simple implementation** | Three equations iterated in a loop — implementable in a spreadsheet {% cite liu2011performance %} |
-| **Numerically stable** | Avoids overflow issues of older convolution algorithms |
-| **Finds the knee** | Reveals the saturation point where throughput flattens and response time goes linear {% cite gunther2007guerrilla %} |
-
-MVA is implemented in tools like PDQ (Pretty Damn Quick) {% cite gunther2005measurement %} and JMT (Java Modelling Tools) {% cite jmt2023 %}.
-
----
-
-## Model Selection Guide
-
-| Scenario | Recommended Model | Rationale |
-|----------|-------------------|-----------|
-| Quick estimate, one resource | M/M/1 | Simple formula R = S/(1-U) |
-| Thread pool or server farm | M/M/c | Multiple servers, shared queue |
-| Cloud VMs with variable tasks | M/G/m/m+r | General service times, finite buffer |
-| Interactive users, multi-tier app | Closed QN + MVA | Fixed population, feedback effects |
-| API gateway with bounded queues | Finite-capacity QN | Blocking when downstream full |
+- **Where it comes from.** The M/M/1 and M/M/c results are standard queuing theory {% cite shortle2018fundamentals %}; the 70% rule of thumb follows from *R* = *S*/(1 − ρ) {% cite liu2011performance %}.
+- **What is assumed.** Exponential times are rarely exact; the formulas are most useful for the shape of the curve, not its precise values.
 
 ---
 

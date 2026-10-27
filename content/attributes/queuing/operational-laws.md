@@ -1,240 +1,92 @@
 ---
 title: Operational Laws
 parent: Queuing Theory
-grand_parent: Quality Attributes
 nav_order: 1
 layout: default
+vegalite: true
 ---
 
 # Operational Laws
 
-Operational analysis evaluates system performance using **measured parameters** and established mathematical relationships {% cite denning1978operational %}. Unlike traditional stochastic queuing theory — which requires assumptions about probability distributions (Poisson arrivals, exponential service times) — operational analysis uses counts of events from system instrumentation {% cite hillston2014operational %}.
+The **operational laws** are relationships between quantities measured on a running system during one observation window, such as throughput, utilization and response time. They hold for every window by definition, so they need no assumption about how arrival or service times are distributed {% cite denning1978operational %}.
 
----
+## 1. A window, four counters, six derived metrics
 
-## Stochastic vs. Operational Approach
+Over a window of length *T*, record four counters: the arrivals *A*, the completions *C*, the busy time *B* of the resource, and *W*, the total time all requests spent in the system during the window (a window total, not a per-request time) (the shaded area below). Everything else is derived {% cite denning1978operational wilson2008operations %}:
 
-| Dimension | Stochastic Approach | Operational Approach |
-|-----------|-------------------|---------------------|
-| **Data basis** | Random variables with probability distributions | Counts of events (completions C, busy time B) |
-| **Assumptions** | Strong: Poisson arrivals, exponential service | Testable: job flow balance (A &asymp; C) |
-| **Validity** | Steady-state limits of infinite processes | Holds for each finite observation window |
-| **Complexity** | Requires deep mathematical background | Simple enough for "back-of-the-envelope" calculations |
-
-The key advantage is that operational laws are **tautologies** — they hold for every observation period by definition {% cite denning1978operational %}. An analyst can always test whether the assumptions hold by examining the measurement data {% cite wilson2008operations %}.
-
----
-
-## Observed and Derived Parameters
-
-From system instrumentation (perfmon, sar, Prometheus, APM traces), we directly observe five quantities {% cite denning1978operational %}:
-
-| Parameter | Symbol | Definition | How to collect |
-|-----------|--------|-----------|----------------|
-| Observation period | T | Duration of measurement | Clock |
-| Arrivals | A | Total requests entering the system | HTTP logs, load balancer counters |
-| Completions | C | Total requests leaving the system | HTTP logs, load balancer counters |
-| Time in system | W | Sum of all request durations | APM traces (Jaeger, Datadog) |
-| Busy time | B | Time the resource is not idle | Prometheus, `sar`, perfmon |
-
-From these, we derive six performance metrics:
-
-| Parameter | Symbol | Formula |
-|-----------|--------|---------|
-| Arrival rate | &lambda; | A / T |
-| Throughput | X | C / T |
-| Utilization | U | B / T |
-| Service time | S | B / C |
-| Avg. number in system | N | W / T |
-| Response time | R | W / C |
-
-**Consistency check:** If A &asymp; C over the observation period (flow balance), then &lambda; &asymp; X.
-
----
-
-## The Six Operational Laws
-
-Hillston formalizes six laws relating these parameters {% cite hillston2014operational %}, all built on Little's Law as the foundation:
-
-### 1. Little's Law
-
-**N = X &middot; R**
-
-The average number of requests in the system (N) equals throughput (X) times average response time (R) {% cite little1961proof %}. Little's original formulation uses L = &lambda;W; in operational analysis the equivalent form N = X &middot; R is preferred because X and R are directly derived from the five observed counters {% cite denning1978operational %}. The law is distribution-free and requires only job flow balance {% cite little2008littles %}.
+| Derived metric | Formula |
+|---|---|
+| Arrival rate λ | *A* / *T* |
+| Throughput *X* | *C* / *T* |
+| Utilization *U* | *B* / *T* |
+| Mean service time *S* | *B* / *C* |
+| Mean number in system *N* | *W* / *T* |
+| Mean response time *R* | *W* / *C* |
 
 ```vega-lite
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "width": 450,
-  "height": 300,
-  "title": {"text": "Cumulative Arrivals a(t) and Completions d(t)", "subtitle": "Shaded area H = accumulated time in system (req-sec)", "subtitleFontSize": 11, "subtitleColor": "#666"},
+  "width": 420, "height": 220,
   "layer": [
-    {
-      "data": {"values": [
-        {"time": 0, "arrivals": 0, "completions": 0},
-        {"time": 0, "arrivals": 1, "completions": 0},
-        {"time": 3, "arrivals": 2, "completions": 0},
-        {"time": 5, "arrivals": 3, "completions": 0},
-        {"time": 8, "arrivals": 3, "completions": 1},
-        {"time": 11, "arrivals": 3, "completions": 2},
-        {"time": 12, "arrivals": 3, "completions": 3},
-        {"time": 18, "arrivals": 4, "completions": 3},
-        {"time": 19, "arrivals": 5, "completions": 3},
-        {"time": 23, "arrivals": 5, "completions": 4},
-        {"time": 26, "arrivals": 5, "completions": 5},
-        {"time": 27, "arrivals": 6, "completions": 5},
-        {"time": 30, "arrivals": 7, "completions": 6},
-        {"time": 33, "arrivals": 8, "completions": 6},
-        {"time": 35, "arrivals": 9, "completions": 6},
-        {"time": 36, "arrivals": 9, "completions": 7},
-        {"time": 38, "arrivals": 9, "completions": 8},
-        {"time": 40, "arrivals": 10, "completions": 8},
-        {"time": 41, "arrivals": 10, "completions": 9},
-        {"time": 45, "arrivals": 10, "completions": 10},
-        {"time": 50, "arrivals": 10, "completions": 10}
-      ]},
-      "mark": {"type": "area", "interpolate": "step-after", "opacity": 0.3, "color": "#1976d2"},
-      "encoding": {
-        "x": {"field": "time", "type": "quantitative"},
-        "y": {"field": "arrivals", "type": "quantitative"},
-        "y2": {"field": "completions"}
-      }
-    },
-    {
-      "data": {"values": [
-        {"time": 0, "value": 0}, {"time": 0, "value": 1}, {"time": 3, "value": 2}, {"time": 5, "value": 3},
-        {"time": 18, "value": 4}, {"time": 19, "value": 5}, {"time": 27, "value": 6}, {"time": 30, "value": 7},
-        {"time": 33, "value": 8}, {"time": 35, "value": 9}, {"time": 40, "value": 10}, {"time": 50, "value": 10}
-      ]},
-      "mark": {"type": "line", "interpolate": "step-after", "strokeWidth": 2.5, "color": "#1565c0"}
-    },
-    {
-      "data": {"values": [
-        {"time": 0, "value": 0}, {"time": 8, "value": 1}, {"time": 11, "value": 2}, {"time": 12, "value": 3},
-        {"time": 23, "value": 4}, {"time": 26, "value": 5}, {"time": 30, "value": 6}, {"time": 36, "value": 7},
-        {"time": 38, "value": 8}, {"time": 41, "value": 9}, {"time": 45, "value": 10}, {"time": 50, "value": 10}
-      ]},
-      "mark": {"type": "line", "interpolate": "step-after", "strokeWidth": 2.5, "color": "#c62828"}
-    },
-    {
-      "data": {"values": [{"time": 48, "value": 10, "label": "a(t) = arrivals"}]},
-      "mark": {"type": "text", "align": "left", "dx": 5, "fontSize": 13, "fontWeight": "bold", "color": "#1565c0"},
-      "encoding": {"x": {"field": "time", "type": "quantitative"}, "y": {"field": "value", "type": "quantitative"}, "text": {"field": "label", "type": "nominal"}}
-    },
-    {
-      "data": {"values": [{"time": 48, "value": 9.2, "label": "d(t) = completions"}]},
-      "mark": {"type": "text", "align": "left", "dx": 5, "fontSize": 13, "fontWeight": "bold", "color": "#c62828"},
-      "encoding": {"x": {"field": "time", "type": "quantitative"}, "y": {"field": "value", "type": "quantitative"}, "text": {"field": "label", "type": "nominal"}}
-    },
-    {
-      "data": {"values": [{"time": 15, "value": 4.5, "label": "H"}]},
-      "mark": {"type": "text", "fontSize": 16, "fontWeight": "bold", "fontStyle": "italic", "color": "#1976d2", "opacity": 0.7},
-      "encoding": {"x": {"field": "time", "type": "quantitative"}, "y": {"field": "value", "type": "quantitative"}, "text": {"field": "label", "type": "nominal"}}
-    }
+    {"data": {"values": [
+        {"t":0,"a":1,"d":0},{"t":3,"a":2,"d":0},{"t":5,"a":3,"d":0},{"t":8,"a":3,"d":1},{"t":11,"a":3,"d":2},{"t":12,"a":3,"d":3},
+        {"t":18,"a":4,"d":3},{"t":19,"a":5,"d":3},{"t":23,"a":5,"d":4},{"t":26,"a":5,"d":5},{"t":27,"a":6,"d":5},{"t":30,"a":7,"d":6},
+        {"t":33,"a":8,"d":6},{"t":35,"a":9,"d":6},{"t":36,"a":9,"d":7},{"t":38,"a":9,"d":8},{"t":40,"a":10,"d":8},{"t":41,"a":10,"d":9},
+        {"t":45,"a":10,"d":10},{"t":50,"a":10,"d":10}]},
+     "mark": {"type": "area", "interpolate": "step-after", "opacity": 0.3, "color": "#019546"},
+     "encoding": {"x": {"field": "t", "type": "quantitative", "title": "time (s)", "scale": {"domain": [0, 50]}},
+                  "y": {"field": "a", "type": "quantitative", "title": "cumulative count", "scale": {"domain": [0, 11]}},
+                  "y2": {"field": "d"}}},
+    {"data": {"values": [{"t":0,"v":1},{"t":3,"v":2},{"t":5,"v":3},{"t":18,"v":4},{"t":19,"v":5},{"t":27,"v":6},{"t":30,"v":7},{"t":33,"v":8},{"t":35,"v":9},{"t":40,"v":10},{"t":50,"v":10}]},
+     "mark": {"type": "line", "interpolate": "step-after", "strokeWidth": 2.5, "color": "#2D6E2A"},
+     "encoding": {"x": {"field": "t", "type": "quantitative"}, "y": {"field": "v", "type": "quantitative"}}},
+    {"data": {"values": [{"t":0,"v":0},{"t":8,"v":1},{"t":11,"v":2},{"t":12,"v":3},{"t":23,"v":4},{"t":26,"v":5},{"t":30,"v":6},{"t":36,"v":7},{"t":38,"v":8},{"t":41,"v":9},{"t":45,"v":10},{"t":50,"v":10}]},
+     "mark": {"type": "line", "interpolate": "step-after", "strokeWidth": 2.5, "color": "#b42318"},
+     "encoding": {"x": {"field": "t", "type": "quantitative"}, "y": {"field": "v", "type": "quantitative"}}}
   ],
-  "encoding": {
-    "x": {"field": "time", "type": "quantitative", "scale": {"domain": [0, 55]}, "axis": {"title": "time", "grid": false}},
-    "y": {"field": "value", "type": "quantitative", "scale": {"domain": [0, 11]}, "axis": {"title": "units", "tickMinStep": 1}}
-  },
   "config": {"font": "Tahoma, sans-serif", "view": {"stroke": null}}
 }
 ```
 
-The shaded area H between the arrival curve a(t) and completion curve d(t) represents the total accumulated time in system. N = H/T, R = H/C, X = C/T — therefore **N = X &middot; R**.
+_Cumulative arrivals (green line) and completions (red line) of one server over T = 50 s. Requests arrive at 0, 3, 5, 18, 19, 27, 30, 33, 35 and 40 s and complete, in the same order, at 8, 11, 12, 23, 26, 30, 36, 38, 41 and 45 s. The shaded area between them is W = 60 request-seconds; the server is busy whenever the lines differ, from 0 to 12, 18 to 26 and 27 to 45 s, so B = 12 + 8 + 18 = 38 s. After Denning and Buzen._ {% cite denning1978operational %}
 
-### 2. Utilization Law
+For example, for this window: *X* = 10/50 = 0.2 req/s, *U* = 38/50 = 76%, *S* = 38/10 = 3.8 s, *N* = 60/50 = 1.2 and *R* = 60/10 = 6 s.
 
-**U<sub>i</sub> = X &middot; D<sub>i</sub>**
+## 2. The laws
 
-The utilization of resource *i* equals system throughput times the service demand at that resource. When U<sub>i</sub> approaches 1.0 (100%), that resource is the **bottleneck** {% cite hillston2014operational %}.
+Each law combines derived metrics. The examples use a submission service whose database is queried four times per request, each query taking 8 ms of database time.
 
-### 3. Service Demand Law
+| Law | Formula | Example |
+|---|---|---|
+| Little's law | *N* = *X* · *R* | window above: 0.2 req/s × 6 s = 1.2 requests in the system, as measured |
+| Service demand | *D*<sub>k</sub> = *V*<sub>k</sub> · *S*<sub>k</sub> | submission service: 4 visits × 8 ms = 32 ms of database work per request (with one visit, *D* = *S*) |
+| Forced flow | *X*<sub>k</sub> = *V*<sub>k</sub> · *X* | submission service at *X* = 10 req/s: the database answers 4 × 10 = 40 queries/s |
+| Utilization | *U*<sub>k</sub> = *X* · *D*<sub>k</sub> | submission service: 10 req/s × 0.032 s = 32% busy |
+| Interactive response time | *R* = *M* / *X* − *Z* | a separate service measured with 50 users, think time 30 s and 1.6 req/s: 50/1.6 − 30 = 1.25 s |
 
-**D<sub>i</sub> = S<sub>i</sub> &middot; V<sub>i</sub>**
+*V*<sub>k</sub> is the number of visits a request makes to resource *k*, *M* the number of users, and *Z* the think time between a user's requests {% cite hillston2014operational %}. With *c* identical servers sharing the work, each does 1/*c* of it, so utilization per server is *X* · *D* / *c*.
 
-Service demand equals the average service time per visit times the number of visits per transaction {% cite wilson2008operations %}. Service demand is the **most important derived parameter** — it determines bottlenecks, drives MVA recursion, and connects measurements to predictions {% cite denning1978operational %}.
+## 3. The largest service demand is the bottleneck
 
-### 4. Forced Flow Law
+Since *U*<sub>k</sub> = *X* · *D*<sub>k</sub> cannot exceed 1, throughput can never exceed 1 / *D*<sub>max</sub>, where *D*<sub>max</sub> is the largest service demand of any resource {% cite denning1978operational %}.
 
-**X<sub>i</sub> = X &middot; V<sub>i</sub>**
+![Web 5 ms, app 15 ms and database 25 ms of service demand; the database caps throughput at 40 per second](three-tier-bottleneck.svg)
 
-The throughput at resource *i* equals system throughput times the visit count. If a transaction visits the database 5 times, the database throughput is 5&times; the system throughput {% cite hillston2014operational %}.
+_A three-tier application. Only reducing the database demand, by fewer visits or faster queries, raises the 40 req/s ceiling._
 
-### 5. Residence Time Law
+## When to use it — and when not
 
-**W = &Sigma; W<sub>i</sub> &middot; V<sub>i</sub>**
+- Use the laws on any measured window: to find the bottleneck, to check a load test's numbers, and as the input to [queuing models](models.md).
+- Do not use them to predict percentiles: they speak only of averages.
 
-Total response time is the sum of time spent at each resource, weighted by visit counts.
+## Limitations
 
-### 6. Interactive Response Time Law
+The laws assume **flow balance** (arrivals equal completions in the window) and a workload whose rates do not change within it. A window cut through a crash, or one that includes start-up, breaks both; observe for many times the typical busy period. If measured values violate Little's law, for example *X* = 200 req/s and *R* = 25 ms but *N* = 10 instead of 5, the measurements are at fault, often because they were taken at different system boundaries {% cite little2011littles %}.
 
-**R = N / X &minus; Z**
+## How solid is this?
 
-For interactive systems with *N* users and think time *Z*, response time equals users divided by throughput minus think time {% cite hillston2014operational %}.
-
----
-
-## Bottleneck Identification
-
-A resource is the system bottleneck if it has the **largest service demand** D<sub>max</sub> {% cite denning1978operational %}. This resource will reach 100% utilization first and limit total system throughput.
-
-**Maximum throughput bound:**
-
-X<sub>max</sub> = 1 / D<sub>max</sub>
-
-**Example:** A three-tier web application with service demands:
-
-```mermaid
-%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#019546', 'lineColor': '#2D6E2A'}}}%%
-graph LR
-    Client["🌐 Client<br>Requests"] --> Web
-
-    subgraph System["3-Tier Web Application"]
-        Web["🖥️ Web Server<br>D = 5 ms"]
-        App["⚙️ App Server<br>D = 15 ms"]
-        DB["🗄️ Database<br>D = 25 ms<br>⚠️ BOTTLENECK"]
-    end
-
-    Web --> App
-    App --> DB
-    DB --> Response["✅ Response"]
-
-    style Web fill:#c8e6c9,stroke:#019546,color:#282828
-    style App fill:#c8e6c9,stroke:#019546,color:#282828
-    style DB fill:#ffcdd2,stroke:#d32f2f,color:#282828,stroke-width:3px
-    style Client fill:#f0f8f0,stroke:#019546,color:#282828
-    style Response fill:#f0f8f0,stroke:#019546,color:#282828
-    style System fill:#fffef0,stroke:#ccc
-```
-
-| Resource | Service Demand D<sub>i</sub> |
-|----------|------------------------------|
-| Web server | 5 ms |
-| App server | 15 ms |
-| Database | 25 ms |
-
-The database is the bottleneck: D<sub>max</sub> = 25 ms, so X<sub>max</sub> = 1/0.025 = **40 transactions/sec**.
-
-No amount of web or app server optimization will push throughput past 40 TPS until the database service demand is reduced {% cite wilson2008operations %}.
-
----
-
-## Data Validation with Little's Law
-
-Little's Law serves as a **sanity check** for measurement data {% cite little2011littles %}. If measured throughput and response times do not satisfy N = X &middot; R, the measurements are wrong — not the law.
-
-Common causes of violation:
-- **Orphan requests** that overlapped the observation window boundary
-- **Counting errors** where arrivals and completions are measured at different points
-- **Non-steady-state** measurements during system startup or shutdown
-
-Wilson recommends that changes of less than 10% in derived metrics should be treated as noise, not signal {% cite wilson2008operations %}.
-
----
-
-## From Operational Laws to Queuing Models
-
-Operational laws tell us about average behavior but not about the **distribution** of response times. For that, we need [queuing models](models.md) — which use the operational parameters (especially service demand D<sub>i</sub>) as inputs to predict response time distributions, queue lengths, and the shape of the hockey stick curve.
+- **Where it comes from.** Denning and Buzen derived the laws from measured quantities {% cite denning1978operational %}; Hillston and Wilson give teaching versions {% cite hillston2014operational wilson2008operations %}.
+- **What is exact.** Little's law and the utilization law are identities of the measured window, not approximations.
 
 ---
 

@@ -1,224 +1,70 @@
 ---
 title: Performance Testing
 parent: Performance
-grand_parent: Quality Attributes
-nav_order: 2
+nav_order: 3
 layout: default
 ---
 
 # Performance Testing
 
-Performance testing validates that software meets its timeliness requirements under realistic workloads. Unlike functional testing — which checks correctness — performance testing checks whether "correct answers" arrive fast enough to be useful {% cite everett2007performance %}.
+**Performance testing** runs a system under a controlled, realistic workload and measures response times, throughput and resource use, to check that it meets stated targets and to find where it stops meeting them. Functional tests ask whether the answer is right; performance tests ask whether it arrives in time {% cite everett2007performance %}.
 
-> "Testing for performance is not given the consideration that its importance deserves as part of the application's entire life cycle." — Molyneaux (2009) {% cite molyneaux2014art %}
+## 1. Six test types, six questions
 
----
+Molyneaux distinguishes six types of performance test, each answering a different question {% cite molyneaux2014art %}.
 
-## Testing Maturity Model
+![Baseline feeds load; load is pushed into stress, held for soak, or narrowed to isolation; smoke gates each build](test-types.svg)
 
-Molyneaux defines three maturity levels {% cite molyneaux2014art %}:
+_How the six test types relate: run a smoke test first on each build; if it passes, run the load test, then push it into stress, hold it for a soak, or narrow it to an isolation test._ {% cite molyneaux2014art %}
 
-| Level | Name | Approach | Defect Escape Rate |
-|-------|------|----------|-------------------|
-| 1 | **Firefighting** | React to production incidents | High (unknown) |
-| 2 | **Performance Validation** | Test before release | ~30% |
-| 3 | **Performance Driven** | Engineer throughout lifecycle | ~5% |
+| Type | Load | Question |
+|---|---|---|
+| Baseline | one user, best case | What is the response time with no contention? |
+| Load | the expected peak | Does the system meet its targets at that peak? |
+| Stress | beyond the expected peak | Where does it break, and how does it fail? |
+| Soak | the expected load for hours | Do memory leaks or slow drift appear over time? |
+| Smoke | the changed code only | Did this build make a known path slower? |
+| Isolation | one transaction, repeated | Which step of a slow transaction is slow? |
 
-Moving from level 2 to level 3 — integrating performance awareness from requirements through deployment — reduces production defect escape by **6&times;**.
+## 2. Write the target as a percentile under a stated load
 
----
+A target needs a measure, a threshold and a load. "Average response time under 2 s" fails twice: an average hides slow requests, and no load is named. Everett recommends stating the *maximum* acceptable time per transaction group {% cite everett2007performance %}; in practice the maximum is stated at a percentile, such as "no slower than 3 s for 95% of requests", because the absolute maximum of a long run is one outlier. For example, "with 500 active users, 95% of searches complete within 3 s and no request fails" names all three.
 
-## Six Types of Performance Tests
+## 3. Make the test environment and workload like production
 
-Each test type serves a distinct purpose {% cite molyneaux2014art %}:
+Results transfer to production only when the test matches it: the same hardware class and configuration, realistic data volumes (not an empty database), and a **workload model** with the right transaction mix, think times between requests and number of active users. The number of key transactions to script rarely exceeds 20 {% cite molyneaux2014art %}. Liu's process puts most of the effort before the first run: design the workload, write the scripts, choose the hardware, set up the environment, fix a repeatable procedure, establish a baseline, then analyze bottlenecks and tune {% cite liu2011performance %}.
 
-| Type | Purpose | When to Use |
-|------|---------|-------------|
-| **Baseline** | Single user, empty system — establish comparison point | Before any load testing |
-| **Load** | Target concurrency to verify SLA compliance | Every release |
-| **Stress** | Overwhelm resources to find the "buckle point" | Capacity planning |
-| **Soak / Stability** | Extended duration to reveal memory leaks and slow degradation | Before production |
-| **Smoke** | Quick check of changed code only | After each build |
-| **Isolation** | Repeated execution of specific transactions | Diagnosing known issues |
+## 4. Run each test in three phases
 
-### Test Types Mapped to Goals
+Each run ramps users up to the peak, holds the peak while measuring, and ramps down to check that resources are released. Many systems fail during ramp-up rather than at the peak, because allocating sessions, threads and memory is harder than steady processing {% cite everett2007performance %}. Measure only the steady phase, and compare every result against the baseline.
 
-```mermaid
-graph TD
-    B["Baseline<br>1 user, empty system"]
-    L["Load Test<br>Target concurrency"]
-    ST["Stress Test<br>Beyond capacity"]
-    SK["Soak Test<br>Extended duration"]
-    SM["Smoke Test<br>Changed code only"]
-    I["Isolation Test<br>Single transaction"]
+## 5. Read the curves, not just the numbers
 
-    B -->|"establishes"| L
-    L -->|"push beyond"| ST
-    L -->|"extend time"| SK
-    SM -->|"quick gate"| L
-    L -->|"diagnose"| I
+The shape of the response-time curve during a run points to a cause.
 
-    style B fill:#4CAF50,color:#fff
-    style L fill:#2196F3,color:#fff
-    style ST fill:#d32f2f,color:#fff
-    style SK fill:#FF9800,color:#fff
-    style SM fill:#9C27B0,color:#fff
-    style I fill:#607D8B,color:#fff
-```
+| Pattern during a run | Likely cause |
+|---|---|
+| Rises, then flattens as load levels off | normal saturation of one resource |
+| Keeps rising at constant load | a leak: memory, connections, file handles |
+| Becomes erratic | contention or garbage-collection pauses |
 
----
+Large tests record thousands of counters. Malik and colleagues reduced them automatically to 5–20 "performance signature" counters and detected deviations from a baseline with 95% average precision, so a pipeline can flag regressions without a person reading every graph {% cite malik2013automatic %}.
 
-## The Testing Process
+## When to use it — and when not
 
-Multiple frameworks converge on a structured multi-phase approach:
+- Run a load test before every release that changes a hot path (code that runs on most requests), and a smoke test on every build.
+- Run stress and soak tests before launches and capacity changes.
+- Do not trust results from an environment that differs from production in hardware, data size or configuration.
 
-### Liu's 8-Step Process
+## Limitations
 
-{% cite liu2011performance %}
+A test shows behavior only for the workload it models: an unmodeled transaction mix or traffic spike remains untested. Few coverage measures exist for load tests; the main one counts only the share of likely workload states that a test visits {% cite jiang2015survey %}. Deciding when a system has been tested enough is therefore a judgement.
 
-1. **Workload design** — Define from customer requirements / SLAs
-2. **Script/tool development** — Create automated drivers
-3. **Hardware selection** — 2–4&times; QA system capacity
-4. **Environment setup** — Realistic data volumes
-5. **Procedure definition** — Repeatable (server restart protocols, warm-up)
-6. **Baseline establishment** — Optimal configuration as yardstick
-7. **Bottleneck analysis** — Queuing theory + performance counters
-8. **Optimization/tuning** — Remove identified bottlenecks
+## How solid is this?
 
-### Jiang's 3-Phase Framework
-
-A survey of 147 papers identifies three fundamental phases {% cite jiang2015survey %}:
-
-| Phase | Activities | Techniques |
-|-------|-----------|------------|
-| **Load Design** | Define workload: realistic vs fault-inducing | Markov chains, UML diagrams, genetic algorithms |
-| **Execution** | Drive workload against system | HP LoadRunner, JMeter, WebLoad, emulation |
-| **Analysis** | Evaluate recorded behavior | Threshold verification, pattern matching, anomaly detection |
-
-### Execution Phases (Everett)
-
-Each individual test run follows three phases {% cite everett2007performance %}:
-
-1. **Ramp-up to peak** — Stagger user sessions; often reveals memory/thread allocation issues
-2. **Measurement at peak** — Timing under full planned workload
-3. **Ramp-down from peak** — Verify correct resource release
-
-{: .warning }
-> Many systems fail during **ramp-up**, not at peak. Resource allocation (memory, threads) is often more taxing than steady-state transaction processing {% cite everett2007performance %}.
-
----
-
-## Workload Design
-
-### Key Principles
-
-- The number of key transactions rarely exceeds **20** {% cite molyneaux2014art %}
-- Focus on **workloads and frequencies**, not individual input values {% cite weyuker2000experience %}
-- Measure **active users** (open sessions), not concurrent users (simultaneous requests) {% cite everett2007performance %}
-- Add **10% safety margin** above go-live concurrency target {% cite molyneaux2014art %}
-
-### The 93% Concentration Rule
-
-Weyuker found that 93% of performance-related project-affecting issues were concentrated in the **weakest 30%** of systems identified during architecture reviews {% cite weyuker2000experience %}. This suggests targeted testing guided by early risk assessment is more effective than uniform coverage.
-
-### Workload Mixing
-
-Running transactions in isolation can miss critical problems. Mixing transaction groups reveals resource interference — such as memory leaks from one module affecting another's execution space {% cite everett2007performance %}.
-
----
-
-## KPI Framework
-
-Molyneaux divides performance indicators into two categories {% cite molyneaux2014art %}:
-
-| Category | Metrics | Focus |
-|----------|---------|-------|
-| **Service-oriented** | Availability, Response Time | What users experience |
-| **Efficiency-oriented** | Throughput, Utilization | How resources are consumed |
-
-### Monitoring Layers
-
-| Layer | Examples | Granularity |
-|-------|---------|-------------|
-| **Generic** | CPU utilization, memory, disk I/O | System-level |
-| **Technology-specific** | Web server, app server, DB metrics | Middleware |
-| **Application internal** | Component, method-level timing | Code-level |
-
-### Requirements Format
-
-State requirements as **maximum response time**, not averages {% cite everett2007performance %}:
-
-| Bad | Good |
-|-----|------|
-| "Average response time < 2s" | "95th percentile response time < 3s" |
-| "System handles 1000 users" | "1000 active users with p99 < 5s" |
-
----
-
-## Diagnostic Workflow
-
-When performance issues are detected, Subraya prescribes a 4-phase diagnostic loop {% cite subraya2006web %}:
-
-1. **Initial diagnosis** — Top-level tools (iostat, sar, uptime)
-2. **Problem isolation** — Categorize: CPU, I/O, Paging, or Network
-3. **Deep probing** — Specific tools (profilers, filemon, svmon)
-4. **Remediation** — Targeted fix, then re-test
-
-### Monitoring Intervals
-
-| Test Duration | Sampling Interval |
-|--------------|-------------------|
-| Short tests | 20 seconds |
-| Routine monitoring | 15 minutes |
-| Tests > 8 hours | 300 seconds |
-
-Balance detail against log file size and monitoring overhead {% cite subraya2006web %}.
-
----
-
-## Automated Analysis
-
-### Performance Signatures (Malik et al.)
-
-Load tests of large-scale systems generate terabytes of data. Malik et al. introduce **performance signatures** — a minimal set of counters capturing essential system characteristics {% cite malik2013automatic %}:
-
-| Technique | Precision | Recall | Type |
-|-----------|-----------|--------|------|
-| Random Sampling | Low | Low | Unsupervised |
-| K-Means Clustering | Medium | Medium | Unsupervised |
-| PCA | 81% | 84% | Unsupervised |
-| **WRAPPER (GA + Logistic Regression)** | **95%** | **94%** | Supervised |
-
-The WRAPPER approach reduces thousands of counters to **5–20** (up to 89% reduction) while maintaining 95% precision in detecting deviations {% cite malik2013automatic %}.
-
----
-
-## Effort Guidelines
-
-| Activity | Guideline |
-|----------|-----------|
-| Scripting | ~0.5 day per transaction {% cite molyneaux2014art %} |
-| Test execution minimum | 5 days {% cite molyneaux2014art %} |
-| PE investment | 1–5% of total project cost {% cite jewell2008performance %} |
-| Key transactions | Rarely >20 per system {% cite molyneaux2014art %} |
-
----
-
-## Performance Bug Characteristics
-
-Understanding how performance bugs behave helps design better tests:
-
-| Characteristic | Value | Source |
-|---------------|-------|--------|
-| Root cause: wrong workload/API understanding | 67% | {% cite jin2012understanding %} |
-| Bugs in input-dependent loops | >75% | {% cite jin2012understanding %} |
-| Discovered by code reasoning (not profiling) | 33–57% | {% cite nistor2013discovering %} |
-| Reports without reproduction steps | 54–73% | {% cite nistor2013discovering %} |
-| Reports with measurements (CPU, I/O) | 34–36% | {% cite zaman2012qualitative %} |
-| Performance regressions vs non-perf (Chrome) | 7&times; more frequent | {% cite zaman2012qualitative %} |
-
-{: .note }
-> Profiling finds only 5–10% of performance bugs {% cite nistor2013discovering %}. **Code reasoning** — reading and thinking about code — is the primary discovery method. Testing strategies should include code review focused on performance patterns, not just runtime measurement.
+- **Where it comes from.** Practitioner books {% cite molyneaux2014art everett2007performance liu2011performance %} and a survey of 147 load-testing papers and tools {% cite jiang2015survey %}.
+- **What is contested.** Molyneaux's figure that moving from release-time validation to performance-driven development cuts defects escaping to production from about 30% to 5% is an experience estimate, not a study result {% cite molyneaux2014art %}.
+- **What supports targeting.** At AT&T, 93% of performance-related problems found in architecture reviews sat in the 30% of projects judged weakest {% cite weyuker2000experience %}: risk reviews tell you where to test hardest.
 
 ---
 
