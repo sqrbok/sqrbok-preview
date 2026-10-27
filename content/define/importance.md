@@ -1,96 +1,57 @@
 ---
 parent: Quality
 nav_order: 1
-title: Importance
+title: Why Software Quality Matters
 layout: default
 ---
 
+# Why Software Quality Matters
 
-# 🔍 Importance of Software Quality  
+A **software failure** is an event in which a system does not do what its users need, and its cost is the clearest argument for treating quality as engineering work rather than a finishing touch. Each failure below broke one named quality characteristic; naming it is the first step towards a requirement that would have caught it.
 
-Software quality is a cornerstone of modern technology. From minimizing downtime to preventing critical failures, the stakes for reliable, well-tested software have never been higher.  
+## 1. Failures, and the characteristic each one broke
 
----
+The table pairs eight documented failures with the [ISO/IEC 25010](foundations/iso25010.md) characteristic they violated, written as *characteristic (subcharacteristic)*; the [Foundations](foundations/) pages define each term.
 
-## 📉 **The Cost of Downtime**
-Downtime can have a massive financial impact, affecting businesses of all sizes and industries. Here are some staggering examples:  
+| Year | System | What went wrong | Characteristic |
+|---|---|---|---|
+| 1962 | Mariner 1 probe | A bar missing from a symbol in the guidance equation let raw, noisy radar data steer the rocket; it was destroyed about 294 s after launch (about US$18.5 million at the time) {% cite nasa_mariner1 %} | Functional suitability (functional correctness) |
+| 1985–87 | Therac-25 radiotherapy | Race conditions in the control software allowed six massive radiation overdoses; several patients died {% cite leveson1993therac %} | Safety (fail safe) |
+| 1996 | Ariane 5, flight 501 | Converting a 64-bit floating-point value to a 16-bit integer overflowed in reused Ariane 4 code; the launcher self-destructed about 40 s after lift-off {% cite lions1996ariane %} | Reliability (fault tolerance) |
+| 1999 | Mars Climate Orbiter | Ground software reported thruster impulse in pound-force seconds; the navigation software expected newton-seconds {% cite nasa1999mco %} | Compatibility (interoperability) |
+| 2012 | Knight Capital | A deployment left old code active on one server; in 45 minutes the firm's router sent over 4 million orders and lost more than US$460 million {% cite sec2013knight %} | Maintainability (analysability) |
+| 2014 | OpenSSL "Heartbleed" | A missing length check let any client read up to 64 KB of server memory, including private keys {% cite nvd2014heartbleed %} | Security (confidentiality) |
+| 2015 | Boeing 787 | A counter in the generator control units overflowed after 248 days of continuous power, which could shut down all AC power; the interim fix was to power-cycle the aircraft {% cite faa2015boeing787 %} | Reliability (faultlessness) |
+| 2024 | CrowdStrike Falcon update | A faulty content update crashed about 8.5 million Windows machines, under 1% of the total, but stopped airlines, hospitals and banks {% cite weston2024crowdstrike %} | Reliability (availability) |
 
-- 🏢 **Top Companies**: Downtime costs the top 2,000 companies a combined $400 billion annually.  
-- 💰 **Meta's Outage (2024)**: Estimated $100 million in lost revenue.  
-- 🛒 **Amazon**: A one-hour outage costs $34 million in sales.  
-- 🕒 **Alibaba (Singles' Day)**: A 20-minute crash cost billions in lost sales.   
+For example, the Knight Capital loss was not a programming error in the new code. The firm reused a flag that had once switched on a function retired years earlier, and one of eight servers did not receive the new release. That is a maintainability failure: dead code nobody removed made the system hard to analyse, and a deployment nobody checked made it fatal.
 
-[🔗 Source: Queue-IT](https://queue-it.com/blog/cost-of-downtime/)  
+## 2. Downtime is a business cost
 
----
+Failures that kill no one still cost money. A 2024 survey of executives at 2,000 of the world's largest companies put the cost of unplanned downtime at about US$400 billion a year, about 9% of their profits {% cite splunk2024downtime %}. The figure is self-reported by a vendor's survey, so read it as an order of magnitude, not a measurement.
 
-## 🔴 Critical Software Failures
+## 3. From incident to requirement
 
-### 🌌 Space
+A failure list is useful only if it changes what a team specifies. Ask of each incident: which characteristic failed, and what measurable requirement would have caught it? For the Boeing 787 the answer is a reliability requirement on continuous operation, tested by running the counter past its limit. The pages on [quality models](foundations/quality-models.md) and [quality requirements](foundations/requirements.md) show how to write such a requirement.
 
-- **Mariner 1 (1962):** A missing hyphen destroyed a spacecraft, costing **$135 million**.
-- **Ariane 5 (1996):** A conversion error caused self-destruction 40 seconds after launch.
-- **Mars Climate Orbiter (1999):** Software confusion between metric and imperial units led to failure.
-- **Hitomi Satellite (2016):** Incorrect thruster use caused disintegration.
+## When to use it — and when not
 
----
+- **Use** incident stories to motivate a quality requirement and to test whether your own quality model would have named the risk.
+- **Do not** use them to estimate how likely a failure is: famous incidents are chosen because they are rare and dramatic.
 
-### 🛡️ Security and Encryption
+## How solid is this?
 
-- **Heartbleed (2012):** OpenSSL vulnerability caused loss of confidential data.
-- **Debian OpenSSL (2006):** A patch broke the random number generator, compromising all generated keys.
-- **Apple "goto fail" Bug:** A code duplication error bypassed SSL/TLS verification.
-- **Sony BMG Rootkit (2005):** Hidden DRM opened security holes exploited by trojans.
-
----
-
-### ⚡ Energy and Telecommunications
-
-- **Northeast Blackout (2003):** A race condition in monitoring software caused cascading power outages.
-- **AT&T Crash (1990):** A software loop triggered a cascading network failure.
-- **Google Search Glitch (2009):** All websites were flagged as malicious.
+- **Where it comes from.** Each row cites one source: an official inquiry or regulator (Ariane 5, Mars Climate Orbiter, Knight Capital, Boeing 787), the academic investigation by Leveson and Turner (Therac-25), the vendor's statement (CrowdStrike), NASA's mission page (Mariner 1) or the public vulnerability record (Heartbleed).
+- **What is contested.** The claim that a defect costs 100 times more to fix in production than in requirements is widely repeated; a study of 171 projects found no such delayed-issue effect {% cite menzies2017delayed %}. The cost of late fixes depends on the project, not on a fixed multiplier.
+- **What we do not hold.** Downtime costs per company or per hour come from vendor surveys; we hold no independent estimate.
 
 ---
 
-### 💰 Finance and Administration
+### References
 
-- **Vancouver Stock Exchange (1982):** large errors due to repeated rounding.
-- **Mt. Gox Bitcoin Exchange (2011):** series of security breaches between 2011 and 2014, resulting in the loss of millions of $460 million.
-- **Knight Capital (2012):** Deployment error caused **$440 million in losses** in 45 minutes.
-- **Post Office Scandal (2000-2015):** Faulty Horizon software falsely implicated 736 subpostmasters.
-- **The DAO Bug (2016):** Exploits in blockchain software resulted in the theft of **3.6 million Ether** (~$50M).
-
----
-
-### 🚑 Medical
-
-- **Therac-25 (1980s):** Radiation therapy machine errors caused fatalities.
-- **Multidata RTP/2 (2000):** Software overdosed radiation, killing eight patients.
-- **Medtronic (2008):** Vulnerabilities in heart devices allowed remote attacks.
-
----
-
-### 🚘 Transportation
-
-- **Toyota Unintended Acceleration (2009):** Software bugs led to recalls and lawsuits.
-- **Boeing 787 (2015):** Integer overflow could shut down all electrical systems after 248 days.
-- **Lime Scooters (2019):** Firmware caused sudden braking, leading to injuries.
-
----
-
-### 🎮 Video Games
-
-- **World of Warcraft "Corrupted Blood" (2005):** A bug simulated a virtual epidemic, studied for real-world disease modeling.
-- **MissingNo. (Pokémon Red/Blue):** Encountering this glitch could corrupt game data.
-- **Guitar Hero II (Xbox 360):** An update caused some consoles to fail completely, resulting in the infamous "red ring of death."
-
----
-
-[Source: LinkedIn.](https://www.linkedin.com/pulse/biggest-software-failures-history-chronological-journey-corrales-3jube/)
-
-[Source: Wikipedia.](https://en.wikipedia.org/wiki/List_of_software_bugs)
+{% bibliography --cited %}
 
 ---
 
 {: .highlight }
-**Disclaimer:** AI is used for text polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.

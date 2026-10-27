@@ -10,609 +10,132 @@ page_type: study-notes
 
 # Study Notes: Quality Models
 
----
+The lecture asks *"what is software quality, and how do we make it specific enough to build and test?"* It shows why people disagree about quality, introduces quality models, follows them from McCall to ISO/IEC 25010, turns one into testable requirements, and ends with the quality pioneers. The [revision questions](RQ-L1-QM.md) test this.
 
-## Table of Contents
+## 1. People mean five different things by quality
 
-1. [Part 1: What is Quality? (Garvin Framework)](#part-1-what-is-quality-garvin-framework)
-2. [Part 2: Quality Models & Terminology](#part-2-quality-models--terminology)
-3. [Part 3: Classic Quality Models](#part-3-classic-quality-models)
-4. [Part 4: Modern Practice (ISO + Requirements)](#part-4-modern-practice-iso--requirements)
-5. [Part 5: Quality Gurus](#part-5-quality-gurus)
-6. [Part 6: Summary & Review](#part-6-summary--review)
+Garvin found five views of quality in the literature {% cite garvin_what_1984 %}; §2 sets two of them aside for software:
 
----
+| View | Quality is… | Who said it |
+|---|---|---|
+| **Transcendent** | excellence you recognise but cannot define | Pirsig |
+| **Product-based** | more of a desired attribute | Abbott |
+| **User-based** | fitness for use: satisfying the user's wants | Juran |
+| **Manufacturing-based** | conformance to requirements | Crosby |
+| **Value-based** | excellence at an acceptable price | Broh |
 
-## Part 1: What is Quality? (Garvin Framework)
+The same release can score high in one view and low in another. A banking app with zero open defects against its specification is high quality in the manufacturing view; if users need six taps to make a transfer, it is low quality in the user view. Garvin also split product quality into eight dimensions (performance, features, reliability, conformance, durability, serviceability, aesthetics, perceived quality); firms compete on a few, Steinway pianos on tone, Yamaha on reliability and conformance.
 
-### Learning Objectives
-- Understand that quality is multi-dimensional
-- Recognize that different stakeholders define quality differently
-- Apply Garvin's five views to real-world products
+→ [Views of Quality](../../define/foundations/views.md)
 
-### Garvin's Five Views of Quality
+## 2. Most projects run on a blend, but one view dominates
 
-David Garvin {% cite garvin_what_1984 %} identified five distinct perspectives on quality (see [Views](views.md) for full details). Each leads to different quality management approaches.
+Three views are practical for software; the product-based view is set aside as a general definition because "more is better" holds only for some attributes (Kano's one-dimensional ones, where more always satisfies more, §10), and the transcendent view because it cannot be tested. The user-based view is checked by **validation**, here meaning checking with users that the product fits their use; the manufacturing-based view by verification against the specification; the value-based view asks whether quality is worth its cost. Which view dominates is a judgement about a project: a team that accepts work by customer demo, as in Scrum or XP, leans on the user view; a team audited against a process standard such as CMMI (a model that rates an organisation's processes on maturity levels), or one whose product a regulator such as the FDA must approve, leans on the manufacturing view; a start-up shipping weekly to learn leans on the value view. The FDA case is not the user view: in regulation, *validation* has its second meaning, showing conformance to a mandated specification and process. The start-up ships known defects when fixing them would cost more than the lesson.
 
-| View | Definition | Example | Approach |
-|------|------------|---------|----------|
-| **Transcendent** | "I know it when I see it" | Rolex watch, Monet painting | Subjective judgment |
-| **Product-based** | More of attribute X is better | Smartphone specs, diamond carats | Measurable attributes |
-| **User-based** | Fitness for purpose | Toyota Corolla (reliable, low-maintenance) | Customer satisfaction |
-| **Manufacturing** | Conformance to specifications | Zero defects in assembly | Process control |
-| **Value-based** | Quality at acceptable cost | Budget airline ticket | ROI analysis |
+→ [Views of Quality](../../define/foundations/views.md)
 
-#### Detailed View Descriptions
+## 3. A quality model replaces "I know it when I see it"
 
-**1. Transcendent View**
-- Quality is absolute and universally recognizable but cannot be precisely defined
-- Often associated with excellence or "innate goodness"
-- *Example:* A luxury watch like a Rolex is recognized as high quality because of its superior craftsmanship and prestige
-- *Criticism:* Subjective and difficult to measure or operationalize
+A **quality model** is a defined set of quality characteristics, and of the relationships between them, used to specify quality requirements and to evaluate whether a product meets them {% cite iso25010_2023 %}. Every model has the same shape: broad **characteristics** split into **subcharacteristics**, each tied to a **measure** with a scale and a counting method. For example, "the payment service must be reliable" becomes: characteristic reliability, subcharacteristic recoverability, measure mean time to restore service in minutes. The model stops at the measure; the threshold, 5 minutes, belongs to the requirement: "While in production, measured over each quarter, the payment service shall restore service after a crash within a mean of 5 minutes." A mean suits restore time because crashes are few and each restore counts; percentiles need many events.
 
-**2. Product-Based View**
-- Quality is a precise and measurable variable based on product attributes
-- More features or better performance equals higher quality
-- *Example:* A smartphone with better resolution, longer battery life, and faster processing speed
-- *Criticism:* Assumes all improvements are desirable, ignoring trade-offs like cost
+Measures are **internal** when taken on code without running it (complexity, coupling) and **external** when taken on the running system (response time, failure rate). Models link the two because internal measures are cheap and available early, so a team can use them to predict external quality before users see it. 
 
-**3. User-Based View**
-- Quality is determined by the extent to which a product satisfies customer needs
-- Different users = different quality definitions
-- *Example:* A budget-friendly car like Toyota Corolla is high quality to customers who value reliability
-- *Criticism:* Highly subjective and dependent on individual expectations
+→ [What Is a Quality Model?](../../define/foundations/quality-models.md)
 
-**4. Manufacturing-Based View**
-- Quality is defined as conformance to specifications or being free from defects
-- Focus on process excellence
-- *Example:* A car produced with zero defects in the assembly line
-- *Criticism:* Focuses on internal consistency but overlooks customer satisfaction
+## 4. Quality assurance builds confidence; quality control checks products
 
-**5. Value-Based View**
-- Quality is the balance between performance and cost
-- Delivers the most value for its price
-- *Example:* A budget airline ticket that meets expectations for basic transportation at low price
-- *Criticism:* Overemphasis on cost-performance trade-offs can compromise safety
+ISO 9000 defines the activities of quality management {% cite iso9000_2015 %}. **Quality planning** sets objectives and processes; **quality assurance** provides confidence that quality requirements will be fulfilled; **quality control** checks work products and corrects them; **quality improvement** increases the ability to fulfil requirements. A review of one pull request is quality control; an audit showing that every pull request is reviewed is quality assurance.
 
-### Practical Three-View Model
+→ [What Is a Quality Model?](../../define/foundations/quality-models.md#3-words-for-quality-work)
 
-Most software organizations blend three views:
+## 5. McCall linked what users see to what developers build
 
-| Perspective | Definition | Methodology Emphasis |
-|-------------|-----------|----------------------|
-| **User-based** | "Fitness for purpose" (Juran) | Agile |
-| **Manufacturing** | "Conformance to requirements" (Crosby) | CMMI, process improvement |
-| **Value-based** | Quality at acceptable cost | Business perspective |
+McCall, Richards and Walters built the first software quality model in 1977 for the US Air Force {% cite mccall_factors_1977 %}. It has 11 **factors** in three groups:
 
----
+| Group | Factor | McCall's definition |
+|---|---|---|
+| Product operation: how well does it run? | Correctness | extent to which a program satisfies its specification and the user's objectives |
+| | Reliability | extent to which it performs its intended function with required precision |
+| | Efficiency | computing resources and code required to perform a function |
+| | Integrity | extent to which access by unauthorized persons can be controlled |
+| | Usability | effort to learn, operate, prepare input and interpret output |
+| Product revision: can we change it? | Maintainability | effort to locate and fix a defect |
+| | Flexibility | effort to modify an operational program |
+| | Testability | effort to test that it performs its intended functions |
+| Product transition: can we move it? | Portability | effort to transfer it to another hardware or software environment |
+| | Reusability | extent to which parts can be reused in other applications |
+| | Interoperability | effort to couple it with another system |
 
-## Part 2: Quality Models & Terminology
+Factors are **external** in McCall's sense: what users experience, not directly measurable; the external measures of §3 are how such factors are later observed on the running system. McCall tied each to **criteria**, 23 internal properties of the software, and each criterion to **metrics**: yes/no checklist questions, scored as the share of "yes" answers {% cite naik2008software %}. For modularity: "does this module implement one function?"; 30 of 40 modules give 0.75, and criterion scores are averaged into a factor score. Maintainability, the "effort required to locate and fix a defect", rests on consistency, simplicity, conciseness, self-descriptiveness and modularity; testability rests on simplicity, instrumentation, self-descriptiveness and modularity. Three criteria serve both factors, so the model is not orthogonal. Security sits under integrity.
 
-### Learning Objectives
-- Define quality model and explain why it's needed
-- Understand the hierarchy: Characteristics → Attributes → Measures
-- Distinguish between QA, QC, and related terms
+→ [McCall's Quality Model](../../define/foundations/mccall.md)
 
-### Why Quality Models Are Needed
+## 6. Quality characteristics trade off against each other
 
-Quality models solve the "I know it when I see it" problem:
+Perry classified each pair of McCall's factors as **direct** (improve together), **inverse** (one worsens the other) or **neutral** {% cite perry_effective_1988 %}. Efficiency loses to almost everything: improving most other factors adds code that does not compute the answer, so it reduces efficiency {% cite naik2008software %}. For example, writing an audit record on every balance query (integrity) adds 2 ms to an 8 ms query, a 25% rise in latency. Other pairs are direct: correctness and reliability, or maintainability and testability, improve together. Gillies added that relationships need not be symmetric {% cite gillies_software_2011 %}: modular code helps reliability, but a redundant server does nothing for maintainability. The signs are judgement; decide competing requirements together.
 
-1. **Shared vocabulary** — Common language for quality requirements
-2. **Measurement capability** — Enable comparison and tracking
-3. **Design guidance** — Inform development decisions
-4. **Trade-off analysis** — Framework for understanding conflicts
+→ [Quality Trade-offs](../../define/foundations/tradeoffs.md)
 
-### Quality Model Definitions
+## 7. ISO/IEC 25010 is today's shared vocabulary
 
-**Simple Definition:**
-> A model with the objective to describe, assess, and/or predict quality.
+ISO/IEC 9126 (2001) and 25010:2011 came between McCall and today. The current **ISO/IEC 25010:2023** has nine product characteristics {% cite iso25010_2023 %}: functional suitability, performance efficiency, compatibility, interaction capability, reliability, security, maintainability, flexibility and safety. The 2023 edition added safety, renamed usability (now interaction capability) and portability (now flexibility), and moved quality in use to ISO/IEC 25019. A **plain renaming** keeps the content under a new name; identical names are not counted. Three ISO names are plain renamings: functional suitability, performance efficiency and interaction capability are McCall's correctness, efficiency and usability. Interaction capability counts: it keeps McCall's interface properties, while usability as an outcome moved to quality in use. Flexibility is roughly his portability plus scalability. Two collect content McCall kept inside differently named factors: security (his integrity) and compatibility (his interoperability). Safety has no counterpart. Words changed meaning too:
 
-**ISO 25000 Definition:**
-> A defined set of characteristics, and of relationships between them, which provides a framework for specifying quality requirements and evaluating quality.
+| McCall factor | Home in ISO/IEC 25010:2023 | Note |
+|---|---|---|
+| Correctness | functional suitability (functional correctness) | |
+| Reliability | reliability | |
+| Efficiency | performance efficiency | product time and resources, not the user's effort (quality-in-use efficiency) |
+| Integrity | security | ISO *integrity* is a security subcharacteristic |
+| Usability | interaction capability | a prerequisite for usability, now under beneficialness (ISO/IEC 25019) |
+| Maintainability, testability, reusability | maintainability | |
+| Flexibility | maintainability (modifiability) | **names swap:** ISO's *flexibility* is McCall's portability plus scalability |
+| Portability | flexibility | **names swap** |
+| Interoperability | compatibility (interoperability) | |
+| no counterpart | safety | |
 
-**Full Definition:**
-> A structured specification of quality in terms of characteristics, attributes, their relationships, and corresponding measurement scales and methods.
+Subcharacteristics worth knowing: **interaction capability** (appropriateness recognizability, learnability, operability, user error protection, user engagement, inclusivity, user assistance, self-descriptiveness), **performance efficiency** (time behaviour, resource utilization, capacity), **reliability** (faultlessness, availability, fault tolerance, recoverability) and **security** (confidentiality, integrity, non-repudiation, accountability, authenticity, resistance). Use the model as a **checklist**: walk all nine, keep those that yield requirements, and write down why the others were dropped; a food-delivery app drops safety: it controls nothing that can harm anyone.
 
-### Quality Model Hierarchy
+→ [ISO/IEC 25010 Product Quality](../../define/foundations/iso25010.md)
 
-```
-Quality Model
-├── Quality Characteristic (e.g., Reliability)
-│   ├── Quality Attribute (e.g., Fault Tolerance)
-│   │   ├── Measurement Scale
-│   │   └── Measurement Method
-│   └── Quality Attribute (e.g., Recoverability)
-└── Quality Characteristic (e.g., Usability)
-    └── ...
+## 8. A quality requirement has a condition, a measure and a threshold
+
+A testable quality requirement follows a template:
+
+```text
+While [condition, with any measurement window], the [component] shall [measure] [threshold].
 ```
 
-**Key Distinction:**
-- **Characteristics** are high-level (not directly measurable)
-- **Attributes** can be measured
+Thresholds come from the current baseline, competitors, what users expect, a service-level agreement, or the cost of the next nine: each extra 9 of availability (99.9% → 99.99%) costs more than the last.
 
-### Internal vs External Quality
+"The system shall be fast and reliable" has no condition, no measure and no threshold, so no test can fail it. Split it into one requirement per characteristic: "While up to 1,000 concurrent users are active, the search API shall respond within 200 ms for at least 95% of requests" and "During business hours (condition), measured per calendar month (window), the order service (component) shall be available (measure) at least 99.9% of the time (threshold)." The **95th percentile** (**p95**) of response time is the value that 95% of requests stay under. If 98% of requests take 70 ms and 2% take 5 s, the mean is 0.98 × 70 + 0.02 × 5,000 ≈ 169 ms, which no request takes; p95 = 70 ms; the 5 s tail shows only at p99 = 5 s. So a requirement names the percentile that matters, and adds p99 when the tail matters: "…within 200 ms for 95% of requests and within 1 s for 99%".
 
-| Type | Visibility | Who Sees It | Examples |
-|------|-----------|-------------|----------|
-| **Internal** (white-box) | Developers | Code metrics, cyclomatic complexity, code coverage |
-| **External** (black-box) | Users | Response time, availability, usability |
+Requirements are best derived from the model in six steps {% cite firesmith2008mfesa %}: (1) select the relevant characteristics, (2) read the context (operations, data volumes, peak users, interfaces), (3) state a quality goal per characteristic, (4) choose a measure, (5) write the requirement with a threshold, (6) check that it is testable, feasible and complete, and loop back if not. 
 
-### Key Terminology
+→ [Writing Quality Requirements](../../define/foundations/requirements.md)
 
-| Term | Definition | Key Point |
-|------|------------|-----------|
-| **Quality Management (QM)** | Plan, verify, remediate, improve | Overall umbrella term |
-| **Quality Planning (QP)** | Identify requirements, activities, tools | Front-end planning |
-| **Quality Assurance (QA)** | Provide confidence in quality | Focuses on process |
-| **Quality Control (QC)** | Verify and correct | Focuses on product |
-| **Quality Improvement (QI)** | Enhance process effectiveness | Continuous improvement |
+## 9. Product quality is not enough: quality in use and process quality
 
----
+**Quality in use** is the degree to which specific users achieve specific goals in a specific context of use. ISO/IEC 25010:2011 named five characteristics: **effectiveness** (e.g. 90% of first-time users complete a booking without help), **efficiency** (a returning user books in under 2 minutes), **satisfaction**, **freedom from risk** (no booking charged twice) and **context coverage** (the targets hold on a phone) {% cite iso25010 %}. ISO/IEC 25019:2023 now regroups them as beneficialness (which holds usability), freedom from risk and acceptability {% cite iso25019_2023 %}. For the project, use the more concrete 2011 five. The same completion rate is product quality (learnability) when measured in a controlled test, and quality in use (effectiveness) when measured with real users in their own context.
 
-## Part 3: Classic Quality Models
+**Process quality** is the quality of how the product is built. Kroeger and Davidson grouped it into suitability, usability, manageability and evolvability, here describing the process {% cite kroeger2009quality %}. A good process tends to produce good products but cannot guarantee them: a sound process can still build the wrong thing. The three form a chain: process quality influences product quality, which influences quality in use.
 
-### Learning Objectives
-- Explain McCall's quality model structure (factors, criteria, metrics)
-- List and categorize McCall's 11 quality factors
-- Understand quality attribute tradeoffs (Perry's model)
+→ [Quality in Use and Process Quality](../../define/foundations/quality-in-use.md)
 
-### McCall's Quality Model
+## 10. The quality pioneers supplied the ideas the models use
 
-McCall {% cite mccall_factors_1977 %} developed the first comprehensive software quality model for the US Air Force (see [Models](models.md) for full details).
+Shewhart separated common-cause from special-cause variation {% cite shewhart1931economic %} and started the improvement cycle that **Deming** spread as **Plan–Do–Check–Act**; Deming's 14 points include "cease dependence on inspection" ("build quality in") {% cite deming1986crisis %}. **Juran** defined quality as fitness for use and management as a trilogy of planning, control and improvement {% cite juran1986trilogy %}. **Crosby** defined quality as conformance to requirements and argued that doing it right first time is cheaper ("Quality Is Free") {% cite crosby1979quality %}. **Ishikawa** gave teams the fishbone (cause-and-effect) diagram and the seven basic tools {% cite ishikawa1985tqc %}, used in post-incident reviews. **Humphrey** applied process maturity to software, which became the CMM, later CMMI {% cite humphrey1989managing %}.
 
-**Innovation:** First structured approach to software quality
-**Structure:** 11 quality factors in 3 categories
+**Kano** classified attributes by how satisfaction responds {% cite kano1984attractive %}: a missing **must-be** attribute dissatisfies and its presence adds nothing (a streaming app resumes where you stopped); a **one-dimensional** attribute satisfies in proportion (picture quality); an **attractive** attribute delights and is not missed (skip the intro). Attractive features drift to must-be as users get used to them.
 
-#### The Three Categories
+→ [Quality Pioneers](../../define/foundations/gurus.md) · [Kano Model](../../define/foundations/kano.md)
 
-| Category | Focus Question | What It Covers |
-|----------|---------------|----------------|
-| **Product Operation** | How well does it run? | Day-to-day functionality |
-| **Product Revision** | Can we change it? | Maintenance and evolution |
-| **Product Transition** | Can we move it? | Portability and integration |
+## Where this goes next
 
-#### McCall's 11 Quality Factors
-
-| Category | Factors | Description |
-|----------|---------|-------------|
-| **Product Operation** | Correctness | Meets specified requirements |
-| | Reliability | Performs without failure |
-| | Efficiency | Uses minimal resources |
-| | Integrity | Protected from unauthorized access |
-| | Usability | Easy to learn and operate |
-| **Product Revision** | Maintainability | Easy to modify for corrections |
-| | Flexibility | Easy to modify for enhancements |
-| | Testability | Easy to validate and verify |
-| **Product Transition** | Portability | Runs in different environments |
-| | Reusability | Components can be reused |
-| | Interoperability | Works with other systems |
-
-#### Three-Level Structure
-
-McCall's model has three levels:
-
-1. **Factor** — External view (what users see)
-   - Example: Reliability
-2. **Criteria** — Internal view (what developers control)
-   - Example: Simplicity, Modularity
-3. **Metric** — Measurement
-   - Example: Cyclomatic complexity
-
-**Key Insight:** Same criterion can affect multiple factors!
-- *Example:* Modularity → Maintainability AND Testability
-
-### Perry's Quality Attribute Relationships
-
-Perry {% cite perry_effective_1988 %} showed that quality attributes are **not independent** — they have relationships:
-
-| Relationship Type | Symbol | Meaning |
-|-------------------|--------|---------|
-| Direct | + | Both improve together |
-| Inverse | − | Tradeoff (one improves, other worsens) |
-| Neutral | (blank) | No relationship |
-
-#### Key Tradeoffs to Know
-
-| Attribute Pair | Relationship | Explanation |
-|----------------|--------------|-------------|
-| Integrity vs Efficiency | Inverse (−) | Access control adds overhead |
-| Usability vs Efficiency | Inverse (−) | Better UI requires more code |
-| Flexibility vs Integrity | Inverse (−) | Flexible data = security risks |
-| Portability vs Reusability | Direct (+) | Both benefit from good structure |
-| Maintainability vs Testability | Direct (+) | Well-structured code is easier to test |
-
-#### Perry's Tradeoff Matrix (Selected)
-
-| Attribute | Efficiency | Maintainability | Reusability |
-|-----------|:----------:|:---------------:|:-----------:|
-| **Integrity** | − | | − |
-| **Usability** | − | + | |
-| **Testability** | − | + | + |
-| **Portability** | − | + | + |
-
-> **Key Takeaway:** You cannot maximize all quality attributes simultaneously. Quality engineering is about **informed tradeoffs**.
+The next lecture, [Measurement](SN_L2_Metrics.md), asks when a measure really stands for a quality characteristic. The course project needs a [quality model for your product](../../define/foundations/project-model.md): keep the relevant ISO/IEC 25010 characteristics, justify those you drop, and write requirements with the template above. It covers product quality; add quality-in-use rows only where user outcomes decide success, with a plan to measure them with real users.
 
 ---
 
-## Part 4: Modern Practice (ISO + Requirements)
-
-### Learning Objectives
-- List ISO 25010's 9 quality characteristics
-- Apply the 6-step process for writing quality requirements
-- Write testable quality requirements using the template
-- Explain Quality in Use and Process Quality
-
-### ISO/IEC 25010:2024 — 9 Characteristics
-
-Use ISO 25010 as a **checklist** when writing requirements:
-
-| # | Characteristic | Question It Answers |
-|---|----------------|---------------------|
-| 1 | **Functional Suitability** | Does it do what it should? |
-| 2 | **Performance Efficiency** | Is it fast/efficient enough? |
-| 3 | **Compatibility** | Does it work with others? |
-| 4 | **Usability** | Can users use it easily? |
-| 5 | **Reliability** | Does it keep working? |
-| 6 | **Security** | Is it protected? |
-| 7 | **Maintainability** | Can we change it? |
-| 8 | **Portability** | Can we move it? |
-| 9 | **Quality in Use** | Do users succeed? |
-
-#### Sub-Characteristics (Selected)
-
-| Characteristic | Sub-Characteristics |
-|----------------|---------------------|
-| **Functional Suitability** | Completeness, Correctness, Appropriateness |
-| **Performance Efficiency** | Time Behavior, Resource Utilization, Capacity |
-| **Reliability** | Maturity, Availability, Fault Tolerance, Recoverability |
-| **Security** | Confidentiality, Integrity, Non-repudiation, Accountability, Authenticity |
-| **Maintainability** | Modularity, Reusability, Analyzability, Modifiability, Testability |
-
-### 6-Step Process: From ISO to Requirements
-
-**Source:** Firesmith 2009
-
-| Step | Action | Purpose |
-|------|--------|---------|
-| 1 | **Determine Relevance** | Which ISO characteristics matter for this project? |
-| 2 | **Consider Context** | Review functional, data, interface requirements |
-| 3 | **Produce Criteria** | Define quality criteria for each characteristic |
-| 4 | **Select Measures** | Choose how to measure each criterion |
-| 5 | **Specify Requirements** | Write testable requirements with thresholds |
-| 6 | **Evaluate** | Validate completeness, testability, feasibility |
-
-> **Warning:** Skipping steps leads to vague requirements like "the system shall be fast."
-
-### Worked Example: Search API Performance
-
-**Goal:** Write a performance requirement for a search API
-
-| Step | Action | Result |
-|------|--------|--------|
-| 1. Relevance | Performance Efficiency matters for UX | Selected |
-| 2. Context | Users expect quick search results | Search is critical |
-| 3. Criteria | Response time for search queries | Time-based criterion |
-| 4. Measure | P95 latency (95th percentile) | Measurable metric |
-| 5. Requirement | Write with template | Testable spec |
-| 6. Evaluate | Testable? Feasible? Complete? | Approved |
-
-**Resulting Requirement:**
-```
-While under normal load (< 1000 concurrent users), the Search API
-shall respond in < 200ms, 95% of the time.
-```
-
-### Quality Requirements Template
-
-**Template:**
-```
-While in [condition], the [component] shall exhibit
-[quality attribute] of [threshold] [measurement].
-```
-
-**Examples:**
-
-| Requirement | Condition | Attribute | Threshold |
-|-------------|-----------|-----------|-----------|
-| API response time | Normal operation | Performance | < 200ms, 95% |
-| Data integrity | Production | Reliability | 99.99% |
-| System availability | Under load | Availability | > 99.9% |
-| Login authentication | All users | Security | 0 unauthorized access |
-
-### Quality in Use
-
-**Definition (ISO 25010):**
-> The degree to which a system achieves its intended purposes when used in a specific environment by specific users.
-
-#### Five Quality in Use Characteristics
-
-| Characteristic | Description | Example Requirement |
-|----------------|-------------|---------------------|
-| **Effectiveness** | Users achieve goals | "90% of users complete checkout on first attempt" |
-| **Efficiency** | Resources used appropriately | "Booking takes < 2 minutes for returning users" |
-| **Satisfaction** | User attitudes | "NPS score > 50 in quarterly surveys" |
-| **Freedom from Risk** | Economic, health, environmental | "No data loss during system failures" |
-| **Context Coverage** | Works in all intended contexts | "Works on all major browsers" |
-
-**Key Insight:** Product quality alone is insufficient. A perfectly maintainable system that users can't use effectively has poor quality in use.
-
-#### Different Stakeholders
-
-| Need | User | Maintainer |
-|------|------|------------|
-| Effectiveness | Complete task | Fix bugs |
-| Efficiency | Fast workflow | Quick changes |
-| Satisfaction | Enjoys using | Productive |
-
-### Process Quality Characteristics
-
-Four characteristics (Kroeger & Davidson, 2009):
-
-| Characteristic | What it Measures |
-|----------------|-----------------|
-| **Suitability** | Does process fit the work? |
-| **Usability** | Can people follow it? |
-| **Manageability** | Can we plan, monitor, control? |
-| **Evolvability** | Can we improve it? |
-
-> **Key Insight:** High quality process tends to produce high quality products (but not guaranteed!). Process quality is the focus of CMMI, ISO 9001.
-
----
-
-## Part 5: Quality Gurus
-
-See [Gurus](gurus.md) for full details on each pioneer.
-
-### Learning Objectives
-- Identify 7 key quality pioneers and their eras
-- Match each guru to their key contribution
-- Explain key concepts: PDCA, Zero Defects, Kano Model, Juran's Trilogy
-
-### Timeline of Quality Pioneers
-
-| Era | Period | Key Figures |
-|-----|--------|-------------|
-| **Manufacturing Era** | 1920s-1950s | Shewhart, Deming, Juran |
-| **Quality Movement** | 1960s-1980s | Ishikawa, Crosby |
-| **Software Era** | 1980s-2000s | Humphrey, Kano |
-
-**Lineage:** Shewhart → Deming → Juran → Humphrey
-
-### Guru Quick Reference
-
-| Guru | Years | One-Sentence Summary | Key Contribution |
-|------|-------|---------------------|------------------|
-| **Walter Shewhart** | 1891-1967 | Control of variation | PDCA Cycle, Statistical Process Control |
-| **W. Edwards Deming** | 1900-1993 | Quality and productivity together | 14 Points for Management |
-| **Joseph Juran** | 1904-2008 | Fitness for purpose | Juran's Trilogy, Pareto Principle |
-| **Kaoru Ishikawa** | 1915-1989 | Root cause analysis | Fishbone Diagram, Quality Circles |
-| **Philip Crosby** | 1926-2001 | Conformance to requirements | Zero Defects, "Quality is Free" |
-| **Watts Humphrey** | 1927-2010 | Father of software quality | CMM/CMMI, PSP, TSP |
-| **Noriaki Kano** | 1940- | Not all attributes are equal | Kano Model |
-
-### Detailed Guru Profiles
-
-#### Walter Shewhart (1891-1967)
-
-**Era:** Manufacturing
-**Key Concept:** Control of Variation
-
-**Contributions:**
-- **Statistical Process Control (SPC)** — Using statistics to monitor manufacturing
-- **PDCA Cycle** (Plan-Do-Check-Act):
-  1. **Plan:** Identify issues and plan solutions
-  2. **Do:** Execute the plan
-  3. **Check:** Compare results with planned outcomes
-  4. **Act:** Adjust based on findings
-- Differentiated **Special Cause** (assignable) vs **Common Cause** (random) variation
-
-**Legacy:** His 1924 memo at Western Electric contained "all of the essential principles... which we know today as process quality control" (George Edwards)
-
----
-
-#### W. Edwards Deming (1900-1993)
-
-**Era:** Manufacturing/Quality Movement
-**Key Concept:** Quality and productivity are NOT mutually exclusive
-
-**Contributions:**
-- Popularized **PDCA Cycle** (credited to Shewhart)
-- **System of Profound Knowledge:**
-  - Systems thinking
-  - Understanding variation
-  - Theory of knowledge
-- **14 Points for Management** (selected):
-  1. Create constancy of purpose
-  2. Adopt new philosophy
-  3. Cease dependence on inspection
-  8. Drive out fear
-  12. Remove barriers to pride
-  14. Put everyone to work on transformation
-
-**Impact:** Influenced Japanese manufacturing revolution
-
----
-
-#### Joseph Juran (1904-2008)
-
-**Era:** Manufacturing/Quality Movement
-**Key Concept:** Fitness for Purpose
-
-**Contributions:**
-- **Fitness for Purpose** — Quality means meeting customer needs
-- **Pareto Principle** (80/20 Rule) — Focus on "vital few" problems
-- **Juran's Trilogy:**
-  1. **Quality Planning** — Define objectives and processes
-  2. **Quality Control** — Monitor performance and address deviations
-  3. **Quality Improvement** — Continuously enhance processes
-
-**Quote:** *"Quality means freedom from deficiencies... Higher quality in this sense usually costs less."*
-
-**Key Insight:** Quality features (what customers want) and defect reduction are both important but different. You need both.
-
----
-
-#### Philip Crosby (1926-2001)
-
-**Era:** Quality Movement
-**Key Concept:** Conformance to Requirements
-
-**Contributions:**
-- **Zero Defects** movement
-- **"Quality is Free"** (1979 book) — Quality is about conformance, not luxury
-- Quality is management responsibility
-- **Price of Non-Conformance (PONC)** — Measure cost of poor quality
-
-**Quote:** *"It is always cheaper to do the job right the first time."*
-
----
-
-#### Kaoru Ishikawa (1915-1989)
-
-**Era:** Quality Movement
-**Key Concept:** Root Cause Analysis
-
-**Contributions:**
-- **Quality Circles** — Self-organized groups for problem-solving
-- **Ishikawa (Fishbone) Diagram** — Tool for root cause analysis
-- **Seven Tools of Quality:**
-  1. Flowcharts
-  2. Pareto diagrams
-  3. Cause-effect diagrams (Fishbone)
-  4. Histograms
-  5. Control charts
-  6. Scatter diagrams
-  7. Check sheets
-
----
-
-#### Noriaki Kano (1940-)
-
-**Era:** Quality Movement/Software Era
-**Key Concept:** Not All Attributes Are Equal
-
-**The Kano Model** {% cite kano1984attractive %} — Three types of quality attributes:
-
-| Type | Effect | Example | Behavior |
-|------|--------|---------|----------|
-| **Must-Haves** | Absence = dissatisfaction | Car has brakes | Expected baseline |
-| **Satisfiers** | More = better | Fuel efficiency | Linear relationship |
-| **Delighters** | Unexpected pleasure | Heated steering wheel | Excitement factor |
-
-**Critical Insight:** Over time, delighters become must-haves!
-
----
-
-#### Watts Humphrey (1927-2010)
-
-**Era:** Software Era
-**Title:** Father of Software Quality
-
-Humphrey {% cite humphrey1989managing %} established the foundations of software process improvement.
-
-**Quote:** *"While software functions are most important to users, these functions are not usable unless the software runs. To get software to run, engineers must remove almost all its defects."*
-
-**Contributions:**
-- **CMM/CMMI** — Capability Maturity Model
-- **TSP** — Team Software Process
-- **PSP** — Personal Software Process
-- **Eight Steps for Quality Software:**
-  1. Establish quality policies and goals
-  2. Train and support developers
-  3. Maintain requirements quality management
-  4. Apply statistical control to software processes
-  5. Review all product artifacts
-  6. Analyze and correct defects
-  7. Manage configuration and change control
-  8. Continuously improve processes
-
----
-
-## Part 6: Summary & Review
-
-### Six Key Takeaways
-
-1. **Quality is multi-dimensional** — Garvin's 5 views help understand different perspectives
-
-2. **Quality models provide structure** — Framework for requirements, design, evaluation
-
-3. **Models evolved over time** — McCall (1977) → ISO 9126 → ISO 25010 (2024)
-
-4. **Tradeoffs are inevitable** — Cannot maximize all attributes simultaneously
-
-5. **Quality in Use matters** — User outcomes, not just product properties
-
-6. **Gurus shaped thinking** — Shewhart → Deming → Juran → Humphrey
-
-### Quick Reference Tables
-
-#### Garvin's 5 Views
-
-| View | Key Word | Example |
-|------|----------|---------|
-| Transcendent | Excellence | Art |
-| Product-based | Features | Specs |
-| User-based | Purpose | Satisfaction |
-| Manufacturing | Conformance | Defects |
-| Value-based | Cost | ROI |
-
-#### McCall's 11 Factors (by Category)
-
-| Operation | Revision | Transition |
-|-----------|----------|------------|
-| Correctness | Maintainability | Portability |
-| Reliability | Flexibility | Reusability |
-| Efficiency | Testability | Interoperability |
-| Integrity | | |
-| Usability | | |
-
-#### ISO 25010 Characteristics (9)
-
-| Product Quality (8) | Quality in Use |
-|--------------------|----------------|
-| Functional Suitability | Effectiveness |
-| Performance Efficiency | Efficiency |
-| Compatibility | Satisfaction |
-| Usability | Freedom from Risk |
-| Reliability | Context Coverage |
-| Security | |
-| Maintainability | |
-| Portability | |
-
-#### Gurus and Their Contributions
-
-| Era | Guru | Key Concept |
-|-----|------|-------------|
-| Manufacturing | Shewhart | PDCA, SPC |
-| Manufacturing | Deming | 14 Points |
-| Manufacturing | Juran | Trilogy, Pareto |
-| Quality Movement | Ishikawa | Fishbone, 7 Tools |
-| Quality Movement | Crosby | Zero Defects |
-| Software | Humphrey | CMM, PSP, TSP |
-| Software | Kano | Kano Model |
-
----
-
-## References
-
-**Primary Sources:**
-- Quality Views Framework {% cite garvin_what_1984 %}
-- Software Quality Factors {% cite mccall_factors_1977 %}
-- Quality Attribute Relationships {% cite perry_effective_1988 %}
-- Software Design Methodology {% cite zhu_software_2005 %}
-- Software Quality Theory {% cite gillies_software_2011 %}
-- Software Process Improvement {% cite humphrey1989managing %}
-- Kano Model {% cite kano1984attractive %}
-
-**Standards:**
-- ISO/IEC 25010:2024 — Systems and software Quality Requirements and Evaluation (SQuaRE)
-- ISO/IEC 25000 — SQuaRE Guide
-- ISO 9126 — Software Product Quality (superseded)
-
-**SQRBOK Pages:**
-- [Foundations: Views](views.md)
-- [Foundations: Models](models.md)
-- [Foundations: Gurus](gurus.md)
+### References
 
 {% bibliography --cited %}
 
@@ -620,7 +143,3 @@ Humphrey {% cite humphrey1989managing %} established the foundations of software
 
 {: .highlight }
 **Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.
-
----
-
-**Next Lecture:** [Measurement](../measurement/) — How to quantify quality
