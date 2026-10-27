@@ -10,161 +10,136 @@ page_type: question-set
 
 # Software Reliability — Revision Questions
 
-**Format:** Explain in your own words, give brief examples
+**Format:** Explain in your own words, give brief examples, and show every calculation step. These questions test the lecture summarised in [Study Notes: Software Reliability](SN_L08_Reliability.md).
 
 ---
 
 ## Part 1: Foundations
 
-### Q1: Fault → Error → Failure in Practice
+### Question 1: Fault, Error, Failure
 
-Choose **one** of the following real-world failures and trace it through the full fault → error → failure chain:
+A web server crashes on requests larger than 8 KB because of a missing length check. It ran for months without trouble.
 
-- CrowdStrike 2024 (8.5M devices bricked)
-- Meta/Facebook 2021 (6-hour global outage)
-- Boeing 737 MAX (MCAS system, 346 deaths)
+1. Name the fault, the activation, the error and the failure.
+2. During the months without trouble, which of the three existed, and why did nobody notice?
+3. Musa and Avizienis use the word "error" differently. State both meanings.
 
-For your chosen case: (a) identify the **fault** (what was wrong in the design/code), (b) describe the **error** (what incorrect internal state occurred), and (c) explain the **failure** (what users observed).
+### Question 2: Ariane 5
 
----
+Trace the Ariane 5 flight 501 loss through the fault–error–failure chain. Then explain why the backup inertial reference computer did not help, and what this says about duplicating software.
 
-### Q2: Hardware vs Software Reliability
+### Question 3: Hardware vs Software
 
-Explain why the "bathtub curve" (infant mortality → useful life → wear-out) applies to hardware but **not** to software.
-
-What does the software reliability curve look like instead, and why?
+Explain why the bathtub curve describes hardware but not software. When does a program's failure rate change?
 
 ---
 
-## Part 2: Failure Severity Classification
+## Part 2: Measuring and Setting Reliability
 
-### Q3: Define FSC for a Scenario
+### Question 4: From Failure Data to Reliability
 
-You are the quality lead for a **hospital patient portal** that allows patients to view test results, book appointments, and message their doctors.
+A system logged 4 failures in 2,000 hours of stable operation.
 
-Define a 4-class Failure Severity Classification for this system. For each class, provide:
-- The severity definition
-- A concrete failure example
-- Which FSC criterion you chose (cost, capability, or human life) and why
+1. Compute λ and the MTTF.
+2. Compute the probability of no failure during a 24-hour run.
+3. Its mean downtime per failure is 2 hours. Compute the availability.
 
----
+### Question 5: Failure Intensity vs Failure Density
 
-## Part 3: Failure Intensity Objectives
+Describe a module that looks good by failure density but bad by failure intensity, and say which measure a user of the system would care about.
 
-### Q4: Calculate FIO from Availability
+### Question 6: Severity Classes
 
-A payment processing system requires **99.9% availability**. Average downtime per failure is **2 minutes** (0.033 hours).
+Define four failure severity classes for a hospital patient portal (test results, appointments, messages to doctors). State which criterion you chose (cost, system capability, human life or environment), why, and give one failure per class.
 
-Using the **exact formula**, calculate:
-1. The maximum allowed failure intensity (λ)
-2. The MTTF
-3. How many failures per month (720 hours) this allows
+### Question 7: FIO from Availability
 
----
+A payment system must be available 99.9% of the time. Mean downtime per failure is 2 minutes.
 
-### Q5: When Metrics Mislead
+1. Using the exact formula, compute the maximum failure intensity λ.
+2. Compute the corresponding MTTF.
+3. How many failures does this allow in 720 hours?
+4. Compute λ with the approximation λ ≈ (1 − A)/t<sub>m</sub> and compare.
 
-Explain a scenario where:
-1. **Failure density** (failures per KLOC) makes a module look safe, but **failure intensity** reveals a serious problem
-2. **Failure intensity** looks acceptable, but the system is actually unreliable for users
+### Question 8: FIO from Reliability
 
----
-
-## Part 4: Fault Tolerance Strategies
-
-### Q6: Prevention vs Tolerance
-
-Compare **fault prevention** and **fault tolerance** as strategies for meeting FIO.
-
-For each, explain: (a) when it is more cost-effective, (b) give a concrete software example, and (c) identify its main limitation.
+A requirement says the probability of no failure during a 4-hour operation must be at least 0.995. What FIO follows?
 
 ---
 
-### Q7: Backward Recovery and the Domino Effect
+## Part 3: Growth Models
 
-Explain **backward recovery** and the **domino effect** using the following scenario:
+### Question 9: When to Stop Testing
 
-> Service A processes an order, sends a "ship item" message to Service B, then fails.
+A Goel–Okumoto model fitted to test data gives a = 80 faults and b = 0.03 per week. The FIO is 1.0 failure per week.
 
-What happens when Service A rolls back? Why is this called the "domino effect"? How would **forward recovery** handle this differently?
+1. What is λ(0)?
+2. What is λ(20)?
+3. After how many weeks is the FIO reached?
+4. How many faults have been found by then, and how many remain?
 
----
+### Question 10: Limits of Growth Models
 
-### Q8: SRGM Release Decision
-
-A system under test has the following Goel-Okumoto parameters:
-- a = 80 faults (total expected)
-- b = 0.03 per week (detection rate per fault)
-
-The FIO target is **1.0 failure per week**.
-
-1. What is the initial failure intensity λ(0)?
-2. After 20 weeks of testing, what is λ(20)?
-3. How many total weeks of testing are needed to reach the FIO?
-4. How many faults will have been found by release time?
+A web shop deploys new features several times a day. Explain why a growth model fitted to its failure data would mislead, and name the approach used instead.
 
 ---
 
-## Part 5: Redundancy & Independence
+## Part 4: Fault Tolerance and Diversity
 
-### Q9: Why Independence Fails
+### Question 11: Recovery and the Domino Effect
 
-Knight & Leveson's 1986 experiment found **29× more coincident failures** than the independence assumption predicts.
+Service A processes an order, sends "ship item" to Service B, and then detects an error and rolls back to a checkpoint taken before the message.
 
-1. Describe the experimental setup (what was tested, how many versions, how many test cases)
-2. List the **three causes** of correlated failures they identified
-3. Explain why this result is devastating for the theoretical reliability claims of N-version programming
+1. What must Service B do, and why?
+2. How can this cascade further? Name the effect.
+3. How would forward recovery handle A's error instead?
 
----
+### Question 12: Acceptance Tests
 
-### Q10: Voting System Reliability
+Write an acceptance test for a function that returns the square root of a number, and one for a function that sorts a list. Why is the second harder to make complete?
 
-Three independently developed versions have individual reliability R_c = 0.95.
+### Question 13: Voting Reliability
 
-1. Calculate the system reliability with **majority voting** (2-of-3)
-2. Calculate the system reliability with a **single version** (no redundancy)
-3. Now assume failures are NOT independent: 10% of failures are coincident (all 3 fail together). Re-estimate the effective system reliability.
+Three versions each have reliability R<sub>c</sub> = 0.95.
 
----
-
-## Part 6: SLO & Error Budgets
-
-### Q11: Error Budget Calculation
-
-A video streaming service has:
-- SLO: 99.95% availability
-- Monthly traffic: 50,000,000 requests
-- Current month's incidents: two outages totaling 8 minutes, plus a degraded-quality period causing 5,000 errors
-
-Calculate:
-1. The monthly error budget (in requests and in minutes)
-2. How much budget has been consumed
-3. What action should the team take?
+1. Compute the reliability of a 2-of-3 majority system, assuming independent failures and a perfect voter.
+2. Now assume some failures are shared: an input makes all three versions fail together with probability 0.01, and on all other inputs each version fails on its own with probability 0.04. Compute the system reliability.
+3. Which assumption did Knight and Leveson's experiment test, and what did it find (setup, the two key numbers, the conclusion)?
 
 ---
 
-### Q12: FIO vs SLO — Same Concept, Different Phase
+## Part 5: From FIO to SLO
 
-Explain how Musa's Failure Intensity Objective (1990s) and Google's Service Level Objective (2010s) represent the **same fundamental concept** applied in different contexts.
+### Question 14: Error Budget
 
-For each of the following pairs, explain the equivalence:
-1. FIO ↔ SLO
-2. Failure intensity λ(t) ↔ Error rate SLI
-3. "Just right" reliability ↔ Error budget
+A streaming service has an SLO of 99.95% successful requests over a 30-day window and serves 50,000,000 requests in that window, spread evenly over time. This window it had three incidents:
+
+- incident A: a full outage of 6 minutes;
+- incident B: a full outage of 3 minutes;
+- incident C: a degraded period in which 4,000 requests failed.
+
+The team's policy, taken from the SRE Workbook's example: a postmortem is required for any single incident that uses *more than* 20% of the window's error budget; changes are frozen only when the budget is used up.
+
+1. Compute the error budget in requests and in minutes of full outage.
+2. Convert each outage to failed requests, and compute the share of the budget each incident used and the total.
+3. Which incidents need a postmortem, and may the team keep shipping changes?
+
+### Question 15: FIO and SLO
+
+Explain why Musa's FIO and Google's SLO express the same idea, and what changed between them. Why is 100% the wrong target for both?
 
 ---
 
 ## Topics Covered
 
 | Topic | Questions |
-|-------|-----------|
-| Fault-Error-Failure Chain & Real-World Failures | Q1, Q2 |
-| Failure Severity Classification | Q3 |
-| Failure Intensity Objective & Availability | Q4, Q5 |
-| Fault Tolerance Strategies | Q6, Q7 |
-| Software Reliability Growth Models | Q8 |
-| Redundancy, Voting & Independence | Q9, Q10 |
-| SLO & Error Budgets | Q11, Q12 |
+|---|---|
+| Fault, error, failure; hardware vs software | 1, 2, 3 |
+| Failure intensity, reliability, availability | 4, 5 |
+| Severity classes and the FIO | 6, 7, 8 |
+| Reliability growth models | 9, 10 |
+| Fault tolerance, voting and diversity | 11, 12, 13 |
+| SLO and error budgets | 14, 15 |
 
 ---
 
