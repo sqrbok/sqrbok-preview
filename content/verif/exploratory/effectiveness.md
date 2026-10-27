@@ -1,266 +1,81 @@
 ---
-title: Empirical Evidence
+title: "Exploratory Testing: Evidence"
 parent: Exploratory Testing
-nav_order: 3
+nav_order: 5
 layout: default
+vegalite: true
+page_type: deep-dive   # the area's evidence page: five studies, each needs its setup stated
 ---
 
-# Empirical Evidence for Exploratory Testing
+# Exploratory Testing: Evidence
 
-The effectiveness of exploratory testing has been studied through multiple controlled experiments and industrial case studies. The evidence converges on three robust findings: ET matches scripted testing in defect detection, is dramatically more efficient, and produces fewer false positives.
+**The evidence on exploratory testing comes from a handful of controlled experiments that compare it with test-case-based testing (TCT) on the same software.** In equal-length test sessions, exploration finds about as many defects as prepared test cases; counting design time, it costs far less. When the same fixed time must also cover design, exploration finds more. Each study's set-up decides what its numbers mean, so each is described before its result.
 
----
+## 1. Same detection, a fraction of the effort
 
-## Reading the Evidence: A Quick Statistics Glossary
+Itkonen et al. had 79 students test two feature sets of an open-source text editor in 90-minute sessions, once with test cases they had designed beforehand and once exploring {% cite itkonen2007defect %}. Exploration found 7.04 defects per subject and test cases 6.37; the difference was not statistically significant (p = 0.088). But designing the test cases took about 7 hours on top of the 1.5-hour session. For example, a typical TCT subject spent 8.5 hours in total for the result an ET subject reached in 1.5.
 
-The experiments below use standard statistical measures. Here is what they mean:
-
-| Term | Meaning | Rule of Thumb |
-|------|---------|---------------|
-| **p-value** | The probability that the observed difference happened by chance. A small p-value means the result is unlikely to be a coincidence. | p < 0.05 = statistically significant; p < 0.001 = highly significant; "n.s." = not significant |
-| **Effect size (d)** | How *large* the difference is, independent of sample size. A significant p-value tells you the difference is real; effect size tells you if it matters. | d = 0.2 small, d = 0.5 medium, d = 0.8 large, d > 1.0 very large |
-| **n.s.** | "Not significant" — the difference could easily be due to chance | Does *not* mean "no difference" — it means we cannot be confident one exists |
-
-*Example:* If ET finds 7.04 defects and scripted finds 6.37 defects with p=0.088 (n.s.), it means: the raw numbers favor ET, but the difference is small enough that random variation could explain it. We cannot conclude ET is better — but we *can* conclude it is **not worse**.
-
----
-
-## Controlled Experiments
-
-### Itkonen & Mantyla (2007, 2014) — The Landmark Study
-
-The most influential ET experiment and its replication {% cite itkonen2007defect itkonen2014testcases %}:
-
-| Metric | ET | TCT | p-value | Source |
-|--------|-----|-----|---------|--------|
-| **Defects found** | 7.04 | 6.37 | 0.088 (n.s.) | {% cite itkonen2007defect %} |
-| **Total effort** | 1.5h | 8.5h (7h design + 1.5h exec) | — | {% cite itkonen2007defect %} |
-| **False reports** | 1.03 | 2.08 | 0.000 | {% cite itkonen2007defect %} |
-| **Defects (replication)** | 5.47 | 6.06 | 0.093 (n.s.) | {% cite itkonen2014testcases %} |
-| **Total effort (replication)** | 4.58h | 19.47h | d=-1.33 (large) | {% cite itkonen2014testcases %} |
-| **False reports (replication)** | 1.84 | 2.90 | 0.006 | {% cite itkonen2014testcases %} |
-
-*n=79 students (2007), n=51 students (2014). TCT = Test-Case-Based Testing.*
-
-{: .highlight }
-> ET was **4-6x more efficient** than scripted testing when total effort (including test case design time) is accounted for, with a large effect size (d=1.33).
-
-### Afzal et al. (2015) — Equal-Time Experiment
-
-Under a strict 90-minute equal-time constraint for all activities {% cite afzal2015experiment %}:
-
-| Metric | ET | TCT | p-value | Effect Size |
-|--------|-----|-----|---------|-------------|
-| **Defects found** | 8.34 | 1.83 | 1.16e-10 | d=2.065 (huge) |
-
-*n=70 (46 students + 24 practitioners). Largest effect size in any ET study.*
-
-{: .important }
-> When time is truly equal (including test case design), ET found **4.6x more defects**. This is the strongest evidence that ET's efficiency advantage translates directly into effectiveness under time pressure.
-
-No significant difference between students and practitioners (p=0.07), challenging the assumption that ET requires extensive experience {% cite afzal2015experiment %}.
-
-### Shah et al. (2014) — Three-Way Comparison
-
-Comparison of ET, Hybrid Testing (HT), and Scripted Testing (ST) with experienced practitioners {% cite shah2014hybrid %}:
-
-| Metric | ET | Hybrid | Scripted | ANOVA |
-|--------|-----|--------|----------|-------|
-| **Defects found** | 13.16 | 10.67 | 7.0 | F=20.53, p<0.001 |
-| **Functionality coverage** | 6.67 | 8.83 | 7.83 | — |
-
-*n=6 experienced testers (10+ years).*
-
-{: .note }
-> ET found the most defects but achieved the lowest systematic coverage. The hybrid approach (combining requirement-based test cases for coverage with test missions for exploratory freedom) provided the best balance {% cite shah2014hybrid %}.
-
-### Prakash & Gopalakrishnan (2011) — Efficiency Comparison
-
-Both groups found similar bug counts, but {% cite prakash2011scripted %}:
-- ET found bugs **earlier** and across **more diverse quality criteria**
-- Test case writing effort: **12 hours** (scripted) vs. **2 hours** (checklists for ET) — a 6x difference
-
----
-
-## Summary of Experimental Evidence
+A replication with 51 students removed the fixed session length {% cite itkonen2014testcases %}. Detection again did not differ significantly (ET 5.47, TCT 6.06, p = 0.093), while total effort did: 4.58 hours for exploration against 19.47 hours for test cases, of which 14.12 were design.
 
 ```vega-lite
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "title": "ET vs. Scripted Testing: Defect Detection Across Studies",
-  "width": 450,
-  "height": 250,
-  "data": {
-    "values": [
-      {"study": "Itkonen 2007", "method": "ET", "defects": 7.04},
-      {"study": "Itkonen 2007", "method": "Scripted", "defects": 6.37},
-      {"study": "Itkonen 2014", "method": "ET", "defects": 5.47},
-      {"study": "Itkonen 2014", "method": "Scripted", "defects": 6.06},
-      {"study": "Afzal 2015", "method": "ET", "defects": 8.34},
-      {"study": "Afzal 2015", "method": "Scripted", "defects": 1.83},
-      {"study": "Shah 2014", "method": "ET", "defects": 13.16},
-      {"study": "Shah 2014", "method": "Scripted", "defects": 7.0}
-    ]
-  },
-  "mark": "bar",
+  "width": "container", "height": 170,
+  "data": {"values": [
+    {"row": "Itkonen 2007 · ET", "part": "Testing", "hours": 1.5},
+    {"row": "Itkonen 2007 · TCT", "part": "Testing", "hours": 1.5},
+    {"row": "Itkonen 2007 · TCT", "part": "Test case design", "hours": 7},
+    {"row": "Itkonen 2014 · ET", "part": "Testing", "hours": 4.58},
+    {"row": "Itkonen 2014 · TCT", "part": "Testing", "hours": 5.35},
+    {"row": "Itkonen 2014 · TCT", "part": "Test case design", "hours": 14.12}
+  ]},
+  "mark": {"type": "bar"},
   "encoding": {
-    "x": {"field": "study", "type": "nominal", "title": "Study", "axis": {"labelAngle": 0}},
-    "y": {"field": "defects", "type": "quantitative", "title": "Mean Defects Found"},
-    "xOffset": {"field": "method"},
-    "color": {
-      "field": "method",
-      "type": "nominal",
-      "scale": {"domain": ["ET", "Scripted"], "range": ["#2e7d32", "#d32f2f"]},
-      "title": "Method"
-    }
-  }
+    "y": {"field": "row", "type": "nominal", "title": null, "sort": null},
+    "x": {"field": "hours", "type": "quantitative", "title": "Mean hours per subject", "stack": "zero", "scale": {"domain": [0, 20]}},
+    "color": {"field": "part", "type": "nominal", "title": null,
+              "scale": {"domain": ["Testing", "Test case design"], "range": ["#019546", "#c99700"]}, "legend": {"orient": "bottom"}},
+    "order": {"field": "part", "sort": "descending"}
+  },
+  "config": {"font": "Tahoma", "axis": {"labelFontSize": 13, "titleFontSize": 13}, "legend": {"labelFontSize": 13}}
 }
 ```
 
-{: .note }
-> *Chart reconstructed from published means. See {% cite itkonen2007defect itkonen2014testcases afzal2015experiment shah2014hybrid %} for original data.*
+_Mean effort per subject. Defects found did not differ significantly in either study._ {% cite itkonen2007defect itkonen2014testcases %}
 
-| Finding | Consistency |
-|---------|-------------|
-| ET >= scripted in defect detection | 4/5 experiments |
-| ET dramatically more efficient (4-6x) | 5/5 experiments |
-| Scripted produces more false positives | 2/2 experiments measuring this |
-| ET achieves lower systematic coverage | 2/2 experiments measuring this |
+Effort for similar results was thus about 5.7 times lower in the first study (8.5 ÷ 1.5) and 4.3 times lower in the second (19.47 ÷ 4.58). Test cases also produced more false defect reports (duplicates, unclear or non-existent defects): 2.08 against 1.03 per subject in the first study and 2.90 against 1.84 in the replication, both significant {% cite itkonen2007defect itkonen2014testcases %}.
 
-### The Efficiency Story
+## 2. When the clock includes design
 
-The most consistent finding across all studies is ET's dramatic efficiency advantage when total effort (including test case design) is counted:
+Afzal et al. gave both groups the same 90 minutes for *everything*, test case design included {% cite afzal2015experiment %}. The 70 subjects (46 students, 24 practitioners) tested the same editor. Exploration found 8.34 defects per subject, test cases 1.83, a difference of about 4.6 times (p ≈ 10⁻¹⁰). This does not show exploration is better per se: it shows that under a fixed time budget, writing test cases first leaves little time to run them.
 
-```vega-lite
-{
-  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "title": "Total Effort: ET vs. Scripted Testing (hours)",
-  "width": 450,
-  "height": 250,
-  "data": {
-    "values": [
-      {"study": "Itkonen 2007", "method": "ET", "hours": 1.5},
-      {"study": "Itkonen 2007", "method": "Scripted (design + execution)", "hours": 8.5},
-      {"study": "Itkonen 2014", "method": "ET", "hours": 4.58},
-      {"study": "Itkonen 2014", "method": "Scripted (design + execution)", "hours": 19.47},
-      {"study": "Prakash 2011", "method": "ET", "hours": 2.0},
-      {"study": "Prakash 2011", "method": "Scripted (design + execution)", "hours": 12.0}
-    ]
-  },
-  "mark": "bar",
-  "encoding": {
-    "y": {"field": "study", "type": "nominal", "title": "Study", "sort": null},
-    "x": {"field": "hours", "type": "quantitative", "title": "Total Hours"},
-    "yOffset": {"field": "method"},
-    "color": {
-      "field": "method",
-      "type": "nominal",
-      "scale": {"domain": ["ET", "Scripted (design + execution)"], "range": ["#2e7d32", "#d32f2f"]},
-      "title": "Method"
-    }
-  }
-}
-```
+## 3. What kinds of defects
 
-{: .note }
-> *Chart reconstructed from published means. Scripted testing effort includes test case design time. See {% cite itkonen2007defect itkonen2014testcases prakash2011scripted %} for original data.*
+In the first Itkonen study the two approaches found similar mixes of defect types {% cite itkonen2007defect %}. Exploration found more GUI defects (70 against 49) and usability problems (19 against 5), but only the usability difference was significant, and the numbers are small.
 
----
+Shah et al. compared exploratory, scripted and hybrid testing (test cases plus open missions) with six practitioners with at least three years of experience, each using all three approaches in turn (scripted, then exploratory, then hybrid) on three versions of a calculator application, each seeded with 25 defects {% cite shah2014hybrid %}. Exploration found the most defects (13.16 per tester, hybrid 10.67, scripted 7.0) but covered the fewest of the specified functions (6.67, against 8.83 for hybrid and 7.83 for scripted). Freedom finds more, but leaves gaps no one planned.
 
-## Industrial Evidence
+## 4. In industry
 
-### Defect Detection Rates
+In two companies using session-based ET, Itkonen and Rautiainen measured 4.8 and 8.7 defects per hour of testing, against 2.47 and fewer than 3 defects per hour reported for functional and use-case-based testing in other studies {% cite itkonen2005exploratory %}. In a survey in Estonia and Finland, 44 of 50 respondents (88%) said they used ET, and 75% of them had no tool support for it {% cite pfahl2014survey %}.
 
-Studies of ET in real organizations show high defect detection rates {% cite itkonen2005exploratory %}:
+## 5. The tester may matter more than the hours
 
-| Context | ET Method | Defect Rate |
-|---------|-----------|-------------|
-| Industrial sessions | Session-based ET | 4.8-8.7 defects/hour |
-| Benchmarks | Usage-based testing | <3 defects/hour |
-| Benchmarks | Functional testing | 2.47 defects/hour |
+In the replication, the time an exploring student spent did not correlate with the defects they found (r = 0.025, p = 0.86), while for test cases it did {% cite itkonen2014testcases %}. In Afzal's experiment practitioners found more defects than students (median 9 against 6), but the difference was not significant (p = 0.07) {% cite afzal2015experiment %}, so the evidence points at skill without proving it. Practitioners in the survey named the high demand on tester skill as ET's main drawback {% cite pfahl2014survey %}.
 
-### Defect Types
+## When to use the evidence — and when not
 
-ET excels at finding certain defect types that scripted testing misses {% cite itkonen2007defect %}:
+The evidence supports exploring when effort is limited and the goal is finding defects. It does not support dropping test cases where coverage of specified functions or a reproducible record is required; there, exploration is the complement, as Shah's hybrid suggests.
 
-| Defect Type | ET | Scripted | ET Advantage |
-|-------------|-----|---------|-------------|
-| **Usability defects** | 19 | 5 | 380% more |
-| **GUI defects** | 70 | 49 | 143% more |
+## Limitations
 
----
+All the experiments used one small desktop application and sessions of a few hours; most subjects were students. The test case designs were the subjects' own, so a better test designer might change the TCT result.
 
-## The Role of Tester Knowledge
+## How solid is this?
 
-ET effectiveness depends heavily on the tester's knowledge and cognitive engagement {% cite itkonen2013knowledge %}:
-
-| Factor | Evidence |
-|--------|----------|
-| **Effort does not equal effectiveness** | ET effort does not correlate with defects found (r=0.025, p=0.86) {% cite itkonen2013knowledge %} |
-| **Experience matters** | More experienced practitioners significantly more likely to use ET (Fisher's exact p=0.016) {% cite pfahl2014survey %} |
-| **Domain knowledge critical** | None of 7 industrial ET practitioners had formal testing training — effectiveness relied on domain knowledge {% cite itkonen2005exploratory %} |
-| **Personality effects** | Extroverts more effective at ET (75% vs. 51.5% control) {% cite shoaib2009personality %} |
-| **But novices can learn** | No significant difference between students and practitioners in one study (p=0.07) {% cite afzal2015experiment %} |
-
-{: .highlight }
-> In ET, it is the **quality of the tester's thinking**, not the quantity of effort, that determines outcomes.
-
-### Teaching ET
-
-> "It is definitely easier to start learning testing when it is fully scripted. If we do freestyle then it would be difficult" — Focus group participant {% cite ghazi2017levels %}
-
-The evidence suggests ET can be taught through structured progression:
-1. Start novices with **low exploration** (detailed charters, steps provided)
-2. Gradually increase exploration as domain knowledge grows
-3. Teach heuristics and tours as a vocabulary for exploration
-4. Use session debriefings as a coaching mechanism
-
----
-
-## ET Complements Scripted Testing
-
-The evidence consistently shows ET and scripted testing are **complementary**, not competing approaches:
-
-```mermaid
-flowchart LR
-    subgraph et["Exploratory Testing"]
-        direction TB
-        E1["Usability defects"]
-        E2["GUI defects"]
-        E3["Edge cases"]
-        E4["Unknown unknowns"]
-    end
-
-    subgraph st["Scripted Testing"]
-        direction TB
-        S1["Specification conformance"]
-        S2["Regression detection"]
-        S3["Systematic coverage"]
-        S4["Traceability to requirements"]
-    end
-
-    subgraph overlap["Both Find"]
-        direction TB
-        O1["Functional defects"]
-        O2["Logic errors"]
-    end
-
-    et --- overlap --- st
-
-    style et fill:#c8e6c9,stroke:#388e3c
-    style st fill:#bbdefb,stroke:#1976d2
-    style overlap fill:#fff9c4,stroke:#f9a825
-```
-
-| Dimension | ET Strength | Scripted Strength |
-|-----------|-------------|-------------------|
-| Defect types | Usability, GUI, edge cases {% cite itkonen2007defect %} | Conformance, specification-based |
-| Efficiency | Higher (no design overhead) | — |
-| Coverage | — | Higher systematic coverage {% cite shah2014hybrid %} |
-| Traceability | — | Full traceability to requirements |
-| Adaptability | High (responds to discoveries) | Low (follows script) |
-
-> "ET is not a replacement for existing test-case based approaches, but a complementary testing approach suitable for certain situations" {% cite itkonen2005exploratory %}
+- **Where it comes from.** Four controlled experiments {% cite itkonen2007defect itkonen2014testcases afzal2015experiment shah2014hybrid %}, one industrial case study {% cite itkonen2005exploratory %} and one survey {% cite pfahl2014survey %}.
+- **What is contested.** The industrial rates are not a controlled comparison: the 2.47 and fewer than 3 per hour come from different studies, products and testers. The survey's authors warn that its 88% may reflect self-selection: the invitation said the survey was about ET. Shah's study had six subjects.
+- **What we do not hold.** Studies with large professional teams or long-lived products; none of the experiments followed a product over several releases.
 
 ---
 

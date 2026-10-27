@@ -1,172 +1,66 @@
 ---
-title: Techniques and Heuristics
+title: Charters, Heuristics and Tours
 parent: Exploratory Testing
 nav_order: 1
 layout: default
 ---
 
-# ET Techniques and Heuristics
+# Charters, Heuristics and Tours
 
-Exploratory testing is not unstructured — it employs a rich vocabulary of techniques and heuristics that guide the tester's investigation. Experienced ET practitioners naturally apply the same underlying principles as formal test design techniques (equivalence partitioning, boundary values, combinatorial coverage) — they simply apply them during execution rather than in a separate design phase {% cite itkonen2009manual %}.
+**A charter, a heuristic and a tour are three tools that tell an exploratory tester what to try next:** the charter sets the mission of a session, a heuristic suggests the next input, and a tour names a strategy for moving through the product. None of them lists test steps; they direct attention.
 
----
+## 1. The charter: a mission, not a script
 
-## Whittaker's Tourist Metaphor
+Hendrickson's charter template has three slots {% cite hendrickson2013explore %}:
 
-James Whittaker's tourist metaphor provides memorable, actionable guidance for testers. Each "tour" represents a specific testing goal with a distinct exploration strategy {% cite whittaker2009exploratory %}:
+> **Explore** *target* **using** *resources* **to discover** *information*.
 
-### The Five Districts
+For example, a session on an online shop might have the charter *Explore the coupon system using the Obsessive-Compulsive tour (repeat the same action) and the Never-and-Always heuristic (a price is never negative) to discover pricing errors.* On the [five-level scale](session-based.md), a charter with only a goal is level 2; naming starting points, such as a tour or heuristic, moves it to level 3, medium exploration, where this charter sits. The **target** is the part of the product to explore; the **resources** are what the tester brings to it: tools, test data, a configuration, or a named heuristic or tour; the **information** names what counts as a finding. A second charter, with a tour as its resource: *Explore checkout using the Saboteur tour (cut the network during payment) to discover lost or double payments.* It names a starting point too, so it is also level 3. A charter listing steps is a script.
 
-```mermaid
-mindmap
-  root((Software<br>Under Test))
-    Business District
-      Guidebook Tour
-      Money Tour
-      Landmark Tour
-    Historical District
-      Bad Neighborhood Tour
-      Museum Tour
-    Entertainment District
-      Obsessive-Compulsive Tour
-      Couch Potato Tour
-    Tourist District
-      Collector's Tour
-      Supermodel Tour
-    Hotel District
-      All-Nighter Tour
-      TOGOF Tour<br>(Good Old Features)
-```
+## 2. Heuristics: where bugs tend to live
 
-| District | Focus | Example Tours |
-|----------|-------|--------------|
-| **Business District** | Features users rely on daily | Guidebook Tour, Money Tour, Landmark Tour |
-| **Historical District** | Legacy code and old features | Bad Neighborhood Tour, Museum Tour |
-| **Entertainment District** | Fun, unusual inputs | Obsessive-Compulsive Tour, Couch Potato Tour |
-| **Tourist District** | First-time user experience | Collector's Tour, Supermodel Tour |
-| **Hotel District** | Background processes | All-Nighter Tour, TOGOF Tour (Tour Of Good Old Features — verify that existing features still work after changes) |
+A heuristic is a rule of thumb for choosing inputs. Hendrickson's catalogue includes the following {% cite hendrickson2013explore %}:
 
-### Selected Tours
+- **Some, None, All** tries a set with some, zero and every element: no permissions, some, all.
+- **Goldilocks** tries values too big, too small and just right, as boundary value analysis does.
+- **Beginning, Middle, End** edits or inserts at each position of a list or text.
+- **CRUD** creates, reads, updates and deletes every kind of entity, in unusual orders.
+- **Follow the Data** traces one value from entry through storage to every screen and report that shows it.
+- **Never and Always** challenges what the system should never or always do ("an order total is never negative").
 
-| Tour | Strategy | What It Finds |
-|------|----------|--------------|
-| **Guidebook Tour** | Follow the user manual exactly | Documentation-code mismatches |
-| **Money Tour** | Test the features that sell the product | Critical feature defects |
-| **Antisocial Tour** | Do everything the software isn't designed for | Error handling gaps |
-| **Back Alley Tour** | Visit the least popular features | Neglected code defects |
-| **Couch Potato Tour** | Accept all defaults, change nothing | Default configuration issues |
-| **Obsessive-Compulsive Tour** | Repeat the same action with slight variations | State accumulation bugs |
-| **All-Nighter Tour** | Leave the application running overnight | Memory leaks, resource exhaustion |
-| **Saboteur Tour** | Disrupt resources (network, disk, memory) | Resilience failures |
-| **Collector's Tour** | Try to collect every output the software can produce | Output validation gaps |
-| **Supermodel Tour** | Focus only on the UI, ignore functionality | Visual and layout defects |
+The **Nightmare Headline Game** asks what headline a failure would produce, and points the next session there {% cite hendrickson2013explore %}.
 
----
+Roughly: input fields suit Goldilocks; lists, Beginning, Middle, End; prices, Never and Always.
 
-## Hendrickson's Heuristics
+Observations of eleven industrial testers found them applying equivalence partitioning, boundary values and combinations *during* execution, without writing them down first {% cite itkonen2009manual %}. The heuristics are the same test design ideas, used at the moment of testing.
 
-Elisabeth Hendrickson provides a complementary set of lightweight heuristics for test idea generation {% cite hendrickson2013explore %}:
+## 3. Tours: a strategy for a whole session
 
-### Charter Template
+A **tour** sets one strategy for a whole session, where a heuristic suggests the next single input. Whittaker groups his tours into six districts of a city; they are listed and explained on [Exploratory Testing Tours](tours.md) {% cite whittaker2009exploratory %}.
 
-Every ET session begins with a **charter** — a brief statement of intent:
+For a full session, from charter to report, see [Exploratory Session Report](session-report.md).
 
-> **Explore** [target] **using** [resources] **to discover** [information]
+## When to use it — and when not
 
-Examples:
-- *Explore the checkout flow using boundary credit card numbers to discover input validation gaps*
-- *Explore the admin dashboard using a slow network connection to discover timeout handling*
+Use these tools when:
 
-### Core Heuristics
+- a feature is new or changed and the specification is thin;
+- you need test ideas fast.
 
-| Heuristic | Technique | What It Tests |
-|-----------|-----------|--------------|
-| **CRUD** | Create, Read, Update, Delete every entity | Data lifecycle completeness |
-| **Goldilocks** | Too big, too small, just right | Boundary conditions |
-| **Follow the Data** | Trace data through the entire system | Data flow integrity |
-| **Interruptions** | Cancel, back, timeout mid-operation | State management |
-| **Soap Opera** | Extreme, dramatic user scenarios | Edge case combinations |
-| **Undo/Redo** | Test all reversible operations | State reversal correctness |
+Do not rely on them alone when:
 
-### The Nightmare Headline Game
+- a regulator requires a predefined, traceable test record;
+- the tester does not know the domain: heuristics produce inputs, but judging the output needs domain knowledge.
 
-A risk-identification technique: ask *"What would be the worst headline if this software fails?"* and then explore scenarios that could produce that headline {% cite hendrickson2013explore %}. This grounds exploration in business risk rather than technical coverage.
+## Limitations
 
----
+Heuristics and tours make a tester's choices explicit, but they do not guarantee any coverage: two testers with the same charter will try different things. Coverage is known only from the session report ([Session-Based Test Management](session-based.md)).
 
-## Dynamic Test Design
+## How solid is this?
 
-A key finding from observational studies: experienced testers doing ET naturally apply classical test design techniques, but **dynamically during execution** rather than in a separate design phase {% cite itkonen2009manual %}:
-
-| Formal Technique | ET Application |
-|------------------|---------------|
-| Equivalence partitioning | Tester intuitively groups similar inputs during exploration |
-| Boundary value analysis | Tester probes edges of observed ranges |
-| Combinatorial testing | Tester varies multiple parameters simultaneously |
-| State transition testing | Tester explores sequences of actions |
-| Error guessing | Tester applies domain knowledge to target likely failures |
-
-{: .highlight }
-> This suggests ET and scripted testing share a common cognitive foundation; the difference lies in *when and how* techniques are deployed, not in the techniques themselves {% cite itkonen2009manual %}.
-
----
-
-## AI-Assisted Exploration
-
-Early research explores tool support for ET practitioners {% cite copche2024chatbot %}:
-
-**BotExpTest** (Discord chatbot) provides:
-- Charter management and time alerts
-- Bug reporting templates
-- Technique knowledge (suggests applicable heuristics)
-- Active suggestions during sessions
-
-In a pilot study with 6 professionals, the chatbot contributed to discovering 3 of 13 previously unknown bugs through its suggestions. Future directions include LLM integration for smarter, context-aware test idea generation {% cite copche2024chatbot %}.
-
-{: .note }
-> AI-assisted ET is nascent but addresses two longstanding challenges: the high skill requirement for testers and the lack of tool support (75% of practitioners have no specific ET tools {% cite pfahl2014survey %}).
-
----
-
-## Worked Example: Money Tour on a Shopping App
-
-A concrete example of applying the Money Tour {% cite whittaker2009exploratory %} to an e-commerce application:
-
-```mermaid
-flowchart TD
-    Start["Start: Money Tour<br>Focus on revenue-critical features"]
-    S1["1. Add items to cart<br>Try different quantities, variants"]
-    S2["2. Apply discount codes<br>Valid, expired, stacked, boundary amounts"]
-    S3["3. Checkout flow<br>Credit card, PayPal, gift card, split payment"]
-    S4["4. Order confirmation<br>Email, receipt, inventory update"]
-    S5["5. Refund/return<br>Partial refund, full refund, exchange"]
-
-    Start --> S1 --> S2 --> S3 --> S4 --> S5
-
-    S1 -.- N1["Found: quantity overflow<br>allows negative price"]
-    S3 -.- N2["Found: race condition<br>double-charge on timeout"]
-    S5 -.- N3["Found: refund exceeds<br>original payment"]
-
-    style Start fill:#fff3e0,stroke:#f57c00
-    style N1 fill:#ffcdd2,stroke:#d32f2f
-    style N2 fill:#ffcdd2,stroke:#d32f2f
-    style N3 fill:#ffcdd2,stroke:#d32f2f
-```
-
-The tester follows the money: every path where money changes hands gets explored. Unlike a scripted test that checks "can the user buy item X," the Money Tour encourages creative variations at each step — stacking discount codes, splitting payments, interrupting checkout mid-transaction.
-
----
-
-## Choosing the Right Technique
-
-| Situation | Recommended Approach |
-|-----------|---------------------|
-| New feature, unfamiliar territory | Tourist metaphor tours {% cite whittaker2009exploratory %} |
-| Data-heavy application | CRUD + Follow the Data {% cite hendrickson2013explore %} |
-| Risk-focused testing | Nightmare Headline Game {% cite hendrickson2013explore %} |
-| Regression after changes | Antisocial + Back Alley tours {% cite whittaker2009exploratory %} |
-| Time-constrained session | Charter with specific heuristics |
-| Performance concerns | All-Nighter + Saboteur tours {% cite whittaker2009exploratory %} |
+- **Where it comes from.** Practitioner books {% cite hendrickson2013explore whittaker2009exploratory %}; the observation that testers apply design techniques dynamically comes from an industrial study of eleven testers {% cite itkonen2009manual %}.
+- **What is contested.** Which heuristics work best has not been compared experimentally; the catalogues are distilled experience.
+- **What we do not hold.** We have summaries of the two books, not their full text.
 
 ---
 
