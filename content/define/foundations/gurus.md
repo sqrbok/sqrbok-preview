@@ -1,146 +1,61 @@
 ---
 parent: Foundations
-nav_order: 3
-title: Gurus
+nav_order: 10
+title: Quality Pioneers
 layout: default
 ---
 
+# Quality Pioneers
 
-| Guru               | Contribution Summary                                                                 |
-|--------------------|-------------------------------------------------------------------------------------|
-| **Walter Shewhart** | Statistical Process Control, PDCA Cycle                                            |
-| **Philipp Crosby**  | Quality as Conformance to Requirements, Prevention Focus                          |
-| **Joseph Juran**    | Quality as Fitness for Purpose, Pareto Principle, Juran’s Trilogy                 |
-| **William Deming**  | 14 Points for Management, Profound Knowledge System, PDCA Cycle                  |
-| **Noriaki Kano**    | Kano Model, Focus on Satisfiers, Delighters                                       |
-| **Kaoru Ishikawa**  | Quality Circles, Fishbone Diagram, Seven Tools of Quality                        |
-| **Watts Humphrey**  | Software Quality, Capability Maturity Model, Team & Personal Software Processes  |
+The **quality pioneers** are the engineers and managers who, mostly in manufacturing between the 1920s and the 1980s, turned quality from inspection at the end of the line into something planned, measured and improved; software quality borrowed their ideas almost unchanged. This page gives each one's lasting idea and where it shows up in software.
 
---- 
+## 1. Seven people, seven ideas
 
+| Pioneer | Lived | Lasting idea | In software today |
+|---|---|---|---|
+| Walter Shewhart | 1891–1967 | control charts: separate common-cause from special-cause variation | flaky-test and build-time dashboards |
+| W. Edwards Deming | 1900–1993 | 14 points for management; the Plan–Do–Check–Act cycle | retrospectives, "build quality in" |
+| Joseph Juran | 1904–2008 | quality as fitness for use; the quality trilogy; the vital few | defect Pareto charts |
+| Kaoru Ishikawa | 1915–1989 | cause-and-effect (fishbone) diagram; seven basic tools; quality circles | post-incident reviews |
+| Philip Crosby | 1926–2001 | quality as conformance to requirements; zero defects; cost of nonconformance | cost of quality |
+| Watts Humphrey | 1927–2010 | process maturity for software: the Capability Maturity Model (CMM); the Personal and Team Software Processes (PSP, TSP) | CMMI, the CMM's successor, used to assess software processes |
+| Noriaki Kano | born 1940 | must-be and attractive quality | feature prioritisation ([Kano Model](kano.md)) |
 
-## Walter Shewhart (1891–1967)
+## 2. The improvement cycle
 
-### Contributions:
-- **Control of Variation**: Emphasis on identifying and controlling variation in manufacturing processes.
-- **Statistical Process Control**: Differentiated between:
-  - **Special Cause Variation** (assignable)
-  - **Common Cause Variation** (random)
-- **PDCA Cycle (Plan, Do, Check, Act)**:
-  1. **Plan**: Identify issues and plan solutions or activities.
-  2. **Do**: Execute the plan.
-  3. **Check**: Compare actual results with planned outcomes.
-  4. **Act**: Adjust plans or improve performance based on findings.
+**Shewhart** showed in the 1920s that a process varies for two kinds of reasons: common causes built into the process, and special causes that can be traced and removed. Reacting to every fluctuation as if it were special makes a process worse. **Deming** carried Shewhart's improvement cycle to Japan and made it famous as Plan–Do–Check–Act {% cite deming1986crisis %}.
 
----
+![Plan, Do, Check, Act as a cycle](pdca-cycle.svg)
 
-## Philipp Crosby (1926–2001)
+_The Plan–Do–Check–Act cycle; Deming later preferred Study to Check._ {% cite deming1986crisis %}
 
-### Contributions:
-- **Quality is Free (1979)**:
-  - Quality is not about luxury but about **conformance to requirements**.
-  - Nonconformance is the absence of quality, leading to quality problems.
-- **Prevention over Correction**:
-  - Focus on preventing problems rather than fixing them.
-- **Senior Management Commitment**:
-  - Quality improvements require leadership involvement, not just delegation.
+Deming's **14 points** include "cease dependence on inspection to achieve quality" and "drive out fear" {% cite deming1986crisis %}. In software terms, testing at the end cannot put quality into a product, and a team afraid to report defects will hide them.
 
----
+## 3. Defining and managing quality
 
-## Joseph Juran (1904–2008)
+**Juran** defined quality as fitness for use and split quality management into a **trilogy**: quality planning, quality control and quality improvement {% cite juran1986trilogy %}. He also popularised the Pareto principle for defects: a vital few causes account for most of them. **Crosby** defined quality as conformance to requirements, argued that doing it right the first time costs less than fixing it, and measured the price of nonconformance {% cite crosby1979quality %}; his book's title, *Quality Is Free*, is the claim.
 
-### Contributions:
-- **Quality as Fitness for Purpose**:
-  - Meeting customer needs to ensure satisfaction.
-  - Balancing cost with quality improvement.
-- **Pareto Principle (80/20 Rule)**:
-  - Focus on the "vital few" problems that cause the majority of issues.
-- **Juran’s Trilogy**:
-  1. **Quality Planning**: Define objectives and processes.
-  2. **Quality Control**: Monitor performance and address deviations.
-  3. **Quality Improvement**: Continuously enhance processes and products.
+**Ishikawa** gave front-line teams seven simple tools, among them the Pareto chart, the check sheet, the control chart and the **cause-and-effect diagram** {% cite ishikawa1985tqc %}.
 
----
+![Fishbone diagram for a checkout that times out at peak load, with causes under six headings](fishbone-checkout.svg)
 
-## William Deming (1900–1993)
+_A cause-and-effect diagram for a software incident. Each bone is a category of cause; the team fills the bones before deciding which cause to fix._
 
-### Contributions:
-- **System of Profound Knowledge**:
-  - Emphasis on systems thinking, understanding variation, and theory of knowledge.
-- **Deming’s 14 Points for Management**:
-  - Focus on quality improvement through leadership, continuous learning, and teamwork.
-- **Popularization of the PDCA Cycle**.
+For example, a shop's checkout times out during a flash sale. The on-call team's first guess is "the database is slow". Filling the fishbone shows six candidate causes, from an unindexed table to alerts that watch mean latency, not p95. The team fixes the index first, because it is cheap, and adds a load test so that the next special cause is caught before release.
 
-### Deming’s 14 Points (Highlights):
-1. Create constancy of purpose towards product and service quality.
-2. Focus on quality over price in supplier relationships.
-3. Encourage teamwork and break down departmental barriers.
-4. Invest in lifelong training and education for employees.
+## 4. Into software
 
----
+**Humphrey** carried these ideas into software. *Managing the Software Process* argued that software organisations could be assessed and improved like manufacturing processes, and became the basis of the Capability Maturity Model {% cite humphrey1989managing %}; he later scaled the same discipline down to individuals with the Personal Software Process {% cite humphrey1995discipline %}.
 
-## Noriaki Kano (1940– )
+## When to use it — and when not
 
-### Contributions:
-- **Kano Model of Customer Satisfaction**: {% cite kano1984attractive %}
-  - Identifies how different features affect customer satisfaction.
-  - Categorizes product attributes into:
-    - **Must-Haves**: Basic needs. Lack of these causes dissatisfaction.
-    - **Satisfiers**: Features that increase satisfaction as they improve.
-    - **Delighters**: Unexpected features that excite and delight customers.
-- **Emphasis on Satisfiers**:
-  - Satisfiers bridge the gap between basic needs and delight. These features require incremental investment but directly enhance customer satisfaction.
+- **Use** these ideas when a quality problem recurs: PDCA to run the improvement, a fishbone to find causes, a Pareto chart to choose which to fix.
+- **Do not** transfer manufacturing statistics blindly: software is built once and copied, so variation between copies is not the problem it is on a production line.
 
+## How solid is this?
 
-![Kano Model of Customer Satisfaction](kano.png)
-
-*Figure. Kano Model of Customer Satisfaction*
-
-*Credits: By Craigwbrown - Own work, CC BY-SA 3.0, https://commons.wikimedia.org/w/index.php?curid=23262780*
-
----
-
-## Kaoru Ishikawa (1915–1989)
-
-### Contributions:
-- **Quality Circles**:
-  - Self-organized groups focused on problem-solving and improving organizational performance.
-- **Ishikawa (Fishbone) Diagram**:
-  - Tool for root cause analysis (Material, Methods, Equipment, Management).
-- **Seven Tools of Quality**:
-  - Flowchart: illustrate or specify a process
-  - Pareto diagrams: classify problems according to importance
-  - Cause and effect diagrams: analyze the causes leading to a problem
-  - Histograms: reveal the frequency of occurrence
-  - Control charts: establish process capability and detect special cause variation
-  - Scatter diagrams: establish correlation between events
-  - Check-sheets: tabulate results through routine checks of a situation
-
-![Ishikawa (Fishbone) Diagram](Ishikava.svg)
-*Figure. Ishikawa (Fishbone) Diagram.*
-
-*Credits: By DanielPenfield - Own work, CC BY-SA 3.0, https://commons.wikimedia.org/w/index.php?curid=9401181*
-
----
-
-## Watts Humphrey (1927–2010)
-
-### Contributions:
-- **Software Quality Focus**:
-  - Addressing software defects to improve usability and reliability.
-- **Eight Steps for Quality Software**:
-  1. Establish quality policies and goals.
-  2. Train and support developers.
-  3. Maintain requirements quality management.
-  4. Apply statistical control to software processes.
-  5. Review all product artifacts.
-  6. Analyze and correct defects.
-  7. Manage configuration and change control.
-  8. Continuously improve processes.
-- **Major Frameworks**:
-  - Capability Maturity Model (CMM)
-  - Team Software Process (TSP)
-  - Personal Software Process (PSP)
+- **Where it comes from.** The pioneers' own books and articles cited above.
+- **What is contested.** Many popular attributions are loose: the cycle is Shewhart's, Deming named it Plan–Do–Study–Act, and "fitness for purpose" is a later paraphrase of Juran's "fitness for use".
 
 ---
 
@@ -148,8 +63,7 @@ layout: default
 
 {% bibliography --cited %}
 
-
 ---
 
 {: .highlight }
-**Disclaimer:** AI is used for text polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.
