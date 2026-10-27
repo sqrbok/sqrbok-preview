@@ -6,6 +6,7 @@ nav_order: 3
 redirect_from: /content/define/measurement/SN_L2_Metrics.html
 layout: default
 page_type: study-notes
+math: katex
 ---
 
 # Study Notes: Quality Measurement
@@ -88,13 +89,25 @@ def delivery_fee(weight_kg, express, country):   # LLOC 1
 
 **Lines of code** come in three counts: LOC (every physical line: 13), SLOC (without blank and comment lines: 12) and LLOC (one per statement: 11, as numbered).
 
-**Cyclomatic complexity** is the number of linearly independent paths through a function's control-flow graph: *V(G) = e − n + 2*, with *e* edges and *n* nodes {% cite mccabe1976complexity %}. Paths are **linearly independent** when each has an edge the others do not; a **basis set** is a largest set of such paths, from which every other path can be built. Counted from the code, V(G) is the number of decisions plus one.
+**Cyclomatic complexity** is the number of linearly independent paths through a function's control-flow graph, with $$e$$ edges and $$n$$ nodes {% cite mccabe1976complexity %}:
+
+$$
+V(G) = e - n + 2
+$$
+
+ Paths are **linearly independent** when each has an edge the others lack; a **basis set** of them builds every other path. Counted from the code, $$V(G)$$ is the number of decisions plus one.
 
 ![Control-flow graph of delivery_fee: 11 nodes, 14 edges, V(G) = 5](../../define/measurement/delivery-fee-cfg.svg)
 
-The graph has four decisions, so V(G) = 14 − 11 + 2 = 5. Drawing `express and country == "RU"` as one node is a convention; radon counts the `and` too: it starts at 1 and adds 1 for each `if`, `elif`, `for`, `while`, `except`, `with`, `assert` and comprehension, and 1 for each Boolean operator (`and`, `or`); `else` adds nothing {% cite radon_docs %}. So radon reports 6 for `delivery_fee`, letter B. The Software Engineering Institute (SEI) bands are 1–10 low risk, 11–20 moderate, 21–50 high, above 50 untestable {% cite sei1997c4 %}; `radon cc` uses other cut-offs: A (1–5), B (6–10), C (11–20), D (21–30), E (31–40), F (41+).
+The graph has four decisions, so $$V(G) = 14 - 11 + 2 = 5$$. Drawing `express and country == "RU"` as one node is a convention; radon counts the `and` too: it starts at 1 and adds 1 for each `if`, `elif`, `for`, `while`, `except`, `with`, `assert` and comprehension, and 1 for each Boolean operator (`and`, `or`); `else` adds nothing {% cite radon_docs %}. So radon reports 6 for `delivery_fee`, letter B. The Software Engineering Institute (SEI) bands are 1–10 low risk, 11–20 moderate, 21–50 high, above 50 untestable {% cite sei1997c4 %}; `radon cc` uses other cut-offs: A (1–5), B (6–10), C (11–20), D (21–30), E (31–40), F (41+).
 
-**Halstead's metrics** count distinct operators *n₁* and operands *n₂* and their occurrences *N₁* and *N₂*; vocabulary *n = n₁ + n₂*, length *N = N₁ + N₂*, volume *V = N · log₂ n* {% cite halstead1977elements %}. Radon counts only arithmetic, augmented-assignment (`+=` as `+`, `*=` as `*`), comparison and Boolean operators; calls, `=`, `raise` and `return` are not counted. Each binary operator has two operands, its two sides, even when a side is itself an expression, and a unary one (`-x`, `not x`) has one; `in` and `is` count as comparisons, while attribute access, subscripts and call arguments are never operators: in `2.0 * (weight_kg - 10)` the operands of `*` are `2.0` and the whole `(weight_kg - 10)`. For `delivery_fee`:
+**Halstead's metrics** count distinct operators $$n_1$$ and operands $$n_2$$ and their occurrences $$N_1$$ and $$N_2$$ {% cite halstead1977elements %}:
+
+$$
+n = n_1 + n_2, \qquad N = N_1 + N_2, \qquad V = N \log_2 n
+$$
+
+ Radon counts only arithmetic, augmented-assignment (`+=` as `+`, `*=` as `*`), comparison and Boolean operators; calls, `=`, `raise` and `return` are not counted. Each binary operator has two operands, its two sides, even when a side is itself an expression, and a unary one (`-x`, `not x`) has one; `in` and `is` count as comparisons, while attribute access, subscripts and call arguments are never operators: in `2.0 * (weight_kg - 10)` the operands of `*` are `2.0` and the whole `(weight_kg - 10)`. For `delivery_fee`:
 
 | Operator | Uses | Its two operands, per use |
 |---|---|---|
@@ -107,9 +120,27 @@ The graph has four decisions, so V(G) = 14 − 11 + 2 = 5. Drawing `express and 
 | `==` | 1 | `country`, `"RU"` |
 | 7 distinct | *N₁* = 9 | *N₂* = 18 uses |
 
-The 12 distinct operands are the nine names and literals in the table plus the three expressions `(weight_kg - 10)`, `2.0 * (weight_kg - 10)` and `country == "RU"`. So *n* = 19, *N* = 27 and *V* = 27 · log₂ 19 ≈ 114.7. In `radon hal` output, read *h1*, *h2*, *N1*, *N2* and *volume*. A chain such as `a + b + c` is two uses of `+`, with operands `a`, `b`, then `(a + b)`, `c`.
+The 12 distinct operands are the nine names and literals in the table plus the three expressions `(weight_kg - 10)`, `2.0 * (weight_kg - 10)` and `country == "RU"`. So $$n = 19$$, $$N = 27$$ and $$V = 27 \log_2 19 \approx 114.7$$. In `radon hal` output, read *h1*, *h2*, *N1*, *N2* and *volume*. In `a + b + c`, `+` is used twice: on `a`, `b`, then on `(a + b)`, `c`.
 
-The **Maintainability Index** combines the three {% cite oman1992maintainability %}: *MI = max(0, (171 − 5.2 ln V − 0.23 G − 16.2 ln L) · 100/171)*, with Halstead volume *V*, cyclomatic complexity *G* and line count *L*. Radon uses its own *G* (6) and the logical lines (*L* = 11): 171 − 24.66 − 1.38 − 38.85 = 106.11, and 106.11 · 100/171 = 62.055, which `radon mi -s` prints as 62.06. Radon scores MI **per file**, not per function: one Halstead volume over the whole file, *G* = 1 + all decision points in the file, and the file's logical lines. A file with two functions of complexity 6 each therefore has *G* = 1 + 5 + 5 = 11, not 12. It also adds a comment term inside the bracket, *+ 50 · sin(√(2.46 · C<sub>rad</sub>))*, where *C* = (comments + docstring lines) ÷ SLOC × 100 and *C<sub>rad</sub>* = *C* · π/180: the percentage is converted as if it were degrees. *C* can exceed 100% when a file has more comment lines than code lines. This file has no comments, so the term is 0. Radon's MI ranks are A (20–100), B (10–19) and C (0–9), as Visual Studio's green, yellow and red {% cite msdocs_mi %}, and separate from the complexity letters.
+The **Maintainability Index** combines the three {% cite oman1992maintainability %}, with Halstead volume $$V$$, cyclomatic complexity $$G$$, line count $$L$$ and the natural logarithm $$\ln$$:
+
+$$
+MI = \max\left(0,\ \left(171 - 5.2 \ln V - 0.23\,G - 16.2 \ln L\right) \cdot \frac{100}{171}\right)
+$$
+
+Radon uses its own $$G = 6$$ and the logical lines, $$L = 11$$:
+
+$$
+171 - 24.66 - 1.38 - 38.85 = 106.11, \qquad 106.11 \cdot \frac{100}{171} = 62.055
+$$
+
+which `radon mi -s` prints as 62.06. Radon scores MI **per file**, not per function: one Halstead volume over the whole file, $$G$$ = 1 + all decision points in the file, and the file's logical lines. A file with two functions of complexity 6 each therefore has $$G = 1 + 5 + 5 = 11$$, not 12. It also adds a comment term inside the bracket,
+
+$$
++\,50 \sin\sqrt{2.46\, C_{\text{rad}}}, \qquad C = \frac{\text{comments} + \text{docstring lines}}{\text{SLOC}} \cdot 100, \qquad C_{\text{rad}} = C \cdot \frac{\pi}{180},
+$$
+
+treating the percentage as degrees. $$C$$ can exceed 100% when a file has more comment lines than code lines. This file has no comments, so the term is 0. Radon's MI ranks are A (20–100), B (10–19) and C (0–9), as Visual Studio's green, yellow and red {% cite msdocs_mi %}, and separate from the complexity letters.
 
 For classes, the **CK suite** has six metrics {% cite chidamber1994metrics %}:
 
