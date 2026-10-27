@@ -1,101 +1,59 @@
 ---
+title: Measurement Definitions
 parent: Measurement
 nav_order: 1
-title: Measurement Definitions
 layout: default
 ---
 
+# Measurement Definitions
 
-# Why metrics?
+A **measurement** assigns numbers or symbols to an attribute of an entity by a stated rule, so that relations between the numbers reflect relations between the things measured {% cite sarle_measurement_1995 %}. A **software quality metric** is such a rule applied to software data: a function whose output is a single value read as the degree to which the software has a quality attribute {% cite ieee1061_1998 %}.
 
-## Everything is Measurable
+## 1. Entity, attribute, rule
 
-{: .highlight }
-"Everything is measurable."
+Every measurement names three things {% cite park1996goal %}. The **entity** is the object: a module, a release, a code review. The **attribute** is the property of it we care about: size, complexity, effort, number of defects. The **rule** says how a value is assigned: "count non-blank, non-comment lines". Change the rule and you have a different measure, even if the name stays the same.
 
-*(D. Hubbard, How to Measure Anything, 2010) {% cite hubbard_how_2014 %}*  
+Hubbard adds the purpose: a measurement is *"a quantitatively expressed reduction of uncertainty based on one or more observations"* {% cite hubbard_how_2014 %}. It does not need to be exact to be useful. Knowing that a review takes one to three hours, not "no idea", already changes a plan. Hubbard's argument that *everything is measurable* runs: if we care about something, it must show up somehow; if it shows up, we can observe more or less of it; and what we can observe in amounts, we can measure. "Maintainability" or "user trust" are not unmeasurable, only not yet defined.
 
-If **X** is something we care about, then **X**, by definition, must be detectable. Consider concepts like “quality,” “risk,” “security,” or “public image.” If these concepts were entirely undetectable, how could we care about them? The very act of caring about these concepts implies they correspond to desirable or undesirable outcomes. 
+## 2. From a quality model to a number
 
-### Key Principles:
+A quality model names what matters; a metric turns one part of it into a number. McCall's model refines each quality **factor** into **criteria**, and each criterion into **metrics** that can be computed {% cite mccall_factors_1977 %}.
 
-1. **Detectability**: If we care about something, it must be detectable directly or indirectly.
-2. **Observability**: If it is detectable, we can observe it in some amount. For example, we can observe "more" or "less" of quality.
-3. **Measurability**: If we can observe it in some amount, it must be measurable.
+![Chain: factor Maintainability, refined into criterion Simplicity, measured by cyclomatic complexity per function, computed on code as 6 for delivery_fee](model-to-metric.svg)
 
-### Example: Measuring Quality in Art
+_From factor to value, after McCall's factor–criteria–metric structure. The value 6 is radon's count for `delivery_fee`, the example on [Size and Complexity Metrics](examples.md); McCabe's graph gives 5._ {% cite mccall_factors_1977 %}
 
-Consider Garvin's transcendental view of quality. Imagine comparing two famous artworks: a painting by **Manet** and another by **Picasso**.
+## 3. The representation condition
 
-- **Question for Discussion**: Which artwork is of higher quality?  
-  - This question demonstrates the subjective and context-dependent nature of quality. In art, "quality" might depend on emotional impact, technical skill, historical importance, etc. The challenge lies in defining measurable criteria for such an abstract concept.
+A measure is valid for an attribute only if the numbers behave like the attribute: if module A is larger than B, its number must be larger too. Lines of code satisfy this for *physical size*: a 2,000-line file is larger than a 500-line file. They do not satisfy it for *functionality*: the same feature can take 50 lines in one style and 500 in another, so more lines does not mean more function. The same number can be a valid measure of one attribute and an invalid measure of another.
 
----
+## 4. Accuracy, precision, resolution
 
-## How This Applies to Software Quality
+Three properties describe how good a single measurement is:
 
-### Key Points:
+- **Accuracy** is how close the measured value is to the true value.
+- **Precision** is how close repeated measurements of the same thing are to each other.
+- **Resolution** is the smallest difference the instrument can show.
 
-- **Control During Development**: Metrics provide a structured way to control quality throughout the software lifecycle.
-- **Release Validation**: Before release, metrics act as quality gates to ensure the product meets predefined standards.
-- **Goal Setting**: Companies set quality targets using metrics to ensure consistent outcomes.
+![Four targets: accurate and precise, precise but not accurate, accurate but not precise, neither](accuracy-precision.svg)
 
+_Accuracy is closeness to the centre; precision is closeness of the shots to one another._
 
-For instance, the **usability** attribute might map to metrics like **task success rate** or **average time on task**.
+**Example.** A load-testing script times each request but adds 50 ms of its own start-up to every reading: a request that really takes 200 ms is reported as 250 ms, run after run. The script is **precise** (the same answer every time) but **not accurate** (always 50 ms too high). A response-time log that truncates every reading to whole seconds has a **resolution** of one second: a request that took 200 ms and one that took 800 ms both show as 0, so a 4× slowdown is invisible.
 
-### Importance of Metrics:
+Not every disagreement is an accuracy problem. If a complexity tool reports 10 for a function and a hand count gives 12, first check whether both use the same counting rule: [Size and Complexity Metrics](examples.md) shows two correct rules giving 5 and 6 for the same code. That is a difference of definition, settled by an [operational definition](development.md) (a statement of exactly how the value is obtained), not by a better instrument.
 
-- Helps identify issues early.
-- Enables comparison between current and past performance.
-- Provides a common language for evaluating quality.
+## When to use it — and when not
 
-**Takeaway**: Learning to set up the right metrics in the right way is a critical skill for software engineers.
+- **Use** the entity–attribute–rule triple whenever a metric is proposed: if one of the three cannot be stated, the metric is not ready.
+- **Use** the representation condition to check that a number means what its name says.
+- **Do not** trust a precise tool to be accurate. Check it once against a known value, using the same counting rule.
+- **Do not** read a difference smaller than the resolution: 0 ms vs 0 ms says nothing.
 
----
+## How solid is this?
 
-## Key Definitions
-
-### Software Quality Metric
-
-According to **IEEE 1061**:  
-
-{: .highlight }
-“A software quality metric is a function whose inputs are software data and whose output is a single numerical value that can be interpreted as the degree to which software possesses a given attribute that affects its quality.”
-
-### Measurement
-
-{: .highlight }
-**D. Hubbard (2010) {% cite hubbard_how_2014 %}**:  
-“Measurement is a quantitatively expressed reduction of uncertainty based on one or more observations.”
-
-{: .highlight }
-**W. Sarle (1997) {% cite sarle_measurement_1995 %}**:  
-“Measurement of some attribute of a set of things is the process of assigning numbers or other symbols to the things in such a way that relationships of the numbers or symbols reflect relationships of the attributes of the things being measured.”
-
----
-
-## Measurement Basics
-
-When considering any measurement, ask the following:
-
-1. **What does the measurement represent?**
-2. **How accurate is the measurement?**
-3. **How precise is the measurement?**
-4. **What is the resolution of the measurement?**
-
-### Key Concepts:
-
-- **Accuracy**: How close the measurement is to the true value.
-- **Precision**: The degree to which repeated measurements under unchanged conditions produce the same results.
-- **Resolution**: The smallest detectable difference between values.
-
-**Discussion**: Why are these factors critical for developing and using metrics in software quality? How might they affect decision-making in software projects?
-
----
-
-## Final thoughts
-
-Understanding and applying software quality metrics is essential for delivering reliable, maintainable, and user-friendly systems. By focusing on measurable attributes, setting appropriate goals, and critically evaluating measurement techniques, software engineers can ensure their products meet the highest quality standards.
+- **Where it comes from.** The definitions are standard: Sarle's from measurement theory, Hubbard's from decision analysis, and the metric definition from IEEE Std 1061-1998. McCall's criteria and metrics were designed for 1970s projects; the chain structure, not the particular list, is what survives in today's models.
+- **What is contested.** Whether every attribute *should* be measured is a separate question from whether it can be. [Measurement Pitfalls](pitfalls.md) shows what happens when only the measurable parts are managed.
 
 ---
 
@@ -106,4 +64,4 @@ Understanding and applying software quality metrics is essential for delivering 
 ---
 
 {: .highlight }
-**Disclaimer:** AI is used for text polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.

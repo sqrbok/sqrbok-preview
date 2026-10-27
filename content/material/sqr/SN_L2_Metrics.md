@@ -8,705 +8,133 @@ layout: default
 page_type: study-notes
 ---
 
-# Study Notes: Quality Measurement and Metrics
+# Study Notes: Quality Measurement
 
----
+The previous lecture described quality through models. This lecture asks how to put a number on quality, and when that number can be trusted. Roadmap: §1–2 what a measurement is; §3 how metrics mislead; §4–5 scales and reading data; §6 designing a metric; §7 code metrics on one function; §8 whether they predict faults. The [revision questions](RQ_L2_Metrics.md) test this lecture.
 
-## Table of Contents
+## 1. A metric is the bottom rung of a quality model
 
-1. [Part 1: Why Measure?](#part-1-why-measure)
-2. [Part 2: Measurement Pitfalls](#part-2-measurement-pitfalls)
-3. [Part 3: Measurement Scales (NOIR)](#part-3-measurement-scales-noir)
-4. [Part 4: Statistical Concepts](#part-4-statistical-concepts)
-5. [Part 5: Developing Metrics (GQM)](#part-5-developing-metrics-gqm)
-6. [Part 6: Code Metrics](#part-6-code-metrics)
-7. [Part 7: Summary & Review](#part-7-summary--review)
+A metric turns one criterion of a quality model into a value a tool can compute. In McCall's model, the factor *maintainability* is refined into criteria such as *simplicity*, which a metric such as cyclomatic complexity per function measures {% cite mccall_factors_1977 %}. IEEE 1061 defines a quality metric as a function from software data to a single value read as the degree to which the software has a quality attribute {% cite ieee1061_1998 %}.
 
----
+→ [Measurement Definitions](../../define/measurement/definitions.md)
 
-## Part 1: Why Measure?
+## 2. Measuring means reducing uncertainty, not being exact
 
-### Learning Objectives
-- Explain why measurement is essential for software quality management
-- Define measurement and metric using standard definitions
-- Distinguish between resolution, accuracy, and precision
+Hubbard defines measurement as *"a quantitatively expressed reduction of uncertainty based on one or more observations"* {% cite hubbard_how_2014 %}. His argument that *everything is measurable* has three steps: if we care about something, it must be detectable; if it is detectable, we can observe more or less of it; and what we can observe in amounts, we can measure. Sarle defines measurement as assigning numbers to things so that relationships between the numbers reflect relationships in the attribute measured {% cite sarle_measurement_1995 %}. That requirement is the **representation condition**: if module A is larger than B, its number must be larger too. Lines of code satisfy it for physical size, not for functionality, complexity or effort: one feature can take 50 lines or 500.
 
-### Why Measurement Matters
+Every measurement names an **entity** (a module), an **attribute** (its size) and a **rule** (count non-blank lines) {% cite park1996goal %}. Three properties describe a single measurement. **Accuracy** is closeness to the true value; **precision** is agreement between repeated measurements; **resolution** is the smallest difference the instrument shows: a log that truncates to whole seconds shows a 200 ms and an 800 ms request both as 0. For example, a timing script that adds 50 ms to every reading reports 250 ms for a 200 ms request, every run: precise, not accurate. A tool reporting complexity 10 where a hand count gives 12 may just use another counting rule: a difference of definition, not accuracy.
 
-We measure software to make informed decisions about:
-- **Quality** — Is the product good enough to release?
-- **Productivity** — Are we delivering value efficiently?
-- **Risk** — What areas need attention?
-- **Improvement** — Are our changes working?
+→ [Measurement Definitions](../../define/measurement/definitions.md)
 
-Metrics feed into critical business decisions: release approval, resource allocation, process improvement, and performance evaluation.
+## 3. Metrics mislead in three ways
 
-> **Warning:** "You can't manage what you can't measure" — but bad metrics lead to bad management!
+**Bad statistics**: the number is misread. In 1995 British regulators warned that third-generation pills doubled the risk of thrombosis: about 1 in 7,000 women on the older pills against 2 in 7,000 on the newer ones, a relative increase of 100% but an absolute increase of 1 in 7,000 {% cite gigerenzer2014risk %}. Ask for the base. **Bad decisions**: the number answers a different question. The **McNamara fallacy** measures what is easy, ignores what is not, and assumes the unmeasured does not matter, which amounts to estimating its effect as zero {% cite forrester1961industrial %}. The **streetlight effect** picks metrics because a tool reports them, not because a question needs them. The fallacy concerns what you conclude; the streetlight effect, what you collect. **Bad incentives**: people move the number instead of the outcome. A mandated 80% coverage gate shows all three: a line-weighted 88% overall hides a payment module at 40% (bad statistics), coverage, which only records which lines ran, stands in for test quality (bad decision), and tests that run code without checking it are the cheapest way to raise it (bad incentive).
 
-### Key Definitions
+→ [Measurement Pitfalls](../../define/measurement/pitfalls.md)
 
-**Hubbard's Definition (2014):**
+## 4. The scale decides which arithmetic is allowed
 
-> "Measurement is a quantitatively expressed reduction of uncertainty based on one or more observations."
+Stevens defined four scales {% cite stevens_theory_1946 %}, and software measurement adds a fifth for counts {% cite park1996goal %}:
 
-Hubbard {% cite hubbard_how_2014 %} argues that measurement doesn't require perfect precision. Even rough estimates reduce uncertainty and have value.
+| Scale | Adds | Meaningful summary | Software example |
+|---|---|---|---|
+| Nominal | labels | mode | defect type |
+| Ordinal | order | median | severity 1–4 |
+| Interval | equal steps | mean | date reported |
+| Ratio | true zero | ratios, "twice as" | hours to fix |
+| Absolute | counts of things; the unit cannot change | everything | number of open defects |
 
-**Sarle's Definition (1997):**
+A statement is meaningful only if it survives every allowed change of unit: 20 °C is not "twice as warm" as 10 °C (68 and 50 °F). Dates are interval: the mean of 10 and 14 March is 12 March, but a defect reported on the 14th is not "twice as late". The mean of severities 1, 1, 2, 4, 4 is 2.4, which assumes equal steps between severities; the median, 2, does not.
 
-> "Measurement of some attribute of a set of things is the process of assigning numbers or other symbols to the things in such a way that relationships of the numbers or symbols reflect relationships of the attributes."
+Scale type is partly a judgement. Summing story points into velocity treats them as ratio data. In one company's data the median hours were 21, 52, 64, 100 and 111 for 1, 2, 3, 5 and 8 points {% cite cohn_storypoints %}. A ratio scale predicts 21 hours (the 1-point median) × points: 42, 63, 105 and 168. The data fit at 3 and 5 points, run 24% high at 2, and fall far short at 8: decide which scale you assume, and check it.
 
-Sarle {% cite sarle_measurement_1995 %} emphasizes the **representation condition**: the numbers must reflect real-world relationships.
+→ [Measurement Scales](../../define/measurement/types.md)
 
-**IEEE 1061 Definition:**
+## 5. Software data are skewed and confounded by size
 
-> "A software quality metric is a function whose inputs are software data and whose output is a single numerical value that can be interpreted as the degree to which software possesses a given attribute that affects its quality."
+If nine bugs take 1 hour each and one takes 100 hours, the mean fix time is 10.9 hours and the median 1 hour: for skewed data, report the median and a high percentile. A **confounder** is a third variable that drives two others and makes them look related. In software it is usually size: large classes score high on most metrics and also have more faults.
 
-| Element | Description | Example |
-|---------|-------------|---------|
-| **Input** | Software data | Source code, defect reports, test results |
-| **Output** | Single numerical value | 0-100, percentage, count |
-| **Interpretation** | Degree of quality attribute | Higher = better maintainability |
+![Class size drives both the coupling metric CBO and fault-proneness; the dashed CBO-to-faults link is the hypothesis](../../define/measurement/confounding-size.svg)
 
-### Resolution, Accuracy, Precision
+**Controlling for size** means comparing classes of similar size, or testing whether size plus the metric predicts faults better than size alone. The **CK metrics** are six class-level metrics of Chidamber and Kemerer (§7), among them **CBO**, the number of other classes a class uses or is used by. In one C++ system no CK metric stayed associated with faults once size was controlled {% cite elemam2001confounding %}; in another C++ system, 4 of 24 object-oriented metrics stayed associated with faults, and 2 of those, both coupling metrics, improved prediction {% cite elemam1999validation %}.
 
-| Property | Definition | Example |
-|----------|------------|---------|
-| **Resolution** | Smallest detectable change | Timer with 1ms vs 1s granularity |
-| **Accuracy** | How close to true value | Thermometer reads 20.5°C when actual is 20°C |
-| **Precision** | Repeatability of measurements | Same code analyzed twice gives same cyclomatic complexity |
+→ [Reading Metric Data](../../define/measurement/statistics.md)
 
-> **Exam Tip:** High precision with low accuracy = consistent but wrong! A ruler that always measures 1cm short is precise (repeatable) but inaccurate.
+## 6. Start from the goal, then define the metric operationally
 
-### Practice Questions
+Basili's **Goal–Question–Metric** works top down: a goal (object, purpose, quality focus, viewpoint, context), questions that show whether it is met, and metrics answering each question {% cite basili_applying_1993 %}. In the goal "analyse the checkout code (object) to improve (purpose) its maintainability (focus) from the developers' viewpoint, while new people join (context)", the question "which functions are hard to change?" is answered by complexity per function and by how often each needed fixing. An **operational definition** states exactly how each value is obtained, meeting Park's two criteria: **communication** (others know what was measured) and **repeatability** (others get the same value) {% cite park_software_1992 %}. Before comparing 15 defects per thousand lines (KLOC) with 8, ask what counts as a defect, when, and what counts as a line.
 
-1. According to Hubbard, what is the purpose of measurement?
-2. What are the three components of an IEEE 1061 metric?
-3. A tool consistently reports cyclomatic complexity as 10, but manual calculation shows 12. Is the tool accurate? Is it precise?
+→ [Developing Metrics with GQM](../../define/measurement/development.md)
 
----
+## 7. Classic code metrics depend on their counting rules
 
-## Part 2: Measurement Pitfalls
-
-### Learning Objectives
-- Identify three categories of measurement dangers
-- Explain the McNamara Fallacy and its relevance to software
-- Recognize the Streetlight Effect in metric selection
-
-### Three Dangers in Metrics
-
-Hoffman {% cite hoffman_darker_2000 %} identified three ways metrics can go wrong:
-
-| Danger | Description | Example |
-|--------|-------------|---------|
-| **Bad Statistics** | Misunderstanding measurement theory | Using mean on ordinal data |
-| **Bad Decisions** | Incorrect use of data | Ignoring confounding variables |
-| **Bad Incentives** | Disregard for human factors | Developers "gaming" coverage metrics |
-
-> "People's behaviors change in predictable ways to provide the answers management asks for when metrics are applied." — Hoffman (2000)
-
-### Statistics Can Mislead
-
-**UK 1995 Contraceptive Warning:**
-
-The UK issued a warning that third-generation contraceptive pills "increased the risk of blood clots twofold — that is, by 100 percent."
-
-| Statistic | Value |
-|-----------|-------|
-| Second-gen risk | 1 in 7,000 women |
-| Third-gen risk | 2 in 7,000 women |
-| Absolute increase | 0.014% (1 in 7,000) |
-| Relative increase | 100% |
-
-**Result:** Panic, discontinued use, unwanted pregnancies.
-
-> **Key Lesson:** Always ask "100% of what baseline?" Relative statistics without absolute context are misleading.
-
-### The McNamara Fallacy
-
-Named for Robert McNamara, US Secretary of Defense 1961-1968.
-
-**Definition:** Making decisions based solely on quantitative observations while ignoring those that are difficult to measure.
-
-**Vietnam War Example:**
-- Strategy based on "body counts" (quantifiable)
-- Ignored morale, political will, terrain (hard to measure)
-- Quantifiable metrics ≠ important metrics
-
-**In Software:**
-- Tracking defect counts because they're easy to measure
-- Ignoring code quality, technical debt, developer satisfaction
-
-> "To omit [unmeasurable] variables is equivalent to saying that they have zero effect... Probably the only value known to be wrong." — Forrester (1961)
-
-Forrester {% cite forrester1961industrial %} emphasized that ignoring hard-to-measure variables doesn't make them irrelevant.
-
-### The Streetlight Effect
-
-**The Parable:** A man searches for his keys under a streetlight, not where he dropped them, because "the light is better here."
-
-**In Software Metrics:**
-- Measuring what tools report automatically, not what matters
-- Tracking code coverage because it's easy to automate
-- Ignoring usability because it's hard to quantify
-
-> **Antidote:** Start with goals (GQM), then find measures. Not the reverse!
-
-### Practice Questions
-
-1. A team achieves 100% code coverage but users still report bugs. Which pitfall does this illustrate?
-2. Why is the McNamara Fallacy particularly dangerous in software development?
-3. How does the Streetlight Effect affect metric selection?
-
----
-
-## Part 3: Measurement Scales (NOIR)
-
-### Learning Objectives
-- List and describe Stevens' four measurement scales
-- Identify which mathematical operations are valid for each scale
-- Apply scale knowledge to evaluate metric validity
-
-### The Representation Condition
-
-> A measurement should map real-world entities into numbers such that relationships of the numbers reflect relationships of the attributes being measured.
-
-**Example:**
-- LOC satisfies representation for **physical size** (more lines = larger codebase)
-- LOC does NOT satisfy representation for **functional size** (more lines ≠ more functionality)
-
-> **Test:** Do mathematical operations on the numbers have meaning in reality?
-
-### Stevens' Measurement Scales
-
-Stevens {% cite stevens_theory_1946 %} defined four measurement scales in his seminal 1946 paper. The mnemonic **NOIR** (French for "black") helps remember them:
-
-| Scale | Properties | Valid Operations | Software Example |
-|-------|------------|------------------|------------------|
-| **N**ominal | Categories only | =, ≠, count | Bug type (UI, logic, data) |
-| **O**rdinal | Categories + order | <, >, rank | Severity (Low, Med, High, Critical) |
-| **I**nterval | Order + magnitude | +, -, mean | Temperature change |
-| **R**atio | True zero | ×, ÷, all | LOC, defect count, time |
-
-### Detailed Scale Descriptions
-
-#### Nominal Scale (Categories)
-
-| Entity | Attribute | Example Values |
-|--------|-----------|----------------|
-| Application | Language | Java, Python, C++ |
-| Fault | Source | assignment, algorithm, interface |
-| Test | Type | unit, integration, system |
-
-**Properties:**
-- No implied order between categories
-- Can count frequencies (mode)
-- **Cannot compute averages!**
-
-**Error Example:** "The average bug type is 2.3" — meaningless!
-
-#### Ordinal Scale (Ranked)
-
-| Entity | Attribute | Example Values |
-|--------|-----------|----------------|
-| Application | Complexity | Low, Medium, High |
-| Fault | Severity | 1-Cosmetic to 4-Critical |
-| Task | Priority | P1, P2, P3, P4 |
-
-**Properties:**
-- Has order but no defined magnitude between values
-- Can compare (<, >), find median, rank
-- **Cannot add or subtract!**
-
-**Error Example:** "Critical (4) is twice as severe as Moderate (2)" — the scale doesn't support this claim.
-
-#### Interval Scale
-
-**Properties:**
-- Has order AND equal intervals between values
-- No true zero (zero doesn't mean "absence of quantity")
-- Can: add, subtract, compute mean
-- **Cannot: multiply, divide meaningfully**
-
-**Example:** Temperature in °F or °C
-- 64°F is NOT "twice as warm" as 32°F
-- The difference (32°F) is meaningful, but the ratio (2:1) is not
-
-#### Ratio Scale
-
-**Properties:**
-- Has true zero (absence of quantity)
-- **All arithmetic operations are valid**
-
-| Entity | Attribute | Example Values |
-|--------|-----------|----------------|
-| Project | Effort | Hours, person-days |
-| Code | Complexity | Cyclomatic complexity |
-| Testing | Coverage | Percentage (0-100%) |
-
-**Example:** A module with CC=20 is twice as complex as one with CC=10.
-
-### Story Points: A Cautionary Tale
-
-**Data from Mike Cohn (2011):**
-
-| Story Points | Median Hours | Range |
-|--------------|--------------|-------|
-| 1 point | 21 hours | 6-26 |
-| 2 points | 52 hours | 31-73 |
-
-**Problem:**
-- If 1 point = 21 hours, then 2 points should ≈ 42 hours
-- Actual median is 52 hours (**24% drift!**)
-
-> **Conclusion:** Story points are ordinal at best. Adding them across sprints is mathematically questionable.
-
-### Practice Questions
-
-1. Classify each metric by scale: bug count, severity rating, lines of code, programming language
-2. Why can't you compute the average severity of bugs?
-3. A team reports "average story points completed per sprint." What's problematic about this?
-
----
-
-## Part 4: Statistical Concepts
-
-### Learning Objectives
-- Choose appropriate central tendency measure for different data types
-- Explain correlation vs causation
-- Identify confounding variables in software metrics research
-
-### Central Tendency: Mean, Median, Mode
-
-| Measure | When to Use | Software Example |
-|---------|-------------|------------------|
-| **Mean** | Symmetric data, ratio scale | Average response time |
-| **Median** | Skewed data, outliers present | Bug fix time |
-| **Mode** | Categorical data, most frequent | Most common defect type |
-
-**Example: Bug Fix Times**
-
-If 9 bugs take 1 hour each and 1 bug takes 100 hours:
-- Mean: (9×1 + 1×100) / 10 = **10.9 hours**
-- Median: **1 hour** ← Better representation!
-
-> **Exam Tip:** For software metrics with outliers (bug fix time, response time, effort), prefer median over mean.
-
-### Correlation ≠ Causation
-
-**Classic Example: Coffee and Cancer**
-
-| Observation | Correlation |
-|-------------|-------------|
-| Coffee drinkers have higher cancer rates | Coffee → Cancer? |
-
-**The Hidden Confounder: Smoking!**
-- Smokers drink more coffee (coffee ↔ smoking)
-- Smoking causes cancer (smoking → cancer)
-- Coffee is correlated but NOT causal
-
-**In Software:**
-- High complexity correlates with defects
-- But class size is a confounder!
-- Large classes have more complexity AND more defects
-
-### The Hidden Variable Problem
-
-El Emam et al. {% cite elemam2001confounding %} conducted a landmark study on object-oriented metrics:
-
-> "Only four, out of twenty-four commonly used object-oriented metrics, were actually useful in predicting the quality of a software module when the effect of the module size was accounted for."
-
-**Common Confounders in Software Research:**
-
-| Confounder | What It Affects |
-|------------|-----------------|
-| Module/class size | Almost everything! |
-| Developer experience | Defect rates, productivity |
-| Time pressure | Quality, technical debt |
-| Technology stack | Performance, maintainability |
-
-> **Solution:** Control for confounders in analysis, or use randomized experiments (A/B testing).
-
-### Practice Questions
-
-1. When should you use median instead of mean?
-2. A study finds that teams using Tool X have fewer defects. What confounders might explain this?
-3. Why did El Emam's study find that most OO metrics weren't useful?
-
----
-
-## Part 5: Developing Metrics (GQM)
-
-### Learning Objectives
-- Apply Hubbard's argument that everything is measurable
-- Use the Goal-Question-Metric framework to develop metrics
-- Write operational definitions using Park's criteria
-
-### Hubbard's Argument: Everything is Measurable
-
-Hubbard {% cite hubbard_how_2014 %} provides a logical argument:
-
-**If X is something we care about:**
-1. X must be detectable somehow (or why would we care?)
-2. If detectable, it exists in some amount
-3. If it exists in some amount, it can be measured
-
-> **Implication:** "Intangibles" like quality, risk, and user satisfaction ARE measurable.
-
-> **Key Insight:** We don't need perfect measurement. Reducing uncertainty, even a little, has value.
-
-### Basili's GQM Framework
-
-Basili {% cite basili_applying_1993 %} developed the Goal-Question-Metric paradigm to ensure metrics serve real purposes:
-
-| Level | Purpose | Example |
-|-------|---------|---------|
-| **Goal** | Define business/project objective | Improve code maintainability |
-| **Question** | What do we need to know? | How complex is each module? |
-| **Metric** | How do we quantify the answer? | Cyclomatic complexity |
-
-#### Goal Template
-
-Write goals using this structure:
-
-| Element | Description | Example |
-|---------|-------------|---------|
-| **Object** | What are we studying? | The code base |
-| **Purpose** | Why? (Improve, understand, control) | Improve |
-| **Focus** | What quality aspect? | Maintainability |
-| **Stakeholder** | For whom? | Development team |
-| **Context** | Environment/constraints | New team members joining |
-
-**Complete Goal:** "Improve maintainability of the code base from the perspective of the development team in the context of new team members joining."
-
-#### GQM Example
-
-| Goal | Improve code maintainability for new team members |
-|------|--------------------------------------------------|
-| **Question 1** | How complex are modules? |
-| **Metric 1a** | Cyclomatic complexity |
-| **Metric 1b** | Lines of code |
-| **Question 2** | Are modules well-documented? |
-| **Metric 2a** | Comment ratio |
-| **Metric 2b** | Documentation coverage |
-
-### Operational Definitions
-
-Park {% cite park_software_1992 %} established two criteria for operational definitions:
-
-| Criterion | Question |
-|-----------|----------|
-| **Communication** | Would others know exactly what was measured? |
-| **Repeatability** | Could others repeat the measurement and get the same result? |
-
-**Example: "Hours Worked on Project"**
-
-Without operational definition, this is ambiguous:
-
-| Ambiguity | Options |
-|-----------|---------|
-| **Source** | Time reporting system or estimates? |
-| **Labor type** | Direct (developers) or indirect (sponsors)? |
-| **Hours** | Paid only or include unpaid overtime? |
-| **Activities** | Include meetings? Training? |
-
-**Good Operational Definition:**
-> "Hours worked: Paid hours logged in the time tracking system by direct development staff (developers, testers, architects) for activities classified as 'development' or 'testing', excluding meetings and training."
-
-### Practice Questions
-
-1. Using GQM, develop metrics for the goal "Reduce defect escape rate to production."
-2. Write an operational definition for "code review completion rate."
-3. Apply Hubbard's argument: Is "developer happiness" measurable?
-
----
-
-## Part 6: Code Metrics
-
-### Learning Objectives
-- Calculate cyclomatic complexity for a code fragment
-- Interpret Maintainability Index scores
-- Use tools like `radon`, ESLint, and SonarQube for metric collection
-- Understand the Chidamber-Kemerer OO metrics suite
-
-### Lines of Code (LOC)
-
-**Definition:** Physical count of source lines (typically via `wc -l`)
-
-| Project | LOC | Category |
-|---------|-----|----------|
-| Expression Evaluator | 450 | Small utility |
-| Sudoku Solver | 2,000 | Small application |
-| Linux Kernel | 6,000,000 | Large system |
-| Windows XP | 45,000,000 | Massive codebase |
-
-**Cautions:**
-- Physical LOC ≠ Logical LOC (statements vs lines)
-- Doesn't measure functionality
-- Varies by coding style and language
-- More code ≠ more value
-
-### Cyclomatic Complexity (McCabe 1976)
-
-McCabe {% cite mccabe1976complexity %} defined cyclomatic complexity as the number of linearly independent paths through code.
-
-**Formula:** `CC = Edges - Nodes + 2` (in Control Flow Graph)
-
-**Simplified counting:** Count decision points and add 1:
-- `if`, `elif`: +1 each (`else` does not add +1 — it is not a new decision point, just the remaining branch already created by the `if`)
-- `for`, `while`: +1 each
-- `and`, `or`: +1 each
-- `case` in switch: +1 each
-- Base: 1
-
-**Example:**
+One function serves as the running example; the `#` comments are annotations for these notes, not code that radon measures:
 
 ```python
-def process(data):           # Base = 1
-    if data is None:         # +1
-        return None
+def delivery_fee(weight_kg, express, country):   # LLOC 1
+    if weight_kg <= 0:                           # decision 1;  LLOC 2
+        raise ValueError(                        # LLOC 3 (two physical lines)
+            "weight must be positive")
 
-    for item in data:        # +1
-        if item > 0:         # +1
-            process_positive(item)
-        elif item < 0:       # +1
-            process_negative(item)
-
-    return result
-# Total CC = 5
+    fee = 5.0                                    # LLOC 4
+    if weight_kg > 10:                           # decision 2;  LLOC 5
+        fee += 2.0 * (weight_kg - 10)            # LLOC 6
+    if express and country == "RU":              # decision 3, plus `and`;  LLOC 7
+        fee *= 1.5                               # LLOC 8
+    elif express:                                # decision 4;  LLOC 9
+        fee *= 2.0                               # LLOC 10
+    return round(fee, 2)                         # LLOC 11
 ```
 
-#### Risk Levels
+**Lines of code** come in three counts: LOC (every physical line: 13), SLOC (without blank and comment lines: 12) and LLOC (one per statement: 11, as numbered).
 
-| CC Range | Risk Level | Recommendation |
-|----------|------------|----------------|
-| 1-10 | Low | Acceptable |
-| 11-20 | Moderate | Review, consider refactoring |
-| 21-50 | High | Refactor to reduce complexity |
-| >50 | Very High | Function is untestable, must split |
+**Cyclomatic complexity** is the number of linearly independent paths through a function's control-flow graph: *V(G) = e − n + 2*, with *e* edges and *n* nodes {% cite mccabe1976complexity %}. Paths are **linearly independent** when each has an edge the others do not; a **basis set** is a largest set of such paths, from which every other path can be built. Counted from the code, V(G) is the number of decisions plus one.
 
-> **Exam Tip:** CC directly relates to testing effort. To fully test a function with CC=10, you need at least 10 test cases (one per path).
+![Control-flow graph of delivery_fee: 11 nodes, 14 edges, V(G) = 5](../../define/measurement/delivery-fee-cfg.svg)
 
-### Halstead Metrics
+The graph has four decisions, so V(G) = 14 − 11 + 2 = 5. Drawing `express and country == "RU"` as one node is a convention; radon counts the `and` too: it starts at 1 and adds 1 for each `if`, `elif`, `for`, `while`, `except`, `with`, `assert` and comprehension, and 1 for each Boolean operator (`and`, `or`); `else` adds nothing {% cite radon_docs %}. So radon reports 6 for `delivery_fee`, letter B. The Software Engineering Institute (SEI) bands are 1–10 low risk, 11–20 moderate, 21–50 high, above 50 untestable {% cite sei1997c4 %}; `radon cc` uses other cut-offs: A (1–5), B (6–10), C (11–20), D (21–30), E (31–40), F (41+).
 
-Halstead {% cite halstead1977elements %} developed metrics based on operators and operands:
+**Halstead's metrics** count distinct operators *n₁* and operands *n₂* and their occurrences *N₁* and *N₂*; vocabulary *n = n₁ + n₂*, length *N = N₁ + N₂*, volume *V = N · log₂ n* {% cite halstead1977elements %}. Radon counts only arithmetic, augmented-assignment (`+=` as `+`, `*=` as `*`), comparison and Boolean operators; calls, `=`, `raise` and `return` are not counted. Each binary operator has two operands, its two sides, even when a side is itself an expression, and a unary one (`-x`, `not x`) has one; `in` and `is` count as comparisons, while attribute access, subscripts and call arguments are never operators: in `2.0 * (weight_kg - 10)` the operands of `*` are `2.0` and the whole `(weight_kg - 10)`. For `delivery_fee`:
 
-| Symbol | Meaning |
-|--------|---------|
-| n₁ | Number of distinct operators |
-| n₂ | Number of distinct operands |
-| N₁ | Total occurrences of operators |
-| N₂ | Total occurrences of operands |
+| Operator | Uses | Its two operands, per use |
+|---|---|---|
+| `<=` | 1 | `weight_kg`, `0` |
+| `>` | 1 | `weight_kg`, `10` |
+| `-` | 1 | `weight_kg`, `10` |
+| `+` (from `+=`) | 1 | `fee`, `2.0 * (weight_kg - 10)` |
+| `*` (1 plain, 2 from `*=`) | 3 | `2.0`, `(weight_kg - 10)`; `fee`, `1.5`; `fee`, `2.0` |
+| `and` | 1 | `express`, `country == "RU"` |
+| `==` | 1 | `country`, `"RU"` |
+| 7 distinct | *N₁* = 9 | *N₂* = 18 uses |
 
-**Derived Metrics:**
+The 12 distinct operands are the nine names and literals in the table plus the three expressions `(weight_kg - 10)`, `2.0 * (weight_kg - 10)` and `country == "RU"`. So *n* = 19, *N* = 27 and *V* = 27 · log₂ 19 ≈ 114.7. In `radon hal` output, read *h1*, *h2*, *N1*, *N2* and *volume*. A chain such as `a + b + c` is two uses of `+`, with operands `a`, `b`, then `(a + b)`, `c`.
 
-| Metric | Formula | Interpretation |
-|--------|---------|----------------|
-| **Vocabulary** | n = n₁ + n₂ | Program vocabulary size |
-| **Length** | N = N₁ + N₂ | Total tokens |
-| **Volume** | V = N × log₂(n) | Program "size" in bits |
-| **Difficulty** | D = (n₁/2) × (N₂/n₂) | Error proneness |
-| **Effort** | E = D × V | Mental effort to develop |
+The **Maintainability Index** combines the three {% cite oman1992maintainability %}: *MI = max(0, (171 − 5.2 ln V − 0.23 G − 16.2 ln L) · 100/171)*, with Halstead volume *V*, cyclomatic complexity *G* and line count *L*. Radon uses its own *G* (6) and the logical lines (*L* = 11): 171 − 24.66 − 1.38 − 38.85 = 106.11, and 106.11 · 100/171 = 62.055, which `radon mi -s` prints as 62.06. Radon scores MI **per file**, not per function: one Halstead volume over the whole file, *G* = 1 + all decision points in the file, and the file's logical lines. A file with two functions of complexity 6 each therefore has *G* = 1 + 5 + 5 = 11, not 12. It also adds a comment term inside the bracket, *+ 50 · sin(√(2.46 · C<sub>rad</sub>))*, where *C* = (comments + docstring lines) ÷ SLOC × 100 and *C<sub>rad</sub>* = *C* · π/180: the percentage is converted as if it were degrees. *C* can exceed 100% when a file has more comment lines than code lines. This file has no comments, so the term is 0. Radon's MI ranks are A (20–100), B (10–19) and C (0–9), as Visual Studio's green, yellow and red {% cite msdocs_mi %}, and separate from the complexity letters.
 
-### Maintainability Index (1992)
+For classes, the **CK suite** has six metrics {% cite chidamber1994metrics %}:
 
-Oman and Hagemeister {% cite oman1992maintainability %} developed the Maintainability Index using empirical data from HP C and Pascal codebases.
+- **WMC**, weighted methods per class: the sum of the methods' complexities, or the number of methods when each counts 1.
+- **DIT**, depth of inheritance tree: steps from the class up to the root. The handbook counts Python's `object` as the root at depth 0, so a class inheriting only from `object` has DIT 1.
+- **NOC**, number of children: immediate subclasses.
+- **CBO**, coupling between objects: other classes it uses or is used by.
+- **RFC**, response for a class: its own methods plus the methods they call directly.
+- **LCOM**, lack of cohesion: pairs of methods that use no attribute in common, minus pairs that share at least one, floored at 0.
 
-**Formula (Visual Studio normalized variant):**
+Fixed thresholds for them usually come from value distributions in other systems and are rarely checked against faults {% cite mishra2021thresholds %}.
 
-```
-MI = max(0, (171 - 5.2×ln(HV) - 0.23×CC - 16.2×ln(LOC)) × 100/171)
-```
+→ [Size and Complexity Metrics](../../define/measurement/examples.md) · [Maintainability Index](../../define/measurement/maintainability-index.md) · [Object-Oriented Metrics](../../define/measurement/oo-metrics.md)
 
-The original Oman & Hagemeister (1992) formula produces values on a 0–171 scale. Visual Studio normalizes this to 0–100 by multiplying by 100/171 and clamping at 0.
+## 8. A high score is not a verdict
 
-Where:
-- HV = Halstead Volume
-- CC = Cyclomatic Complexity
-- LOC = Lines of Code
+Before trusting a radon grade on your own code, ask whether such scores predict faults. A fault predictor flags classes. Count true positives (TP: flagged and faulty), false positives (FP: flagged but fine), false negatives (FN: faulty but not flagged) and true negatives (TN). Then **accuracy** = (TP + TN) / all; **precision** = TP / (TP + FP), undefined (0/0) when nothing is flagged; **recall** = TP / (TP + FN); and **F1** = 2 · precision · recall / (precision + recall). These are a classifier's accuracy and precision, not those of a single measurement in §2.
 
-**Interpretation:**
+When faults are rare, accuracy flatters: flagging nothing is 99% accurate when 1% of classes are faulty, with recall 0. One study raised the accuracy of a CK-based fault predictor from 69.3% to 91.3% by adding inheritance metrics, while its F1 fell from 69.5% to 63.9% {% cite aziz2019inheritance %}. The same metrics apply to code written by language models: GPT-4's solutions to 72 tasks passed more tests than human ones but had 61% higher average cyclomatic complexity {% cite licorish2025llmcode %}.
 
-| MI Score | Color | Meaning |
-|----------|-------|---------|
-| 20-100 | Green | Good maintainability |
-| 10-19 | Yellow | Moderate, needs attention |
-| 0-9 | Red | Poor, difficult to maintain |
+→ [Do Code Metrics Predict Quality?](../../define/measurement/evidence.md)
 
-> **Key Insight:** MI uses McCabe CC as a component! High complexity directly reduces maintainability.
+## Where this goes next
 
-### Tool Connections (Linting Lab)
-
-**Python Tools:**
-
-```bash
-# Install radon
-pip install radon
-
-# Cyclomatic Complexity
-radon cc myfile.py -a -s
-# Output: Average complexity, per-function breakdown
-
-# Maintainability Index
-radon mi myfile.py -s
-# Output: MI score per file (A-F grade)
-
-# Halstead metrics
-radon hal myfile.py
-# Output: Volume, Difficulty, Effort per function
-```
-
-**Multi-Language Tool Matrix:**
-
-| Language | Tools | What They Check |
-|----------|-------|-----------------|
-| **Python** | `radon`, `pylint`, `flake8-cognitive-complexity` | CC, MI, Halstead |
-| **JavaScript** | ESLint (`complexity` rule) | CC per function |
-| **Java** | SonarQube, PMD, Checkstyle | Full suite |
-| **C#** | Visual Studio Code Metrics | CC, MI, class coupling |
-
-**ESLint Configuration Example:**
-
-```json
-{
-  "rules": {
-    "complexity": ["error", 10]
-  }
-}
-```
-
-### Chidamber-Kemerer OO Metrics Suite
-
-Chidamber and Kemerer {% cite chidamber1994metrics %} defined six metrics for object-oriented design:
-
-| Metric | Full Name | Measures | High Value Indicates |
-|--------|-----------|----------|---------------------|
-| **WMC** | Weighted Methods per Class | Sum of method complexities | Complex class, hard to test |
-| **DIT** | Depth of Inheritance Tree | Distance from root class | Complex hierarchy |
-| **NOC** | Number of Children | Immediate subclasses | High influence, careful changes needed |
-| **CBO** | Coupling Between Objects | External class dependencies | Hard to reuse, ripple effects |
-| **RFC** | Response For Class | Methods callable from class | Difficult to test |
-| **LCOM** | Lack of Cohesion in Methods | Method dissimilarity | Class should be split |
-
-> **Exam Tip:** Remember that El Emam et al. found only 4 of 24 OO metrics useful after controlling for class size!
-
-### Coverage Metrics (Preview)
-
-Coverage metrics measure test thoroughness:
-
-| Type | What It Measures |
-|------|------------------|
-| **Statement** | Percentage of statements executed |
-| **Branch** | Percentage of branches taken |
-| **Path** | Percentage of execution paths covered |
-
-> **Note:** Full coverage treatment is in L05 (Adequacy Criteria).
-
-### Practice Questions
-
-1. Calculate the cyclomatic complexity of a function with 3 `if` statements and 1 `for` loop.
-2. A module has MI = 15. What does this indicate and what action should be taken?
-3. What's the relationship between McCabe CC and testing effort?
-4. Why might high CBO be problematic for maintenance?
-
----
-
-## Part 7: Summary & Review
-
-### Six Key Takeaways
-
-1. **Measure with purpose** — Use GQM to ensure metrics serve real goals, not just because tools report them
-
-2. **Know your scale** — NOIR determines which mathematical operations are valid; don't average ordinal data
-
-3. **Watch for pitfalls** — Bad statistics, bad decisions, bad incentives; Streetlight Effect and McNamara Fallacy
-
-4. **Control confounders** — Class size affects almost everything; El Emam showed most OO metrics aren't useful after size control
-
-5. **Use McCabe CC** — Predicts testability, feeds into MI, enforced by linting tools (ESLint, SonarQube, radon)
-
-6. **Apply tools in practice** — `radon` for Python, ESLint `complexity` rule for JS, SonarQube for multi-language
-
-### Quick Reference Tables
-
-#### Measurement Scales (NOIR)
-
-| Scale | Operations | Example |
-|-------|------------|---------|
-| Nominal | =, ≠, count | Bug type |
-| Ordinal | <, >, rank | Severity |
-| Interval | +, -, mean | Temperature |
-| Ratio | ×, ÷, all | LOC, CC |
-
-#### Cyclomatic Complexity Thresholds
-
-| CC | Risk | Action |
-|----|------|--------|
-| 1-10 | Low | OK |
-| 11-20 | Moderate | Review |
-| 21-50 | High | Refactor |
-| >50 | Very High | Must split |
-
-#### Maintainability Index
-
-| MI | Color | Meaning |
-|----|-------|---------|
-| 20-100 | Green | Good |
-| 10-19 | Yellow | Moderate |
-| 0-9 | Red | Poor |
-
-#### GQM Structure
-
-| Level | Question | Output |
-|-------|----------|--------|
-| Goal | What business objective? | Purpose statement |
-| Question | What do we need to know? | Information needs |
-| Metric | How do we quantify? | Measurement |
-
-#### Key Definitions
-
-| Term | Definition |
-|------|------------|
-| Measurement (Hubbard) | Reduction of uncertainty based on observations |
-| Metric (IEEE 1061) | Function from software data to single numerical value |
-| CC (McCabe) | Number of linearly independent paths |
-| MI (Oman) | Composite score predicting maintainability |
-
-### Self-Assessment Checklist
-
-Before the exam, ensure you can:
-
-- [ ] Define measurement using Hubbard's and IEEE 1061 definitions
-- [ ] Distinguish resolution, accuracy, and precision
-- [ ] Explain McNamara Fallacy and Streetlight Effect
-- [ ] List Stevens' four measurement scales (NOIR)
-- [ ] Identify valid operations for each scale type
-- [ ] Choose appropriate central tendency (mean, median, mode)
-- [ ] Explain correlation vs causation with confounders
-- [ ] Apply GQM to develop metrics for a goal
-- [ ] Write operational definitions using Park's criteria
-- [ ] Calculate cyclomatic complexity for a code fragment
-- [ ] Interpret Maintainability Index scores
-- [ ] Use `radon` commands for CC, MI, Halstead
-- [ ] List Chidamber-Kemerer OO metrics and their meanings
-
-### Discussion Questions
-
-1. A manager wants to track "developer productivity" using LOC/day. What problems might arise?
-2. How would you apply GQM to measure "code quality" for a project?
-3. Your team's average CC is 15. What steps would you take?
-4. Why might 100% code coverage still result in bugs?
-
----
-
-### Further Reading
-
-For more details on specific topics covered in these study notes:
-
-- [Definitions](definitions.md) — Measurement fundamentals and Hubbard's argument
-- [Types of Metrics](types.md) — Measurement scales and the representation condition
-- [Common Metrics](examples.md) — McCall model mapping and practical examples
-- [Developing Metrics](development.md) — GQM framework and operational definitions
-- [Pitfalls](pitfalls.md) — Metric misuse and anti-patterns
+Next: [Verification and Validation](SN_L03_Verification.md), then [Adequacy Criteria](SN_L04_Coverage.md), which measures tests with coverage. The linting lab runs `radon cc -s`, `radon hal` and `radon mi -s` on your own code; read the output with [Size and Complexity Metrics](../../define/measurement/examples.md) at hand.
 
 ---
 
@@ -718,6 +146,3 @@ For more details on specific topics covered in these study notes:
 
 {: .highlight }
 **Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.
-
----
-

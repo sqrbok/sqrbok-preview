@@ -1,126 +1,86 @@
 ---
+title: Measurement Scales
 parent: Measurement
-nav_order: 2
-title: Types
+nav_order: 3
 layout: default
+vegalite: true
 ---
 
+# Measurement Scales
 
-# Are Your Measurements Right?
+A **measurement scale** fixes which comparisons and which arithmetic on a measure's values mean something. Stevens named four scales, **nominal, ordinal, interval and ratio** {% cite stevens_theory_1946 %}; software measurement adds a fifth, **absolute**, for counts {% cite park1996goal %}. Averaging defect severities is arithmetic their scale does not support.
 
-## Representation Condition
-A numerical model should make sense in terms of the real-world entity it describes.  
-### Formal Definition:  
-A measurement should map real-world entities into numbers and real-world relations into numerical relations, ensuring that the real-world relations are preserved in the numerical ones.  
-**Example**: Lines of Code (LOC) satisfies the representation condition for physical program size but not for functional program size.
+![Table of five scales: nominal adds labels, ordinal adds order, interval adds equal steps, ratio adds a true zero, absolute adds a fixed unit; with meaningful statistics and software examples for each](scale-ladder.svg)
 
-### Key Measurement Properties:
-- **Resolution**: The smallest change in a quantity that can be detected by a measurement.
-- **Accuracy**: How close a measured value is to the true value.
-- **Precision**: How consistently a measurement produces the same result under the same conditions.
+_Each scale keeps the operations of those above it and adds one. Statistics after the SEI guidebook._ {% cite park1996goal %}
 
----
+## 1. The test: does the statement survive a change of unit?
 
-## Scale. Based on Stevens (1946) {% cite stevens_theory_1946 %} 
-The **scale** of data dictates the type of analysis and arithmetic that is meaningful.  
+A statement about measured values is **meaningful** if it stays true under every change of unit the scale allows {% cite park1996goal %}. Temperature in °C is an interval scale: any shift and stretch, such as converting to °F, is allowed. "Today, at 20 °C, is twice as warm as yesterday at 10 °C" fails the test, because in °F the same days are 68 and 50, not double. "Today is 10 degrees warmer" survives, as a difference of 18 °F. Effort in hours is a ratio scale: converting to minutes multiplies both values by 60, so "task A took twice as long as task B" stays true.
 
-### Types of Scales:
-1. **Nominal**: Categories without any order (e.g., defect priority levels: high, medium, low).
-2. **Ordinal**: Ordered categories without magnitude (e.g., 1st, 2nd, 3rd in a race).
-3. **Interval**: Ordered with magnitude, but no true zero (e.g., temperature in Celsius).
-4. **Ratio**: Ordered with magnitude and a true zero (e.g., defect discovery-to-resolution ratio).
-5. **Absolute**: A special case of ratio scales, where the values are fixed and countable (e.g., number of test cases).
+## 2. Example: one bug tracker, five scales
 
-### Example Application:
-- A **ratio scale** is used to calculate the number of defects found versus fixed during testing. A ratio greater than 1 indicates more defects are being found than fixed.
-- A **nominal scale** is used when categorizing defect severity in a defect-tracking database.
+A single defect record holds all five scales. Process ratings work the same way: a CMMI maturity level, the 1–5 rating of an organisation's process capability, is ordinal, so level 4 is not "twice" level 2.
 
-**Important Rule**: Do not mix values from different scales (e.g., combining ratio and ordinal values) as it can render measurements meaningless.
+The defect record:
 
----
+| Field | Scale | Meaningful | Not meaningful |
+|---|---|---|---|
+| Component (UI, API, DB) | nominal | most frequent component (mode) | "average component" |
+| Severity 1–4 (cosmetic … critical) | ordinal | median severity; "more severe than" | mean severity 2.7; "critical is twice minor" |
+| Date reported | interval | days between two reports | "reported twice as late" |
+| Hours to fix | ratio | mean, ratios: "took three times longer" (meaningful; for skewed times the median summarises better) | — |
+| Number of open defects | absolute | everything; the unit is the thing counted, so no conversion applies | — |
 
-## Understanding Data
+A count is on an absolute scale only once its counting rule is fixed: once the rule is set there is exactly one way to count {% cite park1996goal %}. "13 physical lines" and "11 logical lines" of the same function are two different measures, each absolute, which is why a line count must name its rule.
 
-### Averages: Mean, Median, and Mode
-- **Arithmetic Mean**: The sum of values divided by the count. Commonly referred to as the "average."  
-- **Median**: The middle value in a sorted dataset. Useful for skewed distributions.  
-- **Mode**: The most frequently occurring value in the dataset.  
+For severities 1, 1, 2, 4 and 4, the mean is 2.4, which assumes that the step from 2 to 4 is twice the step from 1 to 2. Nothing in the definition of "severity" says so. Any relabelling that keeps the order is equally valid for an ordinal scale: code the levels 1, 2, 3, 10 instead of 1, 2, 3, 4, and the same defects have mean (1 + 1 + 2 + 10 + 10) / 5 = 4.8, while the median is still level 2. The mean changed with an arbitrary choice; the median did not, so the median is the honest summary {% cite rosenberg2008statistical %}.
 
-#### Additional Types:
-- **Geometric Mean**: Useful when averaging rates or ratios. It normalizes differences in numeric ranges.
-- **Harmonic Mean**: Appropriate for averaging rates (e.g., speed, productivity). It is always the smallest of the three Pythagorean means (arithmetic, geometric, harmonic).
+## 3. Story points: the scale is a judgement
 
-**Example of Geometric Mean**:  
-Comparing two companies based on environmental sustainability (0–5 scale) and financial viability (0–100 scale). The geometric mean prevents the larger numeric range (financial viability) from dominating the result.
+Scale type is not printed on a measure; it depends on how the values were produced and what we conclude from them {% cite park1996goal %}. Story points show why. Teams add them up into velocity, which treats them as ratio data: a 2-point story should take twice as long as a 1-point story. Mike Cohn published the hours actually spent on stories at one company {% cite cohn_storypoints %}:
 
----
+```vega-lite
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": "container", "height": 240,
+  "data": {"values": [
+    {"pts": 1, "lo": 6, "hi": 36, "median": 21, "ratio": 21},
+    {"pts": 2, "lo": 31, "hi": 73, "median": 52, "ratio": 42},
+    {"pts": 3, "lo": 11, "hi": 117, "median": 64, "ratio": 63},
+    {"pts": 5, "lo": 56, "hi": 144, "median": 100, "ratio": 105},
+    {"pts": 8, "lo": 56, "hi": 166, "median": 111, "ratio": 168}
+  ]},
+  "encoding": {"x": {"field": "pts", "type": "quantitative", "title": "Story points", "scale": {"domain": [0, 9]}, "axis": {"values": [1, 2, 3, 5, 8]}}},
+  "layer": [
+    {"mark": {"type": "rule", "strokeWidth": 3, "color": "#c8e6c9"},
+     "encoding": {"y": {"field": "lo", "type": "quantitative", "title": "Hours spent", "scale": {"domain": [0, 180]}}, "y2": {"field": "hi"}}},
+    {"mark": {"type": "line", "strokeDash": [6, 4], "color": "#b42318", "point": {"color": "#b42318"}},
+     "encoding": {"y": {"field": "ratio", "type": "quantitative"}}},
+    {"mark": {"type": "point", "filled": true, "size": 90, "color": "#019546"},
+     "encoding": {"y": {"field": "median", "type": "quantitative"}}}
+  ],
+  "config": {"font": "Tahoma", "axis": {"labelFontSize": 13, "titleFontSize": 13}}
+}
+```
 
-### Range, Standard Deviation, Skewness, and Kurtosis
+_Green dots: median hours; bars: range from shortest to longest story; red dashes: 21 hours × points, what a ratio scale predicts from the 1-point median. Data from one company._ {% cite cohn_storypoints %}
 
-1. **Range**: The difference between the largest and smallest values in the dataset.  
-2. **Standard Deviation**: Measures the amount of variation or dispersion from the mean.  
-3. **Skewness**: Indicates the symmetry of the data distribution.  
-   - Positive skew: Tail extends to the right.
-   - Negative skew: Tail extends to the left.
-4. **Kurtosis**: Measures the "peakedness" of a distribution.  
-   - **Normal Distribution**: Kurtosis = 3 (or 0 in Fisher's definition).  
-   - Higher kurtosis: More flat.
-   - Lower kurtosis: More peaked.
+At 3 and 5 points the medians sit on the line: 64 against 63, 100 against 105. At 2 points the median is 52 against 42, about 24% higher. At 8 points the median is 111 hours, not 168. And the ranges overlap so much that a 3-point story took anything from 11 to 117 hours. Two readings are defensible. Treat points as **ratio** and sum them, accepting a planning error that grows with story size; or treat them as **ordinal** and plan from counts of stories of each size. Decide which you assume, write it down, and check it against hours spent.
 
----
+## When to use it — and when not
 
-### Correlations
+- **Use** the scale to choose the summary: mode for nominal, median for ordinal, mean only from interval upward.
+- **Use** the meaningfulness test before any "twice as" or "average" claim.
+- **Do not** let the scale table forbid analysis outright: start with the conservative type and promote it only when the data show that the steps really are equal {% cite rosenberg2008statistical %}.
 
-**Definition**: Correlation describes whether two variables are associated.  
-- **Key Insight**: Correlation does not imply causation.  
-  **Example**: Children's height and vocabulary are correlated due to age, but one does not cause the other.
+## How solid is this?
 
-**Scatter Plots**: A vital tool for visualizing relationships between two variables.  
-Questions to ask when interpreting scatter plots:
-- Are variables X and Y related?  
-- Is the relationship linear or non-linear?  
-- Are there outliers or influential points?  
-
-#### Common Issues with Correlations:
-1. **Confounding Variables**: A third variable influencing both X and Y.  
-   - Example: Khaled El Emam et al. (1999) found that only 4 out of 24 commonly used object-oriented metrics were useful for predicting software module quality when controlling for module size.
-2. **Spurious Correlation**:  
-   - Both variables change over time.  
-   - Incorrectly swapping response and explanatory variables.  
-
-**To Establish Causation**:
-- Provide a theory supported by domain knowledge.
-- Show correlation between variables.
-- Validate the model with new, independent data.
+- **Where it comes from.** Stevens's four scales {% cite stevens_theory_1946 %}; the absolute scale and the table of permitted statistics from the SEI guidebook {% cite park1996goal %}.
+- **What is contested.** Statisticians such as Velleman argue that scale types should not dictate analysis; the guidebook recommends using them to test reasoning, not to restrict it {% cite park1996goal %}. The story-point data come from one company.
 
 ---
 
-### Statistical Significance
-
-**Definition**: Statistical significance measures the probability that an observed effect is not due to random chance.  
-
-**Best Practices**:
-- Blindly calculating statistics is dangerous without assessing their significance.
-- Sanity check your data and results before drawing conclusions.
-- Use replication and validation to ensure results hold for new cases.
-
----
-
-## Key Takeaways
-
-1. Measurements must preserve real-world relationships to be valid.
-2. Understanding the scale of data is critical for meaningful analysis.
-3. Averages and measures of variation must be used appropriately, with attention to skewness and kurtosis.
-4. Correlation is not causation. Always investigate deeper to avoid misleading conclusions.
-5. Ensure statistical significance and sanity check results before acting on them.
-
-**Discussion**:
-1. Why is it important to distinguish between scales of measurement in software quality metrics?  
-2. How can confounding variables impact the validity of a software quality model?  
-3. What strategies can you use to establish causation, not just correlation, in your metrics?
-
-
----
 ### References
 
 {% bibliography --cited %}
@@ -128,4 +88,4 @@ Questions to ask when interpreting scatter plots:
 ---
 
 {: .highlight }
-**Disclaimer:** AI is used for text polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.

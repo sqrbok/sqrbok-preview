@@ -1,99 +1,51 @@
 ---
+title: Measurement Pitfalls
 parent: Measurement
-nav_order: 5
-title: Pitfalls
+nav_order: 2
 layout: default
 ---
 
-## Common Pitfalls in Using Metrics
+# Measurement Pitfalls
 
-### **"Dilbert Gets Rich" Comic**
+A **measurement pitfall** is a way in which a correctly computed number leads to a wrong conclusion or to wrong behaviour. The pitfalls fall into three groups: **bad statistics** (the number is misread), **bad decisions** (the number answers a different question from the one asked) and **bad incentives** (people change what they do to move the number).
 
-![Dilbert](dilbert_nano.jpg)
+## 1. Bad statistics: relative numbers without a baseline
 
-This comic humorously illustrates how metrics, when misunderstood or misapplied, can lead to absurd outcomes.  
+In October 1995 British regulators warned that third-generation contraceptive pills *doubled* the risk of thrombosis, a 100% increase. The underlying figures were about 1 in 7,000 women on the older pills and 2 in 7,000 on the newer ones: a relative increase of 100%, an absolute increase of 1 in 7,000, or about 0.014 percentage points {% cite gigerenzer2014risk %}. Many women stopped taking the pill, and the scare was later linked to a rise in abortions.
 
-### Key Issues:
+**In software.** "Production incidents doubled this quarter" may mean 1 → 2. "Defect density fell by 40%" says nothing until you know from what. Always ask for the absolute numbers behind a percentage, and for the size of the base.
 
-1. **Bad Statistics**  
-   - Misunderstanding of measurement theory or what is actually being measured.  
-   - Examples: Using averages without considering distribution, or treating ordinal data as interval data.
+## 2. Bad decisions: the McNamara fallacy and the streetlight effect
 
-2. **Bad Decisions**  
-   - Misinterpreting data, leading to decisions with unintended consequences.  
-   - Example: Releasing a product based on incomplete metrics without accounting for critical quality gaps.
+The **McNamara fallacy**, named after the US Secretary of Defense who ran the Vietnam war on body counts, has four steps: measure what is easy to measure; disregard what is not; assume that what is not measured is unimportant; and finally assume that it does not exist. Systems thinker Jay Forrester made the same point about models: leaving a hard-to-quantify variable out is the same as estimating its effect at exactly zero, which is almost certainly wrong {% cite forrester1961industrial %}.
 
-3. **Bad Incentives**  
-   - Ignoring human factors and cultural dynamics in the organization.  
-   - Example: Employees gaming metrics to meet targets rather than improving actual outcomes.
+**In software.** A manager ranks developers by commits per week, lines added and tickets closed. The developer who mentors new hires and removes technical debt scores low on all three, because none of the three counts that work.
 
----
+The **streetlight effect** is the selection step of the same mistake: a man looks for his lost keys under the streetlight, not where he dropped them, because that is where the light is. Teams track the metrics their tools report for free, such as line coverage or number of commits, and not the ones their question needs. The antidote is to start from the goal and only then look for measures: see [Developing Metrics with GQM](development.md).
 
-## The Dangers of Using Software Metrics to (Mis)Manage
+## 3. Bad incentives: when the measure becomes a target
 
-Metrics can have unintended consequences when misused in organizational management.
+People respond to what is measured. Goodhart's law, in its usual phrasing, says that when a measure becomes a target it ceases to be a good measure. Tickets counted as "closed" get closed and reopened.
 
-- **Behavioral Changes**: People often modify their behavior to meet metrics rather than to achieve real objectives.  
-- **Unintended Side Effects**: Misguided focus on metrics may overshadow the true goals of quality and productivity.  
-- **Productivity and Quality Risks**: Metrics misuse can lead to reduced productivity and lower quality, negating the original intent of the metrics.
+**Example.** A company requires 80% line coverage for every release. Six months later the report says 88%, but production defects have not fallen, and developers say they write tests "to hit the number". Each group of pitfalls shows up once:
 
-### **Example from the Field**
+- **Bad statistics.** The 88% is one line-weighted average over very different modules: the UI has 6,000 lines at 95% covered, the API 3,000 at 90%, and the payment module 1,000 at 40%, so (5,700 + 2,700 + 400) / 10,000 = 88%. The average hides that the riskiest module is the least tested.
+- **Bad decision.** Coverage stood in for test quality. The gate measures which lines ran, not whether any test checked the result, so it cannot answer "are our tests good enough?".
+- **Bad incentive.** A test that runs code without asserting anything raises coverage as much as one that checks results, and that is the cheaper test to write when the number is the target.
 
-> “The Darker Side of Metrics,” Eighteenth Ann. Pacific Northwest Software Quality Conf., 2000. {% cite hoffman_darker_2000 %} 
+[Using Coverage in Practice](../../verif/coverage/practice.md) shows how to use coverage as a clue instead.
 
-This research highlights how metrics, while well-intentioned, can lead to counterproductive outcomes:
+## When to use it — and when not
 
-- **Metrics Compliance Over Goals**: Teams focusing on meeting numerical targets instead of solving real problems.
-- **Cultural Resistance**: Negative reactions to being monitored can result in mistrust and lower morale.
+- **Use** the three groups as a checklist before a metric goes on a dashboard: how could it be misread, what question does it really answer, and what will people do to move it?
+- **Use** absolute numbers next to every percentage change.
+- **Do not** attach individual rewards or penalties to a single metric; that is where gaming starts.
+- **Do not** drop an important attribute because it is hard to measure: measure it roughly, or record it as a judgement.
 
-**Takeaway**: Organizations must consider the broader implications of metrics and design systems that encourage genuine improvement without harmful side effects.
+## How solid is this?
 
----
-
-## Metrics Biases and Fallacies
-
-Several biases and logical fallacies can lead to the misinterpretation or misuse of metrics. Understanding these is crucial to avoid pitfalls.
-
-### **1. Streetlight Effect**
-
-> Looking for answers only where it is easiest to measure, ignoring more relevant but harder-to-measure factors.  
-**Example**: Prioritizing easily quantifiable metrics like lines of code over less tangible but critical aspects like code maintainability or team morale.
-
-### **2. McNamara Fallacy**
-
-> Relying solely on quantifiable data while ignoring qualitative insights.
-
-- **Step 1**: Measure what is easy to quantify.  
-- **Step 2**: Disregard what cannot be quantified.  
-- **Step 3**: Assume what cannot be measured is unimportant.  
-**Example**: Judging software quality solely by defect count while ignoring user experience feedback.
-
-### **3. Wrong Correlations**
-
-> Mistaking correlation for causation.  
-**Example**: Assuming that a higher number of commits directly leads to higher productivity without considering the nature of those commits.
-
-### **4. Confounding Variables*
-
-> Ignoring external factors that influence metrics.  
-**Example**: A team’s productivity drops after introducing a new tool. The metric ignores the learning curve required for the new tool.
-
-### **5. Misrepresentation**
-
-> Presenting metrics in misleading ways.  
-**Example**: Using pie charts to compare metrics with vastly different scales, making differences appear smaller than they are.
-
----
-
-## Summary
-
-To use metrics effectively, avoid common biases and consider the broader context in which metrics are applied. When metrics are carefully selected, properly applied, and paired with qualitative understanding, they can drive significant improvements. However, without careful thought, they can lead to poor decisions, counterproductive behaviors, and unintended consequences.
-
-**Discussion**:
-
-1. How might the "streetlight effect" influence decision-making in software projects?
-2. Can you think of examples where metrics-driven incentives backfired in real-life scenarios?  
-3. How can organizations strike a balance between measurable outcomes and intangible quality goals?
+- **Where it comes from.** The pill figures are those used by Gigerenzer to teach risk literacy; later studies put the relative risk between about 1.7 and 2.3, and some disputed any increase. The three-way grouping follows the course lecture, which draws on Hoffman's talk *The Darker Side of Metrics* {% cite hoffman_darker_2000 %}.
+- **What we do not hold.** We have not been able to check Hoffman's text or the exact wording of the Forrester passage, so both are paraphrased here, not quoted. The four steps of the McNamara fallacy are usually credited to the sociologist Daniel Yankelovich (1972).
 
 ---
 
@@ -104,4 +56,4 @@ To use metrics effectively, avoid common biases and consider the broader context
 ---
 
 {: .highlight }
-**Disclaimer:** AI is used for text polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.
