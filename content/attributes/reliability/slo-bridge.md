@@ -2,270 +2,94 @@
 title: From FIO to SLO
 parent: Reliability
 grand_parent: Quality Attributes
-nav_order: 3
+nav_order: 7
 layout: default
+vegalite: true
+page_type: deep-dive   # the error-budget and burn-rate arithmetic plus the chaos-engineering case need their numbers on one page
 ---
 
-# From FIO to SLO: Classical Meets Modern Reliability
+# From FIO to SLO
 
-Musa's Failure Intensity Objective (1993) and Google's Service Level Objective (2016) are conceptually the same idea: define "just right" reliability to balance quality against cost and velocity {% cite musa2004sre %} {% cite beyer2016sre %}. This page traces the conceptual continuity from classical software reliability engineering to modern SRE practice.
+A **service level objective** (SLO) is a target for a measured service level, such as "99.9% of requests succeed over 30 days"; it plays the role of Musa's failure intensity objective for a service that changes every day, and its complement, 1 − SLO, is the **error budget** {% cite beyer2016sre musa2004sre %}.
 
----
+## 1. The same idea in a new phase
 
-## The Core Equivalence
+Musa's FIO and Google's SLO share one principle: 100% reliability is the wrong target, because users cannot tell the difference beyond some level and every extra nine costs features {% cite musa2004sre beyer2016sre %}. The concepts map one to one:
 
-| Classical SRE (Musa 1993-2004) | Modern SRE (Beyer 2016) | Relationship |
-|--------------------------------|-------------------------|--------------|
-| Failure Intensity Objective (FIO) | Service Level Objective (SLO) | Target reliability level |
-| Failure intensity λ(t) | Error rate SLI | What is measured |
-| Operational profile | SLI selection + Critical User Journeys | What to measure about usage |
-| "Just right" reliability | Error budget (1 - SLO) | 100% is the wrong target |
-| Severity classification | Service tiering | Not all failures are equal |
-| Certification (demonstration chart) | SLO burn-rate alerting | Decision mechanism |
-| MTTF/MTTR | Four Golden Signals | Monitoring metrics |
+| Classical (Musa) | Modern SRE (Google) | Shared idea |
+|---|---|---|
+| Failure intensity objective | Service level objective | the reliability target |
+| Failure intensity λ | Service level indicator (SLI): good events / all events | what is measured |
+| "Just right" reliability | Error budget = 1 − SLO | tolerated unreliability |
+| Severity classes | Service tiers | not all failures are equal |
+| Demonstration chart | Burn-rate alerts | the decision rule |
 
-### The Mathematical Link
+One direction is reversed: λ counts failures, so lower is better, while an SLI counts the share of good events, so higher is better; the error rate 1 − SLI corresponds to λ. The difference is the phase. The FIO is a **release gate**: test until the failure intensity is low enough, then ship. The SLO is an **operational loop**: keep shipping while budget remains, and stop when it runs out.
 
-Musa's FIO formula for availability-based objectives {% cite musa2004sre %}:
+![Left, test until the failure intensity meets the FIO, then release; right, ship while error budget remains, freeze when it is gone](fio-vs-slo.svg)
 
-```
-λ = (1 - A) / (A × t_m)
-```
+_The FIO gates one release; the SLO governs a continuous stream of releases._
 
-Google's error budget {% cite beyer2016sre %}:
+## 2. Worked example: an error budget
 
-```
-Error Budget = 1 - SLO
-```
+A checkout service has an SLO of 99.9% successful requests over 30 days and serves 3,000,000 requests in that window.
 
-Both express the same insight: **tolerable unreliability**. The FIO sets a ceiling on failure intensity before release; the error budget sets a ceiling on failure rate in production. The difference is **phase**: FIO is a release gate (stop testing when achieved), while SLO is an operational control loop (halt releases when budget is exhausted).
+1. Error budget: 1 − 0.999 = 0.1% of requests, that is 3,000,000 × 0.001 = **3,000 failed requests**. In time, 30 days × 0.001 = 0.03 days = **43.2 minutes** of full outage.
+2. A bad deployment fails 500 requests per hour for 2 hours: **1,000 failed requests**, a third of the budget.
+3. The SRE Workbook's example policy requires a postmortem when one incident uses more than 20% of the error budget; the Workbook states it for a four-week window, and this page applies it to the 30-day window {% cite beyer2018sreworkbook %}. This incident used 33%, so it needs a postmortem. With 2,000 failures left, releases continue.
 
----
+When an incident report mixes downtime and failed requests, convert to one unit before adding: at 3,000,000 requests per 43,200 minutes, a 10-minute outage loses about 694 requests.
 
-## What Changed: Phase Shift
+## 3. Burn rate
 
-| Aspect | FIO (Release Gate) | SLO (Operational Control) |
-|--------|-------------------|--------------------------|
-| **When applied** | Before release | Continuously in production |
-| **Decision** | "Is the software ready to ship?" | "Can we ship more changes?" |
-| **On failure** | Continue testing or redesign | Feature freeze until budget recovers |
-| **Code assumption** | Stable (no changes during testing) | Changing constantly (CI/CD) |
-| **Measurement** | Test environment, execution time | Production traffic, wall-clock time |
-| **Feedback loop** | Weeks/months | Hours/days |
+The **burn rate** is how fast the budget is being spent, relative to the rate that would use it up exactly at the end of the window {% cite beyer2018sreworkbook %}:
 
-The shift from pre-deployment to operational control was driven by CI/CD: when code changes hourly, a one-time release gate is insufficient. The SLO provides the same reliability governance as the FIO but as a **continuous feedback loop** {% cite beyer2016sre %}.
+burn rate = observed error rate over the alert window (for example, one hour) / (1 − SLO)
 
-```mermaid
-flowchart LR
-    subgraph "FIO: Release Gate (1990s)"
-        T["Test"] --> M["Measure λ(t)"] --> D{"λ ≤ FIO?"}
-        D -->|"Yes"| R["Release ✅"]
-        D -->|"No"| T
-    end
-
-    subgraph "SLO: Operational Loop (2010s)"
-        PROD["Production"] --> MON["Monitor SLI"]
-        MON --> B{"Budget<br>remaining?"}
-        B -->|"Yes"| SHIP["Ship features 🚀"]
-        SHIP --> PROD
-        B -->|"No"| FREEZE["Feature freeze 🛑"]
-        FREEZE --> FIX["Fix reliability"]
-        FIX --> PROD
-    end
-```
-
-### Worked Example: Error Budget for a Checkout Service
-
-A checkout service has **SLO = 99.9%** availability over a 30-day window:
-
-| Metric | Calculation | Value |
-|--------|-------------|-------|
-| Error budget | 100% - 99.9% | **0.1%** |
-| Total requests/month | 3,000,000 | — |
-| Allowed failures/month | 3,000,000 × 0.001 | **3,000 errors** |
-| Allowed downtime/month | 30 days × 0.001 | **43 minutes** |
-
-**Scenario:** A bad deployment causes 500 errors/hour for 2 hours = 1,000 errors.
-
-- Budget consumed: 1,000 / 3,000 = **33%** in one incident
-- Remaining budget: **2,000 errors** for the rest of the month
-- Action: Mandatory postmortem (>20% consumed), but no feature freeze yet
-
----
-
-## From Operational Profiles to SLIs
-
-Musa's operational profile defined **what to measure about usage** — operations and their occurrence probabilities {% cite musa1993operational %}. Modern SLIs serve the same purpose but measure symptoms in production rather than predicting usage upfront {% cite beyer2016sre %}:
-
-| Evolution | Approach | Limitation |
-|-----------|----------|-----------|
-| **Musa (1993)** | Task-based probability profiles for pre-deployment testing | Assumes predictable, typical users {% cite koziolek2005operational %} |
-| **Koziolek (2005)** | Extended profiles adding environment and data dimensions | Complex; Markov chains become intractable {% cite koziolek2005operational %} |
-| **Google SRE (2016)** | SLIs measuring symptoms at the system boundary in production | Reactive, not predictive |
-
-Gmail's switch from server-side to client-side availability measurement revealed failures invisible to servers — demonstrating why production monitoring superseded pre-deployment profiling {% cite beyer2016sre %}.
-
-Musa's operational profile is the conceptual ancestor of **Critical User Journeys (CUJs)** — the key user workflows that SLOs protect.
-
-For operational profile construction details, see [Operational Profile](../../verif/operational-profile/index.md).
-
----
-
-## From SRGMs to Error Budgets
-
-Software Reliability Growth Models track decreasing failure intensity during testing — the system improves as faults are found and fixed {% cite goel1979time %}. Error budgets track **allowed unreliability** in production {% cite beyer2016sre %}:
-
-| SRGM Concept | Error Budget Equivalent |
-|--------------|------------------------|
-| Failure intensity λ(t) decreasing | Burn rate (should stay ≤ 1.0) |
-| Predicted remaining faults | Budget remaining (%) |
-| Certification (demo chart) | Burn-rate alerting thresholds |
-| "Stop testing when FIO met" | "Halt releases when budget exhausted" |
-
-The mathematical kinship: a **burn rate of 1.0** means constant failure intensity consuming exactly the full error budget over the SLO window. Burn rate > 1.0 triggers alerts — the operational equivalent of failing the demonstration chart {% cite beyer2016sre %}.
+A burn rate of 1 uses the whole budget in 30 days; 10 uses it in 3 days. Take the bad deployment from section 2. Traffic is 3,000,000 requests / 720 hours ≈ 4,167 requests per hour, so 500 failures per hour is an error rate of 500 / 4,167 ≈ 0.12, and the burn rate is 0.12 / 0.001 = 120. Measured per request, a natural unit, this error rate is Musa's failure intensity: 0.12 failures per request. A full outage fails every request: error rate 1, burn rate 1 / 0.001 = 1,000, so the 10-minute outage spends budget a thousand times faster than the sustainable rate. The Workbook's suggested fast-burn page fires at a burn rate of 14.4 over one hour, which spends 2% of a 30-day budget in that hour (14.4 × 1 / 720 = 0.02) {% cite beyer2018sreworkbook %}.
 
 ```vega-lite
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "title": "Error Budget Consumption Over 30-Day Window",
-  "width": 500,
-  "height": 280,
-  "layer": [
-    {
-      "data": {
-        "values": [
-          {"day": 0, "budget": 100, "scenario": "Healthy (burn rate 0.5)"},
-          {"day": 5, "budget": 92, "scenario": "Healthy (burn rate 0.5)"},
-          {"day": 10, "budget": 83, "scenario": "Healthy (burn rate 0.5)"},
-          {"day": 15, "budget": 75, "scenario": "Healthy (burn rate 0.5)"},
-          {"day": 20, "budget": 67, "scenario": "Healthy (burn rate 0.5)"},
-          {"day": 25, "budget": 58, "scenario": "Healthy (burn rate 0.5)"},
-          {"day": 30, "budget": 50, "scenario": "Healthy (burn rate 0.5)"}
-        ]
-      },
-      "mark": {"type": "line", "strokeWidth": 2.5},
-      "encoding": {
-        "x": {"field": "day", "type": "quantitative", "title": "Day of Month"},
-        "y": {"field": "budget", "type": "quantitative", "title": "Budget Remaining (%)", "scale": {"domain": [0, 100]}},
-        "color": {"field": "scenario", "type": "nominal", "title": null, "scale": {"range": ["#2e7d32", "#ff9800", "#d32f2f"]}}
-      }
-    },
-    {
-      "data": {
-        "values": [
-          {"day": 0, "budget": 100, "scenario": "Warning (burn rate 1.0)"},
-          {"day": 5, "budget": 83, "scenario": "Warning (burn rate 1.0)"},
-          {"day": 10, "budget": 67, "scenario": "Warning (burn rate 1.0)"},
-          {"day": 15, "budget": 50, "scenario": "Warning (burn rate 1.0)"},
-          {"day": 20, "budget": 33, "scenario": "Warning (burn rate 1.0)"},
-          {"day": 25, "budget": 17, "scenario": "Warning (burn rate 1.0)"},
-          {"day": 30, "budget": 0, "scenario": "Warning (burn rate 1.0)"}
-        ]
-      },
-      "mark": {"type": "line", "strokeWidth": 2.5, "strokeDash": [6, 3]},
-      "encoding": {
-        "x": {"field": "day", "type": "quantitative"},
-        "y": {"field": "budget", "type": "quantitative"},
-        "color": {"field": "scenario", "type": "nominal"}
-      }
-    },
-    {
-      "data": {
-        "values": [
-          {"day": 0, "budget": 100, "scenario": "Critical (burn rate 10)"},
-          {"day": 1, "budget": 67, "scenario": "Critical (burn rate 10)"},
-          {"day": 2, "budget": 33, "scenario": "Critical (burn rate 10)"},
-          {"day": 3, "budget": 0, "scenario": "Critical (burn rate 10)"}
-        ]
-      },
-      "mark": {"type": "line", "strokeWidth": 2.5},
-      "encoding": {
-        "x": {"field": "day", "type": "quantitative"},
-        "y": {"field": "budget", "type": "quantitative"},
-        "color": {"field": "scenario", "type": "nominal"}
-      }
-    }
-  ]
+  "width": 440, "height": 220,
+  "data": {"values": [
+    {"d":0,"b":100,"s":"burn rate 0.5"},{"d":30,"b":50,"s":"burn rate 0.5"},
+    {"d":0,"b":100,"s":"burn rate 1"},{"d":30,"b":0,"s":"burn rate 1"},
+    {"d":0,"b":100,"s":"burn rate 10"},{"d":3,"b":0,"s":"burn rate 10"}]},
+  "mark": {"type": "line", "strokeWidth": 3},
+  "encoding": {
+    "x": {"field": "d", "type": "quantitative", "title": "Day of the 30-day window", "scale": {"domain": [0, 30]}},
+    "y": {"field": "b", "type": "quantitative", "title": "Error budget left (%)", "scale": {"domain": [0, 100]}},
+    "color": {"field": "s", "type": "nominal", "title": null, "scale": {"range": ["#019546", "#c99700", "#b42318"]}}
+  },
+  "config": {"font": "Tahoma, sans-serif", "axis": {"labelFontSize": 12, "titleFontSize": 13}, "legend": {"labelFontSize": 12}, "view": {"stroke": null}}
 }
 ```
 
-{: .note }
-> **Green:** Healthy service — uses only half the budget. **Orange:** Budget exactly exhausted at month end (burn rate = 1.0). **Red:** Major incident — 30-day budget consumed in 3 days (burn rate = 10). This triggers an immediate page alert.
+_Constant burn rates: 0.5 leaves half the budget, 1 spends it exactly, 10 spends it in three days._
 
-For SRE practices (error budgets, burn-rate alerting, four golden signals, toil), see [Site Reliability Engineering](../../organization/05-practice/06-site-reliability-engineering.md).
+## 4. Chaos engineering: testing the tolerance itself
 
----
+Classical fault tolerance argued at design time that redundancy would work. Netflix instead injects faults into production to check that timeouts, retries and fallbacks really work, under four principles: define the steady state by a business metric, vary real-world events, run in production, and automate the experiments {% cite basiri2016chaos %}. The steady-state metric is SPS, stream starts per second, a system-level indicator of whether users can watch.
 
-## Chaos Engineering: Modern Fault Tolerance Validation
+![All users split into normal production, a 1% control group and a 1% experiment group; their SPS are compared](chap-experiment.svg)
 
-Classical fault tolerance relied on design-time diversity arguments: build N versions, assume independence, predict reliability gains. Knight and Leveson (1986) showed this assumption was untenable (see [Fault Tolerance](fault-tolerance.md)). Modern systems take a different approach: **validate resilience mechanisms continuously** through fault injection in production {% cite basiri2016chaos %}.
+_Netflix's ChAP: 1% of users go to a baseline cluster and 1% to a canary cluster with the fault injected; the experiment stops automatically if the canary's SPS deviates too much._ {% cite basiri2019automating %}
 
-### Netflix: From Chaos Monkey to ChAP
+Comparing two equal small groups, rather than the canary against all traffic, separates the effect of the fault from normal fluctuation and limits harm to a small share of users.
 
-Netflix pioneered chaos engineering with four principles {% cite basiri2016chaos %}:
+## When to use it — and when not
 
-1. **Focus on steady state** — Define normal behavior via business metrics (SPS: Stream-Starts Per Second)
-2. **Run in production** — Only production reveals real failure modes
-3. **Vary real-world events** — Inject failures, latency, resource exhaustion
-4. **Automate continuously** — Run experiments on every deployment
+Use SLOs and error budgets for services that change continuously and have enough traffic to measure an SLI. A product shipped once into a device or a vehicle still needs a FIO at release, because no budget can be refilled after shipping. Chaos experiments presuppose monitoring good enough to see the steady state; without it they only cause outages.
 
-The Chaos Automation Platform (ChAP) compares **control vs experimental** traffic clusters with 1% sampling and automatic abort on excessive impact {% cite basiri2019automating %}.
+## Limitations
 
-```mermaid
-flowchart TB
-    TRAFFIC["Production Traffic<br>(100%)"] --> SPLIT{"Traffic<br>Splitter"}
-    SPLIT -->|"99%"| CTRL["Control Cluster<br>(normal operation)"]
-    SPLIT -->|"1%"| EXP["Experimental Cluster<br>(fault injected 💥)"]
-    CTRL --> SPS1["SPS = 1,000/sec"]
-    EXP --> SPS2["SPS = 980/sec"]
-    SPS1 --> CMP{"Compare<br>SPS delta"}
-    SPS2 --> CMP
-    CMP -->|"Δ < 2%"| OK["✅ Resilience<br>confirmed"]
-    CMP -->|"Δ ≥ 2%"| ABORT["🛑 Auto-abort<br>+ alert team"]
-```
+An SLO is only as good as its SLI: measuring success at the server misses failures that happen in the client or the network. The budget arithmetic treats all failed requests as equal, which hides severity; a failed payment and a slow thumbnail count the same unless the service is split into tiers.
 
-Netflix's SPS (Stream-Starts Per Second) metric serves as an SLI at the system boundary — a business-meaningful measure directly descended from Musa's "natural units" {% cite musa2004sre %}.
+## How solid is this?
 
-### Classical Concept Mapping
-
-| Classical Concept | Chaos Engineering Equivalent |
-|-------------------|------------------------------|
-| Fault injection testing | FIT system (inject latency, errors, failures) |
-| Operational profile (system boundary) | SPS metric (stream starts per second) |
-| Failure intensity measurement | SPS deviation in experimental group |
-| Graceful degradation | Fallback mechanisms (forward recovery) |
-| Functional testing ("does it work?") | Chaos testing ("does it survive?") |
-
-The evolution: from **assuming** resilience mechanisms work (classical diversity) to **validating** they work (chaos experiments) {% cite basiri2016chaos %}.
-
-For chaos engineering industry practices, see [Industry Case Studies](../../organization/05-practice/07-industry-case-studies.md).
-
----
-
-## The Full Arc
-
-```mermaid
-timeline
-    title From Classical SRE to Modern SRE
-    1975 : Randell - Recovery blocks
-         : Backward recovery via checkpoint/rollback
-    1979 : Goel-Okumoto - NHPP SRGM
-         : Failure intensity modeling
-    1986 : Knight & Leveson
-         : Independence assumption rejected
-    1993 : Musa - Operational profiles + FIO
-         : "Just right" reliability
-    2004 : Avizienis et al.
-         : Dependability taxonomy unified
-    2016 : Google SRE Book
-         : SLOs, error budgets, golden signals
-    2016 : Netflix chaos engineering
-         : Validate resilience in production
-```
-
-The conceptual thread connecting Musa to modern SRE: **quantitative, "good enough" reliability targets** that balance quality against cost. The methods changed (SRGMs → error budgets, demonstration charts → burn-rate alerts, operational profiles → SLIs), but the philosophy endured: 100% reliability is the wrong target {% cite musa2004sre %} {% cite beyer2016sre %}.
-
-For per-service SLOs as performance budgets and tail latency in distributed systems, see [Performance in the Cloud Era](../performance/cloud-bridge.md).
+- **Where it comes from.** SLIs, SLOs and error budgets from Google's SRE book {% cite beyer2016sre %}, burn-rate alerting and the example policy from the SRE Workbook {% cite beyer2018sreworkbook %}, chaos engineering from Netflix's papers {% cite basiri2016chaos basiri2019automating %}.
+- **What is contested.** The mapping in section 1 is this handbook's synthesis, built on Musa's and Google's texts; neither source states it.
 
 ---
 
