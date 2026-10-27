@@ -1,198 +1,110 @@
 ---
 title: Mutation Testing
 parent: Random Testing
-nav_order: 4
+nav_order: 9
 layout: default
+page_type: deep-dive   # full worked mutmut run: every mutant accounted for, as reviewers asked
 ---
 
 # Mutation Testing
 
-Mutation testing measures the fault-detection effectiveness of a test suite by introducing small, deliberate changes (mutants) into the program and checking whether existing tests catch them. It answers a fundamental question: **if a bug were present, would your tests find it?**
+**Mutation testing** judges a test suite by how many small deliberate faults it detects, and uses the survivors to show where tests are missing. The basics (operators, killed and surviving mutants, the mutation score) are on [Mutation Coverage](../coverage/mutation.md); this page covers why the method works, what it costs and how it is used.
 
-For an introduction to mutation operators and mutation score, see [Mutation Coverage](../coverage/mutation).
+## 1. Why small faults are enough
 
-```mermaid
-flowchart LR
-    A["Original<br>Program"] --> B["Apply Mutation<br>Operators"]
-    B --> C["Mutants"]
-    C --> D["Run Test Suite"]
-    D --> E{"Test fails?"}
-    E -- "Yes" --> F["Killed"]
-    E -- "No" --> G{"Equivalent?"}
-    G -- "Yes" --> H["Exclude"]
-    G -- "No" --> I["Survives — weak test"]
+DeMillo, Lipton and Sayward rested the method on two hypotheses {% cite demillo1978hints %}:
 
-    style F fill:#c8e6c9,stroke:#388e3c
-    style I fill:#ffcdd2,stroke:#c62828
-    style H fill:#e0e0e0,stroke:#757575
+- **The competent programmer hypothesis.** Programs written by competent programmers are close to correct, so real faults look like small syntactic slips.
+- **The coupling effect.** Tests that detect all simple faults are so sensitive that they also detect most complex ones.
+
+Their own evidence came from Hoare's FIND program. Test data built to kill the simple mutants was then run against more than 22,000 random higher-order mutants (several changes at once); only 19 survived, and all 19 turned out to be equivalent to FIND: they behaved exactly like it on every input (see section 4) {% cite demillo1978hints %}. Later studies agree: test data that killed first-order mutants killed over 99% of second- and third-order mutants {% cite jia2011mutation %}.
+
+## 2. Worked example with mutmut
+
+Setup takes two steps: `pip install mutmut`, and a section in `pyproject.toml` naming the code to mutate. This minimal configuration worked with mutmut 3.8:
+
+```toml
+[tool.mutmut]
+source_paths = ["src/"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
 ```
 
----
+mutmut writes the mutated copies to a `mutants/` folder and keeps the results there. `mutmut results` lists each survivor by name, for example `shipping.x_shipping_cost__mutmut_9: survived`; mutmut reports mutants that make the tests time out separately, to be checked by hand.
 
-## Theoretical Foundations
-
-DeMillo, Lipton, and Sayward introduced mutation testing through two key hypotheses {% cite demillo1978hints %}:
-
-### Competent Programmer Hypothesis
-
-Programmers create programs that are "close to being correct" — faults are small syntactic changes from the intended program. This justifies testing for simple errors rather than arbitrary deviations.
-
-**Example** — original function and three mutants:
+`mutmut` changed this function in 18 ways (operators, constants and the message string, or replaced a value with `None`), producing 18 mutants, and ran the three tests against each:
 
 ```python
-def classify(a, b, c):                  # Original
-    if a == b == c:  return "equilateral"
-    if a == b or b == c or a == c:  return "isosceles"
-    return "scalene"
+def shipping_cost(weight, express):
+    if weight <= 0:
+        raise ValueError("weight must be positive")
+    cost = 5 + 2 * weight
+    if express:
+        cost = cost * 2
+    if weight > 20:
+        cost = cost + 10
+    return cost
 
-# Mutant 1 (ROR): a == b == c  →  a >= b == c     ← killed by (2,2,2)
-# Mutant 2 (LCR): a==b or b==c →  a==b and b==c   ← killed by (3,3,5)
-# Mutant 3 (equivalent!): swapping b==c and a==c   ← same behavior for all inputs
+def test_standard(): assert shipping_cost(1, False) == 7
+def test_express():  assert shipping_cost(1, True) == 14
+def test_invalid():
+    with pytest.raises(ValueError): shipping_cost(0, False)
 ```
 
-A test suite that kills Mutants 1 and 2 but cannot kill Mutant 3 (because it is **equivalent**) achieves a mutation score of 2/2 = 100%.
+Nine were killed and nine survived: a mutation score of 9/18 = 50% (no mutant was judged equivalent), although the tests take 5 of the 6 branch outcomes (83% branch coverage), all except the true side of `weight > 20`. Per line, the tests killed both mutants of `weight <= 0` (`< 0`, `<= 1`), four of the five of `5 + 2 * weight` (`None`, `5 - 2 * weight`, `6 + 2 * weight`, `5 + 3 * weight`; the fifth, `2 / weight`, survived) and all three of `cost * 2`. All nine survivors sit on four lines: three change the error message, one changes `2 * weight`, two move the boundary (`>= 20`, `> 21`) and three change `cost + 10` (to `cost - 10`, `cost + 11` or `None`), a line no test reaches. Three of them, shown with `mutmut show`, tell three different stories:
 
-### Coupling Effect
+```diff
+-    cost = 5 + 2 * weight
++    cost = 5 + 2 / weight
 
-> "Test data that distinguishes all programs differing from a correct one by only simple errors is so sensitive that it also implicitly distinguishes more complex errors." {% cite demillo1978hints %}
+-    if weight > 20:
++    if weight >= 20:
 
-Empirical validation: test sets that killed all first-order mutants also killed over 99% of second- and third-order mutants {% cite jia2011mutation %}. For Hoare's FIND algorithm, only 19 out of 22,000+ randomly generated complex-error mutants survived adequate test data — and all 19 were proven equivalent to the original {% cite demillo1978hints %}.
-
-### Practical Evidence
-
-Seven carefully chosen test vectors for FIND achieved mutation adequacy, outperforming {% cite demillo1978hints %}:
-- 24 permutations (38 live mutants remained)
-- 1,000 random permutations (10 live mutants remained)
-- Exhaustive path coverage (insufficient without error-focused selection)
-
----
-
-## Cost Reduction Techniques
-
-Full mutation testing is computationally expensive: a program with N statements and M operators generates O(N × M) mutants, each requiring a full test suite execution. Three decades of research have produced effective cost reduction strategies {% cite jia2011mutation %}:
-
-### Selective Mutation
-
-Not all operators contribute equally. Offutt discovered that **5 key operators** — ABS, UOI, LCR, AOR, ROR — achieve 99.5% of the mutation score of the full operator set {% cite jia2011mutation %}:
-
-| Operator | Name | Example |
-|----------|------|---------|
-| **ABS** | Absolute value insertion | `x` → `abs(x)` |
-| **UOI** | Unary operator insertion | `x` → `−x`, `++x` |
-| **LCR** | Logical connector replacement | `&&` → `\|\|` |
-| **AOR** | Arithmetic operator replacement | `+` → `−`, `*` → `/` |
-| **ROR** | Relational operator replacement | `>` → `>=`, `==` → `!=` |
-
-### Random Sampling
-
-Randomly selecting 10% of mutants reduces cost by 90% while losing only 16% effectiveness {% cite jia2011mutation %}.
-
-### Weak Mutation
-
-Check mutant behavior immediately after the mutated statement executes rather than at program output. Faster but may miss mutants whose local state change does not propagate to output.
-
----
-
-## The Equivalent Mutant Problem
-
-Some mutants produce identical behavior to the original program for all possible inputs. These **equivalent mutants** cannot be killed by any test and must be identified and excluded from the mutation score calculation.
-
-### Scale of the Problem
-
-Empirical studies find 10-40% of mutants are equivalent {% cite jia2011mutation %}. Automatically detecting all equivalent mutants is **undecidable** (reducible to the halting problem), making this the most persistent challenge in mutation testing.
-
-**Concrete equivalent mutant** — for integer `x`, these two conditions are identical:
-
-```python
-if x > 0:   ...    # original
-if x >= 1:  ...    # mutant — equivalent for all integers (no input can distinguish them)
+-        raise ValueError("weight must be positive")
++        raise ValueError(None)
 ```
 
-### Detection Approaches
+- `2 / weight` survives because every test uses weight 1, where `2 * 1 == 2 / 1`: a missing test with another weight.
+- `weight >= 20` survives because no test is near the boundary at 20.
+- The changed message survives because no test checks it; whether that matters is a judgement.
 
-| Approach | Mechanism | Limitation |
-|----------|-----------|------------|
-| **Compiler optimization (TCE)** | If optimized mutant = optimized original, they are equivalent | Limited to optimizations the compiler performs |
-| **Constraint solving** | Generate path constraints that distinguish mutant from original | Scalability limits on complex programs |
-| **Program slicing** | If mutant is outside the backward slice of any output, it is equivalent | Conservative — may miss some equivalences |
+The commands, run in the project folder:
 
-### LLM-Assisted Detection
-
-Tian et al. conducted the first large-scale study of LLMs for equivalent mutant detection on 3,302 Java mutant pairs {% cite tian2024llm_emd %}:
-
-| Approach | Best Model | F1-Score |
-|----------|-----------|----------|
-| **Fine-tuned code embeddings** | UniXCoder (110M params) | **86.58%** |
-| **Pre-trained code embeddings** | UniXCoder | 82.18% |
-| **Few-shot prompting** | GPT-4 | 55.90% |
-| **Best baseline (non-LLM)** | ASTNN | 70.00% |
-
-Key findings:
-- LLMs achieve 35.69% average F1-score improvement over existing techniques
-- **Smaller code-specific models outperform larger general models** — UniXCoder (110M parameters) beats GPT-4 and text-embedding models
-- Prompting alone is insufficient; fine-tuning on code embeddings is necessary
-- Inference time is acceptable: 0.0431 seconds per mutant pair {% cite tian2024llm_emd %}
-
----
-
-## Mutation Testing in Practice
-
-Smith and Williams studied how testers perform mutation analysis in practice {% cite smith2009mutation %}:
-
-| Metric | Value |
-|--------|-------|
-| Coverage improvement | 2-9% statement coverage gain in 60 minutes |
-| Test creation rate | ~1 new test every 6 minutes |
-| Analysis time | Killed mutants: 267s; ignored mutants: 313s |
-| DOA mutants | 43 of 98 mutants killed by existing tests (Dead on Arrival) |
-
-### Operator Effectiveness
-
-Not all operators produce equally useful mutants. COR, COI, and COD operators were most effective for Java backend code, while EAM produced 560 mutants but most were DOA {% cite smith2009mutation %}.
-
-### The "Crossfire" Phenomenon
-
-A single new test case often kills multiple mutants simultaneously, suggesting significant operator redundancy {% cite smith2009mutation %}.
-
-### Practitioner Assessment
-
-Testers view mutation analysis as "effective but relatively expensive" {% cite smith2009mutation %}. The manual source examination forced by mutation analysis — finding the mutant location, understanding the change, writing a killing test — may itself be more valuable than purely automated test generation.
-
----
-
-## The Mutation Testing Arc
-
-```
-DeMillo 1978 — Theory (coupling effect, competent programmer hypothesis)
-    ↓
-Jia & Harman 2011 — Maturity (390+ papers, 36 tools, validated theory)
-    ↓
-Smith 2009 — Practice (feasible but expensive, operator selection matters)
-    ↓
-Tian 2024 — LLM frontier (86.58% F1 on equivalent mutant detection)
+```bash
+mutmut run                 # create the mutants and run the tests against each
+mutmut results             # list the surviving mutants by name
+mutmut show <mutant-name>  # print one survivor as a diff
 ```
 
-### Field Maturity
+**Mutation needs the tests to run the mutated code.** mutmut changes the source files and reruns the tests in the same project, so the tests must call the code directly or through an in-process test client. Tests that send requests to a separately running server never execute the mutants, and every mutant survives, unless the server is restarted on each mutant.
 
-Jia and Harman's comprehensive survey of 390+ papers documented the field's transition from theory to practice {% cite jia2011mutation %}:
+## 3. Cutting the cost
 
-- **36 mutation tools** developed (7 open source, 3 commercial after 2000)
-- **Exponential publication growth** (R² = 0.77 correlation with year)
-- Practical publications surpassed theoretical in 2006
-- Mutation criteria **probsubsumes** all-use data flow coverage
-- Mutation-adequate test sets detect **16% more faults** than all-use adequate sets
+A program with *n* statements and *k* operators yields on the order of *n × k* mutants, each needing a run of the suite. The survey by Jia and Harman, covering more than 390 papers, summarises three ways to cut that {% cite jia2011mutation %}:
 
----
+- **Selective mutation.** Tests that kill all mutants from five operators kill 99.5% of the mutants from the full operator set: ABS (insert an absolute value), UOI (insert a unary operator such as `-x`), LCR (replace a logical connector, `and` ↔ `or`), AOR (replace an arithmetic operator) and ROR (replace a relational operator).
+- **Sampling.** Tests built against a random 10% of the mutants were only 16% less effective, measured by mutation score, than tests built against all of them; the survey does not say whether the 16% is relative or in percentage points.
+- **Weak mutation.** Compare the program state right after the mutated statement instead of the final output: cheaper, but it counts mutants whose effect would never reach the output.
 
-## Modern Tools
+## 4. The equivalent-mutant problem
 
-| Tool | Language | Key Feature |
-|------|----------|-------------|
-| **PIT** (pitest.org) | Java | JUnit integration, bytecode mutation, incremental analysis |
-| **Stryker** | JavaScript/C# | Multi-language support, dashboard reporting |
-| **mutmut** | Python | Pytest integration, survivor analysis |
-| **Mull** | C/C++ | LLVM-based, fast compilation |
-| **Cosmic Ray** | Python | Distributed mutation, operator selection |
+An **equivalent mutant** changes the code but not its behaviour, so no test can kill it; a person must judge each suspect survivor, for example by reading it with `mutmut show`, and remove it from the score. Empirical studies put 10% to 40% of mutants in this category {% cite jia2011mutation %}, and deciding equivalence in general is undecidable. Recent work uses language models, judged by **F1-score**, which balances finding equivalent mutants against false alarms: on 3,302 Java mutant pairs, LLM-based techniques beat the earlier detection tools by 35.69% in F1-score on average (the paper does not say whether this is relative or in percentage points), and the best of them was a fine-tuned code model (UniXCoder) at 86.58% F1, ahead of prompting large general models such as GPT-4 {% cite tian2024llm_emd %}.
+
+## When to use it — and when not
+
+- **Use it** on critical modules, to find the tests a high coverage figure hides, as in the example.
+- **Use it** to compare two test suites, or to check a test-generation tool.
+- **Do not run all mutants on every commit** of a large system; restrict it to changed files, or sample.
+
+## Limitations
+
+In a study of developers using mutation analysis, it raised the statement coverage score by 2–9% in an hour (the paper does not say whether relative or in percentage points) and produced one new test about every six minutes; participants found it "effective but relatively expensive" {% cite smith2009mutation %}. Mutants killed by a test written to kill a different mutant are called **crossfire**; one new test often removes several survivors at once. Equivalent mutants still cost human time, and scores depend on the tool's operators.
+
+## How solid is this?
+
+- **Where it comes from.** DeMillo et al. 1978 {% cite demillo1978hints %} and the Jia and Harman survey {% cite jia2011mutation %}; practice from Smith and Williams {% cite smith2009mutation %}; equivalent-mutant detection from Tian et al. {% cite tian2024llm_emd %}.
+- **What is contested.** The coupling effect is supported for higher-order mutants, which are themselves artificial; how well mutants stand in for real faults is studied on [Coverage and Fault Detection](../coverage/discussion.md).
 
 ---
 

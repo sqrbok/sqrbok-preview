@@ -8,107 +8,39 @@ has_children: true
 
 # Random Testing
 
-Random testing generates test inputs by sampling from input spaces rather than deriving them from specifications or code structure. Despite early dismissal as a "poor methodology," decades of research demonstrate that random testing — with proper feedback, oracles, and tool support — is one of the most effective and scalable approaches to finding software defects.
+**Random testing** chooses test inputs by sampling them from the input space instead of deriving them from the specification or the code; a program, not a person, picks the inputs. Its cost lies elsewhere: deciding automatically whether each output is correct.
 
----
+## The techniques at a glance
 
-## Why Random Testing?
+The four families on these pages differ in what generates the inputs and what judges the outputs.
 
-Systematic testing strategies require human judgement to select inputs. That judgement introduces bias: testers exercise the cases they anticipate, missing the unexpected interactions that cause real failures. Random testing bypasses this bias entirely.
+| Technique | Inputs come from | The oracle is | Typical finding | Page |
+|---|---|---|---|---|
+| Plain random testing | a distribution, ideally the operational profile (how often real users supply each kind of input) | an assertion or a reference | wrong answers; a reliability estimate | [Fundamentals](fundamentals.md) |
+| Feedback-directed | random method calls, extended when valid | contracts and exceptions | API misuse, broken invariants | [Feedback-Directed](feedback.md) |
+| Fuzzing | random or mutated bytes, often steered by coverage | crashes, hangs, sanitizers (compiler checks that turn memory errors into crashes) | memory errors, security bugs | [Fuzz Testing](fuzzing.md) |
+| Property-based | typed generators, deliberately biased towards edge values | a property that must hold for all inputs | logic errors, with a minimal example; no reliability figure | [Property-Based](property-based.md) |
 
-The empirical evidence is compelling:
+[Fundamentals](fundamentals.md) states what it takes for random tests to predict reliability: a system-level test, inputs drawn independently from the operational profile, and an automatic oracle. Only plain random testing on the profile meets all three. Guided tools choose later inputs because of earlier results, and property-based tools bias the distribution towards edge values; both find bugs better but give up the reliability claim.
 
-- **Miller's 16-year fuzz series** found that 25-33% of UNIX utilities crashed on random input {% cite miller1990fuzz %}, and the same error classes persisted for over a decade {% cite forrester2000windows miller2006macos %}
-- **Randoop** found 30 errors in a .NET component already tested by 40 engineers for 5 years — more than a tester typically finds in a year {% cite pacheco2007randoop %}
-- **QuickCheck** discovered bugs in production Haskell libraries with a 300-line tool, finding errors equally distributed across generators, specifications, and implementations {% cite claessen2000quickcheck %}
+[Mutation testing](mutation.md) belongs to the same lecture for a different reason: it plants many small faults, generated systematically by mutation operators (and sometimes sampled at random), to measure how good a test suite is.
 
-Random testing also uniquely supports **statistical reliability prediction**: after N successful random tests drawn from an operational profile, one can bound the probability of undetected failure {% cite hamlet1984random %}.
+## The oracle sets the ceiling
 
----
+Generating a million inputs is easy; knowing which outputs are wrong is not. Each technique above is defined as much by its oracle as by its generator {% cite manes2019fuzzing claessen2000quickcheck %}.
 
-## The Oracle Problem
+![Oracles from crash detection to differential testing, ordered from most automatic to most precise](oracle-spectrum.svg)
 
-Generating millions of inputs is easy. Knowing whether each output is *correct* is the hard part. The oracle mechanism determines what class of bugs random testing can find:
+_A crash oracle needs no human effort but sees only crashes; a property or a second implementation sees wrong answers but must be written._
 
-| Oracle Type | Mechanism | Catches | Misses |
-|-------------|-----------|---------|--------|
-| **Crash detection** | Program crashes or hangs | Reliability failures, memory corruption | Semantic bugs |
-| **Sanitizers** | ASan, UBSan, TSan | Buffer overflows, undefined behavior, data races | Logic errors |
-| **Contracts** | Preconditions, postconditions, invariants | Specification violations | Unspecified behavior |
-| **Properties** | User-defined invariants for all inputs | Logical errors, corner cases | Requires developer specification effort |
-| **Coverage feedback** | New code paths = interesting input | Guides exploration toward new behavior | Does not verify correctness |
-| **Differential** | Compare against reference implementation | Any divergence from reference | Shared bugs in both implementations |
+## Reading order
 
-```mermaid
-flowchart LR
-    A["Crash Detection"] --> B["Sanitizers"]
-    B --> C["Coverage Feedback"]
-    C --> D["Contracts"]
-    D --> E["Properties"]
-    E --> F["Differential"]
+[Fundamentals](fundamentals.md) covers what makes testing random and what it lets you claim about reliability; [Random versus Partition Testing](partition.md) weighs it against systematic test design. The tool pages follow: [Feedback-Directed Random Testing](feedback.md), [Fuzz Testing](fuzzing.md), [Coverage-Guided Fuzzing](greybox.md), [Property-Based Testing](property-based.md) and [Property-Based Testing of Web Services](pbt-web.md). [Mutation Testing](mutation.md) closes the section.
 
-    style A fill:#c8e6c9,stroke:#388e3c
-    style B fill:#c8e6c9,stroke:#388e3c
-    style C fill:#fff3cd,stroke:#ffc107
-    style D fill:#fff3cd,stroke:#ffc107
-    style E fill:#ffccbc,stroke:#e64a19
-    style F fill:#ffccbc,stroke:#e64a19
-```
+## How solid is this?
 
-*Left to right: more automated but less precise → more precise but requires more effort.*
-
-The evolution from crash oracles {% cite miller1990fuzz %} to sanitizer-augmented coverage {% cite manes2019fuzzing %} to specification-based properties {% cite claessen2000quickcheck %} represents a trade-off between **automation and precision** {% cite goldstein2024pbt %}.
-
----
-
-## Random vs. Partition Testing
-
-A persistent question in testing theory: does systematic partition testing outperform random testing?
-
-The debate has a nuanced resolution {% cite duran1984evaluation hamlet1984random ntafos2001comparisons %}:
-
-- **Random wins** when no meaningful partition exists, cost matters, operational profile testing is needed, or stateful systems require sequence testing {% cite hamlet2006random %}
-- **Partition wins** when subdomains are genuinely homogeneous and cost-weighted failure rates vary significantly across subdomains {% cite tsoukalas1993reliability %}
-- **The gap is small**: roughly 20% more random tests erase any partition advantage {% cite hamlet1984random %}, and just 1-2 additional random tests can tilt the balance at scale {% cite ntafos2001comparisons %}
-
-The practical answer: combine both — random testing first for broad coverage and reliability estimation, followed by targeted systematic testing for edge cases {% cite duran1984evaluation %}.
-
----
-
-## Topics in This Section
-
-### [Fundamentals](fundamentals)
-Theory of random testing, reliability prediction, sampling strategies, and feedback-directed tools (Randoop, AutoTest).
-
-### [Fuzz Testing](fuzzing)
-From Miller's 1990 UNIX study through whitebox fuzzing (SAGE) to modern coverage-guided greybox fuzzers (AFL, AFLGo).
-
-### [Property-Based Testing](property-based)
-QuickCheck's paradigm of executable specifications, Hypothesis for Python, JQF's convergence with fuzzing, and industry adoption.
-
-### [Mutation Testing](mutation)
-Test adequacy via fault seeding: operators, mutation score, the equivalent mutant problem, cost reduction, and LLM-assisted detection.
-
----
-
-## Key Numbers
-
-| Fact | Value | Source |
-|------|-------|--------|
-| UNIX utility crash rate (1990) | **25-33%** on random input | Miller 1990 |
-| Randoop vs. manual testing | **100x** more errors per human hour | Pacheco 2007 |
-| Coverage guidance improvement | **1000x** fewer executions to find bugs | Padhye 2019 |
-| Equivalent mutants in practice | **10-40%** of all mutants | Jia & Harman 2011 |
-| PBT practitioner time budgets | **50ms-30s** per property | Goldstein 2024 |
-
----
-
-## Further Exploration
-
-- [Coverage Criteria](../coverage/) — How to measure test thoroughness
-- [Input Domain Testing](../domain/) — Systematic black-box partitioning techniques
-- [Combinatorial Testing](../combinatorial/) — Interaction coverage for parameter combinations
-- [Industry Case Studies](../../organization/05-practice/07-industry-case-studies) — Chaos engineering and resilience testing in practice
+- **Where it comes from.** Every page is built from the random-testing literature review: Hamlet's theory papers, Miller's fuzz studies, the QuickCheck, Hypothesis and JQF papers, and the mutation testing survey {% cite hamlet1984random miller1990fuzz jia2011mutation %}.
+- **What is contested.** Whether random testing beats systematic partitioning has been argued since 1984; the answer depends on cost and on how well the partitions fit the faults. See [Random versus Partition Testing](partition.md).
 
 ---
 
