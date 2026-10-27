@@ -71,15 +71,18 @@ Techniques that generate test inputs by sampling rather than systematic design:
 
 ### [Exploratory Testing](exploratory/)
 Human-driven testing where learning, test design, and execution happen simultaneously:
-- **[Techniques and Heuristics](exploratory/techniques)** - Whittaker's tours, Hendrickson's heuristics, dynamic test design
-- **[Session-Based Test Management](exploratory/session-based)** - Charters, time boxes, metrics, degrees of exploration
-- **[Empirical Evidence](exploratory/effectiveness)** - ET vs. scripted experiments, efficiency data, tester knowledge
+- **[Charters, Heuristics and Tours](exploratory/techniques)** - Hendrickson's charters and heuristics, Whittaker's tours
+- **[Exploratory Testing Tours](exploratory/tours)** - Whittaker's six districts and their tours
+- **[Session-Based Test Management](exploratory/session-based)** - Charters, time boxes, debriefings, levels of exploration
+- **[Exploratory Session Report](exploratory/session-report)** - One session from charter to report, with a template
+- **[Exploratory Testing: Evidence](exploratory/effectiveness)** - ET vs. scripted experiments, efficiency data, tester knowledge
 
 ### [Operational Profile](operational-profile/)
 Usage-based testing proportional to how software is used in the field:
-- **[Developing an OP](operational-profile/development)** - Musa's five-step procedure, representations, data sources
+- **[Developing an Operational Profile](operational-profile/development)** - Operations and modes, the six steps, from rates to probabilities
 - **[Industrial Evidence](operational-profile/case-studies)** - AT&T, HP results, Android profile coverage
-- **[Modern Approaches](operational-profile/modern)** - Operational coverage, adaptive testing, relative coverage
+- **[Operational Coverage](operational-profile/modern)** - Coverage weighted by use, a stopping rule
+- **[From Profile to Exploration](operational-profile/bridge)** - Saturation and the switch to exploratory testing
 
 ---
 

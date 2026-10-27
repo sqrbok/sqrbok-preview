@@ -10,345 +10,123 @@ page_type: study-notes
 
 # Study Notes: Exploratory Testing & Operational Profile
 
-## Purpose
-These study notes cover two complementary testing approaches: **exploratory testing** (qualitative, human-driven discovery) and **operational profile-based testing** (quantitative, usage-driven prioritization). The lecture traces ET from its definition through structured heuristics and empirical evidence, then connects it to operational profiles — from Musa's foundational work (1993) through modern developments like operational coverage and Android Cloud Profiles.
+The lecture asks: *how do you test well when nobody has written the test cases?* and *which tests matter most, given how people actually use the system?* Exploratory testing (ET) answers the first, the operational profile (OP) the second. The difference: in ET the tester's judgement during the session decides what to test next; in OP-based testing, measured or estimated usage frequencies decide it before testing starts. [Revision questions](RQ_L07_Exploratory_OP.md) test it.
 
-**Primary Sources:**
-- Musa 1993, Operational Profiles in Software-Reliability Engineering {% cite musa1993operational %}
-- Whittaker 2009, Exploratory Software Testing {% cite whittaker2009exploratory %}
-- Hendrickson 2013, Explore It! {% cite hendrickson2013explore %}
+## 1. Scripted and exploratory testing find different defects
 
-**Key Research Papers:**
-- Itkonen & Mantyla 2007, 2014: ET vs. scripted testing experiments {% cite itkonen2007defect itkonen2014testcases %}
-- Afzal et al. 2015: Equal-time ET experiment {% cite afzal2015experiment %}
-- Ghazi et al. 2017: Five levels of exploration {% cite ghazi2017levels ghazi2017decision %}
-- Miranda & Bertolino 2016, 2018: Operational coverage {% cite miranda2016stopping miranda2018coverage %}
-- Bleier et al. 2025: Android Cloud Profiles {% cite bleier2025profile %}
+Scripted testing designs tests before running them: repeatable, traceable, suited to regression. Exploratory testing designs each test while running the previous one: suited to new features and thin specifications. Neither replaces the other: Shah et al. compared exploratory, scripted and hybrid testing (test cases plus open missions), and exploration found the most defects but covered the fewest specified functions {% cite shah2014hybrid %}. Both hold because an explorer goes deep where trouble appears and skips some functions, while a script visits every function but probes each lightly.
 
----
+→ [Exploratory Testing](../../verif/exploratory/index.md)
 
-## Part 1: Opening — Two Approaches, One Goal
+## 2. Exploratory testing is learning, design and execution at once
 
-### 1.1 Testing What Matters
+Exploratory testing is "simultaneous learning, test design and test execution" {% cite itkonen2005exploratory %}. The tester loops: learn how the system behaves, design the next test, execute it, steer by the result {% cite hendrickson2013explore %}. Ad hoc testing has no mission, no time box and no report. An exploratory session has at least a mission (even if only the product to test, §7), a time box and a report; session-based test management (SBTM, §5) adds a debriefing.
 
-Both ET and operational profiles share a common goal: **test what matters most to users**. They differ in approach:
+→ [Exploratory Testing](../../verif/exploratory/index.md)
 
-| Aspect | Scripted Testing | Exploratory Testing | Operational Profile |
-|--------|------------------|---------------------|---------------------|
-| **Approach** | Pre-designed test cases | Simultaneous design & execution | Tests proportional to usage |
-| **Best for** | Regression, coverage metrics | Discovery, edge cases | Reliability prediction |
-| **Repeatability** | High | Lower | High |
-| **Documentation** | Upfront (test plans) | Session reports | Quantitative (rates, probabilities) |
-| **Defect types found** | Known, specified | Unknown, emergent | High-frequency, usage-driven |
+## 3. A session follows the system's answers, not a list
 
-**Scripted + Exploratory = Coverage:** Scripted testing systematically exercises known requirements and guards against regression — it finds *specified* defects. Exploratory testing discovers unexpected behaviour that no test plan anticipated — it finds *emergent* defects. Neither alone is sufficient: scripted testing misses what was never specified; exploratory testing misses what requires systematic repetition to verify. Together they cover both dimensions, which is why the combination is standard industry practice {% cite shah2014hybrid %}.
+The lecture's constructed coupon session starts from a **charter**, a one-line mission (§4), and ends with a **session report** reviewed at a short **debriefing** (§5). The charter: *explore the coupon system using the Obsessive-Compulsive tour (repeat the same action) and the Never-and-Always heuristic (a price is never negative) to discover pricing errors*; its scope is valid, repeated, combined and expired coupons with sale prices and cart changes. The shop allows one coupon per order; the specification's tests each applied one coupon and none combined them. Its starting points (a tour, a heuristic) put it at level 3 (§7). Terms are defined in §4–6. Coupons: SAVE10 is 10% off, WELCOME5 is 5.00 off; when two are entered, the first one applied should stay. Applying a coupon twice doubles the discount; a coupon on a sale item drives the price negative; removing items keeps the discount (#103: a kept discount larger than the remaining subtotal); two tabs accept two coupons. The report, field by field (rule in brackets):
 
-### 1.2 The SRE Context
+- **Charter**: as above.
+- **Duration** (normal 60–120 min, short under 60, long over 120): normal, 90 min.
+- **Time split** (testing; bug investigation, from noting a bug to resuming tests; set-up, everything before testing can start): set-up 09:50–09:59 = 9 min; bugs at 10:12–10:18, 10:30–10:35, 10:48–10:52, 11:05–11:08 = 18 min; testing the other 63 of 90 min. So 70%, 20%, 10%.
+- **Areas covered**: repeated coupons, sale items, removed items, two tabs (combined coupons).
+- **Bugs** (defects, one line each, with severity): #101 discount doubles (major); #102 negative price (critical); #103 subtotal below zero (critical); #104 two coupons on one order (major). Critical: an impossible amount (negative price or total); major: a wrong amount with the total still ≥ 0 (#104: a 40.00 cart with SAVE10 then WELCOME5 costs 40 − 4 − 5 = 31.00 instead of 40 − 4 = 36.00); minor: a wrong message; cosmetic: layout.
+- **Issues** (questions and blockers, not defects): may coupons combine with sale prices?
+- **Next charter** (in scope, not reached): explore expired coupons using the Goldilocks heuristic on expiry dates to discover pricing errors.
+- **Debrief outcome** (filled in after the debriefing): #102 and #103 fixed first; a regression test for each of the four bugs.
 
-Operational profile is **Step 2 of 5** in the Software Reliability Engineering process {% cite musa1993operational %}:
+→ [Exploratory Session Report](../../verif/exploratory/session-report.md)
 
-1. Define the product
-2. **Develop operational profiles**
-3. Establish reliability objectives
-4. Plan and execute tests
-5. Apply test results
+## 4. Charters and heuristics give exploration a direction
 
-{: .highlight }
-> **Exam Tip:** Know where operational profile sits in the SRE 5-step process (Step 2). The profile feeds test planning (Step 4) — without it, test allocation is guesswork.
+Hendrickson's **charter**: *explore* target *using* resources *to discover* information, where resources are tools, data or a named heuristic or tour {% cite hendrickson2013explore %}. A tour sets the strategy for a whole session (§6); a heuristic suggests the next single input. Her heuristics include *Never and Always*: test what must never or always hold (a price is never negative). *Some, None, All*: no permissions, some, all. *Goldilocks*: a file too big, too small, just right. *Beginning, Middle, End*: insert at each position of a list. *CRUD*: create, read, update, delete each entity, in odd orders too. *Follow the Data*: check every screen showing a customer's name. They are the test design techniques of earlier lectures, applied during execution {% cite itkonen2009manual %}.
 
----
+→ [Charters, Heuristics and Tours](../../verif/exploratory/techniques.md)
 
-## Part 2: Exploratory Testing
+## 5. Time-boxed sessions make exploration auditable
 
-### 2.1 What is Exploratory Testing?
+Session-based test management (SBTM) was created to make exploration accountable: a manager must be able to see what was tested. It has four parts: a **charter**, a **time box** of about 90 minutes, a **reviewable result** (the session report of §3) and a **debriefing** that chooses the next charter {% cite bach2000session %}. Counts of sessions and bugs make it plannable.
 
-Exploratory testing is **simultaneous learning, test design, and test execution** {% cite itkonen2005exploratory %}. The tester observes the system, forms hypotheses, and tests them immediately.
+→ [Session-Based Test Management](../../verif/exploratory/session-based.md)
 
-Key characteristics:
-- **Not ad-hoc:** ET uses charters, heuristics, and sessions for structure
-- **Cognitive engagement:** The tester's thinking drives test design in real time
-- **Feedback-driven:** Each test result informs the next test
+## 6. Tours name a strategy for a session
 
-> "The result of each test leads you to design the next" — Elisabeth Hendrickson {% cite hendrickson2013explore %}
+Whittaker groups tours into six city districts. Business: core features users pay for (Money tour). Historical: legacy code, past bugs (Bad-Neighborhood). Entertainment: supporting, long-running features (All-Nighter). Tourist: quick visits, outputs (Collector's). Hotel: idle and cancelled work (Couch Potato). Seedy: hostile, destructive use (Saboteur; Obsessive-Compulsive, which repeats the same action) {% cite whittaker2009exploratory %}. 
 
-### 2.2 ET in Practice — The Coupon Example
+→ [Exploratory Testing Tours](../../verif/exploratory/tours.md)
 
-An exploratory tester with the charter *"Explore the coupon system using unusual input combinations to discover pricing errors"* discovers in a 90-minute session:
+## 7. Exploration is a level you choose
 
-| # | Action | Bug Found |
-|---|--------|-----------|
-| 1 | Apply coupon twice | Discount doubles |
-| 2 | Coupon on sale item | Price goes negative |
-| 3 | Apply coupon, then remove items | Discount stays, subtotal < 0 |
-| 4 | Two browser tabs, different coupons | Both coupons apply |
+Between freestyle (the charter names only the test object) and fully scripted (steps and test data) lie three levels: high exploration (a charter with goals), medium (plus starting points and known risks) and low (plus the activities to perform) {% cite ghazi2017levels %}. Typical uses: freestyle to learn a new product; high to find defects fast (see §16); medium to check known risks; low when traceability matters; fully scripted for conformance, reproduction or new testers. At Ericsson, practitioners recommended spreading test time over all five levels, with 34% of total test time at freestyle (16%) and high exploration (18%), instead of the 20% of total test time they currently got together {% cite ghazi2017decision %}.
 
-None of these bugs were in any test plan.
+→ [Session-Based Test Management](../../verif/exploratory/session-based.md)
 
-{: .highlight }
-> **Exam Tip:** Be able to explain the coupon example. It illustrates how ET finds bugs that no script anticipated — through real-time reasoning.
+## 8. ET matches scripted detection at a fraction of the effort
 
-### 2.3 Hendrickson's Heuristics
+In Itkonen's experiment, 79 students found on average 7.04 defects exploring and 6.37 with their own test cases, not significantly different; but the test cases took 7 hours to design on top of the 1.5-hour session, 8.5 hours in all {% cite itkonen2007defect %}. A replication: again no significant difference; ET 4.58 hours per person, test-case-based 19.47 including design {% cite itkonen2014testcases %}. The lecture's "4–6 times less effort" is the ratio: 8.5 ÷ 1.5 ≈ 5.7 and 19.47 ÷ 4.58 ≈ 4.3. When both groups had the same 90 minutes including design, exploration found 8.34 defects per person against 1.83 {% cite afzal2015experiment %}.
 
-**Charter template:** Every session begins with a charter:
+→ [Exploratory Testing: Evidence](../../verif/exploratory/effectiveness.md)
 
-> **Explore** [target] **using** [resources] **to discover** [information]
+## 9. Best for discovery, worst for repeatability
 
-**Core heuristics:**
+Explore new or unspecified features and usability, alongside scripted regression tests; not when a regulator needs a predefined record, exact repetition or coverage figures. Bugs found become scripted tests.
 
-| Heuristic | What to Try | Example |
-|-----------|-------------|---------|
-| **None, Some, All** | Empty, partial, full sets | Permissions: none → admin access bug? |
-| **Too Big, Too Small, Just Right** | Size extremes (Goldilocks) | Image upload: 3 MB, empty, 50 KB |
-| **Beginning, Middle, End** | Position variations | Edit at start/middle/end of line |
-| **Zero, One, Many** | Count variations | Invoices with 0, 1, 100 items |
-| **CRUD** | All data operations | Create, Read, Update, Delete each entity |
-| **Command Injection** | Malicious input | Single quote in search → SQL error? |
-| **Data Type Attacks** | Type boundaries | Feb 30, 13:75, 2^32+1 |
+→ [Exploratory Testing: Evidence](../../verif/exploratory/effectiveness.md)
 
-**The Nightmare Headline Game:** Ask *"What would be the worst headline if this software fails?"* {% cite hendrickson2013explore %}
+## 10. An operational profile lists operations with their probabilities
 
-### 2.4 Session-Based Test Management (SBTM)
+A **profile** is a set of mutually exclusive alternatives with probabilities; an **operational profile** lists a system's operations: "a quantitative characterization of how a system will be used" {% cite musa1993operational %}. For example, if a shop's logs, where each execution of an operation counts as one run, show browse 6,000, search 2,400, add to cart 1,200, check out 300 and admin report 100 operations per hour, the probabilities are 0.60, 0.24, 0.12, 0.03 and 0.01. They must sum to 1: above 1, operations overlap or are counted twice; below 1, one is missing.
 
-**The four pillars** {% cite bach2000session %}:
+→ [Operational Profile](../../verif/operational-profile/index.md)
 
-| Pillar | Details |
-|--------|---------|
-| **Charter** | What to explore, how, and what problems to seek |
-| **Time Box** | 60-120 minutes |
-| **Reviewable Result** | Bug reports, coverage notes, issues |
-| **Debriefing** | Post-session review with manager/team |
+## 11. Functions, operations and runs are different units
 
-**Debriefing questions:** How did you spend your time? What did you find? Did you need special knowledge? Is there more to do?
+A **function** is a task seen from the requirements; an **operation** is a task as the design implements it; a **run** is one execution of an operation, such as removing line #4711 on 3 March. Musa's example: the function "relocate a telephone" may become two operations, removal and installation {% cite musa1993operational %}. An **operational mode** is a distinct pattern of use with its own profile: peak against night, novice against expert, normal against degraded.
 
-{: .highlight }
-> **Exam Tip:** Know the four SBTM pillars (Charter, Time Box, Reviewable Result, Debriefing) and the debriefing questions.
+→ [Developing an Operational Profile](../../verif/operational-profile/development.md)
 
-### 2.5 Whittaker's Tourist Metaphor — Five Districts
+## 12. Six steps lead from modes to probabilities
 
-James Whittaker organizes exploration using a tourist metaphor {% cite whittaker2009exploratory %}:
+The steps: determine operational modes; identify initiators (users, external systems, the system itself); choose a table or a tree; list the operations; determine occurrence rates; divide each rate by the total {% cite musa2004sre %}. A tree suits operations combining attributes; its branch probabilities may differ under each parent (in Musa's example they do not). Musa's billing example classifies accounts by service (residential 0.80, business 0.20), calling plan (none 0.75, national 0.20, international 0.05) and payment (paid 0.99, delinquent 0.01), giving 2 × 3 × 2 = 12 operations. In a tree each probability is the product along its branch: residential, no plan, paid is 0.80 × 0.75 × 0.99 = 0.594; the rarest, business, international, delinquent, is 0.20 × 0.05 × 0.01 = 0.0001 {% cite musa1993operational %}.
 
-| District | Focus | Key Tours |
-|----------|-------|-----------|
-| **Business** | Features users rely on daily | Guidebook Tour, Money Tour |
-| **Historical** | Legacy code and old features | Bad Neighborhood Tour, Museum Tour |
-| **Entertainment** | Fun, unusual inputs | Obsessive-Compulsive Tour, Antisocial Tour |
-| **Tourist** | First-time user experience | Collector's Tour, Supermodel Tour |
-| **Hotel** | Background processes | All-Nighter Tour, TOGOF |
+→ [Developing an Operational Profile](../../verif/operational-profile/development.md)
 
-### 2.6 Five Levels of Exploration
+## 13. Industrial projects reported large savings
 
-ET and scripted testing form a spectrum {% cite ghazi2017levels %}:
+At AT&T, the profile combined with other techniques cut customer-reported problems tenfold and halved system-test time; at Hewlett-Packard, profile-driven system test cut test time and cost by at least half {% cite musa1993operational %}. These are project reports, not controlled studies; AT&T's figure is not the profile's alone.
 
-| Level | Tester Receives | Example |
-|-------|----------------|---------|
-| **1. Freestyle** | Only the test object | "Here's our app. Find problems." |
-| **2. High exploration** | Charter with goals | "Explore attachments for security issues." |
-| **3. Medium** | Charter + starting points | "Try PDFs > 10 MB, ZIP files, Unicode names." |
-| **4. Low exploration** | Detailed activities | "Upload PDF, upload ZIP, upload while offline." |
-| **5. Fully scripted** | Steps + expected results | "Step 1: Click Attach. Step 2: Select file. Expected: success." |
+→ [Operational Profile: Industrial Evidence](../../verif/operational-profile/case-studies.md)
 
-**Industrial finding:** Ericsson used 80% scripted / 20% ET; the evidence-based recommendation was **~57% exploratory** {% cite ghazi2017decision %}.
+## 14. Not all code matters equally: weight coverage by use
 
-{: .highlight }
-> **Exam Tip:** Know the five levels and concrete examples. The "right" level depends on context (finding new defects → higher; regulatory → lower).
+In the lecture's example, four methods have 20 branches, 9 covered: plain coverage is 45%. **Usage-weighted coverage** weights by usage share (login 3/4 covered, 0.50; search 2/6, 0.30; checkout 4/4, 0.15; admin 0/6, 0.05): 3/4 × 0.50 + 2/6 × 0.30 + 4/4 × 0.15 + 0/6 × 0.05 = 62.5%. **Operational coverage**, the published version {% cite miranda2018coverage %}, cuts the ranked list of elements users run into three equal parts, weighted 1, 3, 9 (low, medium, high); here the elements are the methods, ranked by usage share, and each band's coverage is its covered ÷ total branches. Four methods do not divide by three, so the split is a judgement; two ways, with the branches of a two-method band pooled by count:
 
-### 2.7 Empirical Evidence for ET
+| Split | High (weight 9) | Medium (3) | Low (1) | Calculation | Result |
+|---|---|---|---|---|---|
+| A | login 3/4 | search 2/6 | checkout + admin 4/10 | (9 × 0.75 + 3 × 0.333 + 1 × 0.40) ÷ 13 | 62.7% |
+| B | login + search 5/10 | checkout 4/4 | admin 0/6 | (9 × 0.5 + 3 × 1 + 1 × 0) ÷ 13 | 57.7% |
 
-| Study | ET Defects | Scripted Defects | ET Hours | Scripted Hours |
-|-------|-----------|-----------------|---------|---------------|
-| Itkonen 2007 (n=79) | 7.04 | 6.37 (n.s.) | 1.5 | 8.5 |
-| Itkonen 2014 (n=51) | 5.47 | 6.06 (n.s.) | 4.58 | 19.47 |
-| Afzal 2015 (n=70) | 8.34 | 1.83 (p<0.001) | 1.5 | 1.5 (equal time) |
+Either is accepted with the split stated. It is higher than plain coverage when the most used code is better covered than average, lower when worse; uncovered code that nobody uses has weight 0, so it does not pull the weighted figure down. It also serves as a stopping rule.
 
-**Key findings** {% cite itkonen2007defect itkonen2014testcases afzal2015experiment %}:
-1. ET matches scripted testing in defect detection
-2. ET is **4-6x more efficient** when total effort is counted (d=1.33)
-3. ET finds **380% more usability defects**
-4. Scripted testing produces **2x more false positives**
-5. Equal time → ET finds **4.6x more defects** (d=2.065)
+→ [Operational Coverage](../../verif/operational-profile/modern.md)
 
-**Industrial adoption:** 88% of professionals use ET {% cite pfahl2014survey %}.
+## 15. Usage profiles can come free from telemetry
 
-### 2.8 The Coverage Paradox
+Google Play records which methods real users execute in each Android app as a **Cloud Profile**: a list of methods without probabilities, unlike Musa's profile. 99.89% of the top 1,000 apps had one, listing on average 7.88% of an app's methods {% cite bleier2025profile %}. They differed from the lists developers declared: you cannot assume how users will use your software. **Profile coverage**, the unweighted share of these methods a test executes, showed a simple random generator covering more than smarter tools; no tool exceeded 70% on any app.
 
-ET consistently achieves **lower structural coverage** than scripted testing (Shah 2014 {% cite shah2014hybrid %}), yet matches or exceeds it in defect counts. This apparent contradiction has three explanations:
+→ [Operational Profile: Industrial Evidence](../../verif/operational-profile/case-studies.md)
 
-1. **Coverage measures traversal, not fault-revealing power.** Code coverage records which statements or branches were executed — not whether those executions stressed the system. Scripted tests systematically execute all branches, but many of those executions use "expected" inputs on "expected" paths. The code runs without finding a bug not because the bug isn't there, but because the input didn't trigger it.
+## 16. When the profile saturates, explore
 
-2. **Defects cluster.** Most bugs are concentrated in a small fraction of the codebase — the complex, edge-case-heavy modules. ET testers, guided by heuristics and active reasoning, naturally gravitate toward complexity and anomalies. They reach high-defect areas without covering the full structural map.
+Profile-based testing saturates: once the frequent paths are clean, more tests barely improve reliability {% cite bertolino2017adaptive %}. When usage data exists or is cheap (logs, telemetry), it comes first, because if testing must stop early, the most used operations have had the most testing {% cite musa1993operational %}. Without it a profile costs effort (about a staff-month, Musa estimated); under time pressure, start with high-exploration charters on the features users are expected to use most, and build the profile as data arrives. The **two-phase strategy** tests by profile first, then explores high-usage features and what a profile cannot see (rare critical operations, interrupts, usability); finds become regression tests. When to switch is a judgement; one signal is batches finding no new failures.
 
-3. **ET exercises paths with higher fault-revealing inputs.** Even when an ET tester and a scripted tester both execute the same branch, the ET tester is more likely to do so with adversarial, boundary-probing, or semantically interesting inputs. Coverage counts the path once; it doesn't distinguish between a routine traversal and a targeted probe.
+→ [From Profile to Exploration](../../verif/operational-profile/bridge.md)
 
-{: .highlight }
-> **Exam Tip:** Coverage is a **necessary but not sufficient** condition for fault detection. Executing code does not guarantee finding bugs in it — it depends on *how* the code is executed. ET achieves comparable fault detection with lower coverage because it optimises the *quality* of each execution, not the breadth.
+## Where this goes next
 
----
-
-## Part 3: Operational Profile Definition
-
-### 3.1 What is an Operational Profile?
-
-> "Set of operations with occurrence probabilities — quantitative characterization of how the system will be used" {% cite musa1993operational %}
-
-**Example (telephone switch):**
-
-| Operation | Rate/hr | Probability |
-|-----------|---------|-------------|
-| Add call | 10,000 | 0.500 |
-| Query call | 4,000 | 0.200 |
-| Edit call | 3,000 | 0.150 |
-| Remove call | 3,000 | 0.150 |
-| **Total** | **20,000** | **1.000** |
-
-### 3.2 Operations, Functions, and Runs
-
-| Concept | Perspective | Example |
-|---------|-------------|---------|
-| **Function** | User (requirements) | "Relocate telephone" |
-| **Operation** | Design (development) | "Removal" + "Install" |
-| **Run** | Smallest unit | Single "removal" execution |
-
-### 3.3 Operational Modes
-
-The same operation may have different probabilities in different contexts {% cite musa1993operational %}:
-
-| Factor | Example Modes |
-|--------|---------------|
-| **Time** | Peak, Prime, Off |
-| **User type** | Customer, Admin, System |
-| **Experience** | Novice, Expert |
-| **Capability** | Full, Degraded, Maintenance |
-| **Criticality** | Normal, Emergency, Shutdown |
-
-{: .highlight }
-> **Exam Tip:** An operational mode is not just "who uses the system" — it includes time, capability, and criticality.
-
----
-
-## Part 4: Developing Operational Profiles
-
-### 4.1 The 6-Step Procedure
-
-Musa defines a six-step procedure {% cite musa1999software %}:
-
-| Step | Action | Key Question |
-|------|--------|-------------|
-| 1 | **Determine operational modes** | What distinct usage patterns exist? |
-| 2 | **Identify initiators** | Who or what triggers operations? |
-| 3 | **Select representation** | Tabular or graphical? |
-| 4 | **Create operations list** | What operations exist in each mode? |
-| 5 | **Determine occurrence rates** | How often does each operation occur? |
-| 6 | **Calculate probabilities** | Normalize: sum = 1.0 |
-
-**Cost:** ~1 staff-month for an average project (10 developers, 100 KLOC) {% cite musa1993operational %}.
-
-**Step 3 — Tabular vs Graphical:**
-
-| Representation | Structure | Use When |
-|----------------|-----------|----------|
-| **Tabular (flat)** | Simple table: operation, rate, probability | Single initiator type; ≤ ~30 operations; straightforward system |
-| **Graphical (tree)** | Hierarchical: initiator types branch into operations | Multiple initiator types; large operation count; complex system; communication to non-technical stakeholders |
-
-> **Rule of thumb (Musa):** Start with tabular. Switch to graphical when you have multiple initiator types whose operations do not overlap, or when the list grows large enough that structure aids comprehension.
-
-{: .highlight }
-> **Exam Tip:** Tabular = one initiator type, small list. Graphical = multiple initiator types or complex hierarchy. The key driver is the number and type of initiators, not personal preference.
-
-### 4.2 From Rates to Probabilities
-
-$$P(\text{operation}) = \frac{\text{Rate(operation)}}{\text{Sum(all rates)}}$$
-
-**Sources** (in order of quality): Field data → System logs → Surveys → Expert estimate → Best guess.
-
-{: .highlight }
-> **Exam Tip:** Know the probability formula. Be able to calculate probabilities given occurrence rates. Probabilities must sum to 1.0.
-
----
-
-## Part 5: Evidence & Modern OP Approaches
-
-### 5.1 Industrial Evidence
-
-| Organization | Result |
-|--------------|--------|
-| **AT&T Definity PBX** | 10x customer problem reduction, test cycle halved |
-| **Hewlett-Packard** | ≥50% test time and cost reduction |
-
-**Cost-benefit:** OP costs ~1 staff-month. With ≥50% test savings, the ROI exceeds 10:1 {% cite musa1993operational %}.
-
-### 5.2 Operational Coverage
-
-Traditional coverage treats all code equally. **Operational coverage** weights code by usage {% cite miranda2016stopping %}:
-
-**Worked example:**
-
-| Method | Branches | Covered | Usage |
-|--------|----------|---------|-------|
-| `login()` | 4 | 3 | 50% |
-| `search()` | 6 | 2 | 30% |
-| `checkout()` | 4 | 4 | 15% |
-| `adminPanel()` | 6 | 0 | 5% |
-
-**Traditional:** (3+2+4+0)/20 = **45%**
-**Operational:** (3/4)×0.50 + (2/6)×0.30 + (4/4)×0.15 + (0/6)×0.05 = **62.5%**
-
-Operational coverage outperforms traditional in **8 of 9 cases** (p<2.2e-16) {% cite miranda2016stopping miranda2018coverage %}.
-
-{: .highlight }
-> **Exam Tip:** Know the operational coverage formula (weighted sum) and be able to calculate it.
-
-### 5.3 Android Cloud Profiles
-
-Bleier et al. (2025) discovered that operational profiles can be obtained **for free** from production telemetry {% cite bleier2025profile %}:
-
-| Metric | Value |
-|--------|-------|
-| **Availability** | 99.89% of top-1000 Android apps |
-| **Average profile size** | 7.88% of total methods |
-| **Coverage ceiling** | No automated tool exceeds 70% profile coverage |
-
-**Key findings:**
-- Cloud Profiles are **not** strict supersets of developer Baseline Profiles
-- Monkey (random) outperformed model-based tools: 37.45% vs. 32.51%
-- ~30% of user-relevant behavior requires **human exploration**
-
-### 5.4 The OP↔ET Bridge — Two-Phase Testing Strategy
-
-**Phase 1 — Quantitative (OP):**
-1. Build operational profile from usage data
-2. Generate tests proportional to usage frequency
-3. Measure operational coverage
-4. Continue until saturation (~70%)
-
-**Phase 2 — Qualitative (ET):**
-1. Use OP priorities to guide charters
-2. Apply heuristics and tours to high-priority features
-3. Find usability, edge-case, and interaction defects
-4. Convert findings to scripted regression tests
-
-{: .highlight }
-> **Exam Tip:** Know the two-phase strategy. OP first (quantitative) → ET second (qualitative) → convert findings to scripted tests. The saturation point (~70%) triggers the switch.
-
----
-
-## Part 6: Summary — Key Takeaways
-
-| # | Takeaway |
-|---|----------|
-| 1 | **Exploratory testing** = learn, design, execute simultaneously — **4-6x more efficient** than scripted |
-| 2 | **Session-based management** makes ET auditable: charter + time box + debriefing |
-| 3 | **Five levels of exploration** from freestyle to fully scripted — choose per context |
-| 4 | **Operational profile** = operations + occurrence probabilities — quantifies usage |
-| 5 | **6-step procedure:** Modes → Initiators → Representation → List → Rates → Probabilities |
-| 6 | **Industrial evidence:** AT&T 10x improvement, HP 50% cost savings |
-| 7 | **Operational coverage** weights code by usage (62.5% vs. 45% in worked example) |
-| 8 | **Two-phase strategy:** When OP saturates (~70%) → switch to ET for the remaining 30% |
-
-**Key formulas:**
-
-$$P(\text{op}) = \frac{\text{Rate(op)}}{\text{Total Rate}}$$
-
-$$\text{OpCov} = \sum_i \frac{\text{covered}_i}{\text{total}_i} \times \text{usage}_i$$
+[Software Reliability](SN_L08_Reliability.md) builds on the profile: test failure rates predict the field only when tests follow it. For the class session, the instructor sets the exploration level and the time box; a short session is fine, reported with the same fields.
 
 ---
 

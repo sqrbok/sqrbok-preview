@@ -1,182 +1,79 @@
 ---
-title: Operational Profile: Industrial Evidence
+title: "Operational Profile: Industrial Evidence"
 parent: Operational Profile
 nav_order: 2
 layout: default
+vegalite: true
 ---
 
-# Industrial Evidence for Operational Profiles
+# Operational Profile: Industrial Evidence
 
-Operational profile-based testing has been validated in major industrial settings, with documented benefits including order-of-magnitude problem reduction and 50% test cost savings {% cite musa1993operational %}.
+**The industrial evidence for operational profiles consists of two reported telecom and operating-system projects from the early 1990s and, recently, the discovery that Android apps already ship with usage profiles collected from real users.** Both point to the same lesson: test effort spent where users spend their time pays off, and nobody can guess that distribution reliably.
 
----
+## 1. AT&T and Hewlett-Packard
 
-## AT&T Definity (Telephone Switch)
+Musa reports two projects {% cite musa1993operational %}:
 
-The most extensively documented OP case study {% cite musa1993operational %}:
+- **AT&T International Definity**, a PBX telephone switch. Combining the operational profile *with other quality-improvement techniques* cut customer-reported problems and maintenance costs by a factor of 10, halved the system-test interval and shortened product introduction by 30%. The project had invested two to three staff-years in the customer study behind its profile.
+- **Hewlett-Packard**, a multiprocessor operating system. Reorganising system test around the operational profile, with automated test and failure recording, reduced system-test time and cost by at least 50%.
 
-| Metric | Result |
-|--------|--------|
-| **Customer problems** | Reduced by 10x (order of magnitude) |
-| **System test interval** | Halved |
-| **Product introduction interval** | Reduced by 30% |
+For an average project Musa estimated that profile-driven testing cuts test cost by 56%, or 11.5% of total project cost, and that the benefit-to-cost ratio of building and using a profile is typically 10 or more {% cite musa1993operational %}.
 
-The PBX switch operational profile included operations such as local call (59.4%), toll call (15.6%), call forwarding (9.8%), down to conference call (0.01%). By testing proportional to these frequencies, the highest-impact defects were found first.
+## 2. Android Cloud Profiles
+
+Android compiles the most-used methods of an app ahead of time. To know which ones, Google Play aggregates the methods real users execute into a **Cloud Profile** per app. Bleier et al. noticed that such a profile is an operational profile at method level, collected for free {% cite bleier2025profile %}:
+
+- 99.89% of the top 1,000 apps had a Cloud Profile;
+- a Cloud Profile is a usage profile without probabilities: a list of methods; on average the list contained 7.88% of all the methods in an app, so users exercise a small part of the code;
+- the Cloud Profiles were not just supersets of the profiles developers declared themselves, so actual use differed from what developers expected.
+
+They define **profile coverage** as the share of the profile's methods that a test run executes, and compare it with ordinary method coverage.
+
+### Worked example: Candy Crush
+
+Bleier et al. ran two test generators on Candy Crush. Android's random input generator Monkey reached 22.52% method coverage and 21.39% profile coverage. The model-based tool Fastbot2 raised method coverage to 39.33%, a 75% increase, yet its profile coverage fell to 3.13% {% cite bleier2025profile %}. By code coverage Fastbot2 is the better tool; by profile coverage it spent its time in parts of the game that players rarely touch.
+
+The tools compared were Monkey, which sends random taps and keystrokes; DroidBot and Fastbot2, which build a model of the app's screens and choose inputs from it; and a baseline that only starts the app.
 
 ```vega-lite
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "title": "AT&T Definity PBX: Operational Profile",
-  "width": 450,
-  "height": 250,
-  "data": {
-    "values": [
-      {"operation": "Local call", "probability": 0.594},
-      {"operation": "Toll call", "probability": 0.156},
-      {"operation": "Call forwarding", "probability": 0.098},
-      {"operation": "3-way conference", "probability": 0.052},
-      {"operation": "Call waiting", "probability": 0.045},
-      {"operation": "Speed dial", "probability": 0.030},
-      {"operation": "Call transfer", "probability": 0.015},
-      {"operation": "Other operations", "probability": 0.010}
-    ]
-  },
-  "mark": "bar",
+  "width": "container", "height": 150,
+  "data": {"values": [
+    {"tool": "Monkey (random)", "pct": 37.45},
+    {"tool": "Fastbot2 (model-based)", "pct": 32.51},
+    {"tool": "DroidBot (model-based)", "pct": 29.50},
+    {"tool": "Start app, no input", "pct": 24.87}
+  ]},
   "encoding": {
-    "y": {
-      "field": "operation",
-      "type": "nominal",
-      "title": "Operation",
-      "sort": "-x"
-    },
-    "x": {
-      "field": "probability",
-      "type": "quantitative",
-      "title": "Occurrence Probability",
-      "axis": {"format": ".0%"}
-    },
-    "color": {
-      "field": "probability",
-      "type": "quantitative",
-      "scale": {"scheme": "blues"},
-      "legend": null
-    }
-  }
+    "y": {"field": "tool", "type": "nominal", "title": null, "sort": "-x"},
+    "x": {"field": "pct", "type": "quantitative", "title": "Average profile coverage over 50 apps (%)", "scale": {"domain": [0, 50]}}
+  },
+  "layer": [
+    {"mark": {"type": "bar", "cornerRadiusEnd": 3, "color": "#019546"}},
+    {"mark": {"type": "text", "align": "left", "dx": 4, "fontSize": 13}, "encoding": {"text": {"field": "pct", "type": "quantitative", "format": ".2f"}}}
+  ],
+  "config": {"font": "Tahoma", "axis": {"labelFontSize": 13, "titleFontSize": 13}}
 }
 ```
 
-{: .note }
-> *Chart reconstructed to illustrate the Pareto-like distribution typical of operational profiles. See {% cite musa1993operational %} for original data.*
+_Average profile coverage of three test generators and a do-nothing baseline on 50 apps; no tool exceeded 70% on any app._ {% cite bleier2025profile %}
 
----
+These are averages over 50 apps; Monkey's 37.45% is its average, while the 21.39% above is its result on a single app, Candy Crush. The simple random tool covered the most user-relevant code. Coverage of the app's structure and coverage of its actual use are different measures, and ranking tools by one does not rank them by the other.
 
-## Hewlett-Packard
+## When to use it — and when not
 
-HP adopted OP-based testing across multiple product lines {% cite musa1993operational %}:
+Cite this evidence when arguing for usage data in test planning. Do not quote the AT&T factor of 10 as the effect of the profile alone: the project combined several techniques, and no study separates their contributions.
 
-| Metric | Result |
-|--------|--------|
-| **System test time** | Reduced by at least 50% |
-| **System test cost** | Reduced by at least 50% |
+## Limitations
 
----
+The 1993 results are self-reported by the technique's authors, from two projects, without a control group. The Android result measures where tests go, not how many faults they find.
 
-## Bayesian Reliability Analysis (Billing System)
+## How solid is this?
 
-Ozekici and Soyer demonstrated OP-based reliability modeling on a billing system {% cite ozekici2003reliability %}:
-
-| Operation | Frequency |
-|-----------|-----------|
-| Most frequent operation | 59.4% |
-| Least frequent operation | 0.01% |
-
-Key insight: failure rates are **operation-dependent** — some operations are inherently more failure-prone than others. By making failure rates dependent on which operation is executing, the Bayesian model provides more accurate reliability predictions than models that assume uniform failure behavior {% cite ozekici2003reliability %}.
-
----
-
-## Modern: Android Profile Coverage
-
-### What Are Cloud Profiles?
-
-When you use an Android app, Google Play Services silently records which methods (functions) in the app were executed. Google aggregates this data across millions of users and publishes the result as a **Cloud Profile** — essentially a list of "the code paths that real users actually exercise." Developers originally use Cloud Profiles to speed up app startup (the Android runtime pre-compiles frequently-used methods), but Bleier et al. realized these profiles are, by definition, an **operational profile for free**: they tell you which parts of the app matter to real users, without any manual effort or instrumentation.
-
-Bleier et al. (2025) demonstrated that operational profiles can be obtained almost for free in the mobile ecosystem by repurposing existing telemetry infrastructure {% cite bleier2025profile %}:
-
-### Google Cloud Profiles
-
-| Metric | Value |
-|--------|-------|
-| **Availability** | 99.89% of top-1000 Android apps |
-| **Average profile size** | 7.88% of total app methods |
-| **Cost** | Free, no instrumentation required |
-| **Source** | Aggregated real-user telemetry (Google Play) |
-
-### Key Findings
-
-| Finding | Implication |
-|---------|------------|
-| Candy Crush: 2.22% method coverage but 21.39% profile coverage | Testing aligns with user behavior better than raw coverage suggests |
-| Cloud Profiles are not strict supersets of Baseline Profiles | Actual user behavior diverges from developer expectations |
-| Monkey (random) outperformed model-based tools: 37.45% vs. 32.51% profile coverage | Coverage of user-relevant behavior differs from structural coverage |
-| No automated tool exceeded 70% profile coverage | ~30% of user-relevant behavior requires human exploration |
-
-```vega-lite
-{
-  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "title": "Android Testing Tools: Profile Coverage vs. Method Coverage",
-  "width": 450,
-  "height": 250,
-  "data": {
-    "values": [
-      {"tool": "Monkey (random)", "metric": "Profile Coverage", "value": 37.45},
-      {"tool": "Monkey (random)", "metric": "Method Coverage", "value": 42.1},
-      {"tool": "Fastbot2", "metric": "Profile Coverage", "value": 32.51},
-      {"tool": "Fastbot2", "metric": "Method Coverage", "value": 38.7},
-      {"tool": "DroidBot", "metric": "Profile Coverage", "value": 29.50},
-      {"tool": "DroidBot", "metric": "Method Coverage", "value": 35.2},
-      {"tool": "Candy Crush (example)", "metric": "Profile Coverage", "value": 21.39},
-      {"tool": "Candy Crush (example)", "metric": "Method Coverage", "value": 2.22}
-    ]
-  },
-  "mark": "bar",
-  "encoding": {
-    "x": {"field": "tool", "type": "nominal", "title": "Tool / App", "axis": {"labelAngle": -15}},
-    "y": {"field": "value", "type": "quantitative", "title": "Coverage (%)"},
-    "xOffset": {"field": "metric"},
-    "color": {
-      "field": "metric",
-      "type": "nominal",
-      "scale": {"domain": ["Profile Coverage", "Method Coverage"], "range": ["#1565c0", "#90caf9"]},
-      "title": "Metric"
-    }
-  }
-}
-```
-
-{: .note }
-> *Chart reconstructed from published data. See {% cite bleier2025profile %} for original measurements and additional tools.*
-
-{: .highlight }
-> Cloud Profiles transform OP from a theoretical concept into something concrete and practically free. They validate the fundamental OP premise: **you cannot assume you know how users will use your software** {% cite bleier2025profile %}.
-
-### PROFTRACE Tool
-
-| Metric | PROFTRACE | ACVTool (traditional) |
-|--------|-----------|----------------------|
-| **Success rate** | 94.2% (827 apps) | 13.78% |
-| **Approach** | Lightweight uprobes-based tracing | App instrumentation |
-| **App modification** | None required | Required |
-
----
-
-## Summary: Cross-Study Evidence
-
-| Organization | OP Benefit | Source |
-|--------------|-----------|--------|
-| AT&T Definity | 10x problem reduction, 50% faster test | {% cite musa1993operational %} |
-| Hewlett-Packard | 50% test cost reduction | {% cite musa1993operational %} |
-| Android ecosystem | Free OP via telemetry (99.89% coverage) | {% cite bleier2025profile %} |
-| Billing system | Operation-dependent reliability confirmed | {% cite ozekici2003reliability %} |
+- **Where it comes from.** Musa's 1993 article {% cite musa1993operational %}; the Android study measured profiles of the top 1,000 apps and compared tools on 50 {% cite bleier2025profile %}.
+- **What is contested.** The paper's introduction quotes 2.22% method coverage for Monkey on Candy Crush, its tool comparison 22.52%; we use the comparison, where both tools were measured the same way. Whether the industrial savings transfer to other domains; Musa's projects were mostly real-time telecom systems.
+- **What we do not hold.** A controlled study of failures found with and without a profile on the same product.
 
 ---
 

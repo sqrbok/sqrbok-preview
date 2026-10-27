@@ -7,223 +7,71 @@ layout: default
 
 # Developing an Operational Profile
 
-John Musa's five-step procedure transforms vague usage assumptions into a quantitative testing foundation {% cite musa1993operational %}. Each step narrows from broad market characterization to implementation-level operations with specific occurrence probabilities.
+**Developing an operational profile means listing the mutually exclusive operations a system performs and estimating, for each one, the probability that the next operation in the field is that one.** Musa's procedure narrows from usage situations to single operations, and ends with probabilities that sum to 1 {% cite musa1993operational musa2004sre %}.
 
----
+## 1. Terms
 
-## The Five-Step Procedure
+- A **run** is one execution of a task started from outside, such as one bill being processed.
+- An **operation** is a class of similar runs that the design treats alike, for example "process a residential account with no calling plan".
+- A **function** is the same kind of task seen from the requirements; one function may map to several operations, as "relocate a phone" maps to removing it and installing it {% cite musa1993operational %}. In short: a function is what users ask for, an operation is how the design does it.
+- An **operational mode** is a distinct pattern of use that deserves its own profile, such as peak hours against night batch, or normal against degraded operation.
 
-```mermaid
-flowchart TD
-    S1["1. Customer Profile<br>Who purchases?<br>Customer types + weights"]
-    S2["2. User Profile<br>Who operates?<br>User types + weights"]
-    S3["3. System-Mode Profile<br>How is it configured?<br>Modes + probabilities"]
-    S4["4. Functional Profile<br>What do users do?<br>Functions + frequencies"]
-    S5["5. Operational Profile<br>What input combinations?<br>Operations + probabilities"]
+## 2. The six steps
 
-    S1 --> S2 --> S3 --> S4 --> S5
+This handbook uses a six-step arrangement of Musa's procedure; Musa's 2004 book lists five steps (see *How solid is this?*) {% cite musa2004sre %}:
 
-    style S1 fill:#e3f2fd,stroke:#1976d2
-    style S2 fill:#bbdefb,stroke:#1565c0
-    style S3 fill:#90caf9,stroke:#0d47a1
-    style S4 fill:#64b5f6,stroke:#0d47a1
-    style S5 fill:#42a5f5,stroke:#0d47a1,color:#fff
-```
+1. **Determine the operational modes** that need separate profiles.
+2. **Identify the initiators**: users, external systems, and the system itself (timers, backups).
+3. **Choose a representation**: a flat table of operations, or a tree when operations are combinations of independent attributes.
+4. **Create the operations list** for each mode and initiator, from use cases, logs and expert interviews.
+5. **Determine occurrence rates** (operations per hour), best from field data or logs of a similar system, otherwise from estimates.
+6. **Compute occurrence probabilities**: each rate divided by the total rate.
 
-### Step 1: Customer Profile
+## 3. Worked example: from rates to probabilities
 
-Identify all **customer types** (purchasers) and their relative weights:
+A web shop's logs give the following rates in normal daytime use. The numbers are constructed for illustration.
 
-| Customer Type | Weight |
-|---------------|--------|
-| Large enterprise | 0.40 |
-| Small business | 0.35 |
-| Individual | 0.25 |
+| Operation | Rate per hour | Probability |
+|---|---|---|
+| Browse catalogue | 6,000 | 6,000 ÷ 10,000 = 0.60 |
+| Search | 2,400 | 0.24 |
+| Add to cart | 1,200 | 0.12 |
+| Check out | 300 | 0.03 |
+| Admin sales report | 100 | 0.01 |
+| **Total** | **10,000** | **1.00** |
 
-### Step 2: User Profile
+Of 1,000 test runs, 600 would browse and 10 would run the admin report. Night-time batch processing would be a separate mode with its own table.
 
-For each customer type, identify **user types** (actual operators):
+## 4. Worked example: a profile as a tree
 
-| User Type | Probability |
-|-----------|-------------|
-| End user | 0.60 |
-| System administrator | 0.25 |
-| Maintenance engineer | 0.15 |
+When an operation is a combination of attributes, a tree (Musa's graphical representation) multiplies the branch probabilities. Musa's billing system classifies accounts by service (80% residential, 20% business), calling plan (75% none, 20% national, 5% international) and payment (99% paid, 1% delinquent), which gives 2 × 3 × 2 = 12 operations, 6 leaves under each service {% cite musa1993operational %}. In a tree, the probabilities on a branch may depend on the branch above it; in this example they happen to be the same under each parent.
 
-### Step 3: System-Mode Profile
+![Tree from account to service, plan and payment; residential, no plan, paid is 0.8 × 0.75 × 0.99 = 0.594, business, international, delinquent is 0.0001](billing-tree.svg)
 
-Identify operational **modes** (configurations in which the system operates):
+_The billing profile as a tree; each operation's probability is the product along its path. Only two leaves are drawn; the other ten follow the same multiplication._ {% cite musa1993operational %}
 
-| Mode | Probability |
-|------|-------------|
-| Normal operation | 0.85 |
-| Peak load | 0.10 |
-| Recovery/maintenance | 0.05 |
+The most frequent operation has probability 0.594 and the rarest 0.0001, a ratio of almost 6,000 to 1. Such skew is typical, and it is the reason to allocate tests by profile.
 
-### Step 4: Functional Profile
+## When to use it — and when not
 
-For each mode, identify **functions** with their execution frequencies:
+Build a profile when:
 
-| Function | Probability |
-|----------|-------------|
-| Process transaction | 0.45 |
-| Query account | 0.30 |
-| Generate report | 0.15 |
-| System configuration | 0.10 |
+- reliability in the field matters and you want test effort to follow real use;
+- you need a failure rate estimate that means something to users.
 
-### Step 5: Operational Profile
+Do not rely on it alone when:
 
-Combine functions with specific **input variable values** to define operations:
+- rare operations are critical (an emergency shutdown runs almost never); test them separately, whatever their probability.
 
-| Operation | Probability |
-|-----------|-------------|
-| Process small transaction (< $100) | 0.32 |
-| Process large transaction (>= $100) | 0.13 |
-| Query active account | 0.24 |
-| Query closed account | 0.06 |
-| ... | ... |
+## Limitations
 
----
+A profile is only as good as its rates, and new products have no field data. Usage changes over time, so profiles go stale. Profiles also model what users initiate, and miss events such as hardware interrupts or operating-system signals {% cite koziolek2005operational %}.
 
-## Representations
+## How solid is this?
 
-### Tabular (Musa's Standard)
-
-The most common format: a table of operations and their occurrence probabilities, sorted by probability in descending order {% cite musa1993operational %}:
-
-| Rank | Operation | Probability | Cumulative |
-|------|-----------|-------------|------------|
-| 1 | Local call | 0.594 | 0.594 |
-| 2 | Toll call | 0.156 | 0.750 |
-| 3 | Call forwarding | 0.098 | 0.848 |
-| ... | ... | ... | ... |
-| n | Conference (6-way) | 0.0001 | 1.000 |
-
-*Example: PBX telephone switch {% cite musa1993operational %}.*
-
-Operational profiles typically follow a **Pareto-like distribution** — a small number of operations account for most of the usage:
-
-```vega-lite
-{
-  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "title": "Typical OP: Cumulative Probability (Pareto Pattern)",
-  "width": 450,
-  "height": 250,
-  "layer": [
-    {
-      "data": {
-        "values": [
-          {"rank": 1, "cumulative": 0.594, "operation": "Op 1"},
-          {"rank": 2, "cumulative": 0.750, "operation": "Op 2"},
-          {"rank": 3, "cumulative": 0.848, "operation": "Op 3"},
-          {"rank": 4, "cumulative": 0.900, "operation": "Op 4"},
-          {"rank": 5, "cumulative": 0.940, "operation": "Op 5"},
-          {"rank": 6, "cumulative": 0.965, "operation": "Op 6"},
-          {"rank": 7, "cumulative": 0.980, "operation": "Op 7"},
-          {"rank": 8, "cumulative": 0.990, "operation": "Op 8"},
-          {"rank": 9, "cumulative": 0.997, "operation": "Op 9"},
-          {"rank": 10, "cumulative": 1.000, "operation": "Op 10"}
-        ]
-      },
-      "mark": {"type": "area", "color": "#1565c0", "opacity": 0.3},
-      "encoding": {
-        "x": {"field": "rank", "type": "quantitative", "title": "Operation Rank (by frequency)"},
-        "y": {"field": "cumulative", "type": "quantitative", "title": "Cumulative Probability", "scale": {"domain": [0, 1]}, "axis": {"format": ".0%"}}
-      }
-    },
-    {
-      "data": {
-        "values": [
-          {"rank": 1, "cumulative": 0.594},
-          {"rank": 2, "cumulative": 0.750},
-          {"rank": 3, "cumulative": 0.848},
-          {"rank": 4, "cumulative": 0.900},
-          {"rank": 5, "cumulative": 0.940},
-          {"rank": 6, "cumulative": 0.965},
-          {"rank": 7, "cumulative": 0.980},
-          {"rank": 8, "cumulative": 0.990},
-          {"rank": 9, "cumulative": 0.997},
-          {"rank": 10, "cumulative": 1.000}
-        ]
-      },
-      "mark": {"type": "line", "color": "#1565c0", "strokeWidth": 2, "point": true},
-      "encoding": {
-        "x": {"field": "rank", "type": "quantitative"},
-        "y": {"field": "cumulative", "type": "quantitative"}
-      }
-    },
-    {
-      "data": {"values": [{"y": 0.9}]},
-      "mark": {"type": "rule", "strokeDash": [4, 4], "color": "#d32f2f"},
-      "encoding": {"y": {"field": "y", "type": "quantitative"}}
-    }
-  ]
-}
-```
-
-{: .note }
-> *Chart reconstructed to illustrate the Pareto pattern. Dashed line: 90% cumulative probability — just 4 operations cover 90% of usage. See {% cite musa1993operational %} for original data.*
-
-### Markov Chain Models
-
-For systems where operation sequences matter, Markov chain-based usage models capture dependencies between consecutive calls {% cite koziolek2005operational %}:
-
-```mermaid
-stateDiagram-v2
-    [*] --> Login
-    Login --> Browse: 0.7
-    Login --> Search: 0.3
-    Browse --> Browse: 0.4
-    Browse --> Search: 0.2
-    Browse --> Checkout: 0.3
-    Browse --> Logout: 0.1
-    Search --> Browse: 0.5
-    Search --> Search: 0.3
-    Search --> Checkout: 0.1
-    Search --> Logout: 0.1
-    Checkout --> Browse: 0.2
-    Checkout --> Logout: 0.8
-    Logout --> [*]
-```
-
-Markov models can reach **2000+ states** for complex applications (IBM DB2) {% cite koziolek2005operational %}.
-
----
-
-## Data Sources
-
-| Source | Quality | Availability |
-|--------|---------|-------------|
-| Field telemetry / logs | Best | Requires deployed system |
-| Beta testing data | Good | Available before release |
-| Customer surveys | Moderate | Subjective estimates |
-| Domain expert judgment | Moderate | Always available |
-| Similar system data | Variable | Depends on similarity |
-
-{: .highlight }
-> Profile accuracy increases dramatically when based on real usage data rather than expert estimates. Modern telemetry makes this practical for many systems {% cite bleier2025profile %}.
-
----
-
-## Cost and Effort
-
-| Parameter | Value | Source |
-|-----------|-------|--------|
-| Construction effort | ~1 staff month | For 10-developer, 100 KLOC, 18-month project {% cite musa1993operational %} |
-| Benefit-to-cost ratio | 10:1 or greater | Typical industrial experience {% cite musa1993operational %} |
-| Profile maintenance | Ongoing | Must update as usage patterns evolve |
-
----
-
-## Common Challenges
-
-| Challenge | Mitigation |
-|-----------|-----------|
-| **Too many operations** | Use implicit profiles (independent variable sets) {% cite musa1993operational %} |
-| **Unknown usage distribution** | Start with uniform, refine with telemetry |
-| **Profile staleness** | Continuous monitoring or periodic revalidation |
-| **Multi-user interactions** | Model at system level, not individual user level |
-| **Non-user-initiated events** | Supplement OP testing with fault injection {% cite koziolek2005operational %} |
+- **Where it comes from.** Musa's 1993 article and his book {% cite musa1993operational musa2004sre %}. Musa estimated about one staff-month to build a profile for a project of ten developers, 100,000 source lines and 18 months.
+- **What is contested.** The number of steps differs between sources: Musa's 2004 book lists five: identify initiators, create the operations list, review it, determine occurrence rates, determine probabilities. The six-step arrangement here adds the choice of modes and of representation as explicit steps and folds the review into the list step; the work is the same. A literature review of 30 studies lists open problems: realistic inputs, scalability and non-user factors {% cite alishahid2014review %}.
+- **What we do not hold.** Measured comparisons of profile accuracy built from estimates against field data.
 
 ---
 

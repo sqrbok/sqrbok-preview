@@ -10,7 +10,7 @@ page_type: question-set
 
 # Exploratory Testing & Operational Profile — Revision Questions
 
-**Format:** Explain in your own words, give brief examples
+**Format:** Explain in your own words, give brief examples. These questions test the lecture summarised in [Study Notes: Exploratory Testing & Operational Profile](SN_L07_Exploratory_OP.md).
 
 ---
 
@@ -20,9 +20,9 @@ What is the fundamental difference between exploratory testing and operational p
 
 ---
 
-## Question 2: Scripted + Exploratory = Coverage
+## Question 2: Scripted and Exploratory Together
 
-Why does the lecture say "scripted + exploratory = coverage"? What types of defects does each approach find?
+Why does the lecture recommend using scripted and exploratory testing together? What does each approach do well, and what does each miss?
 
 ---
 
@@ -52,25 +52,25 @@ Describe three of Hendrickson's heuristics and give an example for each.
 
 ## Question 7: Session-Based Test Management
 
-Explain Session-Based Test Management (SBTM). Why was it created? What are its four pillars?
+Explain Session-Based Test Management (SBTM). Why was it created? What are its four parts?
 
 ---
 
-## Question 8: Whittaker's Five Districts
+## Question 8: Whittaker's Districts
 
-What are Whittaker's five districts and what does each focus on?
+Name four of Whittaker's tour districts, say what each focuses on, and give one tour from each.
 
 ---
 
 ## Question 9: Five Levels of Exploration
 
-Describe the five levels of exploration (Ghazi 2017). When should you use each?
+Describe the five levels of exploration (Ghazi et al. 2017). When should you use each?
 
 ---
 
 ## Question 10: ET Effectiveness Evidence
 
-Summarize the empirical evidence for ET effectiveness. Include defect detection rates, efficiency comparisons, and industry adoption.
+Summarize the experimental evidence comparing ET with test-case-based testing. What did the experiments measure, what did they find for defects and for effort, and how does a fixed total time change the result?
 
 ---
 
@@ -80,9 +80,9 @@ A manager says "ET is just ad-hoc testing." How would you respond with evidence?
 
 ---
 
-## Question 12: ET Coverage Paradox
+## Question 12: More Defects, Less Coverage
 
-Why does ET achieve lower coverage but comparable defect counts to scripted testing?
+In Shah et al.'s comparison, exploratory testing found the most defects but covered the fewest specified functions. How can both be true, and what does it imply for planning tests?
 
 ---
 
@@ -112,13 +112,13 @@ Why must operational profile probabilities sum to 1.0? What happens if the sum i
 
 ## Question 17: 6-Step OP Procedure
 
-Walk through the 6-step OP procedure (Musa 1999) using a university enrollment system as an example.
+Walk through the six-step OP procedure using a university enrollment system as an example.
 
 ---
 
 ## Question 18: Tabular vs Graphical Representation
 
-When should you use tabular vs. graphical representation for an operational profile?
+When should you use tabular vs. graphical (tree) representation for an operational profile?
 
 ---
 
@@ -137,13 +137,13 @@ Calculate the operational profile for this system:
 
 ## Question 20: AT&T and HP Results
 
-What were the results of OP adoption at AT&T and HP?
+What were the results of OP adoption at AT&T and HP? Why should the AT&T figure not be quoted as the effect of the profile alone?
 
 ---
 
 ## Question 21: Operational Coverage
 
-Explain operational coverage with a worked example. How does it differ from traditional coverage?
+Explain usage-weighted coverage and operational coverage (the published 1/3/9 rule), each with a worked example. How do they differ from traditional coverage?
 
 ---
 
@@ -153,15 +153,15 @@ What are Android Cloud Profiles and why do they matter? What percentage of metho
 
 ---
 
-## Question 23: Saturation Handoff
+## Question 23: Saturation
 
-Why do OP and ET complement each other? Explain the "saturation handoff."
+What is saturation in profile-based testing? Why do OP and ET complement each other once it occurs? No study gives a threshold for switching: which signals would you use to decide?
 
 ---
 
 ## Question 24: Two-Phase Testing Strategy
 
-Describe the two-phase testing strategy. Why should OP come first?
+Describe the two-phase testing strategy. When should OP come first, and what would you do first without usage data?
 
 ---
 
@@ -173,7 +173,7 @@ A startup has limited testing time. Should they build an OP or train testers in 
 
 ## Question 26: Accountability Mechanisms
 
-Compare the accountability mechanisms of SBTM and operational profiles.
+SBTM makes exploratory testing reportable through session reports and debriefings. What does an operational profile, together with operational coverage, give a manager to judge how much testing each operation received and when usage-based testing is enough?
 
 ---
 
@@ -185,19 +185,19 @@ Design a testing strategy for a banking mobile app using both OP and ET. Include
 
 ## Question 28: Operational vs Traditional Coverage
 
-Why does operational coverage give a more useful signal than traditional coverage?
+Why does coverage weighted by use (usage-weighted or operational) give a more useful signal than traditional coverage? Name which one you use.
 
 ---
 
 ## Question 29: Cloud Profiles Validation
 
-Explain how Android Cloud Profiles validate the claim "you cannot assume how users will use your software."
+Explain how Android Cloud Profiles support the claim "you cannot assume how users will use your software." What did comparing test tools by profile coverage show?
 
 ---
 
 ## Question 30: Lecture Summary
 
-Explain the entire L07 lecture in 5 minutes. Cover ET, OP, and how they bridge together.
+Explain the entire lecture in 5 minutes. Cover ET, OP, and how they bridge together.
 
 ---
 
