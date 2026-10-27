@@ -1,5 +1,5 @@
 ---
-title: "Study Notes: Process Improvement"
+title: "SN A02: Process Improvement"
 parent: QAM Study Materials
 grand_parent: Selected Materials
 nav_order: 3
@@ -8,7 +8,7 @@ layout: default
 page_type: study-notes
 ---
 
-# Study Notes: Process Improvement
+# SN A02: Process Improvement
 
 ## Purpose
 
@@ -1123,7 +1123,7 @@ Based on research {% cite repenning2001nobody %}{% cite kuhrmann2016spi %}:
 
 For practice questions, key numbers, glossary, comparison tables, and sample exam questions with model answers, see:
 
-**[Revision Questions: Process Improvement](RQ-A2-Proc.md)**
+**[RQ A02: Process Improvement](RQ-A2-Proc.md)**
 
 ---
 

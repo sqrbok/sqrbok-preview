@@ -1,5 +1,5 @@
 ---
-title: "Study Notes: Quality Measurement"
+title: "SN L02: Quality Measurement"
 parent: SQR Study Materials
 grand_parent: Selected Materials
 nav_order: 3
@@ -9,7 +9,7 @@ page_type: study-notes
 math: katex
 ---
 
-# Study Notes: Quality Measurement
+# SN L02: Quality Measurement
 
 The previous lecture described quality through models. This lecture asks how to put a number on quality, and when that number can be trusted. Roadmap: §1–2 what a measurement is; §3 how metrics mislead; §4–5 scales and reading data; §6 designing a metric; §7 code metrics on one function; §8 whether they predict faults. The [revision questions](RQ_L2_Metrics.md) test this lecture.
 

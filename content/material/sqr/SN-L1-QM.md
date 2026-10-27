@@ -1,5 +1,5 @@
 ---
-title: "Study Notes: Quality Models"
+title: "SN L01: Quality Models"
 parent: SQR Study Materials
 grand_parent: Selected Materials
 nav_order: 1
@@ -8,7 +8,7 @@ layout: default
 page_type: study-notes
 ---
 
-# Study Notes: Quality Models
+# SN L01: Quality Models
 
 The lecture asks *"what is software quality, and how do we make it specific enough to build and test?"* It shows why people disagree about quality, introduces quality models, follows them from McCall to ISO/IEC 25010, turns one into testable requirements, and ends with the quality pioneers. The [revision questions](RQ-L1-QM.md) test this.
 

@@ -1,5 +1,5 @@
 ---
-title: "Study Notes: Classification Tree Method"
+title: "SN A08: Classification Tree Method"
 parent: QAM Study Materials
 grand_parent: Selected Materials
 nav_order: 15
@@ -8,7 +8,7 @@ layout: default
 page_type: study-notes
 ---
 
-# Study Notes: Classification Tree Method
+# SN A08: Classification Tree Method
 
 The lecture asks how to design tests for an object whose inputs have many interacting aspects, without drowning in combinations or relying on intuition. Its answer is the classification tree method (CTM): a tree of aspects and classes, and a table that picks one class per aspect for each test. The [revision questions](RQ_A08_ClassificationTree.md) test this lecture. It is a master's (QAM) lecture, optional for bachelor students, who meet the method only briefly in the input domain lecture; it is not examined in their course.
 

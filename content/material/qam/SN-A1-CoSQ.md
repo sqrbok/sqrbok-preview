@@ -1,5 +1,5 @@
 ---
-title: "Study Notes: Cost of Quality"
+title: "SN A01: Cost of Quality"
 parent: QAM Study Materials
 grand_parent: Selected Materials
 nav_order: 1
@@ -8,7 +8,7 @@ layout: default
 page_type: study-notes
 ---
 
-# Study Notes: Cost of Quality
+# SN A01: Cost of Quality
 
 ## Purpose
 

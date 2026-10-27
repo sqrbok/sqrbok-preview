@@ -1,5 +1,5 @@
 ---
-title: "Study Notes: Maintainability & DSM"
+title: "SN A10: Maintainability & DSM"
 parent: QAM Study Materials
 grand_parent: Selected Materials
 nav_order: 19
@@ -8,7 +8,7 @@ layout: default
 page_type: study-notes
 ---
 
-# Study Notes: Software Maintainability and Design Structure Matrix
+# SN A10: Software Maintainability and Design Structure Matrix
 
 ## Purpose
 

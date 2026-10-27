@@ -1,5 +1,5 @@
 ---
-title: "Revision Questions: Quality Planning"
+title: "RQ A04: Quality Planning"
 parent: QAM Study Materials
 grand_parent: Selected Materials
 nav_order: 8
@@ -8,7 +8,7 @@ layout: default
 page_type: question-set
 ---
 
-# Quality Planning — Revision Questions
+# RQ A04: Quality Planning
 
 **Format:** Explain in your own words, give brief examples
 

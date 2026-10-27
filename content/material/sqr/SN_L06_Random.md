@@ -1,5 +1,5 @@
 ---
-title: "Study Notes: Random Testing"
+title: "SN L06: Random Testing"
 parent: SQR Study Materials
 grand_parent: Selected Materials
 nav_order: 11
@@ -8,7 +8,7 @@ layout: default
 page_type: study-notes
 ---
 
-# Study Notes: Random Testing
+# SN L06: Random Testing
 
 The lecture asks what you gain by letting a program, not a person, choose test inputs. It covers four topics: random testing itself (its theory, and feedback-directed tools such as Randoop), fuzz testing, property-based testing, and mutation testing, which plants many small faults to measure how good tests are. The [revision questions](RQ_L06_Random.md) test this lecture.
 

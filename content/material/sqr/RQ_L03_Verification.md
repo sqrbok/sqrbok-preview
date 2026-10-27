@@ -1,5 +1,5 @@
 ---
-title: "Revision Questions: Verification Methods"
+title: "RQ L03: Verification Methods"
 parent: SQR Study Materials
 grand_parent: Selected Materials
 nav_order: 6
@@ -8,7 +8,7 @@ layout: default
 page_type: question-set
 ---
 
-# L03: Verification Methods — Revision Questions
+# RQ L03: Verification Methods
 
 **Format:** Explain in your own words, give brief examples
 

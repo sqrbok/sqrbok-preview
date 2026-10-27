@@ -1,5 +1,5 @@
 ---
-title: "Revision Questions: Software Inspection"
+title: "RQ A05: Software Inspection"
 parent: QAM Study Materials
 grand_parent: Selected Materials
 nav_order: 10
@@ -8,7 +8,7 @@ layout: default
 page_type: question-set
 ---
 
-# A05: Software Inspection — Revision Questions
+# RQ A05: Software Inspection
 
 **Format:** Explain in your own words, give brief examples
 

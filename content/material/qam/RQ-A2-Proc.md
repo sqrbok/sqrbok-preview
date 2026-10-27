@@ -1,5 +1,5 @@
 ---
-title: "Revision Questions: Process Improvement"
+title: "RQ A02: Process Improvement"
 parent: QAM Study Materials
 grand_parent: Selected Materials
 nav_order: 4
@@ -8,11 +8,11 @@ layout: default
 page_type: question-set
 ---
 
-# Revision Questions: Process Improvement
+# RQ A02: Process Improvement
 
 ## Purpose
 
-Revision questions and exam preparation materials for the Process Improvement lecture. Use alongside the [Study Notes: Process Improvement](SN-A2-Proc.md) for exam preparation.
+Revision questions and exam preparation materials for the Process Improvement lecture. Use alongside the [SN A02: Process Improvement](SN-A2-Proc.md) for exam preparation.
 
 ---
 
@@ -265,7 +265,7 @@ Level 2 Process Areas (7 total):
 
 ---
 
-*For detailed explanations, see [Study Notes: Process Improvement](SN-A2-Proc.md)*
+*For detailed explanations, see [SN A02: Process Improvement](SN-A2-Proc.md)*
 
 ---
 

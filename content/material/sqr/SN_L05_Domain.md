@@ -1,5 +1,5 @@
 ---
-title: "Study Notes: Input Domain Testing"
+title: "SN L05: Input Domain Testing"
 parent: SQR Study Materials
 grand_parent: Selected Materials
 nav_order: 9
@@ -8,7 +8,7 @@ layout: default
 page_type: study-notes
 ---
 
-# Study Notes: Input Domain Testing
+# SN L05: Input Domain Testing
 
 The lecture asks how to choose a handful of test inputs when the full input space is far too large to try. Its answer is a set of black-box techniques that divide inputs by what the specification says should happen, then test chosen points from each part. The [revision questions](RQ_L05_Domain.md) test this lecture.
 

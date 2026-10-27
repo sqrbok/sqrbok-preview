@@ -1,5 +1,5 @@
 ---
-title: "Revision Questions: Combinatorial Testing"
+title: "RQ A07: Combinatorial Testing"
 parent: QAM Study Materials
 grand_parent: Selected Materials
 nav_order: 14
@@ -8,7 +8,7 @@ layout: default
 page_type: question-set
 ---
 
-# A07: Combinatorial Testing — Revision Questions
+# RQ A07: Combinatorial Testing
 
 **Format:** Explain in your own words, give brief examples
 

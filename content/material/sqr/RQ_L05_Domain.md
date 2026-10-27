@@ -1,5 +1,5 @@
 ---
-title: "Revision Questions: Input Domain Testing"
+title: "RQ L05: Input Domain Testing"
 parent: SQR Study Materials
 grand_parent: Selected Materials
 nav_order: 10
@@ -8,9 +8,9 @@ layout: default
 page_type: question-set
 ---
 
-# L05: Input Domain Testing — Revision Questions
+# RQ L05: Input Domain Testing
 
-**Format:** Explain in your own words, give brief examples. These questions test the lecture summarised in [Study Notes: Input Domain Testing](SN_L05_Domain.md). Classification trees belong to the master's lecture A08 and are not asked here.
+**Format:** Explain in your own words, give brief examples. These questions test the lecture summarised in [SN L05: Input Domain Testing](SN_L05_Domain.md). Classification trees belong to the master's lecture A08 and are not asked here.
 
 ---
 

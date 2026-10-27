@@ -1,5 +1,5 @@
 ---
-title: "Study Notes: Static Analysis"
+title: "SN A06: Static Analysis"
 parent: QAM Study Materials
 grand_parent: Selected Materials
 nav_order: 11
@@ -8,7 +8,7 @@ layout: default
 page_type: study-notes
 ---
 
-# Study Notes: Static Analysis
+# SN A06: Static Analysis
 
 ## Purpose
 These study notes cover static analysis techniques for finding software defects without executing code. The material follows the lecture structure: motivation, theoretical foundations, technique overview, two deep dives (zero analysis and model checking), and modern industrial practice.

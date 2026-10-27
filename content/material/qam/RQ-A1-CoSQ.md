@@ -1,5 +1,5 @@
 ---
-title: "Revision Questions: Cost of Quality"
+title: "RQ A01: Cost of Quality"
 parent: QAM Study Materials
 grand_parent: Selected Materials
 nav_order: 2
@@ -8,7 +8,7 @@ layout: default
 page_type: question-set
 ---
 
-# Cost of Quality — Revision Questions
+# RQ A01: Cost of Quality
 
 **Purpose:** Self-study and exam preparation
 **Format:** Explain in your own words, give brief examples

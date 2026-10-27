@@ -1,5 +1,5 @@
 ---
-title: "Revision Questions: Static Analysis"
+title: "RQ A06: Static Analysis"
 parent: QAM Study Materials
 grand_parent: Selected Materials
 nav_order: 12
@@ -8,7 +8,7 @@ layout: default
 page_type: question-set
 ---
 
-# Static Analysis — Revision Questions
+# RQ A06: Static Analysis
 
 **Format:** Explain in your own words, give brief examples
 

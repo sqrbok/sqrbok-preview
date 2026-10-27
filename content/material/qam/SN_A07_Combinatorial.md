@@ -1,5 +1,5 @@
 ---
-title: "Study Notes: Combinatorial Testing"
+title: "SN A07: Combinatorial Testing"
 parent: QAM Study Materials
 grand_parent: Selected Materials
 nav_order: 13
@@ -8,7 +8,7 @@ layout: default
 page_type: study-notes
 ---
 
-# Study Notes: Combinatorial Testing (A07)
+# SN A07: Combinatorial Testing
 
 ## Purpose
 These study notes cover combinatorial testing (CT) — a systematic approach to testing parameter interactions. CT is grounded in 30 years of research and validated across industrial domains from aerospace to autonomous driving.

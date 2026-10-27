@@ -1,5 +1,5 @@
 ---
-title: "Study Notes: Software Reliability"
+title: "SN L08: Software Reliability"
 parent: SQR Study Materials
 grand_parent: Selected Materials
 nav_order: 15
@@ -8,7 +8,7 @@ layout: default
 page_type: study-notes
 ---
 
-# Study Notes: Software Reliability
+# SN L08: Software Reliability
 
 The lecture runs: define failure, measure it, rank failures by severity, set a target (the FIO), reach it by removing faults (growth models) or tolerating them (recovery, voting), then keep it in operation (the SLO). The [revision questions](RQ_L08_Reliability.md) test this lecture.
 
