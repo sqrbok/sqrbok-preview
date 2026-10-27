@@ -1,182 +1,111 @@
 ---
+title: Size and Complexity Metrics
 parent: Measurement
-nav_order: 3
-title: Examples
+nav_order: 6
 layout: default
+page_type: deep-dive   # one function worked through three metrics; every count must be reproducible, so the counting rules stay on the page
 ---
 
-# Examples and Discussions
+# Size and Complexity Metrics
 
-## McCall Model Mapping
+**Size and complexity metrics** are computed from source code alone: **lines of code** count its length, **cyclomatic complexity** counts its decisions, and **Halstead's metrics** count its operators and operands. The [Maintainability Index](maintainability-index.md) combines all three into one score.
 
-![McCall Use-Factor-Criteria-MetricsMap](http://www.plantuml.com/plantuml/png/ZL9jQiCm3FtVK_Xt87VeQ3SOhAoqtG4yvMK872T8Ic6tdw2XhYc4_KY8NfxUX_5MBOeDdBiXJfic76WNKmfVYlOjaetIxeGDmh4zm8H9DqqJZZ9sCrdud23HUCmEDhuKlpcn_VhausuSXZapEU6A3DKR_4BatroOuOJ4rQPJPebqrydAQiXKXAS4ksk6rxvduaBOuyg49xXsVknnyWLTQlWmwqgSiuclp8AkTFA8n8e2B0dUSuS9_ig4suyF_F2ZzXcfR_TG4fxgSxgu9MBXXaFaRFuKxBzfQjDm7CMAI7sWw_d31Mhh_hNTSvEjootNxGy0)
+**Example.** The page computes each one on the same Python function, with the output of the `radon` tool {% cite radon_docs %}.
 
-*Figure. McCall Use-Factor-Criteria-Metrics Mapping*
+```python
+def delivery_fee(weight_kg, express, country):
+    if weight_kg <= 0:
+        raise ValueError(
+            "weight must be positive")
 
-### For Product Operation:
-- **Usability**:  
-  - Communicativeness: How easily users can communicate with the software.  
-  - Accessibility: How easily users with disabilities can interact with the software.
+    fee = 5.0
+    if weight_kg > 10:
+        fee += 2.0 * (weight_kg - 10)
+    if express and country == "RU":
+        fee *= 1.5
+    elif express:
+        fee *= 2.0
+    return round(fee, 2)
+```
 
-- **Reliability**:  
-  - Accuracy: The correctness of the software's outputs.  
-  - Consistency: The ability of the software to perform in the same way across different environments.  
-  - Completeness: The extent to which the software meets its functional requirements.
+## 1. Lines of code
 
-- **Efficiency**:  
-  - Device Efficiency: The ability of the software to function across different devices (e.g., desktop, mobile).  
-  - Accessibility: Ensuring that performance is consistent, even with accessibility features enabled.
+`radon raw` gives three counts for the same function:
 
-### For Product Revision:
-- **Reusability**:  
-  - Accuracy: The accuracy of reused components.  
-  - Structuredness: How organized the code is for easy reuse.  
-  - Conciseness: The brevity and clarity of reusable components.  
-  - Device Independence: The software’s ability to function on various platforms without requiring significant adaptation.
+```text
+    LOC: 13
+    LLOC: 11
+    SLOC: 12
+    Comments: 0
+    Multi: 0
+    Blank: 1
+```
 
-- **Maintainability**:  
-  - Structuredness: Organized code that is easy to navigate and modify.  
-  - Conciseness: Code that avoids redundancy and is more maintainable.  
-  - Legibility: Clear and easy-to-read code that facilitates understanding.
+**LOC** counts every physical line: 13. **SLOC** (source lines) leaves out blank and comment lines: 12, without the blank line. **LLOC** (logical lines) counts statements, so the `raise` spread over two lines counts once: 11, namely the `def` line, three `if` lines, the `elif`, `raise`, `fee = 5.0`, the three updates of `fee` and `return`. Sizes of whole systems are usually quoted in **KLOC**, thousands of lines. Which count a figure uses must be stated; otherwise "500 lines" means nothing. All three measure physical size well and functionality poorly: see the [representation condition](definitions.md).
 
-- **Portability**:  
-  - Completeness: Ensuring all necessary dependencies are included for portability.  
-  - Device Independence: How well the software operates across various devices.
+## 2. Cyclomatic complexity
 
-- **Testability**:  
-  - Structuredness: Code that is easy to test by ensuring a clear structure.  
-  - Legibility: Readable code makes it easier to design and execute tests.  
-  - Traceability: The ability to trace tests back to specific requirements or components.
+McCabe's **cyclomatic complexity** is the number of linearly independent paths through a function's control-flow graph: *V(G) = e − n + 2*, where *e* is the number of **edges** (transfers of control) and *n* the number of **nodes** (statements or blocks) {% cite mccabe1976complexity %}. When every decision has two outcomes, this equals the number of decisions plus one.
 
----
+![Control-flow graph of delivery_fee with four decisions, eleven nodes and fourteen edges](delivery-fee-cfg.svg)
 
-## Metric Decomposition
+_The graph has 11 nodes and 14 edges: V(G) = 14 − 11 + 2 = 5, that is four decisions plus one. Conventions: one exit node is added, the `raise` gets an edge to it, and `express and country == "RU"` is drawn as a single decision; drawing the `and` as two decision nodes would give 6._
 
-![Metrics Decomposition Example](http://www.plantuml.com/plantuml/png/LP31QiCm44Jl-GgTVUal1De4UYY493-mjSRkWhGogrL9-_ML8eFhWozlPhoZEMOZjSZY8os7mNqGYzMFFZcm_Ho6mRqcLOosaS6TgGJBLIbY3LHJIBaet9qZEddFAP3XvSoFZVQakvBX-QFJD2MrBbsHKz4HxgBmF1edwK8tkTDZWNYsecYrxiYxJc-O5N1fUYeiSm_VZ0mHOhNjDvJc5bxZxX98AezBW46GyxvKEqdYroixhJtvYsH67w45DzHDEtJZN_m7VO8ZnA_R_m40)
+Tools count decisions from the code instead of drawing the graph. `radon cc` starts at 1 and adds 1 for each `if`, `elif`, `for`, `while`, `except`, `with`, `assert` and comprehension or generator expression, and 1 for each Boolean operator (`and`, `or`); `else` and `finally` add nothing {% cite radon_docs %}. For `delivery_fee` it reports **6**, not 5, because `express and country == "RU"` hides a second decision inside the first. Neither number is wrong; they follow different counting rules, so compare complexity only between values from the same tool.
 
-*Figure. Metrics Decomposition*
+The number has two uses. It is the size of a basis set: the smallest set of paths from which every path can be built, which [basis path coverage](../../verif/coverage/basis.md) asks the tests to run. [Branch coverage](../../verif/coverage/code.md), which asks only that every decision outcome be taken once, may need fewer tests. And it is a risk flag. McCabe suggested 10 as an upper limit per module {% cite mccabe1976complexity %}; the SEI bands are 1–10 low risk, 11–20 moderate, 21–50 high and above 50 untestable {% cite sei1997c4 %}. `radon cc` scores every function, method and class separately (a class with *m* methods scoring *c₁ … cₘ* gets ⌊(1 + c₁ + … + cₘ) / m⌋ + 1; for the `Cart` class of [Object-Oriented Metrics](oo-metrics.md), with methods scoring 1, 1, 2 and 1, that is ⌊6 / 4⌋ + 1 = 2, as radon prints) and prints a letter: A for 1–5, B for 6–10, C for 11–20, D for 21–30, E for 31–40 and F for 41 and above {% cite radon_docs %}. At 6, `delivery_fee` is a B: low risk.
 
-### Maintainability
+## 3. Halstead's metrics
 
-Maintainability can be broken down into several key sub-metrics:
+Halstead counts distinct operators *n₁*, distinct operands *n₂*, and their total occurrences *N₁* and *N₂*; the **vocabulary** is *n = n₁ + n₂* and the **length** *N = N₁ + N₂* {% cite halstead1977elements %}. What counts as an operator is the tool's choice. Radon counts only arithmetic, augmented-assignment (every augmented assignment counts as its operator: `+=` as `+`, `*=` as `*`), comparison and Boolean operators; each operator's operands are what it acts on, and a sub-expression such as `(weight_kg - 10)` counts as one operand of the operator above it. Calls (`round`), assignments with `=`, `raise` and `return` are not counted {% cite radon_docs %}. Unary operators such as `-x` and `not x` count with one operand; `in`, `not in`, `is` and `is not` count as comparisons; attribute access (`order.total`), subscripts (`items[0]`) and call arguments are not operators, and appear only as operands when they stand on one side of an operator.
 
-1. **Correctability**:  
-   - Measures how easy it is to fix faults in the software.  
-   - Includes sub-metrics like:  
-     - **Faults count**: Number of faults found.  
-     - **Closure time**: Time taken to close a fault.  
-     - **Isolate/Fix time**: Time spent diagnosing versus fixing issues.  
-     - **Fault rate**: Faults per 1,000 lines of code.
+| Operator | Occurrences | Operands (each pair is one occurrence) |
+|---|---|---|
+| `<=` | 1 | `weight_kg`, `0` |
+| `>` | 1 | `weight_kg`, `10` |
+| `-` | 1 | `weight_kg`, `10` |
+| `+` (from `+=`) | 1 | `fee`, `2.0 * (…)` |
+| `*` (1 plain, 2 from `*=`) | 3 | `2.0`, `(weight_kg - 10)`; `fee`, `1.5`; `fee`, `2.0` |
+| `and` | 1 | `express`, `country == "RU"` |
+| `==` | 1 | `country`, `"RU"` |
+| **7 distinct** | ***N₁* = 9** | ***N₂* = 18** occurrences, **12 distinct** |
 
-2. **Effort**:  
-   - Measures the resources required to make corrections or improvements.  
-   - Includes:  
-     - **Resource prediction**: Estimating the effort required.  
-     - **Effort expenditure**: Actual resources spent.
+For a file containing only `delivery_fee`, `radon hal` prints the four counts under its own names, followed by the derived values; for reading a report, *h1*, *h2*, *N1*, *N2* and *volume* are the ones to check:
 
-3. **Testability**:  
-   - Focuses on the extent and quality of testing.  
-   - Sub-metrics include:  
-     - **Degree of testing**: E.g., statement coverage and test plan completeness.  
-     - **Effort**: Resources spent on testing.
+```text
+    h1: 7          # distinct operators, n₁
+    h2: 12         # distinct operands, n₂
+    N1: 9          # operator occurrences, N₁
+    N2: 18         # operand occurrences, N₂
+    vocabulary: 19
+    length: 27
+    volume: 114.6940428629768
+    difficulty: 5.25
+    effort: 602.1437250306282
+    time: 33.45242916836823
+```
 
-4. **Expandability**:  
-   - Measures how easily changes can be made to the software.  
-   - Includes:  
-     - **Effort**: Time or resources for implementing changes.  
-     - **Change counts**: Number of modifications.  
-     - **Change effort**: Average effort per change.  
-     - **Change size**: Volume of code modified.
+The 12 distinct operands are `weight_kg`, `0`, `10`, `fee`, `2.0`, `1.5`, `express`, `country`, `"RU"` and the three sub-expressions `(weight_kg - 10)`, `2.0 * (weight_kg - 10)` and `country == "RU"`. From these, **volume** *V = N · log₂ n*, **difficulty** *D = (n₁ / 2) · (N₂ / n₂)* and **effort** *E = D · V*:
 
----
+- *V* = 27 · log₂ 19 = 27 · 4.25 ≈ **114.7**, the bits needed to write the function down in this vocabulary;
+- *D* = 3.5 · 1.5 = **5.25**, which grows when the same operands are used again and again;
+- *E* = 5.25 · 114.7 ≈ **602**. Halstead read *E / 18* as seconds of writing time: radon prints 33 s, a sign of a small function.
 
-## Object-Oriented Metrics
+Halstead gave no thresholds. Use the values to compare functions within one code base, measured by one tool.
 
-When working with object-oriented programming, several key metrics help evaluate software quality:
+## When to use them — and when not
 
-1. **Number of Methods per Class**: Indicates the complexity of a class.  
-2. **Depth of Inheritance Tree**: Measures how deeply a class is inherited.  
-3. **Number of Child Classes**: Tracks the number of subclasses for a class.  
-4. **Coupling Between Object Classes**: Evaluates how interconnected different classes are.  
-5. **Calls to Methods in Unrelated Classes**: Measures the extent of cross-class interactions.
+- **Use** cyclomatic complexity to find the functions that need the most tests and the closest review.
+- **Use** the same tool, with the same settings, for every value you compare.
+- **Do not** compare LOC across languages or styles, or use it to judge productivity.
 
----
+## How solid is this?
 
-## Maintainability Index
-
-### Definition
-
-The **Maintainability Index** is a single number representing the maintainability of code, calculated using:
-
-Maintainability Index = MAX(0, (171 -  
-      5.2 * log(Halstead Volume) -  
-      0.23 * (Cyclomatic Complexity) -  
-      16.2 * log(Lines of Code)) * 100 / 171)
-
-Where:
-- **Halstead Volume** relates to the complexity of code based on distinct operators and operands.  
-- **Cyclomatic Complexity** measures the number of independent paths through a program’s code.  
-- **LOC** refers to Lines of Code.
-
-### Origins
-
-The Maintainability Index was introduced in 1992 by Paul Oman and Jack Hagemeister. It was based on statistical regression analysis across various metrics in systems coded in C and Pascal.
-
-### Practical Use
-
-- Low values (close to 0) indicate hard-to-maintain code.
-- High values (approaching 171) suggest well-structured, maintainable code.
-
-### Design Considerations
-
-From Microsoft’s design rationale:
-- If the index shows **red**, it indicates a high likelihood of maintainability issues.
-- The focus is on identifying problematic areas with a high degree of confidence.
-
-
-> "We noticed that as code tended toward 0 it was clearly hard to maintain code and the difference between code at 0 and some negative value was not useful."
-
-> "The desire was that if the index showed red then we would be saying with a high degree of confidence that there was an issue with the code."
-
-[Source. MSDN blog](https://learn.microsoft.com/en-us/visualstudio/code-quality/code-metrics-maintainability-index-range-and-meaning)
+- **Where it comes from.** McCabe 1976 and Halstead 1977. Every figure on this page was produced by radon 6.0.1 and recomputed by hand; the counting rules were read from radon's source.
+- **What is contested.** All three metrics grow with size, so much of what they "predict" is size; see [Reading Metric Data](statistics.md). Halstead's time and effort interpretations have little empirical support.
 
 ---
 
-## Examples of Commonly Used Automated Metrics
-
-### Development Metrics:
-- **Lines of Code (LOC)**: A simple yet widely used productivity metric.  
-- **Test Coverage**: Ensures the completeness of tests, with variants like line coverage or branch coverage.  
-- **Cyclomatic Complexity**: Highlights potential maintenance issues by measuring complexity.
-
-### Performance Metrics:
-- **Response Time**: Measures how quickly the system responds to user requests.  
-- **Throughput**: The number of transactions or tasks handled in a given time.
-
-### Reliability Metrics:
-- **Mean Time to Failure (MTTF)**: Average time until a failure occurs.  
-- **Mean Time to Repair (MTTR)**: Time taken to recover from failures.
-
-### Security Metrics:
-- **Code Reviews**: Evaluating adherence to security practices like input validation and secure coding standards.  
-- **Static Analysis Tools**: E.g., Bandit, Snyk, used for automated security checks.
-
-### Maintainability Metrics:
-- **Cyclomatic Complexity**: Again used to assess maintainability.  
-- **Tech Debt**: Metrics like SQALE and SONAR evaluate technical debt.  
-- **Dependency Analysis**: Helps to understand and manage code dependencies and change impacts using methods like Design Structure Matrix.
-
-
-## Example: ISO 25002 Attributes-Metrics Mapping
-
-In software engineering, quality attributes such as **reliability**, **usability**, or **maintainability** require **metrics** to measure the extent to which these attributes are present in a system. Metrics allow us to analyze quality during development and validate it during release.
-
-![Attributes-metrics mapping example](http://www.plantuml.com/plantuml/png/RLXjSjou4VtlKtHLeggrQosDlLOYgrAfbLPIhIghsD67_qDW3mSn2J3enaZZ6-GUkK2kaAFa90iqcn-Kvzy83Ju-l7xTQEfdOXEvTRvgJVVg3VmZcSRn3iwOetjCZ0G_NDzzWlV7gzNxrw_Ul86hv2sxu6LVNdW3TycnUNJwTrxu9SI8bfTRJ-40mXeOYS4QGeBE4645F-1XVVWZV3m-U3qytdQDCzuYF3dUp63W5l-LNCGMFTCf_A40jex8-HhMQ3X5f05lzLr4uE7CsXIDLQgV8rf76Rn0tIAbfW1VuDOPBglh65h0vmujOmLRqoGSNl2__wuEL-yWUSSqClVaYD7RtGBlYucAvpn4xD0Kj92uIpmI_ilxNW2uzemnT1XLr4cLZD4lzS9SFZF68ilTZXZRGH7d6Uke_8rhvggyEtgtccyWsQ7qBmoR36etnjSu2gM9gqgGe_6qnXYn0YDnncOtfl3ZuKSzmvJ37lgisc34ab8ESCV6LoPMLA3jYsndjnrTN_u2f9icwglLu91Rh5DZECJTx4Lw-ZZ5jYuqSih953sxEypKLLbn11ALv74CJU6Kl4cy2T5zatDAs31Zsp515t6Bdh6Q4riew6tSTUMzft3k61hqDMyADnmZa2Rhv-Bwqzj7nt1sUQSuNrBZn_p3ZV6c5jEVmhrhHSE859ej0kbHO3jxnE7agWydi0afPek-4kKQDxDLXkQP4bUzM-3MCAgR9WTr6A4DdZSZxJ5s9ElA_Q7Zml4pHekUCt4ra3XQwrXsp5mZjX42gM6u3mt6oJkNCOQOcTkmnRWJ1KxX1eq77iMGc5PhsJwTF_kTSjXNMgHQB1FUNOTOpOMLbWXcpHZrX2FNdvPW2h8ir7DZlwOEZAzoc3X4LChZ6tJLm3er3JpA_abKoHQiGuHtz-U3hnmPOfnKAFBcBMrl_8E-EbK6h9HyfK_Db3uvw7tmG7CNFFWAenJS_2GZuT_GnEpbNuLOx5jmLG8SZVDWmECJ99fUz44jfvshCT6nTCIBO5FniVX0AesmO1ekZRgQHy7gOt_zS7Gyda0hhQUq95ku59H9x0LNOpSEjmWdgmFeObWxwwHF3vbTKFwR3qyDLZLcmHczifNxoz1NwfiMSaQs_LtNx5Jpz_24-7Mqtycn4lxqifzV6i82-7UpTRNg8GLd6sSp08VnBM3AppPuUVi0_Vz__-SdtQoixqjK6Y8MF5NYh1YqHYcM1UfNtEbnzhjRXW1ZsMtH8v5MDs7iRwYriGWNIAxsS2i9_2wX3zVBxAaOYd9ds5564QvtAMvnHnDTcaV9XeYZkmx_V7JSs_XoFUJnrMZOSznaIKCShWhgWgUNDTZ5q7TryGWIJ_r2DHWqtSIGwasNMBhYQGQK_GGRuwi6gz8NzP6nXbUh0PQEScZe5HHIj0WFx1htJLAk1VBveHHaFILBl2RhIJPZDUKeXpnyU2kAaFGofNg3RNyZUagjt38JNYknnQrpd5dUdEjrRJfZHslUc6VNfXP-2wQ2Nyin9Rbv6IW76ZOUGoBDDQMk2t5n7_wuMgqaElPSQvhnDaD3AQ9S_jtKnQ32Efggh_tagr9Bpz1a2cDgZhLvtHZdsRXv_SEPDytkswB2Bl0nrNNnuJBtJR16Ygh2DTfPvgK5l9vVEjTLAVxiCQ6b3f3Sw2tZT0DMKAKeJMnyw-Hw5LdcgWN5cr1Dw4kMBbUftFbWvJaQUUeLKSJJc78-gqp7WbKA8qG-pMOWBdHD2HLI7AHRnscG7e7_c1qXe3emwwp42yPNvSbfmAqZaepFvwccSG8RLxCK1Cvp35MoaqDM4X3yGHQuRZjZkSyZENevVZe9puVEBcBbxCnt7qzKw7ka1MbPo5BqjQ20DbG8mttvk0EJEBIcm34IBngugYiRHDqhDAIJ-BwRHf70J5yxinRREfyOTHxx7E94TKpXSkxtQrUdA6_EyNycOh75qYwIOFaX-KM_TJ5usJYK9LHcfsUvQl1P3o3NCdPDs9NDciBPutiA_7WH7pvQY4tJBAZhsbvtzo6WiEOd4t4aEUcp1qEASgn2DmkHV3nyD_kDNoDlytc9KMVAgHdBr8z-KTrnYDaiVUCi5mi3RKp4QgdCyijj_qVQ9zvW7B_Gn7lQjfVABdl5BNQDiRXtOj3OY-y1MTHHeGi-1qTwa-dsqbn2Ib2ULxO3z7upwDVFp-Wh_I_2xm00)
-
-*Figure. Mapping ISO 25002 Software Quality Attributes to Metrics*
-
-
----
 ### References
 
 {% bibliography --cited %}
@@ -184,4 +113,4 @@ In software engineering, quality attributes such as **reliability**, **usability
 ---
 
 {: .highlight }
-**Disclaimer:** AI is used for text polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.

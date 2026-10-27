@@ -183,8 +183,8 @@ def analyse(path: Path) -> dict:
         lead=' '.join(lead_words),
         examples=examples,
         callouts=len(re.findall(r'\{:\s*\.(note|warning)\s*\}', body)),
-        h1=len(re.findall(r'^#\s+', body, re.M)),
-        h4=len(re.findall(r'^#{4,}\s+', body, re.M)),
+        h1=len(re.findall(r'^#\s+', FENCE_RE.sub('', body), re.M)),
+        h4=len(re.findall(r'^#{4,}\s+', FENCE_RE.sub('', body), re.M)),
         cites=len(re.findall(r'\{%\s*cite', text)),
         has_bib='{% bibliography' in text,
         hand_refs=bool(re.search(r'^#{2,4}\s*References', text, re.M))
