@@ -1003,11 +1003,16 @@ language = {eng},
 }
 
 @article{bhatia2023satd,
-  author = {Bhatia, Aaditya and Krasner, Allie and Mundra, Adi and others},
-  title = {An Empirical Study of Self-Admitted Technical Debt in Machine Learning Software},
-  journal = {arXiv preprint},
-  year = {2023},
-  eprint = {2311.12019}
+  author    = {Bhatia, Aaditya and Khomh, Foutse and Adams, Bram and Hassan, Ahmed E.},
+  title     = {An Empirical Study of Self-Admitted Technical Debt in Machine Learning Software},
+  journal   = {ACM Transactions on Software Engineering and Methodology},
+  volume    = {35},
+  number    = {8},
+  pages     = {1--41},
+  year      = {2026},
+  publisher = {ACM},
+  doi       = {10.1145/3785001},
+  note      = {Preprint: arXiv:2311.12019}
 }
 
 @article{khleel2023bilstm,
@@ -1464,13 +1469,15 @@ language = {eng},
   note      = {102 studies analyzed, 493 citations}
 }
 
-@article{li2025flakyguard,
+@inproceedings{li2025flakyguard,
   author    = {Li, Chengpeng and Behrang, Farnaz and Shi, August and Liu, Peng},
   title     = {{FlakyGuard}: Automatically Fixing Flaky Tests at Industry Scale},
-  journal   = {arXiv preprint arXiv:2511.14002},
+  booktitle = {Proceedings of the 40th IEEE/ACM International Conference on Automated Software Engineering (ASE)},
+  pages     = {2158--2170},
   year      = {2025},
-  doi       = {10.48550/arXiv.2511.14002},
-  note      = {47.6\% repair rate, 51.8\% developer acceptance}
+  publisher = {IEEE},
+  doi       = {10.1109/ASE63991.2025.00179},
+  note      = {47.6\% repair rate, 51.8\% developer acceptance. Preprint: arXiv:2511.14002}
 }
 
 @inproceedings{chen2024flakydoctor,
@@ -1503,10 +1510,11 @@ language = {eng},
 @article{gu2024testart,
   author    = {Gu, Siqi and Zhang, Quanjun and Li, Kecheng and Fang, Chunrong and Tian, Fangyuan and Zhu, Liuchuan and Zhou, Jianyi and Chen, Zhenyu},
   title     = {{TestART}: Improving {LLM}-based Unit Testing via Co-evolution of Automated Generation and Repair Iteration},
-  journal   = {arXiv preprint arXiv:2408.03095},
-  year      = {2024},
-  doi       = {10.48550/arXiv.2408.03095},
-  note      = {18\% pass rate improvement, 20\% coverage enhancement}
+  journal   = {ACM Transactions on Software Engineering and Methodology},
+  year      = {2026},
+  publisher = {ACM},
+  doi       = {10.1145/3844945},
+  note      = {18\% pass rate improvement, 20\% coverage enhancement. Preprint: arXiv:2408.03095}
 }
 
 @inproceedings{abdullin2025testwars,
@@ -1521,12 +1529,16 @@ language = {eng},
 % === LLM Code Review ===
 
 @article{zeng2025swrbench,
-  author    = {Zeng, Zhengran and Shi, Ruikai and Han, Keke and Li, Yixin and Sun, Kaicheng and Wang, Yidong and Yu, Zhuohao and Xie, Rui and Ye, Wei and Zhang, Shibo},
-  title     = {Benchmarking and Studying the {LLM}-based Code Review},
-  journal   = {arXiv preprint arXiv:2509.01494},
-  year      = {2025},
-  doi       = {10.48550/arXiv.2509.01494},
-  note      = {SWRBench: 1000 PRs, 90\% human agreement, multi-review +43\% F1}
+  author    = {Zeng, Zhengran and Shi, Ruikai and Han, Keke and Li, Yixin and Sun, Kaicheng and Wang, Yidong and Yu, Zhuohao and Xie, Rui and Ye, Wei and Zhang, Shikun},
+  title     = {{SWR-Bench}: Assessing {LLM} Performance in Real-World Code Review Comment Generation},
+  journal   = {Proceedings of the ACM on Software Engineering},
+  volume    = {3},
+  number    = {FSE},
+  pages     = {3093--3115},
+  year      = {2026},
+  publisher = {ACM},
+  doi       = {10.1145/3808144},
+  note      = {SWRBench: 1000 PRs, 90\% human agreement, multi-review +43\% F1. Preprint: arXiv:2509.01494 (first titled ``Benchmarking and Studying the LLM-based Code Review'')}
 }
 
 @inproceedings{zhou2024vulndetection,
@@ -1552,10 +1564,13 @@ language = {eng},
 @article{ferrag2025llmtoagents,
   author    = {Ferrag, Mohamed Amine and Tihanyi, Norbert and Debbah, M\'{e}rouane},
   title     = {From {LLM} Reasoning to Autonomous {AI} Agents: A Comprehensive Review},
-  journal   = {arXiv preprint arXiv:2504.19678},
-  year      = {2025},
-  doi       = {10.48550/arXiv.2504.19678},
-  note      = {Taxonomy of 60 benchmarks, MCP/ACP/A2A protocols}
+  journal   = {IEEE Access},
+  volume    = {14},
+  pages     = {84237--84285},
+  year      = {2026},
+  publisher = {IEEE},
+  doi       = {10.1109/ACCESS.2026.3698694},
+  note      = {Taxonomy of 60 benchmarks, MCP/ACP/A2A protocols. Preprint: arXiv:2504.19678}
 }
 
 @article{wang2024agentsse,
@@ -1921,21 +1936,25 @@ language = {eng},
 }
 
 @inproceedings{li2024iris,
-  author    = {Li, Ziyang and Pacheco, Saikat and Chheda, Mayur and Naik, Mayur},
+  author    = {Li, Ziyang and Dutta, Saikat and Naik, Mayur},
   title     = {{IRIS}: {LLM}-Assisted Static Analysis for Detecting Security Vulnerabilities},
-  booktitle = {arXiv preprint arXiv:2405.17238},
-  year      = {2024},
-  doi       = {10.48550/arXiv.2405.17238},
-  note      = {Neuro-symbolic: LLM + CodeQL gives +103\% detection vs CodeQL alone}
+  booktitle = {Proceedings of the Thirteenth International Conference on Learning Representations (ICLR)},
+  year      = {2025},
+  url       = {https://proceedings.iclr.cc/paper/2025/hash/582d4e27fa24168f3af1f4582655034b-Abstract-Conference.html},
+  note      = {Neuro-symbolic: LLM + CodeQL gives +103\% detection vs CodeQL alone. Preprint: arXiv:2405.17238}
 }
 
 @article{wang2025llmpa,
-  author    = {Wang, Jiayuan and Li, Chaozheng and Li, Xiao and Dong, Shuai and Zhong, Hao},
+  author    = {Wang, Jiayimei and Ni, Tao and Lee, Wei-Bin and Zhao, Qingchuan},
   title     = {A Contemporary Survey of Large Language Model Assisted Program Analysis},
-  journal   = {arXiv preprint arXiv:2502.18474},
+  journal   = {Transactions on Artificial Intelligence},
+  volume    = {1},
+  number    = {1},
+  pages     = {105--129},
   year      = {2025},
-  doi       = {10.48550/arXiv.2502.18474},
-  note      = {Survey of LLM in SA: vulnerability detection, verification, fuzzing. 50-99\% effectiveness}
+  publisher = {Scilight Press},
+  doi       = {10.53941/tai.2025.100006},
+  note      = {Survey of LLM in SA: vulnerability detection, verification, fuzzing. 50-99\% effectiveness. Preprint: arXiv:2502.18474}
 }
 
 @inproceedings{cadar2008klee,
@@ -2449,14 +2468,16 @@ language = {eng},
   doi       = {10.5220/0012572400003690}
 }
 
-@misc{ghazi2017levels,
+@article{ghazi2017levels,
   author    = {Ghazi, Ahmad Nauman and Petersen, Kai and Bjarnason, Elizabeth and Runeson, Per},
-  title     = {Exploratory Testing: One Size Doesn't Fit All},
-  year      = {2017},
-  howpublished = {arXiv preprint arXiv:1704.00537},
-  eprint    = {1704.00537},
-  archiveprefix = {arXiv},
-  url       = {https://arxiv.org/abs/1704.00537}
+  title     = {Levels of Exploration in Exploratory Testing: From Freestyle to Fully Scripted},
+  journal   = {IEEE Access},
+  volume    = {6},
+  pages     = {26416--26423},
+  year      = {2018},
+  publisher = {IEEE},
+  doi       = {10.1109/ACCESS.2018.2834957},
+  note      = {Preprint: arXiv:1704.00537 (titled ``Exploratory Testing: One Size Doesn't Fit All'')}
 }
 
 @misc{ghazi2017decision,
@@ -3513,11 +3534,17 @@ language = {eng},
   doi       = {10.1155/2020/8840389}
 }
 
-@article{molnar2020study,
+@incollection{molnar2020study,
   author    = {Molnar, Arthur-Jozsef and Motogna, Simona},
   title     = {A Study of Maintainability in Evolving Open-Source Software},
-  journal   = {arXiv preprint arXiv:2008.04819},
-  year      = {2020}
+  booktitle = {Evaluation of Novel Approaches to Software Engineering (ENASE 2020), Revised Selected Papers},
+  editor    = {Ali, Raian and Kaindl, Hermann and Maciaszek, Leszek A.},
+  series    = {Communications in Computer and Information Science},
+  volume    = {1375},
+  pages     = {261--282},
+  year      = {2021},
+  publisher = {Springer},
+  doi       = {10.1007/978-3-030-70006-5_11}
 }
 
 @inproceedings{campbell2018cognitive,
@@ -4137,4 +4164,14 @@ language = {eng},
   publisher = {D. Van Nostrand},
   address   = {New York},
   year      = {1931}
+}
+
+% --- Performance and queuing area (L09/A09), added 2026-10-27 ---
+
+@misc{locust_docs,
+  title        = {Locust Documentation},
+  author       = {{Locust contributors}},
+  howpublished = {\url{https://docs.locust.io/}},
+  note         = {Version 2.47},
+  year         = {2026}
 }
