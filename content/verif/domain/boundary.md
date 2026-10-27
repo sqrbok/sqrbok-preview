@@ -7,293 +7,58 @@ layout: default
 
 # Boundary Value Analysis
 
-Boundary Value Analysis (BVA) focuses testing on the edges of equivalence partitions, where faults are most likely to occur. Off-by-one errors and incorrect boundary operators are among the most common programming mistakes.
+**Boundary value analysis (BVA)** tests the edges between [equivalence classes](equivalence.md): points on a boundary and points just beside it. Ambiguous class definitions and slips such as `<` for `<=` show up at boundaries {% cite tian2005sqe %}.
 
----
+## 1. Five kinds of boundary fault
 
-## Why Boundaries Matter
+Tian lists the faults a boundary can have {% cite tian2005sqe %}:
 
-**Empirical observation:** Faults cluster at partition boundaries.
+| Fault | What is wrong | Example |
+|---|---|---|
+| Closure | the boundary point is on the wrong side | `x < 100` where the spec says `x ≤ 100` |
+| Shift | the boundary is at the wrong value | `x ≤ 90` instead of `x ≤ 100` |
+| Tilt | a coefficient is wrong (two or more inputs) | `x + 2y ≤ 10` instead of `x + y ≤ 10` |
+| Missing | a boundary is not implemented | no upper limit on a quantity |
+| Extra | a boundary exists that should not | a cut-off the spec never asked for |
 
-**Common boundary bugs:**
-- Loop termination (`< n` vs `<= n`)
-- Array indexing (0-based vs 1-based)
-- Range checks (`x < max` vs `x <= max`)
-- Comparison operators (`>` vs `>=`)
+## 2. ON and OFF points
 
-> "Boundary problems are most likely to happen at boundaries." {% cite tian2005sqe %}
+An **ON point** lies on the boundary. An **OFF point** lies a small step ε away from it, on the side where processing differs, so the OFF point should get the other result than the ON point. The OFF point can lie in a neighbouring valid class: for "teen ≥ 13" it is 12, a child. It lies **outside** the condition's valid region for a closed boundary (`≤`, `≥`), and **inside** the condition's valid region for an open one (`<`, `>`) {% cite tian2005sqe %}.
 
----
+![Closed boundary x ≤ 100: ON point 100 valid, OFF point 101 outside. Open boundary x < 100: ON point 100 invalid, OFF point 99 inside](on-off-points.svg)
 
-## Boundary Fault Types
+_ON and OFF points for a closed and an open boundary; ε is 1 for integers._
 
-| Fault Type | Description | Example |
-|------------|-------------|---------|
-| **Closure** | Wrong operator (`<` vs `≤`) | `if (x < 10)` should be `if (x <= 10)` |
-| **Shift** | Boundary at wrong value | `if (x < 10)` should be `if (x < 11)` |
-| **Tilt** | Coefficient wrong (2D+) | `ax + by = K` vs `ax + cy = K` |
-| **Missing** | Boundary not implemented | No upper bound check |
-| **Extra** | Spurious boundary | Unnecessary constraint added |
+The pair catches a closure fault: if the code says `x < 100` where the spec says `x ≤ 100`, the ON point 100 is rejected and the test fails. The pair catches a shift as well: with `x ≤ 90`, the ON point 100 is rejected; with `x ≤ 110`, the OFF point 101 is accepted.
 
-### Example: Off-by-One Error
+**Closure or shift?** A test only shows the boundary is misplaced; the type is named from the code. On integers `x < 100` equals `x ≤ 99`, so no test separates closure from a one-step shift. An *extra* boundary is targeted by no strategy: it shows only when some test, such as a class representative, falls in the extra sub-range.
 
-```python
-# Bug: Processes items 1-9, misses item 10
-for i in range(1, 10):
-    process(items[i])
+## 3. How many points per boundary
 
-# Correct: Processes items 1-10
-for i in range(1, 11):
-    process(items[i])
-```
+The simplest strategy, [**Weak 1×1**](boundary-strategies.md) (unrelated to *weak* EP), takes one ON and one OFF point per boundary condition; it detects closure, shift and missing boundaries. A missing boundary shows because ON and OFF points should be processed differently: without the boundary, both get the same result and one test fails. Boundaries over several inputs, non-numeric inputs and decimals are covered on [Boundary Testing Strategies](boundary-strategies.md).
 
-BVA would test values 9, 10, and 11 to catch this.
+Boundaries come from where specified behaviour changes, not from every partition line: in the [city-tax tree](classification-tree.md), the family 30,000 edge needs no test, since the rate stays 1%.
 
----
+## 4. Worked example: the age fare
 
-## ON/OFF Point Formalism
+For the age classes on [Equivalence Partitioning](equivalence.md) (child 0–12, teen 13–19, adult 20–64, senior 65–120), every class limit is closed: eight limits, from 0 up to 120. Neighbouring limits share a pair: 12 and 13 serve both "child ≤ 12" and "teen ≥ 13". So Weak 1×1 needs five pairs, −1/0, 12/13, 19/20, 64/65 and 120/121, ten values. −1 is already a class representative, and 121 can stand in for 130 as the representative of "above 120", so the whole suite is the ten boundary values plus the representatives 6, 16, 40 and 80: 14 tests, plus three format tests (not a number, missing, null).
 
-A rigorous approach to boundary testing from Tian {% cite tian2005sqe %}:
+**Fault example.** The specification says senior means `age ≥ 65`; the code says `age > 65`. This is a closure fault, and the ON point catches it: a test with 65 expects the senior fare and gets the adult one. A shift fault, `age ≥ 70`, is caught by the same test, and for integers `age > 65` behaves exactly like a one-step shift to `age ≥ 66`.
 
-### Definitions
+## When to use it — and when not
 
-| Concept | Definition |
-|---------|------------|
-| **ON point** | Exactly on the boundary (satisfies `f(x) = K`) |
-| **OFF point** | Just off boundary, within ε distance |
-| **ε-neighborhood** | Small distance distinguishing ON from OFF |
+- **Use it** wherever a specification compares: ranges, limits, sizes, dates.
+- **Use [stronger strategies](boundary-strategies.md)** when a boundary involves two or more inputs, such as `x + y ≤ 10`, or for non-numeric inputs.
+- **Do not use it alone** for combined conditions; see [decision tables](decision-tables.md).
 
-### Key Rule
+## Limitations
 
-> **The OFF point must be in the opposite processing region from the ON point.**
+Boundary testing assumes "case-like" processing; loops that change the input break this model {% cite tian2005sqe %}. Coincidental correctness is common: a wrong boundary can still give the right output. ε is hard to choose for floating point, and for a bounded type, such as a byte or an enum, the OFF point may not exist.
 
-### Closed Boundaries (≤, ≥)
+## How solid is this?
 
-The boundary point is **included** in the valid region.
-
-```mermaid
-flowchart LR
-    subgraph "Closed: x ≤ 100"
-        OUT["x = 101<br>OFF point<br>(outside)"]
-        ON["x = 100<br>ON point<br>(boundary)"]
-        IN["x = 50<br>Interior"]
-    end
-
-    style OUT fill:#ffcccc,stroke:#cc0000
-    style ON fill:#fff3cd,stroke:#ffc107
-    style IN fill:#ccffcc,stroke:#009900
-```
-
-**Test points for `x ≤ 100`:**
-- ON point: x = 100 (valid, on boundary)
-- OFF point: x = 101 (invalid, just outside)
-
-### Open Boundaries (<, >)
-
-The boundary point is **excluded** from the valid region.
-
-```mermaid
-flowchart LR
-    subgraph "Open: x < 100"
-        ON["x = 100<br>ON point<br>(excluded)"]
-        OFF["x = 99<br>OFF point<br>(inside)"]
-        IN2["x = 50<br>Interior"]
-    end
-
-    style ON fill:#ffcccc,stroke:#cc0000
-    style OFF fill:#fff3cd,stroke:#ffc107
-    style IN2 fill:#ccffcc,stroke:#009900
-```
-
-**Test points for `x < 100`:**
-- ON point: x = 100 (invalid, exactly on boundary)
-- OFF point: x = 99 (valid, just inside)
-
----
-
-## BVA Testing Strategies
-
-### Basic BVA (4k + 1)
-
-For each of k input variables, test:
-- Minimum value
-- Just above minimum (min + ε)
-- Nominal (middle) value
-- Just below maximum (max - ε)
-- Maximum value
-
-Plus one test with all nominal values.
-
-**Formula:** `4k + 1` tests for k variables
-
-**Example:** k = 3 variables → **13 tests**
-
-### Robust BVA (6k + 1)
-
-Adds values **beyond** valid boundaries:
-- Below minimum (min - ε)
-- Above maximum (max + ε)
-
-**Formula:** `6k + 1` tests for k variables
-
-**Example:** k = 3 variables → **19 tests**
-
-### Strategy Comparison
-
-| Strategy | Points per Boundary | Detects | Formula |
-|----------|---------------------|---------|---------|
-| **Weak 1×1** | 1 ON + 1 OFF | Closure, shift | 2 per condition |
-| **Weak N×1** | N ON + 1 OFF | + tilt detection | (n+1) × b + 1 |
-| **Basic BVA** | 4 per variable | Standard faults | 4k + 1 |
-| **Robust BVA** | 6 per variable | + beyond-boundary | 6k + 1 |
-
-> **Practical minimum:** Weak 1×1 (one ON + one OFF per boundary condition).
-
----
-
-## Test Count Examples
-
-| Variables (k) | Basic BVA (4k+1) | Robust BVA (6k+1) |
-|---------------|------------------|-------------------|
-| 1 | 5 | 7 |
-| 2 | 9 | 13 |
-| 3 | 13 | 19 |
-| 4 | 17 | 25 |
-| 5 | 21 | 31 |
-
----
-
-## Closed vs Open Boundary Summary
-
-| Boundary Type | Operator | ON Point | OFF Point Location |
-|---------------|----------|----------|-------------------|
-| **Closed** | ≤ | On boundary (valid) | Outside (invalid) |
-| **Closed** | ≥ | On boundary (valid) | Outside (invalid) |
-| **Open** | < | On boundary (invalid) | Inside (valid) |
-| **Open** | > | On boundary (invalid) | Inside (valid) |
-
----
-
-## Multidimensional BVA
-
-When testing functions with multiple numeric inputs:
-
-### Single Variable at Extreme
-
-Hold all variables at nominal, vary one to extreme:
-
-| Test | X | Y | Z |
-|------|---|---|---|
-| T1 | min | nom | nom |
-| T2 | max | nom | nom |
-| T3 | nom | min | nom |
-| T4 | nom | max | nom |
-| T5 | nom | nom | min |
-| T6 | nom | nom | max |
-| T7 | nom | nom | nom |
-
-### Combining Extremes
-
-For higher assurance, combine extreme values:
-
-| Test | Latitude | Longitude |
-|------|----------|-----------|
-| T1 | -90 (min) | -180 (min) |
-| T2 | -90 (min) | +180 (max) |
-| T3 | +90 (max) | -180 (min) |
-| T4 | +90 (max) | +180 (max) |
-| T5 | 0 (nom) | 0 (nom) |
-
-### Ordered Pairs
-
-When relationship between variables matters:
-
-| Relationship | Test Values | Purpose |
-|--------------|-------------|---------|
-| x < y | (1, 5) | Normal order |
-| x = y | (3, 3) | Equal values |
-| x > y | (5, 1) | Inverted order |
-
----
-
-## Practical Example: Date Validation
-
-**Function:** `isValidDate(year, month, day) -> Boolean`
-
-### Boundary Identification
-
-| Variable | Min | Max | Special |
-|----------|-----|-----|---------|
-| Year | 1 | 9999 | Leap years |
-| Month | 1 | 12 | - |
-| Day | 1 | 28/29/30/31 | Month-dependent |
-
-### Test Cases
-
-| Test | Year | Month | Day | Expected | Boundary |
-|------|------|-------|-----|----------|----------|
-| T1 | 2024 | 1 | 0 | Invalid | Day below min |
-| T2 | 2024 | 1 | 1 | Valid | Day at min |
-| T3 | 2024 | 1 | 31 | Valid | Day at max (Jan) |
-| T4 | 2024 | 1 | 32 | Invalid | Day above max |
-| T5 | 2024 | 0 | 15 | Invalid | Month below min |
-| T6 | 2024 | 13 | 15 | Invalid | Month above max |
-| T7 | 2024 | 2 | 29 | Valid | Leap year Feb |
-| T8 | 2023 | 2 | 29 | Invalid | Non-leap Feb |
-| T9 | 0 | 6 | 15 | Invalid | Year below min |
-
----
-
-## BVA Limitations
-
-1. **Case-like processing assumption:** BVA assumes inputs map directly to processing regions without loops that modify the input.
-
-2. **Coincidental correctness:** A bug may exist but the test happens to pass because of specific values chosen.
-
-3. **ε-limit problems:** Floating-point precision varies across platforms. What is "just above" 1.0?
-
-4. **Closed domain issues:** For some domains, the OFF point may be undefined (e.g., minimum of unsigned integer).
-
-5. **Specification dependency:** Boundaries must be documented; implicit boundaries are easily missed.
-
----
-
-## Combining BVA with EP
-
-BVA complements Equivalence Partitioning:
-
-```mermaid
-flowchart TD
-    EP[Equivalence Partitioning] --> |"Identifies partitions"| P1[Child: 0-12]
-    EP --> P2[Teen: 13-19]
-    EP --> P3[Adult: 20-64]
-    EP --> P4[Senior: 65+]
-
-    P1 --> |"BVA adds boundaries"| B1["0, 12, 13"]
-    P2 --> B2["13, 19, 20"]
-    P3 --> B3["20, 64, 65"]
-    P4 --> B4["65, 120"]
-
-    style EP fill:#e1f5fe
-    style B1 fill:#fff3cd
-    style B2 fill:#fff3cd
-    style B3 fill:#fff3cd
-    style B4 fill:#fff3cd
-```
-
-**EP alone:** Tests 5, 15, 30, 70 (one per partition)
-**EP + BVA:** Adds 0, 12, 13, 19, 20, 64, 65 (boundary points)
-
----
-
-## Key Takeaways
-
-1. **Faults cluster at boundaries** — test edges of every partition
-2. **ON/OFF formalism** provides rigorous boundary point selection
-3. **Closed boundaries:** OFF point outside; **Open boundaries:** OFF point inside
-4. **4k+1 formula** for basic BVA; **6k+1** for robust BVA
-5. **Combine with EP** — EP identifies what to partition, BVA tests the edges
-6. **Weak 1×1** is practical minimum when resources are limited
+- **Where it comes from.** The fault types, ON/OFF points and strategies follow Tian's *Software Quality Engineering*, chapter 9 {% cite tian2005sqe %}.
+- **What we do not hold.** No study in the review measures how many real faults sit at boundaries; that claim is practitioner experience.
 
 ---
 

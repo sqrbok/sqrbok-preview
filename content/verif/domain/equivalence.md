@@ -7,276 +7,53 @@ layout: default
 
 # Equivalence Partitioning
 
-Equivalence Partitioning (EP) divides the input domain into classes where all values are expected to produce similar behavior. Testing one representative from each class provides confidence for the entire class.
+**Equivalence partitioning (EP)** divides the input domain into classes whose members the specification says should be processed the same way, and tests one representative of each class. If the program handles one member correctly, it is assumed to handle the whole class correctly {% cite labiche2026cp %}.
 
----
+## 1. Rules for a good partition
 
-## Core Principle
+A partition has two properties: it is **complete**, so every possible input belongs to some class, and **disjoint**, so no input belongs to two classes. Classes come from the specification: one class per stated case, one per kind of error, and one per range below, inside and above each limit.
 
-> "If one value in a class fails, all values in that class will fail the same way."
+**Invalid classes are classes too.** Testers favour inputs they expect to be accepted, the *positive test strategy* {% cite teasley1994positive %}, so invalid classes must be listed on purpose. Each invalid class gets its own test, with all other inputs valid, so that a rejection can be traced to that one input.
 
-**Key assumption:** Inputs within an equivalence class:
-- Trigger the **same code paths**
-- Reveal the **same faults**
-- Produce **similar (not identical) results**
+## 2. Worked example: an age-based fare
 
-**Partition requirements:**
-- **Complete:** Every possible input belongs to some partition
-- **Disjoint:** No input belongs to multiple partitions
+A ticket service charges by age, an integer number of years: child 0–12, teen 13–19, adult 20–64, senior 65–120. Each range gives one class below, one inside and one above; here the valid range is split further by fare. The age **range** has four valid classes and two invalid ones, below 0 and above 120. Format errors, a value that is not a number, missing or null, are checked on the field before the range applies; they are not part of the range model, and each gets one test of its own.
 
----
+![Age axis divided into six classes, two invalid and four valid, with one representative each](age-partitions.svg)
 
-## Partition Types
+_The range model: six classes, six tests: −1, 6, 16, 40, 80 and 130; the three format checks add three more. The red edges are where [boundary value analysis](boundary.md) adds more, using 121 in place of 130._
 
-### Range-Based (Comprehension)
+For a function that validates an e-mail address, the classes include "one `@`", "no `@`", "two `@`", "empty local part" and "empty domain", with one representative each: `user@example.com`, `userexample.com`, `user@@example.com`, `@example.com` and `user@`.
 
-Defined by numeric or ordered ranges:
+## 3. Weak and strong EP
 
-```mermaid
-flowchart LR
-    subgraph "Age Input Domain"
-        INV["Invalid<br>age < 0"]
-        C["Child<br>0-12"]
-        T["Teen<br>13-19"]
-        A["Adult<br>20-64"]
-        S["Senior<br>65+"]
-    end
+With several inputs, the classes have to be combined.
 
-    style INV fill:#ffcccc,stroke:#cc0000
-    style C fill:#ccffcc,stroke:#009900
-    style T fill:#ccffcc,stroke:#009900
-    style A fill:#ccffcc,stroke:#009900
-    style S fill:#ccffcc,stroke:#009900
-```
+- **Weak EP** uses each class of each input at least once; in combination-strategy terms this is *each choice*. With inputs of 3, 4 and 2 classes it needs max(3, 4, 2) = 4 tests, filling the shorter lists by repeating classes.
+- **Strong EP** tests every combination (*all combinations*): 3 × 4 × 2 = 24 tests.
 
-**Test values:** -1 (invalid), 5 (child), 15 (teen), 30 (adult), 70 (senior)
+Both counts use **valid** classes only. Each invalid class adds one test of its own, with all other inputs valid. **Example:** the age range has 4 valid and 2 invalid classes; ticket type has 2 valid classes (single, return) and 1 invalid (unknown type). Ticket type also gets missing and null tests. Weak EP needs max(4, 2) + 3 = 7 tests; strong EP needs 4 × 2 + 3 = 11. The five format tests (age 3, ticket type 2) add 5: 7 + 5 = 12 and 11 + 5 = 16. (The word *weak* here is unrelated to the Weak 1×1 boundary strategy.)
 
-### Enumeration-Based
+Weak EP assumes a fault depends on one input at a time; strong EP also catches faults that need two classes together, at a cost that multiplies with every input. Between the two, the [combination strategies](integration.md) choose how many combinations are enough.
 
-Defined by discrete sets of values:
+## 4. The category-partition method
 
-| US Region | Representative State |
-|-----------|---------------------|
-| Northeast | New York |
-| South | Texas |
-| Midwest | Illinois |
-| West | California |
+Ostrand and Balcer turned EP into a procedure {% cite ostrand1988category %}: list the parameters and environment conditions, split each into **categories** (characteristics that matter) and **choices** (the classes), mark constraints between choices, such as `[error]` (an error case: tested once, never combined), then combine the choices into test frames, abstract test cases that name one choice per category (the frame "age: teen; ticket type: return" becomes, for example, the test "age 16, return ticket"), and give each frame concrete values. Current tools automate the frame generation and check the constraints {% cite labiche2026cp %}.
 
-One test per region exercises the complete set.
+## When to use it — and when not
 
-### Invalid Partitions
+- **Use it** first, on every specification: other techniques build on it.
+- **Use it** to make invalid inputs visible, so negative tests are planned instead of forgotten.
+- **Do not stop at one value per class** for numeric ranges: off-by-one faults sit at the edges, which [boundary value analysis](boundary.md) tests.
 
-**Critical:** Include invalid inputs explicitly:
+## Limitations
 
-| Attribute | Valid Partitions | Invalid Partitions |
-|-----------|------------------|-------------------|
-| String length | 1-100 chars | 0, >100 |
-| Set size | 1+ elements | Empty set |
-| Pointer | Valid reference | Null, dangling |
-| File | Exists, readable | Missing, locked, corrupt |
+The "same behaviour" assumption holds only if the code really treats a class alike. If the implementation adds a case the specification does not mention, for example a discount for age 18, one representative per class misses it. Partitions also depend on the tester: two people can draw different classes from the same text.
 
----
+## How solid is this?
 
-## Weak vs Strong EP
-
-### Weak Equivalence Partitioning
-
-**Formula:** `max(|partition counts|)` tests
-
-**Assumption:** Single-fault—only one input variable causes the fault at a time.
-
-**Example:**
-- Variable A: 3 partitions
-- Variable B: 4 partitions
-- Variable C: 2 partitions
-
-**Weak EP tests:** max(3, 4, 2) = **4 tests**
-
-```
-Test 1: A₁, B₁, C₁
-Test 2: A₂, B₂, C₂
-Test 3: A₃, B₃, C₁  (wrap C)
-Test 4: A₁, B₄, C₂  (wrap A)
-```
-
-### Strong Equivalence Partitioning
-
-**Formula:** `∏(|partition counts|)` tests
-
-**Assumption:** Multi-fault—interactions between variables may cause faults.
-
-**Same example:**
-**Strong EP tests:** 3 × 4 × 2 = **24 tests**
-
-All combinations of partitions are tested.
-
-### Comparison
-
-| Aspect | Weak EP | Strong EP |
-|--------|---------|-----------|
-| **Tests** | max(n₁, n₂, ...) | n₁ × n₂ × ... |
-| **Coverage** | Each partition once | All combinations |
-| **Detects** | Single-variable faults | Interaction faults |
-| **Cost** | Low | High (exponential) |
-| **Use when** | Resource-constrained | High criticality |
-
-```mermaid
-xychart-beta
-    title "Test Count Growth: Weak vs Strong EP"
-    x-axis "Number of Variables (3 partitions each)" [2, 3, 4, 5]
-    y-axis "Test Cases" 0 --> 300
-    bar "Weak EP" [3, 3, 3, 3]
-    bar "Strong EP" [9, 27, 81, 243]
-```
-
----
-
-## Finding Equivalence Classes: Heuristics
-
-| Source | Method | Example |
-|--------|--------|---------|
-| **Specification** | One class per stated case | "Discounts for orders > $100" → {≤$100, >$100} |
-| **Code paths** | One class per branch | `if/else` → 2 classes |
-| **Error types** | One class per error | Invalid format, overflow, null |
-| **Ranges** | Valid + boundary violations | 1-100 → {<1, 1-100, >100} |
-| **Membership** | Inside + outside groups | Prime vs composite numbers |
-| **Outputs** | Classes producing same output | All inputs → "Error 404" |
-
-> **Smell:** If you're writing many similar test cases, they probably belong to the same equivalence class!
-
----
-
-## Category-Partition Method
-
-A systematic 6-step approach to equivalence partitioning {% cite ammann2016introduction %}:
-
-### Step 1: Identify Parameters
-List all input parameters and environment variables.
-
-**Example:** File copy function
-- Source file path
-- Destination file path
-- Overwrite flag
-- File system state
-
-### Step 2: Define Categories
-Identify characteristics relevant for testing each parameter.
-
-| Parameter | Categories |
-|-----------|------------|
-| Source file | Existence, size, permissions |
-| Destination | Existence, directory, permissions |
-| Overwrite flag | True, false |
-
-### Step 3: Specify Choices
-Define how each category splits into sub-domains.
-
-| Category | Choices |
-|----------|---------|
-| Source existence | Exists, Missing |
-| Source size | Empty, Small, Large |
-| Destination existence | Exists, New |
-
-### Step 4: Add Constraints
-Mark choices that must/cannot appear together.
-
-```
-[if Dest exists] Overwrite = true → allowed
-[if Dest exists] Overwrite = false → error expected
-[property] Source missing → [error] (marks expected error)
-```
-
-### Step 5: Generate Test Frames
-Combine choices according to selection criteria.
-
-### Step 6: Derive Test Cases
-Assign concrete values to each test frame.
-
-{: .note }
-The [Classification Tree Method](classification-tree.md) extends Category-Partition with a **graphical tree notation** and **combination table**, replacing textual TSL constraints with a visual, hierarchical representation.
-
----
-
-## Selection Criteria
-
-| Criterion | Description | Tests |
-|-----------|-------------|-------|
-| **Each-Choice** | Each choice at least once | Minimum |
-| **Pair-Wise** | All pairs from different categories | Moderate |
-| **Base-Choice** | Base + vary one category | Moderate |
-| **All-Combinations** | Every combination | Exhaustive |
-
-**Example (3 categories, 2 choices each):**
-
-| Criterion | Test Count |
-|-----------|-----------|
-| Each-Choice | 2 |
-| Pair-Wise | 4 |
-| All-Combinations | 8 |
-
----
-
-## Multidimensional Partitioning
-
-When multiple attributes matter:
-
-| Dimension | Values |
-|-----------|--------|
-| Size | Small, Medium, Large |
-| Color | Red, Green, Blue |
-| Shape | Circle, Square, Triangle |
-
-**Total classes:** 3 × 3 × 3 = 27 combinations
-
-**Common multidimensional cases:**
-
-| Attribute | Partition Values |
-|-----------|------------------|
-| String | Empty, 1 char, typical, max, >max |
-| Collection | Empty, 1 element, few, many |
-| Numeric | Below min, min, typical, max, above max |
-| Reference | Null, valid, invalid |
-
----
-
-## Practical Example: Email Validation
-
-**Function:** `isValidEmail(email: String) -> Boolean`
-
-### Step 1: Identify Partitions
-
-| Aspect | Valid | Invalid |
-|--------|-------|---------|
-| @ symbol | Present (1) | Missing, multiple |
-| Local part | Non-empty | Empty |
-| Domain | Valid format | Empty, no TLD |
-| Characters | Allowed | Spaces, control chars |
-| Length | 1-254 | 0, >254 |
-
-### Step 2: Create Test Cases
-
-| Test | Input | Expected | Partition |
-|------|-------|----------|-----------|
-| T1 | `user@domain.com` | Valid | Standard email |
-| T2 | `a@b.co` | Valid | Minimum valid |
-| T3 | `user+tag@domain.com` | Valid | Plus addressing |
-| T4 | `userdomain.com` | Invalid | Missing @ |
-| T5 | `user@@domain.com` | Invalid | Multiple @ |
-| T6 | `@domain.com` | Invalid | Empty local |
-| T7 | `user@` | Invalid | Empty domain |
-| T8 | `` | Invalid | Empty string |
-
-**Weak EP:** 8 tests (one per class)
-
----
-
-## Key Takeaways
-
-1. **One test per class** is sufficient if partitions are well-defined
-2. **Include invalid partitions** explicitly—positive test bias will skip them
-3. **Weak EP** for resource-constrained testing; **Strong EP** for critical systems
-4. **Category-Partition Method** provides systematic rigor
-5. **Combine with BVA** to test partition boundaries
+- **Where it comes from.** EP is a textbook technique {% cite myers2011art %}; category-partition is from Ostrand and Balcer {% cite ostrand1988category %}.
+- **What we do not hold.** The literature review did not obtain the full text of Teasley et al. {% cite teasley1994positive %}; only their conclusion that testers prefer confirming inputs is used here, without their figures.
 
 ---
 
