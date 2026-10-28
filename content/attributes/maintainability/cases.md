@@ -1,139 +1,59 @@
 ---
-title: Case Studies
+title: Refactoring Case Studies
 parent: Maintainability
 grand_parent: Quality Attributes
-nav_order: 4
+nav_order: 9
 layout: default
 ---
 
-# Maintainability Case Studies
+# Refactoring Case Studies
 
-Theory matters, but empirical evidence from real systems provides the most compelling arguments for investing in maintainability. The cases below span open-source browsers, commercial operating systems, industrial simulations, and automated tooling — yet they converge on remarkably similar lessons.
+**Refactoring** in these studies means changing a system's structure to make later changes cheaper; four published cases measure what it bought, each with a different measure {% cite maccormack2006exploring kim2014refactoring wahler2016refactoring szoke2015refactoring %}.
 
-## Mozilla: Architecture as a Managerial Choice
+## 1. Mozilla: a deliberate redesign
 
-### Context
+In late 1998, after Netscape released its browser code, the Mozilla team redesigned it. Propagation cost fell from 17.35% to 2.78%, 84% lower (the paper says a change could reach "80% fewer" files), and dependencies fell from 6,717 to 3,037 {% cite maccormack2006exploring %}. The details are on [Propagation Cost](propagation-cost.md).
 
-Mozilla (Netscape) released its proprietary browser code as open source in 1998. The initial code had a **propagation cost of 17.35%** — meaning a change to any file could potentially affect 17% of the entire codebase.
+## 2. Windows 7: refactoring at Microsoft
 
-### The Re-design
+Kim et al. surveyed 328 Microsoft engineers and analysed the Windows 7 version history {% cite kim2014refactoring %}. 78% of the engineers defined refactoring as a change that improves readability, maintainability or performance, not only as a behaviour-preserving transformation, and 76% named regression bugs as a risk. In Windows 7, the top 5% of "preferentially refactored" modules, ranked much higher for refactoring than for ordinary commits, changed their inter-module dependencies by a factor of 0.85 of the average change per module, against 1.10 for the other modules, a ratio of 0.77. The refactored modules grew in lines of code even as some complexity measures fell, and their post-release defects fell only slightly more than the rest's: a change factor of 0.93 against 1.00, a 7% relative difference. The difference is small and confounded with other changes to the same modules, so refactoring alone did not explain the defect reduction in Windows 7.
 
-A purposeful architectural re-design in late 1998 restructured the codebase to reduce coupling and increase modularity.
+## 3. Worked example: ABB's simulation tool
 
-### Results
+At ABB Corporate Research, DID was a physics simulation for designing magnetic components, about 30 kloc of Java grown by researchers without software-engineering training {% cite wahler2016refactoring %}. Adding a new magnetic component needed at least 59 changes in 17 existing classes, mostly copy and paste. The original developer refactored it, with software engineers spending about three hours a week for three months reviewing structure and answering questions. The work separated concerns, built a finer data model and added unit, integration and system tests.
 
-| Metric | Before | After | Change |
-|--------|--------|-------|--------|
-| Propagation Cost | 17.35% | 2.78% | **-84%** |
-| Vertical buses | 2 | increased significantly | — |
-| Architecture | highly coupled | more modular than Linux (5.82% PC) | — |
+| Time to add | Before | After | Less time |
+|---|:-:|:-:|:-:|
+| A magnetic component | 6–8 weeks | 1–2 weeks | 75% |
+| A cooling method | 8–12 weeks | 1–2 weeks | 83% |
 
-![DSM heatmaps: Mozilla v1 (left) shows scattered dependencies; Linux (right) shows block-diagonal clusters](mozilla-linux-comparison.png)
+| Tool count | Before (15 kloc) | After (5 kloc) | Fewer per kloc |
+|---|:-:|:-:|:-:|
+| Duplicated code (PMD) | 5,647 lines | 338 lines | 82% |
+| FindBugs warnings | 1,450 | 374 | 23% |
 
-![Mozilla DSM after redesign showing emergent block-diagonal modular structure](mozilla-re2.png)
+The refactored version did not yet have all features, so for the tool measurements the authors removed the GUI and file input-output code from the old version: 15 kloc of the old 30 kloc were compared with 5 kloc of the new version. The improvements are therefore per kloc. Duplicated lines fell from 5,647 / 15 = 376 to 338 / 5 = 68 per kloc, 82% fewer, while the raw count fell by 94% partly because the new code is smaller. FindBugs warnings fell from 1,450 / 15 = 97 to 374 / 5 = 75 per kloc, 23% fewer. The time figures are the developer's own estimates; the paper's 75% and 83% use the upper ends of the ranges (8 to 2, 12 to 2 weeks); midpoints give about 79% for a component.
 
-![Propagation cost comparison: Mozilla v1 (17.35%), Linux (5.82%), Mozilla v2 (2.78%)](chart-mozilla-linux.svg)
+## 4. Automatic refactoring at four companies
 
-### Lesson
+Szoke et al. had four companies apply almost 4,000 automatic refactorings, in more than 1,000 commits, to projects of about 5 million lines in total, mostly Java {% cite szoke2015refactoring %}. Measured with a maintainability model per refactoring type and project, 55% of the cases improved maintainability, 10% decreased it and 35% made no traceable difference. Results depended on the type. Removing unnecessary constructors, the dominant fix in one company, lowered the score every time: the deleted constructors were short, simple methods, so the distribution of method lengths shifted towards longer ones, and the model rates distributions, not size.
 
-Architecture is not determined by function — it results from purposeful choices by designers. An "architecture for participation" is essential for open-source success {% cite maccormack2006exploring %}.
+## 5. What the cases share
 
-## Microsoft Windows: Large-Scale Refactoring
+Each case targeted a known problem: coupling at Mozilla and Windows, duplication at ABB, rule violations in the automatic study. Each reported a different measure, so the cases cannot be ranked against each other. And where the measure was not structural, such as defects at Microsoft or the maintainability score in the automatic study, refactoring explained only part of the change.
 
-### Context
+## When to use it — and when not
 
-Kim et al. studied refactoring practices across 5 Microsoft products, including a multi-year effort on Windows {% cite kim2014refactoring %}.
+Use these cases to argue for targeted refactoring, measured as planned. Do not quote one case's percentage as what refactoring delivers.
 
-### Key Findings
+## Limitations
 
-| Finding | Detail |
-|---------|--------|
-| Top 5% of preferentially refactored modules | Inter-module dependencies decreased by factor **0.85** |
-| Non-refactored modules | Dependencies increased by factor **1.10** |
-| Engineer definition of refactoring | 78% defined it as any change improving readability/maintainability |
-| Primary risk identified | 76% cited regression bugs |
-| Effect on module size | Refactoring increased LOC even while reducing complexity |
+Each case is one organisation or one system. ABB's time figures are self-reported, and Microsoft's results come from one product's history.
 
-### Lesson
+## How solid is this?
 
-Measuring refactoring impact requires a **multi-dimensional view** — single metrics can give misleading results. A module may grow in size yet become easier to maintain.
-
-## ABB DID: Industrial Refactoring
-
-### Context
-
-ABB's DID physics simulation (30 kLOC Java) was considered "unmaintainable." Adding a single new component required **59 changes across 17 classes**, relying on error-prone copy/paste {% cite wahler2016refactoring %}.
-
-### The Refactoring
-
-Software engineering experts consulted with developers approximately 3 hours per week for 3 months. The focus areas were: separation of concerns (MVC), a fine-grained data model, and multi-level testing.
-
-### Results
-
-| Metric | Before | After | Change |
-|--------|--------|-------|--------|
-| Duplicated code | 5,647 lines | 338 lines | **-94%** |
-| FindBugs defects (normalized) | baseline | reduced | **-23%** |
-| Time per new component | 6–8 weeks | 1–2 weeks | **-75%** |
-| Automated tests | 0 | 200+ (unit + integration + system) | — |
-
-### Lesson
-
-Relatively small expert investment (3 h/week for 3 months) can transform an "unmaintainable" system. Start with separation of concerns and automated testing.
-
-## Automatic Refactoring at Scale
-
-### Context
-
-Szoke et al. developed a refactoring framework and deployed it at 4 companies across approximately 3 million LOC, performing around 4,000 refactoring operations {% cite szoke2015refactoring %}.
-
-### Results
-
-| Finding | Detail |
-|---------|--------|
-| Refactorings that improved maintainability | **55%** (ColumbusQM model) |
-| Refactorings that showed decrease | Only **10%** |
-| Most effective targets | Reducing coding rule violations and coupling |
-| Tool chain | SourceMeter + IDE plugins (Eclipse, NetBeans, IntelliJ) |
-
-### The "UnnecessaryConstructor" Paradox
-
-Some refactorings that fix a specific issue can accidentally worsen another metric — expert interpretation of measurement tools is essential.
-
-### Lesson
-
-Automation helps at scale, but not all refactorings are equal. Target specific anti-patterns rather than applying broad transformations.
-
-## OSS Evolution Patterns
-
-### Context
-
-Molnar (2020) studied maintainability evolution in 3 open-source projects (FreeMind, jEdit, TuxGuitar) over multiple years {% cite molnar2020study %}.
-
-### Key Findings
-
-- Most maintainability issues concentrated in a **small subset of packages**.
-- In jEdit, **6 packages** accounted for 80% of maintenance effort.
-- MI and ARiSA metrics were significantly influenced by software size (confounding variable).
-- **SQALE** was not affected by size — making it more robust for longitudinal analysis.
-
-## Cross-Case Patterns
-
-| Case | Investment | Key Metric | Improvement |
-|------|-----------|------------|-------------|
-| Mozilla | Architectural re-design | Propagation Cost | **-84%** |
-| Microsoft | Targeted refactoring | Inter-module dependencies | **-15%** (top modules) |
-| ABB | 3 h/week expert guidance | Time per component | **-75%** |
-| Automatic | Framework at scale | Maintainability score | **55% improved** |
-
-Four common patterns emerge across all cases:
-
-![Lorenz curve: dependency concentration — top 10% of dependencies cause over 50% of change propagation](chart-lorenz.svg)
-
-1. **Targeted intervention outperforms broad application.** Mozilla re-designed architecture; ABB focused on separation of concerns; the automated framework was most effective against specific anti-patterns.
-2. **Expert interpretation of metrics is essential.** The "UnnecessaryConstructor" paradox and the Microsoft finding that LOC increases during refactoring both show that raw numbers mislead without context.
-3. **Measurement must be multi-dimensional.** No single metric captures maintainability. Propagation cost, duplication, defect counts, and development time each reveal a different facet.
-4. **Small investments yield disproportionate returns.** ABB's 3 hours per week transformed a system; Mozilla's one-time re-design cut coupling by 84%.
+- **Where it comes from.** A management science study of Mozilla and Linux, a Microsoft field study, an ABB industrial report and a four-company study {% cite maccormack2006exploring kim2014refactoring wahler2016refactoring szoke2015refactoring %}.
+- **What is contested.** Whether a maintainability score captures what developers gain: in the Microsoft study, refactored modules grew in size while dependencies fell {% cite kim2014refactoring %}.
 
 ---
 

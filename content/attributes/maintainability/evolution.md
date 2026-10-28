@@ -1,5 +1,5 @@
 ---
-title: Software Evolution
+title: Software Evolution and Aging
 parent: Maintainability
 grand_parent: Quality Attributes
 nav_order: 1
@@ -8,102 +8,51 @@ layout: default
 
 # Software Evolution and Aging
 
-Software systems that interact with the real world are subject to relentless evolutionary pressure. Lehman's classification of programs, his eight laws of evolution, and Parnas's analysis of software aging together form the theoretical foundation for understanding why maintenance dominates the software lifecycle.
+**Software evolution** is the continuing change of a program after its first release; Lehman showed that a program used in the real world must keep changing, and Parnas showed how the changes themselves make it age {% cite lehman1980programs parnas1994aging %}.
 
----
+## 1. Programs that must change
 
-## Lehman's Program Classification
+Lehman sorts programs by how they relate to the world {% cite lehman1980programs %}. An **S-program** is fully defined by its specification, such as a sorting routine. A **P-program** solves a real problem only approximately, such as a chess program. An **E-program** is embedded in the world it serves, and using it changes that world: an operating system or a payroll system. E-programs are where maintenance cost comes from. Lehman quotes an estimate that of US programming spending in 1977, some 70% went on maintenance and about 30% on development {% cite lehman1980programs %}.
 
-Lehman {% cite lehman1980programs %} classified programs into three types based on their relationship to the environment in which they execute:
+The changes themselves come in four kinds {% cite iso14764_2022 %}: **corrective** (fixing discovered failures), **adaptive** (keeping the software usable in a changed environment, such as a new operating system or law), **perfective** (improving it, for example adding features or improving performance) and **preventive** (fixing latent faults or structure before they cause failures, such as refactoring).
 
-| Type | Name | Definition | Example |
-|------|------|------------|---------|
-| **S-type** | Specification-defined | Correctness is determined solely by the specification; the program can be proven correct against it | A mathematical function, a compiler for a formally defined language |
-| **P-type** | Problem-approximate | Solves a real-world problem where the specification is an approximation; acceptability depends on the quality of the solution in practice | A chess program, a weather simulation |
-| **E-type** | Embedded in real world | The program is part of the world it models; its operation changes the environment, which in turn changes the requirements | An operating system, a stock trading platform, an airline reservation system |
+## 2. Lehman's first two laws
 
-E-type programs are the most common in industry and the most subject to evolutionary pressure. Because they are embedded in the real world, they must change as that world changes -- or become progressively less satisfactory {% cite lehman1980programs %}.
+From statistical models of the release history of large systems, Lehman stated laws of program evolution: five by 1980, eight in his 1996 revision {% cite lehman1980programs lehman1996laws %}. The first two:
 
----
+- **Law I, continuing change.** A program used in a real-world environment must be continually adapted, or it becomes progressively less satisfactory.
+- **Law II, increasing complexity.** As a program evolves, its complexity increases unless work is done to maintain or reduce it.
 
-## The Eight Laws of Software Evolution
+Together: change is unavoidable, and every change costs structure unless restored. **Technical debt** is the extra cost of future changes caused by shortcuts in the structure now. Its **principal** is the cost of repairing the shortcut, which static-analysis tools report as remediation cost (see [Measuring Maintainability](measurement.md)) {% cite letouzey2012sqale %}. Its **interest** is the extra cost each later change pays meanwhile; it rises because complexity grows, as Law II says {% cite lehman1980programs %}.
 
-Lehman formulated the first five laws based on quantitative studies of OS/360 evolution {% cite lehman1980programs %}. Three further laws were added in the 1996 revisitation {% cite lehman1996laws %}:
+## 3. Parnas's two causes of aging
 
-| # | Law | Statement | Year |
-|---|-----|-----------|------|
-| I | **Continuing Change** | An E-type system must be continually adapted, or it becomes progressively less satisfactory in use | 1974 |
-| II | **Increasing Complexity** | As an E-type system evolves, its complexity increases unless work is done to maintain or reduce it | 1974 |
-| III | **Self-Regulation** | The evolution process of E-type systems is self-regulating, with close to normal distribution of measures of process and product attributes | 1974 |
-| IV | **Conservation of Organizational Stability** | The average effective global activity rate in an evolving E-type system is invariant over the product's lifetime (i.e., the work rate is approximately constant regardless of resources committed) | 1980 |
-| V | **Conservation of Familiarity** | As an E-type system evolves, all associated with it -- developers, users, managers -- must maintain mastery of its content and behavior; excessive growth in release content reduces that familiarity | 1980 |
-| VI | **Continuing Growth** | The functional content of an E-type system must be continually increased to maintain user satisfaction over its lifetime | 1991 |
-| VII | **Declining Quality** | The quality of an E-type system will appear to be declining unless it is rigorously maintained and adapted to its changing operational environment | 1996 |
-| VIII | **Feedback System** | E-type evolution processes constitute multi-loop, multi-level feedback systems; failure to recognize this leads to invalid planning and unreliable outcomes | 1996 |
+Parnas names two causes of software aging {% cite parnas1994aging %}. **Lack of movement** is the owners' failure to modify the product to meet changing needs. **Ignorant surgery** is aging caused by the changes themselves, made by people who do not understand the original design. Together they form a "one-two punch": neglect builds pressure for an urgent change, and the urgent change is made without the design.
 
-Laws I and II are the most cited: together they explain why maintenance effort grows over time -- the system must keep changing (Law I), and each change makes it harder to change further (Law II) unless deliberate effort is invested in structural improvement.
+![Lack of movement leads to urgent change, ignorant surgery and decayed structure, which feeds back into lack of movement](aging-loop.svg)
 
----
+_Parnas's aging loop. His preventive measures cut the loop where the changes are made._ {% cite parnas1994aging %}
 
-## Software Aging (Parnas 1994)
+## 4. Worked example: a payroll system
 
-Parnas {% cite parnas1994aging %} argued that software, like people, gets old. Unlike hardware wear-out, software aging is caused by human and organizational factors.
+A payroll system (constructed example) has this history. A new tax law takes effect, and the update ships nine months late. That is **lack of movement**. Under deadline, a contractor adds the new rate as a special case inside the report module instead of the tax module. That is **ignorant surgery**: the code works, but the tax rule now lives in two places. The design document still describes one tax module, so the next developer changes only that one, and the reports come out wrong.
 
-### Two Causes of Aging
+Parnas's prescriptions map onto each step {% cite parnas1994aging %}. **Design for change** would have hidden the tax rules behind one module interface. **Keep records** would have kept the design document true. **Second opinions**, meaning design and code reviews, would have caught the special case. For a system that has already aged, he lists remedies: retroactive documentation, retroactive modularization, amputation of code not worth saving, and major surgery that removes redundant parts and gratuitous dependencies.
 
-1. **Lack of Movement** -- failure to modify the software to meet changing needs. The environment moves on while the software stands still, leading to obsolescence. Users find workarounds, switch to competitors, or demand urgent (and poorly planned) changes.
+## When to use it — and when not
 
-2. **Ignorant Surgery** -- changes made by people who do not fully understand the original design. Each such change erodes the conceptual integrity of the system. Documentation becomes inaccurate, structure degrades, and the software becomes increasingly difficult to understand and modify.
+Use Lehman and Parnas to argue for maintenance budget before it is needed: they explain why a system that is not changing is ageing too. Do not use the laws to predict numbers for one project; they describe statistical regularities across large, long-lived systems.
 
-### The "One-Two Punch"
+## Limitations
 
-When both forces combine, software value declines rapidly. Lack of Movement creates pressure for urgent changes, which are then carried out as Ignorant Surgery because the urgency leaves no time for proper understanding. The result is accelerating decay -- a vicious cycle that can render a system unmaintainable.
+The 70% figure is a single national estimate from the 1970s, quoted by Lehman, not a measurement of modern projects. The laws were formed on a few large systems. The other six laws are self-regulation (III), conservation of organisational stability (IV), conservation of familiarity (V), continuing growth (VI), declining quality (VII) and feedback system (VIII): the evolution process is a multi-loop feedback system and has to be treated as one to be improved {% cite lehman1996laws %}.
 
-![Software aging: Lack of Movement and Ignorant Surgery combine as a "one-two punch" accelerating value decline](aging-flow.svg)
+Breivold et al. separate maintainability, about fine-grained, short-term, localized changes, from **evolvability**, about coarse-grained, long-term, radical functional or structural changes {% cite breivold2012evolvability %}. Evolvability needs architecture-level analysis such as a [design structure matrix](dsm.md), explained later.
 
-### Software Geriatrics (Prescriptions)
+## How solid is this?
 
-Parnas {% cite parnas1994aging %} proposed two categories of intervention:
-
-**Preventive measures** (slow the aging process):
-- **Design for Change** -- use information hiding and separation of concerns to isolate likely changes behind stable interfaces
-- **Keep Records** -- maintain accurate, up-to-date documentation of design decisions and their rationale
-- **Second Opinions** -- use design reviews to catch aging-accelerating decisions before they are implemented
-
-**Remedial measures** (treat existing aging):
-- **Retroactive documentation** -- reconstruct the design rationale for undocumented systems
-- **Retroactive modularization** -- restructure the code to restore information hiding boundaries
-- **Amputation** -- remove unsalvageable components and replace them with clean implementations
-- **Major surgery** -- large-scale restructuring when the overall architecture has degraded beyond local repair
-
-> "Programs, like people, get old. We can't prevent aging, but we can understand its causes, take steps to limits its effects, temporarily reverse some of the damage it has caused, and prepare for the day when the software is no longer viable." {% cite parnas1994aging %}
-
----
-
-## The Feedback System Perspective
-
-Lehman's 1996 revisitation {% cite lehman1996laws %} introduced a crucial insight: E-type evolution processes are **multi-loop, multi-level feedback systems**. This has several important consequences:
-
-- **Local improvements are attenuated or inverted** -- productivity improvements in one part of the process may be cancelled out by organizational feedback loops (e.g., faster coding leads to more features requested, which leads to more complexity, which slows coding again)
-- **Self-stabilization through negative feedback** -- Laws III, IV, and V describe how organizational and cognitive constraints act as governors that keep the evolution rate approximately constant regardless of management intervention
-- **Instability from excessive positive feedback** -- when feedback loops reinforce rather than dampen change (e.g., accumulating technical debt that accelerates further debt), the system can enter a state of declining quality (Law VII)
-
-This perspective explains why simplistic process improvements (adding developers, adopting new tools) often fail to produce lasting gains: they address only the forward path of the feedback system while ignoring the return paths that regulate overall system behavior {% cite lehman1996laws %}.
-
----
-
-## Evolvability vs. Maintainability
-
-Breivold et al. {% cite breivold2012evolvability %} conducted a systematic review distinguishing **evolvability** from **maintainability**:
-
-| Dimension | Maintainability | Evolvability |
-|-----------|----------------|--------------|
-| **Granularity** | Fine-grained (code-level) | Coarse-grained (architectural) |
-| **Time horizon** | Short-term (next release) | Long-term (5--30 years) |
-| **Change type** | Corrective, adaptive, perfective | Radical enhancements, platform migration |
-| **Focus** | Preserve existing functionality | Enable new capabilities |
-
-A key finding is that standard quality models (ISO 25010, McCall) lack an explicit **Architectural Integrity** sub-characteristic {% cite breivold2012evolvability %}. Systems can score well on code-level maintainability metrics while suffering from architectural erosion that makes large-scale evolution prohibitively expensive. This gap suggests that maintainability measurement must be complemented by architectural-level analysis -- such as Design Structure Matrices and Propagation Cost -- to capture the full picture of a system's long-term health.
+- **Where it comes from.** Lehman's statistical studies of the evolution of large systems {% cite lehman1980programs %} and Parnas's 1994 essay {% cite parnas1994aging %}.
+- **What is contested.** Whether the laws still hold for small, fast-released systems; Lehman himself stated that they only apply once a system and its organisation are well established {% cite lehman1980programs %}.
 
 ---
 

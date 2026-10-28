@@ -4,150 +4,66 @@ parent: Maintainability
 grand_parent: Quality Attributes
 nav_order: 2
 layout: default
+page_type: deep-dive  # the SIG model with a worked profile, and SQALE with a worked ratio
 ---
 
 # Measuring Maintainability
 
-The measurement landscape for software maintainability is highly fragmented. A systematic literature review by Ardito et al. identified 174 distinct metrics across 43 primary studies, yet over 75% of those metrics were mentioned by only a single paper {% cite ardito2020maintainability %}. This lack of consensus has produced a range of competing approaches, from simple index formulas to benchmarked quality models and technical-debt frameworks.
+**Measuring maintainability** means rating properties of the source code that make changes cheap or expensive; the SIG model rates eight such properties against a benchmark of real systems, and SQALE prices the work needed to fix what falls short {% cite sig2016criteria letouzey2012sqale %}.
 
----
+## 1. The SIG model: eight properties
 
-## The Maintainability Index (MI)
+The Software Improvement Group (SIG) rates eight source code properties, chosen to be largely independent of each other {% cite sig2016criteria %}: volume, duplication, unit size, unit complexity (a **unit** is the smallest piece of code that can be executed and tested on its own, such as a method or function), unit interfacing (parameters per unit), module coupling (incoming dependencies per module, where a SIG module is a grouping of related units in the code, such as a class or file, not a design-level module; pydeps's module is a file), component balance (number and size spread of top-level components, a component being a top-level grouping of modules) and component independence (share of code with no incoming calls from other components). Each property feeds the ISO/IEC 25010 sub-characteristics it affects:
 
-The Maintainability Index is one of the earliest composite metrics, combining Halstead volume, cyclomatic complexity, and lines of code into a single number {% cite ardito2020maintainability %}:
+| Property | Analysability | Modifiability | Testability | Modularity | Reusability |
+|---|:-:|:-:|:-:|:-:|:-:|
+| Volume | X | | X | | |
+| Duplication | X | X | | | |
+| Unit size | X | | | | X |
+| Unit complexity | | X | X | | |
+| Unit interfacing | | | | | X |
+| Module coupling | | X | | X | |
+| Component balance | X | | | X | |
+| Component independence | | | X | X | |
 
-$$MI = 171 - 5.2 \cdot \ln(\text{aveV}) - 0.23 \cdot \text{aveG} - 16.2 \cdot \ln(\text{aveSTAT})$$
+Every rating is 1 to 5 stars, calibrated on SIG's benchmark so that 5% of systems get 5 stars, 30% get 4, 30% get 3, 30% get 2 and 5% get 1 star. A certificate needs at least 3 stars overall and at least 2 for every sub-characteristic {% cite sig2016criteria %}.
 
-where $\text{aveV}$ = average Halstead Volume per module, $\text{aveG}$ = average Cyclomatic Complexity per module, and $\text{aveSTAT}$ = average lines of code per module.
+## 2. Worked example: rating unit complexity with a quality profile
 
-| MI Range | Interpretation |
-|----------|---------------|
-| > 85 | Easily maintainable |
-| 65 -- 85 | Moderately maintainable |
-| < 65 | Difficult to maintain |
+SIG does not average unit complexity. It sorts every unit into a risk category by its cyclomatic complexity. It then adds up the lines of code in each category and compares each category's share of all lines with a maximum {% cite baggen2012standardized %}. The shares are per category, not cumulative:
 
-**Limitations.** The MI uses averages across all modules, which masks local hotspots: a few highly complex modules can be hidden by many simple ones. It was designed for procedural code and does not account for object-oriented features such as inheritance and coupling. Empirical evidence shows that MI is significantly influenced by software size (a confounding effect), and it correlates only moderately with technical debt at the class level (Spearman rho approximately -0.6) {% cite molnar2020study %}.
+| Rating | Moderate (CC 11–20), at most | High (CC 21–50), at most | Very high (CC above 50), at most |
+|---|:-:|:-:|:-:|
+| 5 stars | 25% | 0% | 0% |
+| 4 stars | 30% | 5% | 0% |
+| 3 stars | 40% | 10% | 0% |
+| 2 stars | 50% | 15% | 5% |
+| 1 star | anything worse | | |
 
----
+Units with CC 1–10 are low risk and fill the rest. Suppose a system's code splits 70% low, 20% moderate, 8% high and 2% very high. Five stars fails on high (8% > 0%), four stars fails on high (8% > 5%), three stars fails on very high (2% > 0%), and two stars holds: **2 stars**. The 2% of very complex code decides the rating, while an average over all units would barely move. Duplication is rated more simply, by thresholds of 3%, 5%, 10% and 20% duplicated code for 5 to 2 stars, counting fragments longer than 6 lines; in Python, `pylint --disable=all --enable=duplicate-code --min-similarity-lines=7 mypackage` reports such blocks (tested with pylint 4.1.3); the duplication share is the sum of the reported block lengths divided by all lines of code. Ratings are interpolated on a continuous scale from 0.5 to 5.5, so n stars means a value from n − 0.5 up to n + 0.5; the exact interpolation cannot be reproduced without SIG's benchmark data {% cite baggen2012standardized %}. Each sub-characteristic's rating is then the average of the ratings of the properties mapped to it, and the sub-characteristics combine into one maintainability rating {% cite baggen2012standardized %}. So SIG never averages measurements of units, which would hide the worst ones, but does average star ratings, which are already judgements on whole profiles.
 
-## The SIG Model
+The ratings predict maintenance work: in SIG's validation, issues in 4-star systems were resolved 3 times faster than in 2-star systems {% cite baggen2012standardized %}.
 
-The Software Improvement Group (SIG) model takes a fundamentally different approach: instead of a single formula, it evaluates eight source code properties against an industry benchmark of hundreds of real-world systems {% cite sig2016criteria %} {% cite baggen2012standardized %}.
+## 3. SQALE: pricing the debt
 
-### Eight Source Code Properties
+SQALE turns each rule violation found by static analysis into a remediation cost, and rates the code by the **technical debt ratio**, remediation cost divided by development cost {% cite letouzey2012sqale %}. Costs are in **work units**, an effort unit the user chooses, such as hours; the method's example assumes 1,000 lines cost 100 work units to develop {% cite letouzey2012sqale %}. So 5,000 lines cost 500 work units, and if fixing their violations costs 15, the ratio is 3%. The rating grid is a choice. On the grid in the SQALE method (A up to 1%, B 2%, C 4%, D 8%, E above) the code is rated C {% cite letouzey2012sqale %}. Applied to the same 3% ratio, SonarQube's default grid (A up to 5%, B under 10%, C under 20%, D under 50%) rates the code A {% cite sonarsource_metrics molnar2020study %}.
 
-| Property | What It Measures |
-|----------|-----------------|
-| **Volume** | Overall size of source code (LOC, normalized by language productivity) |
-| **Duplication** | Identical code fragments occurring in multiple places |
-| **Unit Complexity** | Cyclomatic complexity of methods and functions |
-| **Unit Size** | Lines of code per unit (method or function) |
-| **Unit Interfacing** | Number of interface parameter declarations per unit |
-| **Module Coupling** | Incoming dependencies between modules |
-| **Component Balance** | Number and size distribution of top-level components |
-| **Component Independence** | Percentage of code in modules with no incoming cross-component dependencies |
+## 4. And the Maintainability Index?
 
-### Mapping to ISO 25010 Sub-characteristics
+The Maintainability Index (MI) combines Halstead volume, cyclomatic complexity and lines of code into one number; Coleman et al. proposed cut-offs of 85 and 65 on its 0–171 scale {% cite coleman1994using %}. Formula on the radon page, [Rating Python Code with Radon](radon.md); the inputs are defined on the [Maintainability Index](../../define/measurement/maintainability-index.md) page under Measurement. Letter grades are not comparable: radon's CC letters, radon's MI letters, SQALE's and SonarQube's each use their own bands. How radon computes and grades it, and how its output gives the unit-complexity and unit-size profiles (not the other six properties), is on [Rating Python Code with Radon](radon.md). Across three open-source projects, Molnar and Motogna found MI influenced by system size, while SQALE was not; at class level MI and technical debt had a Spearman rank correlation of ρ ≈ −0.6 {% cite molnar2020study %}. It is negative because a high MI means easy to maintain and high debt means hard; 0.6 is moderate by the usual rule of thumb, which calls values between about 0.4 and 0.7 moderate, so the two measures overlap but do not replace each other.
 
-Each sub-characteristic of maintainability is derived from a specific subset of code properties {% cite sig2016criteria %}:
+## When to use it — and when not
 
-| Sub-characteristic | Contributing Properties |
-|-------------------|------------------------|
-| **Analyzability** | Volume, Duplication, Unit Size, Component Balance |
-| **Modifiability** | Duplication, Unit Complexity, Module Coupling |
-| **Testability** | Volume, Unit Complexity, Component Independence |
-| **Modularity** | Module Coupling, Component Balance, Component Independence |
-| **Reusability** | Unit Size, Unit Interfacing |
+Use SIG profiles to compare systems or track one over time, and SQALE to prioritise fixes by cost. Do not compare SQALE letters across tools without checking the grid, and do not read any of these ratings as a measure of architecture: they see units and files, not the dependency structure.
 
-![SIG model: eight source code properties mapped to five ISO 25010 maintainability sub-characteristics](sig-model-mapping.png)
+## Limitations
 
-### Star Rating Calibration
+SIG's thresholds come from its own benchmark, which outsiders cannot inspect. SQALE costs are estimates per rule, set by the tool vendor.
 
-Properties are rated on a 1-to-5 star scale, calibrated against SIG's benchmark repository so that the distribution reflects the full range of quality achieved by real-world systems {% cite baggen2012standardized %}:
+## How solid is this?
 
-| Stars | Benchmark Percentile |
-|-------|---------------------|
-| 5 | Top 5% of systems |
-| 4 | Next 30% |
-| 3 | Next 30% |
-| 2 | Next 30% |
-| 1 | Bottom 5% |
-
-![SIG star rating distribution calibrated against industry benchmark](chart-sig-stars.svg)
-
-**Certification threshold:** overall maintainability rating of at least 3 stars, with each sub-characteristic scoring at least 2 stars {% cite sig2016criteria %}.
-
-### Validation
-
-Empirical analysis of maintenance performance shows that higher-rated systems allow significantly faster issue resolution. Systems rated 4 stars resolve issues approximately twice as fast as systems rated 2 stars {% cite visser2016building %}, with some analyses reporting up to a 3x difference {% cite baggen2012standardized %}. This provides direct evidence that code-level quality ratings predict real maintenance outcomes.
-
----
-
-## SQALE: A Technical Debt Approach
-
-The SQALE (Software Quality Assessment based on Lifecycle Expectations) method reframes maintainability as a financial question: how much would it cost to bring the code up to its expected quality standard? {% cite letouzey2012sqale %}
-
-Rather than scoring code on a relative benchmark, SQALE normalizes static-analysis findings into remediation costs. The central metric is the **Technical Debt Ratio (TDR)**:
-
-$$TDR = \frac{\text{remediation cost}}{\text{estimated development cost}}$$
-
-| Rating | TDR Threshold |
-|--------|--------------|
-| **A** | < 1% of development cost |
-| **B** | 1% -- 2% |
-| **C** | 2% -- 5% |
-| **D** | 5% -- 8% |
-| **E** | > 8% |
-
-**Strengths.** Unlike the MI, SQALE is not sensitive to software size because it aggregates individual violation costs rather than averaging metric values {% cite molnar2020study %}. The financial metaphor (remediation cost in developer-hours) makes quality discussions accessible to non-technical stakeholders. Visualization tools such as the SQALE Pyramid and Debt Map help teams locate and prioritize debt hotspots {% cite letouzey2012sqale %}.
-
----
-
-## Cognitive Complexity
-
-Cyclomatic Complexity (CC) counts the number of linearly independent paths through a method -- useful for estimating test effort, but widely regarded as unsatisfactory for measuring how difficult code is to *understand*. A switch statement with 10 cases receives the same CC score as deeply nested control flow, despite the vast difference in cognitive burden {% cite campbell2018cognitive %}.
-
-**Cognitive Complexity** addresses this gap with three intuitive rules:
-
-1. **Ignore** readable shorthand structures (e.g., null-coalescing operators).
-2. **Increment** for every break in linear flow (if, for, catch, goto, etc.).
-3. **Add a nesting penalty** for control flow nested inside other control flow.
-
-| Aspect | Cyclomatic Complexity | Cognitive Complexity |
-|--------|----------------------|---------------------|
-| **Counts** | Independent execution paths | Breaks in linear flow + nesting depth |
-| **Switch** | +1 per case | +1 for the entire switch |
-| **Nested if inside loop** | +1 | +2 (flow break + nesting) |
-| **Design goal** | Testability (minimum test cases) | Human comprehension difficulty |
-
-A developer acceptance survey across 22 open-source projects on SonarCloud showed a 77% acceptance rate, with developers actively fixing high Cognitive Complexity code {% cite campbell2018cognitive %}.
-
----
-
-## Comparison of Approaches
-
-| Approach | Level | Strengths | Limitations |
-|----------|-------|-----------|-------------|
-| **MI** | Method / class | Simple formula; single number | Sensitive to size; averages mask hotspots; procedural-era design |
-| **SIG** | System | ISO 25010-aligned; benchmarked against industry | Requires specialized tooling and benchmark access |
-| **SQALE** | System | Financial metaphor; size-independent | Tool-dependent; rating thresholds need calibration |
-| **Cognitive Complexity** | Method | Matches developer intuition; built into SonarQube | No standard system-level aggregation |
-| **ColumbusQM** | System | Probabilistic; ISO 25010-aligned | Proprietary model |
-
----
-
-## Most Widely Used Metrics
-
-Despite 174 cataloged metrics, tool support concentrates on a small set {% cite ardito2020maintainability %}:
-
-| Metric | Tool Support | Primary Studies |
-|--------|-------------|-----------------|
-| **LOC** (Lines of Code) | 14 of 19 tools | 15 studies |
-| **Cyclomatic Complexity** | 13 of 19 tools | 14 studies |
-| **CBO** (Coupling Between Objects) | -- | 18 studies (most popular OO metric) |
-| **RFC** (Response for Class) | -- | 17 studies |
-
-The concentration of tool support around LOC and Cyclomatic Complexity reflects their simplicity and language-independence, while CBO's dominance among OO metrics underscores the importance of coupling as a maintainability driver.
+- **Where it comes from.** SIG's evaluation criteria and its calibration method {% cite sig2016criteria baggen2012standardized %}; the SQALE method definition {% cite letouzey2012sqale %}.
+- **What is contested.** Which metrics matter at all: a systematic review found 174 maintainability metrics, most used once {% cite ardito2020maintainability %}.
 
 ---
 
