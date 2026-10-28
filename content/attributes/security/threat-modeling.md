@@ -2,171 +2,79 @@
 title: Threat Modeling
 parent: Security
 grand_parent: Quality Attributes
-nav_order: 2
+nav_order: 5
 layout: default
+page_type: deep-dive   # STRIDE-per-element rules, a worked walk of one diagram and the effectiveness evidence must sit together
 ---
 
-# Threat Modeling: 81% Precision, But Only 36% Recall
+# Threat Modeling
 
-Threat modeling is a systematic process for identifying security threats to a system before they are exploited. Shostack (2014) argues it should be a **basic professional skill** — "like version control" — not a specialist activity {% cite shostack2014threat %}. Yet empirical studies show that current practice is at the lowest maturity level, with significant room for improvement {% cite yskout2020tmmaturity %}.
+**Threat modeling** is the structured analysis of a system's design to find what an attacker could do to it, before the system is built or changed; it is the main technique for finding design flaws rather than coding bugs {% cite shostack2014threat %}.
 
----
+## 1. Four questions
 
-## Shostack's 4-Step Framework
+Shostack reduces threat modeling to four questions {% cite shostack2014threat %}:
 
-Shostack distills threat modeling into four questions {% cite shostack2014threat %}:
+1. **What are we building?** Draw a data flow diagram (DFD) of the system.
+2. **What can go wrong?** Walk the diagram with a prompt such as STRIDE.
+3. **What are we going to do about it?** For each threat: mitigate, eliminate, transfer or accept it.
+4. **Did we do a good job?** Check that every element was covered and every threat has a decision.
 
-| Step | Question | Technique |
-|------|----------|-----------|
-| 1 | **What are we building?** | Data Flow Diagrams (DFDs) |
-| 2 | **What can go wrong?** | STRIDE categories |
-| 3 | **What are we going to do about it?** | Mitigate, eliminate, transfer, or accept |
-| 4 | **Did we do a decent job?** | Validate completeness and consistency |
+A **DFD** uses four element types: **external entities** (people or systems outside your control, drawn as rectangles), **processes** (code you run, circles), **data stores** (databases, files, logs; parallel lines) and **data flows** (arrows). A **trust boundary** (dashed line) separates parts with different privileges; most threats sit where flows cross it.
 
-```mermaid
-flowchart LR
-    Q1["1. What are<br>we building?<br>(DFDs)"]
-    Q2["2. What can<br>go wrong?<br>(STRIDE)"]
-    Q3["3. What to<br>do about it?<br>(mitigate/accept)"]
-    Q4["4. Did we do<br>a decent job?<br>(validate)"]
-    Q1 --> Q2 --> Q3 --> Q4
-    Q4 -.->|"iterate"| Q1
+## 2. STRIDE
 
-    style Q1 fill:#e8f5e9,stroke:#019546,color:#282828
-    style Q2 fill:#c8e6c9,stroke:#019546,color:#282828
-    style Q3 fill:#a5d6a7,stroke:#019546,color:#282828
-    style Q4 fill:#81c784,stroke:#019546,color:#282828
-```
+Besides confidentiality, integrity and availability, three more properties follow from them in practice: **authentication** (a principal, the identity that acts, a user or a service, is who it claims to be), **authorization** (a principal may do only what it is allowed to) and **non-repudiation** (a principal cannot later deny an action it took). STRIDE names six threat categories, each the opposite of one of these six properties {% cite microsoft_stride %}:
 
-The process starts with Data Flow Diagrams showing trust boundaries, data stores, processes, and external entities. Threats are then systematically elicited by applying STRIDE categories to each DFD element.
+| Threat | Violates | Example in a shop |
+|---|---|---|
+| **S**poofing | Authentication | Logging in as Alice with her leaked password |
+| **T**ampering | Integrity | Changing the price field in an order request |
+| **R**epudiation | Non-repudiation | A customer denies placing an order and no log proves it |
+| **I**nformation disclosure | Confidentiality | An error page showing the SQL query and table names |
+| **D**enial of service | Availability | Thousands of fake orders filling the database |
+| **E**levation of privilege | Authorization | A customer reaching the admin page by guessing its URL |
 
----
+In **STRIDE-per-element**, external entities can be spoofed and can repudiate (S, R); processes are open to all six; data flows to T, I and D; data stores to T, I and D, plus R when the store is a log that must prove who did what {% cite shostack2014threat %}.
 
-## STRIDE Threat Categories
+![Customer, web shop process, shop database, audit log and payment provider with a trust boundary around the shop servers, each labelled with its STRIDE letters](shop-dfd.svg)
 
-Microsoft's STRIDE framework provides a mnemonic for six threat categories {% cite microsoft_stride %}:
+_A shop's DFD with the STRIDE letters that apply to each element._ {% cite shostack2014threat %}
 
-| Category | Threat | Property Violated | Example |
-|----------|--------|-------------------|---------|
-| **S**poofing | Pretending to be someone else | Authentication | Stolen credentials |
-| **T**ampering | Modifying data or code | Integrity | Man-in-the-middle attack |
-| **R**epudiation | Denying an action occurred | Non-repudiation | Unsigned transactions |
-| **I**nformation Disclosure | Exposing data to unauthorized parties | Confidentiality | Heartbleed (CVE-2014-0160) {% cite nist_cve_2014_0160 %} |
-| **D**enial of Service | Making a system unavailable | Availability | WannaCry ransomware {% cite nist_cve_2017_0144 %} |
-| **E**levation of Privilege | Gaining unauthorized access | Authorization | Buffer overflow → root |
+**Example.** Walking the shop diagram element by element gives, among others: the customer can be **spoofed** (fix: multi-factor login for accounts with saved cards); the login flow crossing the boundary can be **tampered** with (fix: TLS, Transport Layer Security, on every connection); the shop database can **disclose** data through SQL injection (fix: parameterised queries); the audit log data store can be **tampered** with by an admin who wants to hide a refund, which in turn enables **repudiation**, since the log can no longer prove who did what (fix: append-only log shipped off the server). Each threat then gets an owner and a decision.
 
-Shostack candidly acknowledges that STRIDE "makes a lousy taxonomy" — it was designed as a **mnemonic to prompt thinking**, not a rigorous classification system {% cite shostack2014threat %}. Categories overlap, and real attacks often span multiple categories.
+One attack can produce entries on several elements, and each element gets its own letter. **S goes on the element whose identity is faked**, because the mitigation (stronger authentication of that identity, such as multi-factor login) belongs to it. For the login SQL injection on [Vulnerabilities, Bugs and Flaws](vulnerabilities.md), this attack gives **S** (spoofing) on the external entity Customer, whose identity (Alice's) is faked, and **I** (information disclosure) and **T** (tampering) on the shop database; the weakness that allows it is fixed in the web-shop process. **S** on the process would mean faking the shop itself, as a phishing clone does. Some teams record such an attack on the process that fails to authenticate instead; this course records it on the entity whose identity is faked. The CIA view names what is lost; the STRIDE entries name how, element by element.
 
----
+## 3. How well it works
 
-## STRIDE Empirical Effectiveness
+Scandariato et al. measured STRIDE with 57 master's students, in teams of three to five, analysing the same digital publishing system over three years {% cite scandariato2015stride %}. **Precision**, the share of reported threats that are real, was good: 81%. **Recall**, the share of real threats that were reported, was low: on average teams found 36% of the threats in the study's reference set, against the 80% the authors had expected. They produced 1.8 valid threats per hour, or 0.9 per hour once documentation was counted.
 
-Scandariato et al. (2015) conducted the most rigorous empirical evaluation of STRIDE to date, with 57 participants applying STRIDE to a web application {% cite scandariato2015stride %}:
+Practice is immature. Yskout et al. analysed 20 threat modeling projects done by one consultancy for nine customers and placed the discipline at **level 1, ad hoc**, of a five-level maturity model; a project took about 69 hours (standard deviation 32), and finding threats was only a third of that effort {% cite yskout2020tmmaturity %}.
 
-| Metric | Value | Implication |
-|--------|-------|-------------|
-| **Precision** | 81% | Most identified threats are valid |
-| **Recall** | 36% | **64% of actual threats are missed** |
-| **Productivity** | 1.8 valid threats/hour | Drops to 0.9 with documentation overhead |
-| **Main weakness** | Spoofing, tampering under-reported | Participants focus on familiar categories |
+## 4. Other methods
 
-### What This Means
+Shevchenko et al. compare twelve threat modeling methods and conclude that none is best; the choice depends on the system and the goal {% cite shevchenko2018tm %}. Four common alternatives to STRIDE:
 
-STRIDE is **good at confirming** threats you identify (81% precision) but **poor at finding all** threats (36% recall). This means:
+- **PASTA** is a seven-stage, risk-centred process that starts from business objectives and simulates attacks.
+- **LINDDUN** applies the same DFD walk to privacy threats such as linkability and identifiability, which STRIDE omits.
+- **Attack trees** put the attacker's goal at the root and decompose it into the ways to reach it.
+- **Trike** starts from a requirements model of who may create, read, update and delete each asset, and rates the risk to each action.
 
-- STRIDE should not be the **only** threat identification technique
-- Teams should combine STRIDE with attack trees, LINDDUN (privacy), or other complementary methods
-- The 1.8 threats/hour rate means a moderately complex system requires significant time investment
+Shevchenko et al. name no single best method: the choice depends on the target (risk, security or privacy), the time available, the team's experience and how involved stakeholders want to be {% cite shevchenko2018tm %}.
 
----
+## When to use it — and when not
 
-## Threat Modeling Maturity
+Use threat modeling when a new system or feature changes trust boundaries: new interfaces, data stores or third parties. It is cheapest before code exists, and a poor fit for coding bugs in finished code; that is what [Static Security Analysis](static-analysis.md) and review are for.
 
-Yskout et al. (2020) proposed a 5-level maturity model and found that most organizations are at **Level 1 (ad-hoc)** {% cite yskout2020tmmaturity %}:
+## Limitation
 
-| Level | Name | Description |
-|-------|------|-------------|
-| 1 | **Ad-hoc** | Informal, inconsistent, individual expertise |
-| 2 | **Repeatable** | Documented process, basic templates |
-| 3 | **Defined** | Standardized across organization, training |
-| 4 | **Managed** | Measured, tracked, continuously improved |
-| 5 | **Optimized** | Automated, self-adaptive, integrated into CI/CD |
+STRIDE is a mnemonic, not a taxonomy: Shostack himself calls it a "lousy taxonomy", because one attack often fits several letters {% cite shostack2014threat %}. With 36% recall, a STRIDE session should be one input among several, not a completeness check.
 
-### Key Findings
+## How solid is this?
 
-| Finding | Value |
-|---------|-------|
-| Average project TM effort | 69 hours (SD=32) |
-| Threat elicitation share | Only 1/3 of total effort |
-| Research focus | Disproportionately on elicitation |
-| Adoption criteria | 6: model-based, traceable, systematic, business-integrated, context-aware, scalable |
-
-The gap between **research focus** (mostly on threat elicitation techniques) and **practitioner needs** (equal time on modeling, analysis, and review) suggests that advancing maturity requires tools and processes for the entire TM lifecycle, not just better threat identification.
-
----
-
-## 12 Threat Modeling Methods
-
-Shevchenko et al. (2018) surveyed 12 threat modeling methods at the SEI/CMU {% cite shevchenko2018tm %}:
-
-| Method | Focus | Strengths | Limitations |
-|--------|-------|-----------|-------------|
-| **STRIDE** | Per-element threats via DFDs | Most mature, systematic | Scalability, 36% recall |
-| **PASTA** | Risk-centric, 7-stage process | Business context | Complex, requires expertise |
-| **LINDDUN** | Privacy threats | Complements STRIDE for GDPR | Privacy-only scope |
-| **Attack Trees** | Decompose attack goals | Visual, intuitive | Manual, no tool support |
-| **CVSS Scoring** | Vulnerability severity | Standardized, quantitative | Scores may vary across experts |
-| **Trike** | Requirements-based, risk model | Formal risk assessment | Limited adoption |
-
-The survey's key conclusion: **no single best method** — selection depends on project needs, team expertise, and regulatory context {% cite shevchenko2018tm %}. STRIDE remains the most mature and widely adopted, but organizations should consider combining methods for comprehensive coverage.
-
----
-
-## OWASP Top 10
-
-The OWASP Top 10 catalogues the most critical web application security risks, updated periodically based on industry data {% cite owasp2021top10 %}:
-
-| # | Risk | Case Study |
-|---|------|------------|
-| A01 | **Broken Access Control** | Target: HVAC vendor credentials → 40M cards {% cite krebs2014target %} |
-| A02 | **Cryptographic Failures** | Heartbleed: missing bounds check → memory leak {% cite nist_cve_2014_0160 %} |
-| A03 | **Injection** | Equifax: Apache Struts RCE → 147M records {% cite nist_cve_2017_5638 %} |
-| A04 | **Insecure Design** | SolarWinds: no threat model for build process {% cite cisa_solarwinds %} |
-| A05 | **Security Misconfiguration** | Default credentials, unnecessary services |
-| A06 | **Vulnerable Components** | Log4Shell: JNDI lookup → RCE in 93% of clouds {% cite nist_cve_2021_44228 %} |
-| A07 | **Authentication Failures** | Credential stuffing, session fixation |
-| A08 | **Software & Data Integrity** | SolarWinds: compromised build pipeline {% cite cisa_solarwinds %} |
-| A09 | **Logging & Monitoring Failures** | WannaCry: patch available 2 months before attack {% cite nist_cve_2017_0144 %} |
-| A10 | **Server-Side Request Forgery** | Cloud metadata endpoint abuse |
-
-The Top 10 is not a testing methodology but a **prioritization guide** — it helps teams focus security effort on the most impactful risk categories.
-
----
-
-## CVSS: Scoring Vulnerability Severity
-
-The Common Vulnerability Scoring System quantifies vulnerability severity on a 0-10 scale using three metric groups {% cite mell2007cvss %} {% cite first_cvss31 %}:
-
-| Metric Group | What It Measures | When Applied |
-|-------------|-----------------|--------------|
-| **Base** | Intrinsic vulnerability characteristics (attack vector, complexity, impact on CIA) | At disclosure |
-| **Temporal** | How the threat evolves over time (exploit maturity, patch availability) | Over time |
-| **Environmental** | Organization-specific context (asset criticality, existing mitigations) | Per deployment |
-
-### Severity Scale (CVSS v3.1)
-
-| Rating | Score Range | Example |
-|--------|------------|---------|
-| None | 0.0 | Informational finding |
-| Low | 0.1–3.9 | Minor information disclosure |
-| Medium | 4.0–6.9 | XSS requiring user interaction |
-| High | 7.0–8.9 | SQL injection in authenticated endpoint |
-| Critical | 9.0–10.0 | Log4Shell (10.0), Heartbleed (7.5), EternalBlue (8.1) |
-
-Log4Shell (CVE-2021-44228) scored **CVSS 10.0** — the maximum — because it required no authentication, could be triggered remotely, and provided full system compromise {% cite nist_cve_2021_44228 %}.
-
-{: .note }
-> CVSS scores may be inconsistent across experts {% cite mell2007cvss %}. The Base score captures technical severity but not business impact — a CVSS 10.0 vulnerability in an internal tool may matter less than a CVSS 6.0 in a payment system.
+- **Where it comes from.** The four questions and STRIDE-per-element are from Shostack {% cite shostack2014threat %}; the effectiveness data from one controlled study {% cite scandariato2015stride %}; the maturity assessment from one consultancy's projects {% cite yskout2020tmmaturity %}.
+- **What is contested.** Scandariato's subjects were students, so professionals may reach higher recall; recall also depends on the reference set of threats being complete.
+- **What we do not hold.** Comparative studies of PASTA, LINDDUN or attack trees with the same rigour as the STRIDE study.
 
 ---
 

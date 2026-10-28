@@ -1,205 +1,89 @@
 ---
-title: Secure Design
+title: Secure Design Principles
 parent: Security
 grand_parent: Quality Attributes
-nav_order: 3
+nav_order: 9
 layout: default
 ---
 
-# Saltzer & Schroeder's 8 Principles Still Define Secure Design After 50 Years
+# Secure Design Principles
 
-In 1975, Saltzer and Schroeder published eight design principles for computer system protection {% cite saltzer1975protection %}. Remarkably, these principles remain the foundation of modern secure software engineering — from container isolation (least privilege) to open-source security (open design) to zero-trust architectures (complete mediation). Their evolution traces a clear arc from conceptual warnings to executable code artifacts.
+**Secure design principles** are rules for structuring a system so that whole classes of vulnerability cannot arise, rather than fixing them one by one; the classic set is Saltzer and Schroeder's eight principles from 1975 {% cite saltzer1975protection %}.
 
----
+## 1. Saltzer and Schroeder's eight principles
 
-## The Eight Principles
+Saltzer and Schroeder's principles reduce the number and seriousness of flaws, since flawless protection is out of reach {% cite saltzer1975protection %}. They are one vocabulary; Howard and LeBlanc's SD3 commitments in §2 are the other:
 
-| # | Principle | Definition | Modern Example |
-|---|-----------|-----------|----------------|
-| 1 | **Economy of mechanism** | Keep the design as simple as possible | Microservices over monoliths; Log4Shell violated this — complex JNDI lookup in a logging library {% cite nist_cve_2021_44228 %} |
-| 2 | **Fail-safe defaults** | Base access on permission, not exclusion | Default-deny firewall rules; allowlists over blocklists |
-| 3 | **Complete mediation** | Check every access to every object | Zero-trust architecture; OAuth token validation on every request |
-| 4 | **Open design** | Security should not depend on secrecy of design | Open-source security; SolarWinds violated this — security depended on build process secrecy {% cite cisa_solarwinds %} |
-| 5 | **Separation of privilege** | Require multiple conditions for access | Multi-factor authentication; code review + CI approval for merge |
-| 6 | **Least privilege** | Grant only the minimum access needed | Container security (rootless), IAM roles, browser sandboxing |
-| 7 | **Least common mechanism** | Minimize shared mechanisms between users | Process isolation, separate security domains, microservice boundaries |
-| 8 | **Psychological acceptability** | Security mechanisms must be easy to use correctly | Password managers; if security is too hard, users bypass it |
+| Principle | Saltzer and Schroeder's definition, shortened | A present-day example (ours) |
+|---|---|---|
+| Economy of mechanism | Keep the design as simple and small as possible | One small, reviewed authorization module instead of checks scattered through the code |
+| Fail-safe defaults | Base access on permission, not exclusion | A firewall that denies all traffic except listed ports |
+| Complete mediation | Check every access to every object for authority | Validate the session token on every request, not only at login |
+| Open design | The design should not be secret; security rests on keys | Published encryption algorithms with secret keys |
+| Separation of privilege | Require two keys where feasible | A merge needs both a passing pipeline and a second reviewer |
+| Least privilege | Give every program and user the least privilege they need | The web shop's database account can read orders but not drop tables |
+| Least common mechanism | Minimise mechanisms shared by all users | Separate containers per service instead of one shared server process |
+| Psychological acceptability | Make protection easy to use correctly | A password manager instead of a 20-character rotation rule |
 
-### The Evolution Arc
+Their reason for fail-safe defaults still holds: a mistake in a mechanism that grants permission fails by refusing access, noticed at once; one in a mechanism that excludes access fails by allowing it, unnoticed {% cite saltzer1975protection %}. Least privilege also limits damage after a break-in: browsers render pages in low-privilege sandboxes, and a non-root container on a read-only file system leaves an intruder little.
 
-```mermaid
-flowchart LR
-    S75["1975<br>Saltzer &<br>Schroeder<br>(warnings)"]
-    A04["2004<br>Avizienis<br>(taxonomy)"]
-    H06["2006<br>Howard SD3<br>(practice)"]
-    M06["2006<br>McGraw<br>(touchpoints)"]
-    SDL["2010s<br>Microsoft SDL<br>(industry)"]
-    RQ24["2024<br>RQCODE<br>(executable)"]
+## 2. Secure by design, by default, in deployment
 
-    S75 --> A04 --> H06 --> M06 --> SDL --> RQ24
+Howard and LeBlanc turned such principles into three commitments for product teams, **SD3** {% cite howard2006writing %}. *Secure by design*: the architecture rules out vulnerability classes, guided by a threat model. *Secure by default*: the product as installed has a small **attack surface** (the set of entry points an attacker can send input to), with optional features off and no default passwords. *Secure in deployment*: operators get guidance and patches.
 
-    style S75 fill:#e8f5e9,stroke:#019546,color:#282828
-    style A04 fill:#c8e6c9,stroke:#019546,color:#282828
-    style H06 fill:#a5d6a7,stroke:#019546,color:#282828
-    style M06 fill:#81c784,stroke:#019546,color:#282828
-    style SDL fill:#66bb6a,stroke:#019546,color:#fff
-    style RQ24 fill:#4caf50,stroke:#019546,color:#fff
+## 3. All input is evil until proven otherwise
+
+Howard and LeBlanc's best-known rule: treat all external input as hostile until validated {% cite howard2006writing %}. Three habits follow:
+
+- **Allowlist, not blocklist.** Define what is valid and reject everything else. A blocklist fails on the first variant it did not anticipate: block `--` and the attacker sends `alice' /*`, since SQLite reads an unclosed `/*` as a comment to the end (tested on the shop).
+- **Canonicalise first.** Decode and normalise input to one form, then validate it; otherwise an apostrophe sent percent-encoded as `%27`, or a Unicode look-alike, passes a check for apostrophes and is decoded into one afterwards.
+- **Validate at a chokepoint.** Put validation where input enters, in one place: one routine is easy to review and test, and no code path can skip it.
+
+## 4. Example: the shop module after the fixes
+
+The shop module from [Static Security Analysis](static-analysis.md), with its four Bandit findings fixed:
+
+```python
+import hashlib
+import os
+import sqlite3
+
+SECRET_KEY = os.environ["SHOP_SECRET_KEY"]
+
+
+def hash_password(password, salt):
+    return hashlib.pbkdf2_hmac("sha256", password.encode(), salt, 600_000).hex()
+
+
+def find_user(db, name, password):
+    row = db.execute("SELECT id, salt, pw FROM users WHERE name = ?", (name,)).fetchone()
+    if row and row[2] == hash_password(password, row[1]):
+        return (row[0],)
+    return None
+
+
+DISCOUNTS = {"none": 1.0, "student": 0.9, "black_friday": 0.7}
+
+
+def apply_discount(price, rule):
+    return price * DISCOUNTS[rule]
 ```
 
-The principles evolved from conceptual "warnings" (1975) → formal taxonomy elements (Avizienis 2004) → industry standard practices (Microsoft SDL, Howard's SD3) → executable code artifacts (RQCODE 2024) {% cite avizienis2004basic %} {% cite howard2006writing %} {% cite sadovykh2024devsecops %}.
+The `?` placeholder keeps input as data, never SQL, so injection is impossible by construction. The discount rule is looked up in an **allowlist**: any other value raises an error instead of reaching `eval` (all input is evil until it matches). The secret moves out of the code (open design: security rests on the key, not on hiding the source). Passwords get a random per-user **salt** (defeating precomputed tables) and a deliberately slow hash. Bandit reports no issues, and the exploit test on [Dynamic Security Testing](dynamic-testing.md) passes.
 
----
+## When to use it — and when not
 
-## Howard's SD3: Secure by Design, Default, Deployment
+Use the principles as a review checklist for designs and for changes to authentication, authorization or input handling. They reduce flaws but prove nothing, so they work alongside [Threat Modeling](threat-modeling.md) and testing, not instead of them.
 
-Howard and LeBlanc operationalize Saltzer's principles into three actionable mandates {% cite howard2006writing %}:
+## Limitation
 
-| Principle | Meaning | Practice |
-|-----------|---------|----------|
-| **Secure by Design** | Architecture prevents entire vulnerability classes | Threat modeling, principle of least privilege, defense in depth |
-| **Secure by Default** | Out-of-the-box configuration is safe | Minimal attack surface, all features opt-in, no default passwords |
-| **Secure in Deployment** | Tools and guidance for secure operation | Security guides, patch management, monitoring |
+The principles conflict. Separation of privilege hurts psychological acceptability, and complete mediation costs performance; Saltzer and Schroeder warn that caching an authority check needs scepticism {% cite saltzer1975protection %}. Applying them takes judgement.
 
-### "All Input Is Evil Until Proven Otherwise"
+## How solid is this?
 
-Howard's most influential maxim: treat all external input as potentially malicious {% cite howard2006writing %}. The implementation strategy:
-
-- **Whitelist over blacklist** — define what is allowed, reject everything else
-- **Input chokepoints** — centralized validation at system boundaries (not scattered throughout code)
-- **Canonical form** — normalize input before validation (prevent encoding attacks)
-- **Dangerous C functions** — never use `gets()`, `strcpy()`, `sprintf()`, `scanf()` without bounds checking
-
-Heartbleed (CVE-2014-0160) violated this principle: the OpenSSL heartbeat extension trusted the length field in the request without bounds checking, allowing attackers to read up to 64KB of server memory per heartbeat request {% cite nist_cve_2014_0160 %}. A 2-line bounds check would have prevented the vulnerability.
-
----
-
-## Case Studies: Principles Violated
-
-### Heartbleed (2014) — Economy of Mechanism Violated
-
-| Aspect | Detail |
-|--------|--------|
-| **CVE** | CVE-2014-0160 {% cite nist_cve_2014_0160 %} |
-| **CVSS** | 7.5 (High) |
-| **Root cause** | Missing bounds check in OpenSSL heartbeat extension |
-| **Impact** | 17% of HTTPS servers affected; private keys, passwords, session tokens exposed |
-| **Principle violated** | Economy of mechanism — heartbeat feature added unnecessary complexity to a critical library |
-| **CERT rule violated** | ARR38-C: guarantee library functions don't form invalid pointers |
-| **Fix** | 2 lines of code: validate payload length against record length |
-
-### Log4Shell (2021) — Economy of Mechanism Violated
-
-| Aspect | Detail |
-|--------|--------|
-| **CVE** | CVE-2021-44228 {% cite nist_cve_2021_44228 %} |
-| **CVSS** | 10.0 (Critical) |
-| **Root cause** | JNDI lookup enabled by default in logging library |
-| **Impact** | 93% of enterprise cloud environments vulnerable {% cite wiz2021log4shell %}; 2M+ attacks/hour |
-| **Principle violated** | Economy of mechanism — a logging library should not perform remote code execution |
-| **Fix** | Disable JNDI lookup by default (fail-safe defaults) |
-
-### SolarWinds (2020) — Open Design Violated
-
-| Aspect | Detail |
-|--------|--------|
-| **Timeline** | Compromise: Sep 2019 → Discovery: Dec 2020 (9 months undetected) |
-| **Root cause** | Attackers injected malicious code into the Orion build process {% cite cisa_solarwinds %} |
-| **Impact** | 18,000 organizations installed compromised update {% cite gao2021solarwinds %} |
-| **Principle violated** | Open design — security depended on build process secrecy, not on verifiable integrity |
-| **Triggered** | Executive Order 14028 mandating SBOMs and supply chain security |
-
-### WannaCry (2017) — Complete Mediation Violated
-
-| Aspect | Detail |
-|--------|--------|
-| **CVE** | CVE-2017-0144 (EternalBlue) {% cite nist_cve_2017_0144 %} |
-| **Impact** | 200K+ computers, 150 countries, NHS £92M |
-| **Principle violated** | Complete mediation — SMBv1 did not validate all incoming packets |
-| **Lesson** | Patch was available 2 months before the attack; operational discipline matters |
-
----
-
-## DevSecOps: Integrating Security Into CI/CD
-
-DevSecOps extends DevOps by embedding security activities into every pipeline stage {% cite rangnau2020devsecops %}:
-
-```mermaid
-flowchart LR
-    P["<b>📋 Plan</b><br>Threat Modeling<br>Security Reqs"]
-    C["<b>💻 Code</b><br>Secure Coding<br>Code Review"]
-    B["<b>🔨 Build</b><br>SAST · SCA"]
-    T["<b>🧪 Test</b><br>DAST<br>Pen Testing"]
-    D["<b>🚀 Deploy</b><br>Sign-off<br>Infra Security"]
-    O["<b>📊 Operate</b><br>Monitoring<br>Incident Response"]
-
-    P --> C --> B --> T --> D --> O
-    O -.-> P
-
-    style P fill:#e8f5e9,stroke:#019546,color:#282828
-    style C fill:#c8e6c9,stroke:#019546,color:#282828
-    style B fill:#a5d6a7,stroke:#019546,color:#282828
-    style T fill:#81c784,stroke:#019546,color:#282828
-    style D fill:#66bb6a,stroke:#019546,color:#282828
-    style O fill:#4caf50,stroke:#019546,color:#fff
-```
-
-### Pipeline Reality
-
-| Challenge | Evidence | Source |
-|-----------|----------|--------|
-| Pipeline overhead | 14 min total; ZAP = 6:52 bottleneck | {% cite rangnau2020devsecops %} |
-| False positive rate | 70% of findings are not real vulnerabilities | {% cite rajapakse2021security %} |
-| Tool integration | Speed mismatch: scans take hours, deploys take minutes | {% cite rajapakse2021security %} |
-| Requirement mapping | ARQAN achieves 85% accuracy mapping reqs → controls | {% cite sadovykh2024devsecops %} |
-| Automation rate | RQCODE automates 62% of security checks as code | {% cite sadovykh2024devsecops %} |
-
----
-
-## Supply Chain Security
-
-Williams et al. (2025) identify three attack vectors threatening the entire DevSecOps model {% cite williams2025supplychain %}:
-
-| Vector | Attack Type | Case Study |
-|--------|------------|------------|
-| **Dependencies** | Malicious or vulnerable components | Log4Shell — accidental vulnerability in ubiquitous library {% cite nist_cve_2021_44228 %} |
-| **Build infrastructure** | Compromised CI/CD pipeline | SolarWinds — malicious code injected during build {% cite cisa_solarwinds %} |
-| **Humans** | Social engineering of maintainers | XZ Utils — years-long social engineering to insert backdoor |
-
-Countermeasures include:
-- **SBOMs** (Software Bills of Materials) — inventory all dependencies; adoption accelerated by Log4Shell
-- **Automated VEX** — reachability analysis to reduce false positives
-- **Reproducible builds** — verify that binary matches source code
-- **ML-based detection** — identify malicious commits and dependency patterns
-
----
-
-## Security Requirements Engineering: SQUARE
-
-The Security Quality Requirements Engineering (SQUARE) methodology provides a systematic 9-step process for eliciting and prioritizing security requirements {% cite mead2005square %}:
-
-| Step | Activity |
-|------|----------|
-| 1 | Agree on definitions |
-| 2 | Identify security goals |
-| 3 | Develop artifacts (misuse cases, attack trees) |
-| 4 | Perform risk assessment |
-| 5 | Select elicitation technique (e.g., ARM) |
-| 6 | Elicit security requirements |
-| 7 | Categorize requirements |
-| 8 | Prioritize requirements (e.g., AHP) |
-| 9 | Inspect requirements |
-
-### Requirements as Code (RQCODE)
-
-Sadovykh et al. (2024) advance requirements engineering with **RQCODE** — a framework that formalizes security controls as executable Java objects with `check()` and `enforce()` methods {% cite sadovykh2024devsecops %}:
-
-| Component | Purpose | Accuracy |
-|-----------|---------|----------|
-| **ARQAN** | NLP/SBERT mapping from vague requirements → STIG controls | 85% mapping accuracy |
-| **RQCODE** | Testable security requirements as code | 62% automation rate |
-| **Coverage** | IEC 62443 → platform-specific STIGs | 66.15% of STIGs |
-
-This represents the current state of the art in making security requirements both **systematic** (SQUARE's structured process) and **enforceable** (RQCODE's executable checks). McGraw's three pillars — applied risk management, software security touchpoints, and knowledge — provide the strategic framework, with abuse cases explicitly integrating attacker thinking into the requirements phase {% cite mcgraw2006software %}.
+- **Where it comes from.** The eight principles and their definitions are from Saltzer and Schroeder {% cite saltzer1975protection %}; SD3 and the input rules from Howard and LeBlanc's practitioner book {% cite howard2006writing %}. The code and its Bandit result were run as shown.
+- **What is contested.** Saltzer and Schroeder also listed two principles they considered only partly applicable to computers, work factor and compromise recording; most modern lists keep the eight.
+- **What we do not hold.** Empirical studies measuring how much each principle reduces vulnerabilities.
 
 ---
 
