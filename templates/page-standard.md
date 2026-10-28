@@ -215,6 +215,21 @@ Every page or study note **rewritten to this standard** passes a student review 
   judgement, not with ever-sharper rules.
 - **Log** every round in `sqr_lit_review/review/[domain]/[topic]/status.md`: round, page, doubt,
   resolution.
+- **Cross-check with a second model.** Once the Claude reviewers pass an area, run
+  `sqr_lit_review/scripts/gemini_review.sh <base-url> <page> <name> "<knows>" "<topic>"` on each
+  page. It sends Gemini 3.1 Pro one continuous screenshot of the page, with no print page breaks,
+  and the same brief the Claude reviewers get. Treat its output as a lead: verify every finding
+  against the source before acting. In the first trial it found real gaps that the Claude
+  reviewers had missed, but it also misread numbers.
+
+## 8a. Content-preservation check
+
+A rewrite must not silently drop correct material. Before committing an area, compare it with
+the pre-revision version (`git show <base>:<path>`). List each concept, model, worked example,
+sourced finding, figure and tool in the old pages. For each one, record where it now lives, or
+why it was removed (wrong or unverifiable, logged in `status.md`). Restore anything correct and
+useful that has no new home: put it in the existing page when the budget allows, or on a new page
+when a cluster is shared by several areas (for example, a case library).
 
 ---
 
@@ -231,4 +246,5 @@ Every page or study note **rewritten to this standard** passes a student review 
 - [ ] Figures rebuilt, named and captioned (§5d)
 - [ ] `python scripts/check_pages.py` and `python scripts/check_citations.py` clean
 - [ ] `bundle exec jekyll build` succeeds, and the page was **read in the rendered HTML**
-- [ ] Student review: no blocking doubts (§8)
+- [ ] Student review: no blocking doubts (§8); Gemini cross-check verified
+- [ ] Content-preservation check against the pre-revision pages (§8a)

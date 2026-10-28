@@ -79,7 +79,7 @@ def total(prices, coupon):
     return subtotal - coupon
 ```
 
-Radon reports, for the whole file: $$V = 144.9$$ ($$n_1 = 7$$, $$n_2 = 14$$, $$N_1 = 11$$, $$N_2 = 22$$), $$G = 1 + 5 + 1 = 7$$ (five decision points in `delivery_fee`, one in `total`), $$L = \text{LLOC} = 16$$. Against the one-function file, `total` adds two operators (`>`, `-`) used once each, two operands (`coupon`, `subtotal`) used four times, one decision and 5 logical lines (`def`, `subtotal = …`, `if`, two `return`s): 9 + 2 = 11, 18 + 4 = 22, 12 + 2 = 14, 11 + 5 = 16. SLOC = 17 code lines plus 1 comment line, so $$C = 1 / 17 = 5.88\%$$. (Dividing by all 18 non-blank lines, SLOC plus the comment, would give 71.38, not radon's 71.74.) `radon raw shop.py` shows where the line counts come from:
+Radon reports, for the whole file: $$V = 144.9$$ ($$n_1 = 7$$, $$n_2 = 14$$, $$N_1 = 11$$, $$N_2 = 22$$), $$G = 1 + 5 + 1 = 7$$ (five decision points in `delivery_fee`, one in `total`), $$L = \text{LLOC} = 16$$. Against the one-function file, `total` adds two operators (`>`, `-`) used once each, two operands (`coupon`, `subtotal`) with four occurrences in total (both appear in the `>` and in the `-`), one decision and 5 logical lines (`def`, `subtotal = …`, `if`, two `return`s): 9 + 2 = 11, 18 + 4 = 22, 12 + 2 = 14, 11 + 5 = 16. SLOC = 17 code lines plus 1 comment line, so $$C = 1 / 17 = 5.88\%$$. (Dividing by all 18 non-blank lines, SLOC plus the comment, would give 71.38, not radon's 71.74.) `radon raw shop.py` shows where the line counts come from:
 
 ```text
     LOC: 21

@@ -65,7 +65,7 @@ Nine were killed and nine survived: a mutation score of 9/18 = 50% (no mutant wa
 +        raise ValueError(None)
 ```
 
-- `2 / weight` survives because every test uses weight 1, where `2 * 1 == 2 / 1`: a missing test with another weight.
+- `2 / weight` survives because every test that reaches that line uses weight 1 (`test_invalid` stops at the guard first), where `2 * 1 == 2 / 1`: a missing test with another weight.
 - `weight >= 20` survives because no test is near the boundary at 20.
 - The changed message survives because no test checks it; whether that matters is a judgement.
 
