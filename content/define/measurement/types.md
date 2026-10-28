@@ -12,7 +12,7 @@ A **measurement scale** fixes which comparisons and which arithmetic on a measur
 
 ![Table of five scales: nominal adds labels, ordinal adds order, interval adds equal steps, ratio adds a true zero, absolute adds a fixed unit; with meaningful statistics and software examples for each](scale-ladder.svg)
 
-_Each scale keeps the operations of those above it and adds one. Statistics after the SEI guidebook._ {% cite park1996goal %}
+_Each scale keeps the statistics of those above and adds one property; stronger scales allow fewer unit changes. Statistics after the SEI guidebook._ {% cite park1996goal %}
 
 ## 1. The test: does the statement survive a change of unit?
 

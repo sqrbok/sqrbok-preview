@@ -41,7 +41,7 @@ A failure list is useful only if it changes what a team specifies. Ask of each i
 
 ## How solid is this?
 
-- **Where it comes from.** Each row cites one source: an official inquiry or regulator (Ariane 5, Mars Climate Orbiter, Knight Capital, Boeing 787), the academic investigation by Leveson and Turner (Therac-25), the vendor's statement (CrowdStrike), NASA's mission page (Mariner 1) or the public vulnerability record (Heartbleed).
+- **Where it comes from.** Each row cites one source: an official inquiry or regulator (Ariane 5, Mars Climate Orbiter, Knight Capital, Boeing 787), the academic investigation by Leveson and Turner (Therac-25), Microsoft's statement (CrowdStrike), NASA's mission page (Mariner 1) or the public vulnerability record (Heartbleed).
 - **What is contested.** The claim that a defect costs 100 times more to fix in production than in requirements is widely repeated; a study of 171 projects found no such delayed-issue effect {% cite menzies2017delayed %}. The cost of late fixes depends on the project, not on a fixed multiplier.
 - **What we do not hold.** Downtime costs per company or per hour come from vendor surveys; we hold no independent estimate.
 

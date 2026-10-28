@@ -17,7 +17,7 @@ $$
 V(G) = e - n + 2
 $$
 
-where *e* is the number of edges and *n* the number of nodes. The counts depend on how the graph is drawn (with or without Start and End nodes, statements merged into blocks or not), but *V(G)* does not. For code built only from two-way decisions there is a shortcut: *V(G)* = number of decisions + 1.
+where *e* is the number of edges and *n* the number of nodes. The counts depend on how the graph is drawn (Start and End nodes or not, statements merged or not), but *V(G)* does not, provided the graph has one exit. For code built only from two-way decisions there is a shortcut: *V(G)* = number of decisions + 1.
 
 Because a basis set reaches every edge, basis path coverage **subsumes branch coverage**.
 
@@ -45,7 +45,7 @@ A basis needs three tests:
 | 2 | x > 0, x ≥ 10 | x = 15 | 2 |
 | 3 | x ≤ 0 | x = −2 | −1 |
 
-Each two-way decision adds one basis path, nested or not; the saving shows with decisions **in sequence**, where the number of all paths doubles with each one: four independent `if` statements in a row have 2<sup>4</sup> = 16 paths but a basis of 5.
+Each two-way decision adds one basis path, nested or not; the saving shows with decisions **in sequence**, where the number of all paths doubles with each one: four `if` statements in a row have 2<sup>4</sup> = 16 paths but a basis of 5.
 
 ## 3. Building a basis
 
@@ -61,7 +61,7 @@ Some paths can never run. When the same condition is tested twice and nothing in
 
 _Same shape as the graph on [Terminology](terminology.md), but the second decision repeats A: the graph promises more paths than the program has._
 
-In this graph *V(G)* = 3, but only two independent paths can run, so the achievable target is those two: 2 of 3 basis paths, and full branch coverage. Feasibility is undecidable in general, so each uncovered path needs a person's judgement.
+In this graph *V(G)* = 3, but only two independent paths can run, so the achievable target is 2 of 3 basis paths, with full branch coverage. Feasibility is undecidable in general, so each uncovered path needs a person's judgement.
 
 ## When to use it — and when not
 
