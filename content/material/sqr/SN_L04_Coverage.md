@@ -38,7 +38,7 @@ The test `grade(95)` takes 1 of the 4 branches. Adding `grade(75)` takes the fal
 
 ## 3. Branch coverage subsumes statement coverage, and both are weak
 
-Statement coverage asks that every statement runs; branch coverage asks that every decision outcome is taken, including the false side of an `if` with no `else`. A suite that runs every statement can still skip that empty false side. In the lecture's example, `x = 0; if A < 5: x = 4; y = z / x`, the test `A = 2` runs every statement, and only the false side (`A = 6`) divides by zero. Branch coverage subsumes statement coverage, but it treats each decision on its own, so it misses faults that appear only for one *combination* of outcomes.
+Statement coverage asks that every statement runs; branch coverage asks that every decision outcome is taken, including the false side of an `if` with no `else`. A suite that runs every statement can still skip that empty false side. In the lecture's example, `x = 0`, then `if A < 5: x = 4` with no `else`, then `y = z / x` after the `if`, the test `A = 2` runs every statement, and only the false side (`A = 6`) divides by zero. Branch coverage subsumes statement coverage, but it treats each decision on its own, so it misses faults that appear only for one *combination* of outcomes.
 
 → [Statement and Branch Coverage](../../verif/coverage/code.md)
 

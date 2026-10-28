@@ -37,7 +37,7 @@ The mean cannot tell them apart. The **p95** can. Here a percentile is meant in 
 
 ## 4. Throughput saturates; response time keeps climbing
 
-As users are added, throughput first rises with load, then flattens when the busiest resource is saturated; response time stays flat at first, then grows steadily, because every extra user only waits longer in the queue. With *M* users who each think *Z* seconds between requests, the **interactive response time law** links the curves: *R* = *M* / *X* − *Z* {% cite denning1978operational %}.
+As users are added, throughput first rises with load, then flattens when the busiest resource is saturated; response time rises slowly at first, then grows steadily, because every extra user only waits longer in the queue. With *M* users who each think *Z* seconds between requests, the **interactive response time law** links the curves: *R* = *M* / *X* − *Z* {% cite denning1978operational %}.
 
 ```vega-lite
 {

@@ -34,7 +34,7 @@ Four studies of open-source bug trackers describe how performance bugs differ fr
 | Zaman et al. 2011 {% cite zaman2011security %} | 4,293 performance and 847 security bugs in Firefox | security bugs were triaged 3.64 times faster; more than 62% of performance bugs were never assigned to a developer |
 | Zaman et al. 2012 {% cite zaman2012qualitative %} | sampled performance bugs from Firefox and Chrome | performance bugs needed more discussion, were harder to reproduce, and in Chrome were more often regressions |
 
-Two lessons follow. First, a profiler finds the hot spot of a run (the code where that run spent most of its time), but a third to over half of the bugs were found by someone reading the code and noticing work that grows with the input, against 5–10% with a profiler: review for performance, not just test for it. Second, because the typical fix is small, the cost lies in finding the bug, which is an argument for performance budgets (see §3) and early review. Third, since performance bugs are often never assigned, a team has to track them deliberately.
+Three lessons follow. First, a profiler finds the hot spot of a run (the code where that run spent most of its time), but a third to over half of the bugs were found by someone reading the code and noticing work that grows with the input, against 5–10% with a profiler: review for performance, not just test for it. Second, because the typical fix is small, the cost lies in finding the bug, which is an argument for performance budgets (see §3) and early review. Third, since performance bugs are often never assigned, a team has to track them deliberately.
 
 ## 3. Why late discovery is expensive
 
