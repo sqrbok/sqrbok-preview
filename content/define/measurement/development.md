@@ -21,8 +21,8 @@ A team is about to add three new developers to a checkout service and worries th
 
 _One goal, two questions, four metrics. Each metric answers exactly one question here; in larger trees a metric can serve several._
 
-- **Goal.** Analyse the checkout code base *to improve* its maintainability *from the viewpoint of* the developers, *in the context of* new people joining the team. The five parts: object = the checkout code base; purpose = improve; quality focus = maintainability; viewpoint = the developers; context = new people joining.
-- **Q1: Which functions are hard to change?** Answered by cyclomatic complexity per function, a property of the code, and by the number of functions changed in three or more fixes last quarter, a property of its history.
+- **Goal.** Analyse the checkout code base *to improve* its maintainability *from the viewpoint of* the developers, *in the context of* new people joining the team. The five parts: object = the checkout code base; purpose = improve; quality focus = maintainability; stakeholder = the developers; environment = new people joining.
+- **Q1: Which functions are hard to change?** Answered by [cyclomatic complexity](examples.md) per function (its number of decisions plus one), a property of the code, and by the number of functions changed in three or more fixes last quarter, a property of its history.
 - **Q2: How long does a typical fix take?** Answered by the median hours from bug report to merged fix, and by the share of fixes re-opened within 30 days, which guards against fixes that are fast but wrong.
 
 Notice what the tree leaves out: lines of code per developer, commit counts, coverage. They are easy to collect, but they answer neither question.

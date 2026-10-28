@@ -138,7 +138,7 @@ A request passes Nginx (*D* = 3 ms), an application server (*D* = 20 ms) and Pos
 
 ### Q22: MVA by hand
 
-A closed system has an application server with *D* = 0.1 s and a database with *D* = 0.3 s; users think *Z* = 0.5 s. Run the MVA recursion for *n* = 1, 2 and 3 users, and compute the knee *M*\* = (*D* + *Z*) / *D*<sub>max</sub>.
+A closed system has an application server with *D* = 0.1 s and a database with *D* = 0.3 s; users think *Z* = 0.5 s. Run the MVA recursion for *n* = 1, 2 and 3 users, and compute the knee *M*\* = (*D* + *Z*) / *D*<sub>max</sub>, with *D* = Σ*D*<sub>k</sub>.
 
 ---
 

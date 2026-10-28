@@ -53,7 +53,7 @@ For example, a team must judge the **maintainability** of a 40-module billing sy
 ## When to use it — and when not
 
 - **Use** McCall's model to see why an internal property matters: the criteria name the code properties behind each user-visible factor, which modern standards hide.
-- **Do not** use it as the checklist for a new product: it has no security, compatibility or safety characteristic. Use [ISO/IEC 25010](iso25010.md) instead.
+- **Do not** use it as the checklist for a new product: it has no separate security or compatibility characteristic, and none for safety. Use [ISO/IEC 25010](iso25010.md) instead.
 
 ## Limitations
 
