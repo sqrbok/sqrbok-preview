@@ -1,186 +1,63 @@
 ---
-title: Industrial Deployment
+title: Deploying Static Analysis
 parent: Static Analysis
-nav_order: 8
+nav_order: 9
 layout: default
+page_type: deep-dive  # two sourced case studies with their numbers and caveats
 ---
 
-# Industrial Deployment of Static Analysis
+# Deploying Static Analysis
 
-Deploying static analysis tools is as much an organizational challenge as a technical one. Tools that work well in research settings frequently fail in practice due to high false positive rates, lack of workflow integration, or poor initial rollout. This page examines what makes deployment succeed, drawing on case studies from Microsoft, eBay, Google, and Nortel Networks.
+**Deploying** a static analysis tool means making developers act on its findings, which is mainly an organisational task: the tool must run where developers already work, show few false alarms, and be tuned to the code base. Google and eBay reached the same lesson by different routes {% cite sadowski2015tricorder %} {% cite jaspan2007understanding %}.
 
----
+## 1. Example: Google puts findings in code review
 
-## Success Factors
+Google's **Tricorder** runs about 30 analyzers, written by teams across the company, on every changelist sent for code review, and posts their findings as review comments on the changed lines. A team of two or three people maintains the platform {% cite sadowski2015tricorder %}.
 
-Successful deployments share a consistent set of practices:
+![Changelist goes to analyzers, findings appear as review comments, reviewers click PLEASE FIX or NOT USEFUL, which feeds each analyzer's not-useful rate](tricorder-loop.svg)
 
-| Factor | Evidence | Source |
-|--------|----------|--------|
-| **Workflow integration** | Tricorder runs at code review, not as a standalone report | {% cite sadowski2015tricorder %} |
-| **Customization** | eBay disabled 75% of default checks to reach usable FP rate | {% cite jaspan2007understanding %} |
-| **Suggested fixes** | One-click fixes lower the barrier to action | {% cite sadowski2015tricorder %} |
-| **Project-level config** | Team-wide settings, not per-user -- ensures consistency | {% cite sadowski2015tricorder %} |
-| **Measure usefulness** | Developer action rate, not theoretical accuracy | {% cite sadowski2015tricorder %} |
-| **Low false positive rate** | < 10% threshold consistent across organizations | {% cite sadowski2015tricorder %} {% cite jaspan2007understanding %} |
-| **Incremental adoption** | Start with high-value checks, add gradually | {% cite jaspan2007understanding %} |
+_Tricorder's feedback loop: reviewers mark findings PLEASE FIX or NOT USEFUL, authors can APPLY FIX, and the not-useful rate decides whether an analyzer stays._ {% cite sadowski2015tricorder %}
 
-> **Key insight:** The common thread is treating developers as customers. Measure what they find useful, not what the tool finds correct.
+Averaged over 90 days, it reported about 93,000 findings a day; on an average day reviewers clicked PLEASE FIX on 716 of them and NOT USEFUL on 48, a daily not-useful rate of 48 / (48 + 716 + APPLY FIX), at most 6.3%. The paper gives no daily count of APPLY FIX clicks, only that they were "much lower"; the authors suspect many developers fixed the code in their own editor instead. Most findings were never shown, because they sat on lines the change did not touch {% cite sadowski2015tricorder %}. Four choices made this work:
 
----
+- **Workflow integration.** Results appear at review time, when the author is ready to change the code and the reviewer sees whether a warning was ignored. A tool developers have to run themselves "just will not be run as frequently as intended".
+- **A measured false-alarm budget.** Each analyzer's not-useful rate is NOT USEFUL / (NOT USEFUL + PLEASE FIX + APPLY FIX). At 10% or more the analyzer goes on probation and its writers must show progress in fixing it; above 25% the platform team may switch it off, though in practice it usually works with the writers on a fix instead. On the weekly chart for 2014, the rate across all analyzers was typically about 5% in recent months, and under 4% without the analyzers on probation; that 5% comes from a different chart from the daily 716 and 48 above, so the two cannot be combined into one rate. Google measures clicks rather than true false-positive rates on purpose: "developers will decide whether an analysis tool has high impact, and what they consider a false positive to be".
+- **Fixes, not just findings.** Analyzers attach a suggested fix the author can preview and apply in the review tool.
+- **Project-level settings.** Customisation is per project, never per developer, so a team does not argue about whose settings count.
 
-## Case Study: Microsoft SLAM
+## 2. Example: eBay tunes before rollout
 
-**Context:** Windows device drivers are critical for OS stability but notoriously difficult to test. A single driver bug can cause a Blue Screen of Death (BSOD) crash.
+eBay evaluated FindBugs for its Java code base of millions of lines {% cite jaspan2007understanding %}. Its out-of-the-box settings were a poor fit: some checkers that were on by default found nothing of interest, while some that were off found more. Switching checkers on and off, sometimes per package, removed 75% of the original warnings, which developers judged mostly false; on the customised version the evaluators estimated 10% false positives. Developers who had tried a tool once, unaware it could be tuned, had dismissed all static analysis as "useless"; the customised results won them over.
 
-**Approach:** Counter-Example Guided Abstraction Refinement (CEGAR) {% cite ball2004slam %}:
+eBay then gave each checker a priority with a fixed rule:
 
-1. **Abstract** the C driver code into a boolean program (retaining only control flow and API calls)
-2. **Model check** the abstraction against API usage rules (e.g., "every lock must be followed by an unlock")
-3. If the counterexample is **spurious** (artifact of abstraction), **refine** the abstraction with more detail
-4. If the counterexample is **real**, report the bug with a concrete execution trace
+| Priority | Policy | eBay example |
+|---|---|---|
+| High | purge every instance from the whole code base | possible null pointer exception |
+| Medium | no new instances; old ones fixed only when the code is refactored | high McCabe complexity (many independent paths through a function) |
+| Low | a cap on how many new instances each release may add | mostly style issues |
 
-**Impact:**
+To decide whether the tool was worth it, the team compared its yearly cost, two engineers to run it, with the bugs two manual testers of the same cost found per week, and concluded FindBugs gave better value. The paper's cost figures are deliberately "completely faked", keeping only their order of magnitude, so only the method transfers, not the numbers. Part of the argument was an estimate from earlier literature that a defect found during development costs about ten times less than one found in testing {% cite jaspan2007understanding %}.
 
-| Metric | Detail |
-|--------|--------|
-| Product | **Static Driver Verifier (SDV)** shipped in Windows Driver Development Kit |
-| Adoption | Mandatory for driver certification |
-| Effect | Significantly reduced driver-related BSOD crashes |
-| Longevity | A decade of successful deployment {% cite ball2011slam %} |
+## 3. A rollout that works
 
-**Lesson:** Formal methods can succeed in industry when focused on a **specific, high-value domain** with clear properties to verify. SLAM succeeded because device drivers have well-defined API contracts and the cost of failure (OS crash) is extremely high.
+Both experiences, with Chess and West's review cycle (set goals, run the tool, review its output, fix) {% cite chess2007static %}, give one order of steps:
 
----
+1. Decide which faults matter for this code base, and pick tools that look for them.
+2. Run the tools on a sample, review the warnings with the developers, and switch off checkers that produce noise.
+3. Set a policy per priority: what must be fixed now, what may not be added, what is only counted.
+4. Show results where developers already work (code review, the build) and only for changed code.
+5. Measure how often developers act on findings, and retire analyzers they keep rejecting.
 
-## Case Study: eBay FindBugs
+## When to use this — and when not
 
-**Context:** Large Java e-commerce platform with millions of lines of code. Goal: reduce production bugs cost-effectively.
+- Use this order for any new analyzer, from a linter to a commercial security scanner.
+- Do not start by enforcing an untuned tool on all legacy code: a flood of irrelevant warnings is how eBay's developers came to call static analysis "useless".
 
-**Timeline** {% cite jaspan2007understanding %}:
+## How solid is this?
 
-| Phase | Action | Result |
-|-------|--------|--------|
-| **1. Initial evaluation** | Deployed FindBugs with default configuration | **50% false positives** -- developers dismissed tool as "useless" |
-| **2. Customization** | 2 FTE spent evaluating and tuning checks | Disabled 75% of default checks (irrelevant to eBay's codebase) |
-| **3. Severity classification** | Classified remaining checks by severity | High / Medium / Low categories |
-| **4. Enforcement policy** | Defined action requirements per severity | See below |
-
-**Enforcement policy:**
-
-| Severity | Policy |
-|----------|--------|
-| **High** | Must fix before release |
-| **Medium** | No new issues allowed (fix-forward) |
-| **Low** | Limited enforcement |
-
-**Result:** 10% false positive rate, developer acceptance, cost approximately $400K/year -- equivalent to about 2 manual testers.
-
-**Lesson:** Static analysis scales to millions of LOC; manual testers do not. But trust is fragile -- a bad first experience poisons adoption for years. **Customization before deployment is essential**, not optional.
-
----
-
-## Case Study: Google Tricorder
-
-**Context:** Thousands of developers, monorepo architecture, billions of lines of code.
-
-**Architecture** {% cite sadowski2015tricorder %}:
-
-| Component | Role |
-|-----------|------|
-| **Platform approach** | Multiple analyzers contribute findings to a single dashboard |
-| **Code review integration** | Findings appear as comments in the code review UI |
-| **PLEASE FIX mechanism** | Reviewer marks a finding for the author to address |
-| **Domain expert analyzers** | Security, performance, and API teams write custom analyzers for their area |
-| **Feedback loop** | Developers can mark findings "not useful" -- rate is tracked per analyzer |
-
-**Key metrics:**
-
-| Metric | Value |
-|--------|-------|
-| Findings per day | **93,000** across 31,000 changelists |
-| "Not useful" rate | **~5%** platform-wide |
-| Per-analyzer threshold | **< 10%** or disabled |
-| Unique Linter users | **18,000+** |
-
-**Lesson:** The platform approach works -- let domain experts contribute analyzers while maintaining quality through the 10% false positive threshold. Centralizing the infrastructure while decentralizing the analysis expertise scales to large organizations.
-
----
-
-## Case Study: Nortel Networks
-
-**Context:** Telecommunications software, 3+ million lines of C/C++, 3 projects {% cite zheng2006static %}.
-
-**Method:** Compare automated static analysis (Reasoning/Illuma, later Klocwork K7) against testing and manual inspection on the same codebase.
-
-**Findings:**
-
-| Metric | Value |
-|--------|-------|
-| ASA cost per fault | **60-72%** of inspection cost |
-| ASA defect yield | 23-37% |
-| Testing defect yield | 63-98% |
-| ASA detects best | Checking faults, assignment faults |
-| Testing detects best | Functional faults, algorithmic faults |
-| Combined yield | Higher than either alone |
-
-**Lesson:** ASA does not replace testing or inspection -- it is a **third complementary technique**. The three together catch more defects than any two. Organizations that skip ASA leave an entire class of faults (checking and assignment errors) under-detected.
-
----
-
-## Anti-Patterns in SA Deployment
-
-Common mistakes that cause static analysis initiatives to fail:
-
-| Anti-Pattern | Problem | Fix |
-|--------------|---------|-----|
-| **Analysis Fatigue** | Too many warnings -- developers ignore ALL findings | Customize: disable noisy checks before rollout |
-| **False Confidence** | Clean SA report interpreted as "no bugs" | Combine SA with testing and inspection |
-| **No Customization** | Default configurations produce 50%+ false positives | Invest in tuning before deployment |
-| **Standalone Tool** | Tool not integrated in daily workflow -- forgotten | Embed in code review or CI/CD pipeline |
-| **Big Bang Rollout** | Thousands of existing issues overwhelm developers | Start incremental: enforce on new code only |
-| **No Measurement** | Cannot justify ROI, cannot identify improvement areas | Track developer action rate on findings |
-
-{: .warning }
-> The most common failure mode is deploying a tool with default settings and expecting developers to sort through the noise. This reliably produces rejection, not adoption.
-
----
-
-## Deployment Maturity Model
-
-Organizations can assess their static analysis maturity on a five-level scale:
-
-| Level | Practice | Example |
-|-------|----------|---------|
-| **Level 1: Ad hoc** | Individual developers run tools locally, occasionally | Developer installs SonarLint in their IDE |
-| **Level 2: CI integration** | Tool runs on every commit, results visible to team | SonarQube in Jenkins pipeline |
-| **Level 3: Gated** | Findings block merge if severity exceeds threshold | GitHub CodeQL as a required check |
-| **Level 4: Customized** | Organization-specific rules, tuned false positive thresholds | eBay's FindBugs customization {% cite jaspan2007understanding %} |
-| **Level 5: Platform** | Multiple tools integrated, feedback loop, domain experts contribute analyzers | Google Tricorder model {% cite sadowski2015tricorder %} |
-
-Most organizations operate at Level 1-2. The case studies above demonstrate that the jump from Level 2 to Level 4 -- adding customization and enforcement -- is where the largest ROI gains occur.
-
----
-
-## Summary
-
-| Principle | Evidence |
-|-----------|----------|
-| Integrate into workflow | Google: code review integration, not standalone reports |
-| Customize before deploying | eBay: 50% FP with defaults, 10% after tuning |
-| Focus on high-value domains | Microsoft: device drivers with clear API contracts |
-| Combine techniques | Nortel: ASA + testing + inspection beats any two |
-| Measure developer perception | Google: "not useful" rate, not theoretical accuracy |
-| Start incremental | eBay: enforce on new code, expand gradually |
-
----
-
-## Further Exploration
-
-- [Empirical Effectiveness](effectiveness.md) -- Quantitative data on false positive rates, cost, and tool precision
-- [Analysis Techniques](techniques.md) -- The technical foundations underlying these deployed tools
-- [Static Analysis Overview](./) -- Why static analysis matters and the soundness-completeness tradeoff
-- [Inspection Effectiveness](../inspection/effectiveness.md) -- How manual inspection complements automated analysis
+- **Where it comes from.** Tricorder's design and numbers {% cite sadowski2015tricorder %}; eBay's evaluation {% cite jaspan2007understanding %}; the review cycle {% cite chess2007static %}.
+- **What is contested.** Both cases come from large companies with dedicated tool teams, reported by the people who built the systems. The 10% threshold is Google's choice; the paper notes it matches other platforms such as Coverity's, not that it is optimal.
 
 ---
 

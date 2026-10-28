@@ -10,81 +10,112 @@ page_type: question-set
 
 # RQ A06: Static Analysis
 
-**Format:** Explain in your own words, give brief examples
+Revision questions for [SN A06: Static Analysis](SN_A06_Static.md). Answer in your own words and show your working; every question can be answered from the study notes and the handbook pages they link to.
+
+**Format:** explain in your own words, with brief examples.
 
 ---
 
-## Question 1: Zero Analysis Trace
+## Part 1: Foundations
 
-Given the following code, trace the zero analysis to fixed point. Identify where (if anywhere) a divide-by-zero warning is issued.
+## Question 1: Static vs Dynamic Analysis
+
+Give an example of a situation in which you would prefer:
+
+a) dynamic analysis (testing) over static analysis;
+b) static analysis over dynamic analysis;
+c) model checking over a lighter static analysis.
+
+Explain each choice.
+
+## Question 2: Soundness and Completeness
+
+A tool reports "no bugs found" for a program that contains a null pointer dereference.
+
+- Is the tool sound for null dereferences? Why or why not?
+- Can you tell from this one result whether it is complete?
+- Name a kind of tool that would report this dereference, and the price it pays for doing so.
+
+## Question 3: Rice's Theorem
+
+- What does Rice's theorem say about static analysis tools in practice?
+- How do practical tools still work?
+- Which of the three (soundness, completeness, termination) can a practical tool keep, and what does it give up?
+
+## Question 4: Abstraction
+
+Zero analysis abstracts each integer to {Z, NZ, MZ}.
+
+- For three 32-bit variables, how many concrete states are there, and how many abstract ones?
+- Where does the abstraction lose information, and what kind of report does that produce?
+- Why does a finite set of abstract values guarantee that the analysis terminates?
+
+---
+
+## Part 2: Techniques
+
+## Question 5: AST Pattern Matching
+
+- What is an abstract syntax tree, and how do pattern checkers use it?
+- How would a rule like PMD's "empty `while` body" work on the tree?
+- What can a pattern check not see that dataflow analysis can?
+
+## Question 6: Four Tools, One File
+
+Four Python tools were run on the same file with three planted faults. Which tool found which fault, and what does the result tell a team that runs only one of them?
+
+## Question 7: Taint Analysis
+
+Define source, sink and sanitizer, then trace the taint through this code. Where should the sanitizer go, and what is it?
+
+```python
+user_id = request.args["id"]                       # ?
+query = "SELECT * FROM users WHERE id=" + user_id
+db.execute(query)                                  # ?
+```
+
+## Question 8: Zero Analysis Trace
+
+Trace zero analysis to the fixed point. Is a divide-by-zero warning issued, and is it a real bug?
+
 ```c
 a = 5;
 b = 0;
 if (condition) {
     b = a;
 }
-c = a / b;   // Is b safe here?
+c = a / b;
 ```
-*Hint: What is b's abstract value after the if-else merge?*
 
----
+## Question 9: Zero Analysis with a Loop (Practical)
 
-## Question 2: Product Automaton
-
-Given a simple function with two lock/unlock calls:
 ```c
-lock(m);
-if (error) {
-    return;     // Does this violate locking discipline?
+int a = 10;      // B1
+int b = a - 10;  // B1
+int c = 1;       // B1
+while (b < 5) {  // B2 (loop header)
+    c = c * b;   // B3
+    b = b + 1;   // B3
 }
-unlock(m);
+int d = a / c;   // B4
 ```
-Construct the product automaton with the locking FSM ($P_0$ = unlocked, $P_1$ = locked, $P_2$ = error). Identify the error state.
+
+a) Draw the control flow graph and mark the loop head.
+b) Give the abstract values at each block on each pass until the fixed point.
+c) What is the abstract value of `c` at B4, and is a warning issued?
+d) Run the code in your head: is the warning a real bug or a false positive?
+
+## Question 10: Null Analysis
+
+Explain branch refinement with an example of your own. Why does a value become "maybe None" again after an `if`/`else` joins?
 
 ---
 
-## Question 3: Soundness vs Completeness
+## Part 3: Model Checking and CEGAR
 
-A tool reports "No bugs found" for a program that actually contains a null pointer dereference.
-- Is this tool sound? Why or why not?
-- Is this tool complete? Why or why not?
-- Give an example of a tool that would catch this vs miss it.
+## Question 11: Program Model Construction (Practical)
 
----
-
-## Question 4: Model Checking vs Dataflow
-
-A concurrent program has a potential deadlock (Thread A locks resource 1 then waits for resource 2; Thread B locks resource 2 then waits for resource 1). Would you use dataflow analysis or model checking to detect this? Explain your reasoning.
-
----
-
-## Question 5: Tool Disagreement
-
-Lenarduzzi et al. (2021) found <0.4% agreement among six SA tools. What does this mean for a team that relies on a single tool like SonarQube? What would you recommend?
-
----
-
-## Question 6: CEGAR Explanation
-
-Explain the CEGAR loop in your own words. Why does it start with a coarse abstraction instead of analyzing the full program? What happens when a counterexample is spurious?
-
----
-
-## Question 7: The 10% FP Rule
-
-What is the 10% false positive rule? Who enforces it and how? Why is this threshold important for industrial adoption of SA tools? What happens when a tool exceeds it at Google?
-
----
-
-## Question 8: Cost-Effectiveness Comparison
-
-Compare the cost-effectiveness of static analysis, manual code inspection, and testing based on the Nortel study (Zheng 2006). When would you invest in SA vs additional testing? What types of defects does each approach find best?
-
----
-
-## Question 9: Program Model Construction (Practical)
-
-Produce a program model for the code below. Be sure to identify and describe the states, actions, transitions, initial state, and end states.
+Build a model for the code below: list the states, actions, transitions, initial state and end state. Fold the declarations into the initial state, the state before the first loop test.
 
 ```c
 int x = 0;
@@ -95,74 +126,71 @@ while (x < 3) {
 }
 ```
 
----
-
-## Question 10: Counterexamples in Model Checking
-
-In the context of model checking, what is a counterexample? Why is it valuable for debugging? What is the difference between a real and a spurious counterexample?
-
----
-
-## Question 11: When Model Checking Fails
-
-Under what circumstances is model checking *not* a useful strategy? Give at least 3 situations where a different analysis technique would be more appropriate.
-
----
-
 ## Question 12: LTL Properties
 
-Let $F$ be a formula. Represent in LTL the following properties:
-a) $F$ holds in **all** states of a path $s_0, s_1, \ldots$
-b) $F$ holds in **some** future state
-c) Whenever a lock is acquired, it is **eventually** released: $G(\textit{lock} \rightarrow F(\textit{unlock}))$
+Let p be a formula. Write in LTL:
 
-Explain each operator ($G$, $F$, $U$) in plain English.
+a) p holds in every state of a run;
+b) p holds in some future state;
+c) whenever a lock is acquired, it is eventually released.
 
----
+Explain G, F, X and U in plain English, and say which of (a) and (c) is a safety property and which a liveness property.
 
-## Question 13: Static vs Dynamic Analysis Tradeoffs
+## Question 13: The Counter That Ends at 2
 
-Give an example of a circumstance under which you would prefer:
-a) Dynamic analysis over static analysis?
-b) Static analysis over dynamic analysis?
-c) Model checking over more lightweight static analysis?
+Two processes each add 1 to a shared `n` ten times, through a local copy. Explain how the final value can be 2, and why random simulation rarely shows it while a model checker always finds it.
 
-Explain your reasoning for each choice.
+## Question 14: Product Automaton
 
----
-
-## Question 14: Tool Adoption Strategies
-
-Describe two strategies for eliciting developer support and encouraging static analysis tool adoption in an organization. Reference the Google Tricorder experience and the eBay FindBugs deployment.
-
----
-
-## Question 15: Rice's Theorem Implications
-
-Rice's Theorem (1953) proves that all non-trivial semantic properties of programs are undecidable.
-- Explain what this means for static analysis tools in practice.
-- How do practical tools work despite this theoretical limitation?
-- What tradeoffs (soundness/completeness/termination) must every tool make?
-
----
-
-## Question 16: Taint Analysis
-
-Explain how taint analysis detects SQL injection vulnerabilities. Define: source, sink, and sanitizer. Trace the taint through this code:
-
-```java
-String input = request.getParameter("id");   // source
-String query = "SELECT * FROM users WHERE id=" + input;
-db.execute(query);                           // sink
+```c
+lock(m);
+if (error) {
+    return;
+}
+unlock(m);
 ```
 
-Where should a sanitizer be applied?
+Using the lock automaton (P0 unlocked, P1 locked, error), construct the product with the code's program points. Which path reaches an error, and which rule does it break?
+
+## Question 15: Model Checking Locking (Practical)
+
+```c
+void process(int flag) {
+    lock(m);           // S0
+    do_work();         // S1
+    if (flag) {
+        lock(m);       // S2
+    }
+    unlock(m);         // S3
+}
+```
+
+a) Draw the control flow graph.
+b) Draw the product automaton (program points × lock states).
+c) Identify every path that reaches an error state.
+d) Is the counterexample real or spurious? How do you decide?
+
+## Question 16: CEGAR
+
+Explain the CEGAR loop. Why start from a coarse abstraction? Use the SLAM loop with `nPackets` (code and counterexamples in the study notes §7 and on [Abstraction Refinement (CEGAR)](../../verif/static/cegar.md)) to show what happens when a counterexample is spurious, and name the predicate that removes it.
+
+## Question 17: Counterexamples
+
+What is a counterexample in model checking, and why is it more useful to a developer than a warning? What is the difference between a real and a spurious counterexample?
+
+## Question 18: Model Checking or Dataflow?
+
+Thread A locks resource 1 and then waits for resource 2; thread B locks resource 2 and then waits for resource 1. Would you use dataflow analysis or model checking to find the deadlock? Explain.
+
+## Question 19: When Model Checking Fails
+
+Give three situations where model checking is not the right technique, and say what you would use instead.
 
 ---
 
-## Question 17: Symbolic Execution
+## Part 4: Symbolic Execution and Practice
 
-Explain how symbolic execution differs from concrete testing. Given:
+## Question 20: Symbolic Execution
 
 ```c
 int f(int x, int y) {
@@ -174,97 +202,52 @@ int f(int x, int y) {
 }
 ```
 
-What symbolic constraints does the engine collect to reach the error path? What is path explosion, and how does KLEE mitigate it?
+What path condition must the engine solve to reach the error path? Give one input that satisfies it. What is path explosion, and which two search heuristics does KLEE alternate to cope with it?
 
----
+## Question 21: Tool Disagreement
 
-## Question 18: AST Pattern Matching
+Lenarduzzi and colleagues found less than 0.4% agreement among six tools, and precision from 18% to 86%. What do these numbers mean for a team that relies on SonarQube alone? What would you recommend?
 
-PMD detects bugs by matching patterns in the Abstract Syntax Tree. Explain:
-- What is an AST and how is it constructed from source code?
-- How does a rule like "Empty While Statement" work at the AST level?
-- What are the limitations of AST pattern matching compared to dataflow analysis?
+## Question 22: The 10% Rule (Practical)
 
----
+In one week an analyzer's findings receive 12 NOT USEFUL, 90 PLEASE FIX and 18 APPLY FIX clicks.
 
-## Question 19: Abstraction in Static Analysis
+a) Compute its not-useful rate as Tricorder defines it.
+b) What happens to the analyzer, and who must act?
+c) Why does Google measure developer reactions rather than true false-positive rates?
 
-Explain how abstraction reduces the state space in static analysis. Use the zero analysis example: how does abstracting integers to $\{Z, NZ, MZ\}$ reduce $2^{96}$ possible 32-bit values to just 3 abstract values? Why does this guarantee termination?
+## Question 23: Tool Adoption
 
----
+Describe two strategies for getting developers to act on static analysis findings, one from Google's Tricorder and one from eBay's FindBugs rollout.
 
-## Question 20: LLM-Augmented Static Analysis
+## Question 24: Cost-Effectiveness (Practical)
 
-IRIS (Li 2024) combines LLMs with CodeQL and achieves +103% detection improvement. Explain:
-- Why do traditional SA tools struggle with certain vulnerability types?
-- How does the neuro-symbolic approach work (LLM + static analysis)?
-- What are the risks of relying on LLMs for security analysis?
+In a release, static analysis found 31 faults; later, inspection found 20, testing 40 and customers 9.
 
----
+a) Compute the fault-detection yield of static analysis.
+b) Compare the result with the Nortel ranges for static analysis, inspection and testing.
+c) Which fault types does each technique find best, and when would you invest in static analysis rather than more testing?
 
-## Practical Problems
+## Question 25: LLM-Assisted Analysis
 
----
+IRIS combines an LLM with CodeQL and detects 55 instead of 27 of 120 known vulnerabilities.
 
-## Question 21: Zero Analysis Walkthrough (Practical)
-
-Trace the zero analysis for the following code. Show the abstract state at each program point and identify all warnings.
-
-```c
-int a = 10;      // B1
-int b = a - 10;  // B1
-int c = 1;       // B1
-while (b < 5) {  // B2 (loop header)
-    c = c * b;   // B3
-    b = b + 1;   // B3
-}
-int d = a / c;   // B4 — is c safe here?
-```
-
-Draw the CFG. What is the abstract value of $c$ at block B4? Does the analysis report a false positive?
-
----
-
-## Question 22: Model Checking Locking (Practical)
-
-Given the following code with a locking FSM ($P_0$=unlocked, $P_1$=locked, $P_2$=error):
-
-```c
-void process(int flag) {
-    lock(m);           // S0
-    do_work();         // S1
-    if (flag) {
-        lock(m);       // S2 — is this safe?
-    }
-    unlock(m);         // S3
-}
-```
-
-a) Draw the CFG for the code
-b) Draw the product automaton (code states $\times$ lock states)
-c) Identify all paths that reach an error state $P_2$
-d) Is the counterexample real or spurious?
+- Why do conventional taint analyzers miss some of them?
+- What does the LLM do, and what does CodeQL still do?
+- What are the risks of relying on an LLM for security analysis?
 
 ---
 
 ## Topics Covered
 
 | Topic | Questions |
-|-------|-----------|
-| Zero/dataflow analysis | Q1, Q19, Q21 |
-| Model checking | Q2, Q4, Q9, Q10, Q11, Q22 |
-| Soundness & completeness | Q3, Q15 |
-| CEGAR | Q6 |
-| Tool ecosystem | Q5, Q7, Q14 |
-| Cost-effectiveness | Q8 |
-| Temporal logic (LTL) | Q12 |
-| Static vs dynamic | Q13 |
-| Taint analysis | Q16 |
-| Symbolic execution | Q17 |
-| AST pattern matching | Q18 |
-| Abstraction | Q19 |
-| LLM augmentation | Q20 |
-| Practical problems | Q9, Q21, Q22 |
+|---|---|
+| Foundations, soundness, Rice, abstraction | Q1–Q4 |
+| Patterns, types, taint | Q5–Q7 |
+| Dataflow analysis | Q8–Q10 |
+| Model checking, LTL, CEGAR | Q11–Q19 |
+| Symbolic execution | Q20 |
+| Tools, adoption, evidence, LLMs | Q21–Q25 |
 
 ---
 
