@@ -10,162 +10,110 @@ page_type: question-set
 
 # RQ A04: Quality Planning
 
-**Format:** Explain in your own words, give brief examples
+Revision questions for [SN A04: Quality Planning](SN-A4-QualityPlan.md). Each can be answered from the study notes and the linked handbook pages. Where a question asks for a number, show the calculation.
 
 ---
 
-## Question 1: Quality as an Afterthought
+## Part 1: The plan
 
-Wallace and Fujii (1989) found that only 10% of test plan topics were actually addressed in surveyed projects.
+### Question 1: Why a plan
 
-Explain why quality activities are often skipped. What pressures cause teams to deprioritize testing? How does Google's approach (Test Certified from Day 1) prevent this problem?
+Explain why quality activities are dropped under schedule pressure, and how a documented plan protects them. Why does the need for a plan grow when the same people do development and quality work?
 
----
+### Question 2: Assurance and control
 
-## Question 2: The 11 Decisions Framework
+Explain the difference between quality assurance and quality control, with one example of each for a web project. Why does a project need both?
 
-A complete quality plan must address 11 decisions grouped into WHAT, WHEN, WHO, and HOW.
+### Question 3: The eleven decisions
 
-List and briefly explain at least 8 of the 11 decisions. For a student project (SQR), which decisions are most critical to address?
+List the eleven decisions a quality plan records. For a three-week student project, which three decisions would you write first, and why?
 
----
+### Question 4: Drivers
 
-## Question 3: Quality Assurance vs Quality Control
+Name the four things that drive a plan's answers. For a mobile banking app, give one concrete consequence of each driver for the plan.
 
-Quality management includes both QA and QC activities.
+### Question 5: Agile and assurance
 
-Explain the fundamental difference between Quality Assurance and Quality Control. Give one example of each. Why do you need both?
-
----
-
-## Question 4: Criticality Levels
-
-DO-178B defines 5 criticality levels (A-E) for avionic software, while ISO 26262 uses ASIL (A-D plus QM).
-
-Explain what determines a system's criticality level. If you're building a web app (Level E/QM) vs. airplane software (Level A), how would your coverage requirements differ?
+A team says: "We use Scrum, so we need no quality assurance." Answer them using Koopman's three questions and the roles that Scrum and XP already assign.
 
 ---
 
-## Question 5: Microsoft Coverage by Milestone
+## Part 2: Activities and rigor
 
-Microsoft targets 65% coverage at M2, 75% at M3, and 80% at Release.
+### Question 6: Minimum V&V tasks
 
-Why do coverage targets increase toward release rather than staying constant? What does each milestone focus on?
+Using Wallace and Fujii's minimum tasks, name the V&V tasks for the requirements and design phases. Why does test planning start in these phases rather than after coding?
 
----
+### Question 7: Is independent V&V worth it?
 
-## Question 6: Quality Gates Entry/Exit Criteria
+Summarize the two studies Wallace and Fujii report on independent V&V. Which project conditions made V&V pay off, and what does that imply for a small web project?
 
-Quality gates have entry criteria (before starting) and exit criteria (before proceeding).
+### Question 8: Criticality
 
-For a "Code Review" gate, list at least 2 entry criteria and 2 exit criteria. What are the possible decisions (Pass, Conditional, Fail, Suspend) and when would each apply?
+1. For DO-178B levels A, C and E, give the failure condition and the structural coverage objective.
+2. Why does Miranda write gate criteria per criticality class before knowing which modules are critical?
+3. Your team builds a parking-payment app with an admin dashboard and a payment module. Assign each to one of Miranda's three classes and justify the choice.
 
----
+### Question 9: Writing a gate criterion
 
-## Question 7: Google's Three-Stage Gates
+Write two exit criteria for a "merge to main" gate, each with its metric, desired value, predicate and object. Explain why "the code is good enough" is not a criterion.
 
-Google uses Pre-submit, Post-submit, and Release gates.
+### Question 10: Phased gates
 
-Describe what happens at each gate. What checks are automated vs. manual? Why is the 80% incremental coverage requirement important at pre-submit?
+Microsoft raised its coverage gate from 65% to 75% to 80% across milestones. Give one advantage and one risk of phasing a gate instead of requiring 80% from the start.
 
----
+### Question 11: Bug bar
 
-## Question 8: Test Process Maturity (TMMi)
+Before a release, the team has five open bugs: one causes data loss, two have workarounds, two are cosmetic. The plan's bug bar says: no open severity-1 bug, at most two open severity-2 bugs. Assign severities, decide whether the release may ship, and say who should be accountable for the decision.
 
-TMMi defines 5 maturity levels from Initial to Optimization.
+### Question 12: Maturity and roles
 
-Describe levels 1, 2, and 3. For a student project, what is a realistic target level? What distinguishes a Level 2 team from a Level 3 team?
-
----
-
-## Question 9: Google Test Certified Levels
-
-Google's Test Certified program has 5 levels (L1-L5).
-
-Compare Level 1 requirements with Level 3 requirements. If your team currently has no CI, what steps would you take to reach Level 2?
+1. Name the five TMMi levels.
+2. Compare Google's Test Certified Level 1 with Level 5.
+3. Write a RACI row for "release decision" in a team with developers, a tester and a product owner.
 
 ---
 
-## Question 10: The RACI Matrix
+## Part 3: Documents, effort, reports
 
-A RACI matrix assigns Responsible, Accountable, Consulted, and Informed roles.
+### Question 13: Addressed, not filled in
 
-For unit testing in a typical team, who should be R (Responsible)? Why does Google say "You build it, you break it"? Create a RACI row for "Release decision."
+What does IEEE 829 mean by a topic being "addressed"? Give one topic a small project could legitimately exclude, with the sentence that addresses it.
 
----
+### Question 14: Level test plan
 
-## Question 11: IEEE 829 and the "Addressed" Principle
+Write the "features not to be tested" and "suspension criteria and resumption requirements" entries of a system test plan for an online shop.
 
-IEEE 829 states that every topic must be formally addressed: include, record in tool, or exclude with rationale.
+### Question 15: Estimating effort
 
-Why is it important to never leave topics blank? Give an example of a section you might "exclude with rationale" for a small project.
+A system has 12 functions: 8 simple and non-critical, 4 complex and critical. Use Miranda's table of tests per function.
 
----
+1. How many system-level tests are needed?
+2. With I = 0.5 and U = 0, how many test cases in total?
+3. With 0.5 hours to design a test, 0.2 hours to run it, and R = 0.5, how many hours?
+4. The system measures 60 function points. Sanity-check your total with Jones' rule.
 
-## Question 12: Test Effort Estimation
+### Question 16: Thirty percent of what
 
-Tester-to-developer ratios vary from 1:5 to 5:1 across industries. Microsoft uses 1:1.
+A test lead reports "we are 60% done". Name three different things this could mean, and rewrite the report so that a manager can act on it.
 
-What factors explain these differences? If testing is typically 30% of total development effort, how would you sanity-check your test estimate for a 100 function-point project?
+### Question 17: Test suite ownership
 
----
-
-## Question 13: The Agile Trust Problem
-
-Koopman (2010) argues that Agile's "trust picture" creates quality risks.
-
-What are Koopman's three evaluative questions for Agile teams? Why does he argue that even Agile teams need independent quality verification?
+Why did practitioners rate knowing who owns a test suite as their most important information need in continuous delivery? What happens to a failing suite that nobody owns?
 
 ---
 
-## Question 14: Lightweight Test Plan
-
-A one-page test plan can address all 11 decisions with just 6 sections: Scope, Approach, Gates, Roles, Schedule, Risks.
-
-Create a lightweight test plan outline for your SQR project. Include at least one concrete example for each section.
-
----
-
-## Question 15: CI Dashboard Metrics
-
-A study identified 39 information needs in CI/CD, with "test suite ownership" as the most important.
-
-Why is knowing who owns each test suite critical? What happens when ownership is unclear and tests start failing?
-
----
-
-## Question 16: Defect Triage and Bug Bar
-
-During a sprint, your team discovers 5 bugs: 1 causes data loss, 2 have workarounds, and 2 are cosmetic issues.
-
-Classify each bug as P1/P2/P3-P4. If your bug bar is "0 P1s, ≤3 P2s allowed for release," which bugs must be fixed before release? Who should make the triage decision?
-
----
-
-## Question 17: Defense in Depth
-
-The V&V technique selection matrix shows that different techniques suit different quality characteristics (Functionality, Reliability, Usability, Maintainability, Security).
-
-Which technique is strongest for Maintainability? Which for Usability? Explain why no single technique catches all defects and why combining methods is necessary.
-
----
-
-## Topics Covered
+## Topics covered
 
 | Topic | Questions |
-|-------|-----------|
-| Quality planning rationale | Q1, Q3 |
-| 11 decisions framework | Q2, Q17 |
-| Criticality & coverage | Q4, Q5 |
-| Quality gates | Q6, Q7, Q16 |
-| Process maturity & organization | Q8, Q9, Q10 |
-| Documentation (IEEE 829) | Q11 |
-| Test effort estimation | Q12 |
-| Agile & quality | Q13 |
-| Practical application | Q14 |
-| Metrics & dashboards | Q15 |
-| Defect triage & bug bar | Q16 |
-| V&V technique selection | Q17 |
+|---|---|
+| The plan and its decisions | Q1, Q2, Q3, Q4, Q5 |
+| V&V activities and criticality | Q6, Q7, Q8 |
+| Quality gates | Q9, Q10, Q11 |
+| Maturity and roles | Q12 |
+| Documentation | Q13, Q14 |
+| Effort estimation | Q15 |
+| Reporting | Q16, Q17 |
 
 ---
 

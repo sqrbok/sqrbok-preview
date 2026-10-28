@@ -1,222 +1,77 @@
 ---
-title: Defect Classification
+title: Defect Origin and Detection
 parent: Cost of Quality
 nav_order: 3
 layout: default
 ---
 
-# Defect Classification Schemes
+# Defect Origin and Detection
 
-Defect Classification Schemes provide a structured methodology for technical teams to categorize software anomalies, enabling objective feedback on development processes and identification of systemic quality gaps {% cite chillarege2000odc %} {% cite butcher2002improving %}.
+The **origin / where-found matrix** classifies every defect by two attributes, the phase that introduced it and the activity that found it, and from those counts computes how well each verification activity removes the defects present when it runs {% cite kan2002metrics miranda2013coq %}. It is the minimum classification that makes a cost-of-quality analysis actionable.
 
-## Kan's Origin/Where-Found Matrix
+## 1. The two attributes
 
-The Origin/Where-Found Matrix, introduced by Kan (2002), is the simplest defect classification scheme and provides immediate insight into V&V effectiveness {% cite kan2002metrics %}.
+- **Origin**: where the defect was introduced (requirements, high-level design, low-level design, code, or a bad fix during testing).
+- **Where found**: the activity that detected it (an inspection, a test level, or the field).
 
-### The Core Idea
+Cross-tabulating them shows **escapes**: a defect found far later than it was made passed through every activity in between, and each phase it slipped through raises the cost of its fix.
 
-Every defect has two key properties:
-- **Origin** — Which phase injected it? (Requirements, Design, Code)
-- **Where Found** — Which activity detected it? (Inspection, Test, Field)
+![A three-by-three matrix of origin (requirements, design, code) against where found (review, test, field); review finds are early, requirements and design defects found in test escaped review, and every field find is an escape](origin-found-matrix.svg)
 
-Cross-tabulating these reveals **escape patterns** — defects that slip through multiple phases before detection, accumulating cost at each stage.
+_Reading the matrix: review finds are cheap, earlier-phase defects found in test escaped a review, and field finds cost most._ {% cite miranda2013coq %}
 
-### Real Project Data
+## 2. Example: Kan's project data
 
-Kan provides this matrix from an actual software project (3,465 defects):
+Kan's example project recorded 3,465 defects. The counts below are the matrix's margins, as reproduced in Miranda's notes {% cite kan2002metrics miranda2013coq %}:
 
-| Origin ↓ / Found → | Req Insp | HLD Insp | LLD Insp | Code Insp | UT | IT | ST | Field | **Total** |
-|--------------------|----------|----------|----------|-----------|-----|-----|-----|-------|-----------|
-| **HLD** | 49 | 681 | — | — | — | — | — | — | 730 |
-| **LLD** | 6 | 42 | 681 | — | — | — | — | — | 729 |
-| **Code** | 12 | 28 | 114 | 941 | — | — | — | — | 1,095 |
-| **UT** | 21 | 43 | 43 | 223 | 2 | — | — | — | 332 |
-| **IT** | 20 | 41 | 61 | 261 | — | 1 | — | — | 387 |
-| **ST** | 6 | 8 | 24 | 72 | — | — | 1 | — | 111 |
-| **Field** | 6 | 16 | 16 | 40 | — | — | — | 1 | 81 |
-| **Column Total** | 122 | 859 | 939 | 1,537 | 2 | 4 | 1 | 1 | **3,465** |
+| Origin | Defects | | Where found | Defects |
+|---|---:|---|---|---:|
+| Requirements | 122 | | High-level design inspection | 730 |
+| High-level design | 859 | | Low-level design inspection | 729 |
+| Low-level design | 939 | | Code inspection | 1,095 |
+| Code | 1,537 | | Unit test | 332 |
+| Bad fixes during testing | 8 | | Integration test | 387 |
+| | | | System test | 111 |
+| | | | Field | 81 |
+| **Total** | **3,465** | | **Total** | **3,465** |
 
-### How to Read the Matrix
-```mermaid
-quadrantChart
-    title Origin vs Found Matrix
-    x-axis Early Found --> Late Found
-    y-axis Code Origin --> Req Origin
-    quadrant-1 Escaped design bugs
-    quadrant-2 Ideal - early catch
-    quadrant-3 Normal - code in test
-    quadrant-4 Costly - field escapes
-```
+The diagonal shows most defects caught where they were made: 681 of the 859 high-level design defects in the design inspection, 941 of the 1,537 code defects in the code inspection {% cite miranda2013coq %}.
 
-| Pattern | Location | Meaning | Action |
-|---------|----------|---------|--------|
-| **High diagonal** | Same phase | Caught where injected | ✅ Ideal |
-| **Below diagonal** | Lower-left | Early injection, early catch | ✅ Good |
-| **Above diagonal** | Upper-right | Escaped multiple phases | ⚠️ V&V gap |
-| **High "Field" column** | Right edge | Customer found it | 💥 Expensive |
+## 3. Defect removal efficiency per activity
 
-### Key Insights from the Data
+The **defect removal efficiency (DRE)** of an activity is the share of the defects present when it runs that it finds. Defects present = defects introduced so far minus defects already found {% cite kan2002metrics %}. For the low-level design inspection:
 
-1. **Inspections are effective:** 3,457 of 3,465 defects (99.8%) caught before testing
-2. **Field escapes exist:** 81 defects reached customers despite strong inspections
-3. **Design defects propagate:** HLD defects found in code inspection (28) indicate missed design reviews
+DRE = 729 / ((122 + 859 + 939) − 730) = 729 / 1,190 = 61.3%
 
-### Actionability for CoQ
+For the tests, count the 8 bad fixes in when they were made: 2 during unit test, 4 during integration test, 1 during system test and 1 after it. Unit test then sees 3,457 − 2,554 + 2 = 905, integration test 905 − 332 + 4 = 577 and system test 577 − 387 + 1 = 191. The same rule gives every activity:
 
-The matrix directly supports Cost of Quality decisions:
+| Activity | Present | Found | DRE |
+|---|---:|---:|---:|
+| High-level design inspection | 981 | 730 | 74.4% |
+| Low-level design inspection | 1,190 | 729 | 61.3% |
+| Code inspection | 1,998 | 1,095 | 54.8% |
+| Unit test | 905 | 332 | 36.7% |
+| Integration test | 577 | 387 | 67.1% |
+| System test | 191 | 111 | 58.1% |
 
-| If you see... | It means... | Invest in... |
-|---------------|-------------|--------------|
-| High Field column | V&V not catching defects | More/earlier inspections |
-| High row total, low early columns | Injection > early removal | Prevention at that phase |
-| Defects far from diagonal | Late detection of early bugs | Shift-left activities |
+The **overall DRE** before release is (3,465 − 81) / 3,465 = 97.7%: only 81 defects reached the field. In this project the inspections, not the tests, carried most of the load; unit testing removed barely a third of what reached it.
 
-> **Connection to lecture:** This is the minimum classification needed to make CoQ actionable. Without knowing origin and detection phase, you can't target prevention investments.
+## When to use it, and when not
 
-### Agile Adaptation
+- **Use it** whenever defects are logged: two extra fields per defect report (origin and where found) are enough to compute every DRE above. In an iterative project, the rows and columns become the team's own activities, for example story refinement, pull-request review, continuous-integration tests and production.
+- **Do not use it** to blame phases or people; origin is often a judgement made long after the fact.
 
-Even with fewer formal phases, track:
-- **Origin:** Story, Design, Code
-- **Found:** PR Review, CI, QA, Production
+## Limitations
 
-The principle remains: diagonal = good, far from diagonal = expensive.
+- **Origin is assigned by people,** usually the developer who fixed the defect, and is often uncertain.
+- **The field count is never final.** DRE before release looks better the earlier you compute it, because field defects keep arriving.
+- **Counts are not costs.** A field defect may cost many times an inspection find; weight the counts before deciding where to invest ([Defect Classification Schemes](04-classification-schemes.md) shows one weighting).
 
-## Orthogonal Defect Classification (ODC)
+## How solid is this?
 
-ODC is a methodology developed by IBM that uses a set of non-redundant (orthogonal) attributes to span the defect information space {% cite chillarege2000odc %}. It is specifically designed to provide objective, data-based decision support for technical teams, not just management {% cite butcher2002improving %}.
-
-### Submittor Attributes (Classified at Detection)
-
-| Attribute | Description | Examples |
-|-----------|-------------|----------|
-| **Activity** | Process step exposing the defect | Code Inspection, Function Test |
-| **Trigger** | Condition required to expose defect | Coverage, Variation, Sequencing, Interaction |
-| **Impact** | Actual or perceived customer impact | Usability, Reliability, Performance |
-
-**Trigger Types:**
-- Coverage, Variation, Sequencing
-- Interaction, Workload/Stress
-- Recovery/Exception
-- Software Configuration
-
-### Responder Attributes (Classified at Fix)
-
-| Attribute | Description | Values |
-|-----------|-------------|--------|
-| **Target** | Entity that was fixed | Design, Code, Documentation |
-| **Defect Type** | Nature of the correction | See below |
-| **Qualifier** | Specificity of change | Missing, Incorrect, Extraneous |
-
-**Defect Types:**
-- Assignment/Initialization
-- Checking
-- Algorithm/Method
-- Function/Class/Object
-- Timing/Serialization
-- Interface/OO Messages
-- Relationship
-
-### Process Feedback Through Signatures
-
-ODC provides feedback through "signatures"—characteristic patterns of defect distributions {% cite butcher2002improving %}:
-
-> *If a team finds 60% of defects in base code with only single-function triggers, the product is likely not ready for release, as complex interaction testing has not yet matured.*
-
-## HP's Defect Origins, Types, and Modes
-
-The HP model is designed to maximize process improvement during project retrospectives {% cite huber1999comparison %}:
-
-### Critical Comparison to ODC
-
-| Aspect | ODC | HP Model |
-|--------|-----|----------|
-| **Focus** | Where the fix was implemented | Where defect could have been prevented |
-| **Terminology** | "Target" | "Origin" |
-| **Finding** | 76% Code defects | 63% Design defects |
-
-The fundamental semantic difference: ODC's "Target" identifies where the fix was implemented, while HP's "Origin" identifies the first activity where the defect could have been **prevented** {% cite huber1999comparison %}.
-
-### Defect Cost Weighting
-
-HP applies industry-derived multipliers showing that not all defects are equal {% cite huber1999comparison %}:
-
-| Origin Phase | Cost Multiplier |
-|--------------|-----------------|
-| **Specification** | 14.25× |
-| **Design** | 6.25× |
-| **Code** | 2.5× |
-
-This demonstrates the economic superiority of early-phase prevention.
-
-## LiDeC (Lightweight Defect Classification)
-
-LiDeC was developed for embedded automotive software where source code is often supplier-owned, limiting an OEM's ability to perform fine-grained analysis {% cite mellegard2012lightweight %}:
-
-### Design Goals
-
-- Minimize "process footprint" by raising abstraction level
-- Reduce classification effort (vs. 19 minutes per defect for standard Root Cause Analysis)
-- Support distributed development environments
-- Enable safety-specific tracking (ISO 26262)
-
-### Four Lifecycle Phases
-
-| Phase | Purpose |
-|-------|---------|
-| **Recognition** | Discovery data (who, when, where found) |
-| **Analysis** | Underlying cause, injection activity |
-| **Resolution** | Impact, required verification |
-| **Post-mortem** | Final state, lessons learned |
-
-### Key Difference from ODC
-
-LiDeC replaces fine-grained code categories with high-level characterizations and adds **safety-specific attributes** {% cite mellegard2012lightweight %}:
-
-- Functional Safety Impact
-- ASIL-classified requirements (per ISO 26262)
-- Supplier vs. OEM responsibility tracking
-
-## Connection to Cost of Quality
-
-Defect classification is the bridge between technical findings and the language of money used by upper management {% cite houston1999cost %}:
-
-### Prevention vs. Failure Tracking
-
-Classification allows organizations to track the shift from:
-- **External Failure costs** (customer complaints, reputation damage)
-- **To Prevention and Appraisal costs** (training, formal inspections)
-
-### ROI Evidence
-
-Raytheon data shows that systematic defect tracking supports dramatic improvement {% cite houston1999cost %}:
-
-| Metric | CMM Level 1 | CMM Level 3 |
-|--------|-------------|-------------|
-| Total CoSQ | ~65% | ~20% |
-| Rework costs | ~50% | <10% |
-
-### The 1:10:100 Rule
-
-Classification schemes prove that a defect caught in requirements ($1) is 100× cheaper than one found after release ($100+), justifying the "front-loading" of quality processes {% cite knox1993modeling %}.
-
-```mermaid
-xychart-beta
-    title "Cost to Fix Defect by Phase (1:10:100 Rule)"
-    x-axis [Requirements, Development, Post-Release]
-    y-axis "Relative Cost ($)" 0 --> 120
-    bar [1, 10, 100]
-```
-
-## Choosing a Classification Scheme
-
-## Choosing a Classification Scheme
-
-| Scheme | Start Here If... | Dimensions | Overhead |
-|--------|------------------|------------|----------|
-| **Kan's Matrix** | You need quick insights with minimal process change | 2 | ⬤○○○ |
-| **ODC** | You want rigorous process feedback and have resources | 8 | ⬤⬤⬤⬤ |
-| **HP Model** | You focus on retrospectives and prevention planning | 3 | ⬤⬤○○ |
-| **LiDeC** | You work in embedded/automotive with supplier code | 4 | ⬤⬤○○ |
+- **Where it comes from.** The matrix and the DRE formula from Kan's book, the project data as reproduced in Miranda's notes {% cite kan2002metrics miranda2013coq %}.
+- **What is contested.** Miranda's reproduction leaves out a few small cells, so some inner rows do not add up to their totals; the margins used here do add up, to 3,465 both ways.
+- **What we do not hold.** Kan's book itself; the figures come through the course notes.
 
 ---
 

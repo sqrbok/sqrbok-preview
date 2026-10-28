@@ -1,136 +1,56 @@
 ---
-title: Metrics, Dashboards & Reporting
+title: Test Status Reporting
 parent: Quality Planning
 nav_order: 6
 layout: default
 ---
 
-# Metrics, Dashboards & Reporting
+# Test Status Reporting
 
-Effective quality management requires measuring progress and communicating results. This page covers test metrics, CI dashboards, and stakeholder-tailored reporting.
+**Test status reporting** answers the question "how much testing has been done, and is the product ready?" with measures chosen in advance in the quality plan, its eleventh decision, and delivered to each stakeholder in a form they can act on {% cite kaner2000measurement ahmad2024infoneeds %}. No single number answers it.
 
-## Multi-Dimensional Test Measurement
+## 1. "We are 30% done": thirty percent of what?
 
-"Extent of testing" is multi-dimensional; no single metric suffices {% cite kaner2000measurement %}:
+Kaner shows that a figure such as "30% of testing is done" can rest on any of several dimensions {% cite kaner2000measurement %}:
 
-| Dimension | Description |
-|-----------|-------------|
-| **Product Coverage** | Testing vs. "good enough" quality model |
-| **Agreement-Based** | Progress against documented test plan |
-| **Risk-Based** | Critical areas of risk remaining |
-| **Effort-Based** | Tester hours, calendar time consumed |
-| **Obstacles** | Tests blocked by defects, environment issues |
+| Dimension | What the 30% compares |
+|---|---|
+| Product coverage | tests done against a model of good-enough testing, a model that changes as bugs and new knowledge appear |
+| Agreement-based | tasks finished against the tasks promised in the plan |
+| Project history | this project against similar past projects |
+| Risk-based | the critical risk areas still open, and the time needed to close them |
+| Evaluation | whether testing is turning up surprises that suggest it is weaker than expected |
+| Results | bug statistics, tests completed |
+| Results and obstacles | progress plus the obstacles that blocked testing |
+| Effort | hours or weeks of testing spent |
 
-### Coverage Metrics
+A useful report states which dimension it uses, and usually combines several: progress against plan, the remaining risks, and what is blocking.
 
-| Type | Measures |
-|------|----------|
-| Statement coverage | % of code statements executed |
-| Branch coverage | % of decision branches taken |
-| Loop coverage | Loop boundary conditions |
-| Requirements coverage | % of requirements tested |
+## 2. What people in a pipeline need to know
 
-### Results/Risk Metrics
+In continuous integration and delivery, Ahmad et al. collected **39 information needs** from studies and practitioners. The most important and most frequent was **who owns a test suite**: who maintains it and fixes it when it fails. Next came the flaws and trends in the end-to-end delivery flow, and which components had the most recent test failures {% cite ahmad2024infoneeds %}.
 
-- Bug arrival rates
-- Reappearing bugs
-- Customer-found defects
-- Defect density by module
+**Dashboards** serve these needs. Salagundi describes one built from Jenkins pipelines that store results in Elasticsearch, a Flask back end, a web front end and links back to the raw logs, so that teams see trends and anomalies as builds run {% cite salagundi2024dashboard %}. Report generators such as Allure collect results in the pipeline and publish an interactive report with stack traces, logs, screenshots, history across releases and a matrix tracing tests to requirements {% cite peddireddy2024allure %}.
 
-### Efficiency Metrics
+## Example: one status, three audiences
 
-- Cost per bug found
-- Time debugging tests
-- Direct vs. indirect finds
+A release is a week away. The **developers** see the dashboard: 4 failing tests, each with its owner and a link to the log. The **test lead** sees agreement and risk: 85 of 100 planned scenarios run, payment and refunds still untested, the staging database down for two days (an obstacle). The **project manager** gets one paragraph: two risk areas remain, about four days of work, release on time if staging is restored by Tuesday. _(Constructed example.)_
 
-## CI Dashboard Architecture
+## When to use it, and when not
 
-CI dashboards transform raw test data into actionable intelligence {% cite salagundi2024dashboard %}:
+- **Decide the measures in the plan**, before testing starts, so that nobody chooses the flattering one at the end.
+- **Do not report a bare percentage.** Always name the dimension and add the open risks.
 
-```
-┌─────────────────┐
-│ Execution Layer │  Jenkins pipelines
-└────────┬────────┘
-         ↓
-┌─────────────────┐
-│ Database        │  Elasticsearch
-└────────┬────────┘
-         ↓
-┌─────────────────┐
-│ Backend API     │  Flask
-└────────┬────────┘
-         ↓
-┌─────────────────┐
-│ Frontend        │  Chart.js, AG Grid
-└────────┬────────┘
-         ↓
-┌─────────────────┐
-│ Logstore        │  Hyperlinks to logs
-└─────────────────┘
-```
+## Limitations
 
-> "A CI dashboard is like the glass cockpit of a modern airliner." {% cite salagundi2024dashboard %}
+- **Measures change behaviour.** Kaner asks what unintended effects measuring, and managing by the measures, will have {% cite kaner2000measurement %}; a completion rate, for instance, rewards running the easy tests first.
+- **Dashboards show what is collected.** A risk nobody logs does not appear on any chart.
 
-### Key Dashboard Metrics
+## How solid is this?
 
-| Category | Metrics |
-|----------|---------|
-| Test Status | Pass/fail/blocked counts |
-| Coverage | Code coverage percentage |
-| Defects | Density, flaky tests |
-| DORA KPIs | MTTR, deployment frequency, lead time |
-
-## Information Needs in CI/CD
-
-A study identified 39 distinct information needs across CI/CD pipelines {% cite ahmad2024infoneeds %}:
-
-| Category | Key Needs |
-|----------|-----------|
-| **Test Suite** | Test suite ownership (most important), flaky tests, failure causes |
-| **Code/Commit** | Functional behavior, non-functional impact, architecture changes |
-| **CI Jobs** | Longest-running jobs, recently failed jobs |
-| **Infrastructure** | Hardware/simulator availability |
-| **Trends** | Frequent defects, delivery flow trends |
-| **Release** | Release dates, contents, resource issues |
-
-### Most Important Need
-
-**Test suite ownership** — Who is responsible for maintaining and fixing each test suite.
-
-## Automated Reporting
-
-Allure Reports automate test reporting lifecycle {% cite peddireddy2024allure %}:
-
-**Integration Steps:**
-1. Clone repository (actions/checkout)
-2. Configure environment (actions/setup-java)
-3. Execute tests and generate reports via Allure CLI
-4. Publish to GitHub Pages
-5. Archive artifacts
-6. Send notifications with report links
-
-**Report Features:**
-- Interactive visualizations (graphs, charts)
-- Detailed debugging (stack traces, logs, screenshots)
-- Historical/statistical views across releases
-- Traceability matrix pairing tests to requirements
-
-## Stakeholder-Tailored Reporting
-
-Tailor metrics by stakeholder level {% cite ahmad2024infoneeds %}:
-
-| Stakeholder | Focus | Units |
-|-------------|-------|-------|
-| **Managers** | Business impact | Dollars, schedule |
-| **Technical Leads** | Quality trends | Defect rates, coverage |
-| **Developers** | Immediate issues | Failed tests, blockers |
-
-### Visualization Best Practices
-
-- **Color coding:** Green/Yellow/Red for status
-- **Historical trends:** Show progress over time
-- **Drill-down:** From summary to detail
-- **Single source of truth:** Centralized dashboard prevents silos
+- **Where it comes from.** Dimensions from Kaner; information needs from Ahmad et al.'s study; dashboard and report tooling from Salagundi and Peddireddy {% cite kaner2000measurement ahmad2024infoneeds salagundi2024dashboard peddireddy2024allure %}.
+- **What is contested.** The dashboard and Allure papers describe tools in use; they do not measure whether teams decide better with them.
+- **What we do not hold.** A controlled study of reporting styles and release decisions.
 
 ---
 

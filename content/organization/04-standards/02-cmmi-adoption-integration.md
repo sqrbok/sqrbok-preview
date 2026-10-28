@@ -7,120 +7,44 @@ layout: default
 
 # CMMI Adoption & Integration
 
-Adopting and integrating Capability Maturity Model Integration (CMMI) is a complex organizational transformation that, when combined with Agile methodologies, requires balancing process discipline with business flexibility {% cite astridita2024cmmi %} {% cite shelat2025cmmi %}.
+**CMMI adoption** is the organizational project of reaching a maturity level (usually 2 or 3) and passing an appraisal; today it is mostly combined with Agile methods, which raises the question of how much of [CMMI](01-cmmi-overview.md) Agile practices already cover {% cite astridita2024cmmi ferdinansyah2021cmmi %}.
 
-## Agile + CMMI Integration: Benefits and Challenges
+## 1. How far Agile gets you
 
-The integration of CMMI-DEV V2.0 with Agile project management provides a structured way to enhance software development prowess in the digital era {% cite astridita2024cmmi %}.
+A review of seven primary studies on combining Agile and CMMI concludes that the two fit well at the project level and poorly at the organization level {% cite ferdinansyah2021cmmi %}:
 
-### Perceived Benefits
+| Maturity level | Fit with Agile alone | Why |
+|---|---|---|
+| 2 Managed | fully compatible, apart from configuration management (below) | its process areas are project management, engineering and support, which Scrum-style practices cover |
+| 3 Defined | partially compatible | organization-wide process areas (standard processes, training) have no Agile counterpart |
+| 4–5 | not achievable with Agile alone | Agile has no equivalent of statistical process management |
 
-Organizations adopting CMMI V2.0 alongside Agile achieve significant improvements {% cite astridita2024cmmi %}:
+Configuration management is the clearest gap at Level 2: Agile methods do not say how to preserve and baseline work products, so teams add explicit practices for it. The review found lack of knowledge of CMMI or Agile, and organizational culture, to be the most frequent challenges.
 
-| Metric | Improvement |
-|--------|-------------|
-| Estimation accuracy | **17% increase** |
-| Rework | **70% reduction** |
-| On-time delivery | **97% rate** |
+## 2. Reported benefits
 
-This synergy refines budget and schedule predictions and improves goal attainment by creating comprehensive workload and cost forecasts.
+A systematic review of 23 studies on CMMI v2.0 with Agile project management reports better estimation, planning, risk management and requirements validation {% cite astridita2024cmmi %}. The figures usually quoted with it, a **17% increase in estimation accuracy**, a **70% reduction in rework** and **97% on-time delivery**, are the CMMI Institute's own numbers as relayed by another author, not results measured in the review.
 
-### Key Challenges
+## 3. Example: what culture does to an appraisal
 
-| Challenge | Description |
-|-----------|-------------|
-| **Compliance Gap** | Agile lacks explicit processes for Configuration Management and org-level improvement |
-| **Philosophy Clash** | CMMI's control emphasis conflicts with Agile's minimal bureaucracy |
-| **Implementation Costs** | High costs and documentation requirements hinder SMEs |
+Tsai studied a Taiwanese information-service company's project teams as they implemented CMMI Level 3 {% cite tsai2020cmmi %}. Success went with a strong team culture along six dimensions, among them teams oriented toward reform, concentrated decision-making (which suits Level 3's organization-wide processes), shared ownership, and rewards given to the group rather than to individuals, which prevented members from competing. Teams that built their own subculture could overcome obstacles in the wider organization.
 
-Research shows that Agile cannot achieve CMMI compliance on its own {% cite ferdinansyah2021cmmi %}.
+A mixed-methods study of 24 practitioners in Bangalore IT companies at Level 3 shows the other side {% cite shelat2025cmmi %}: 42% of interview responses named employee resistance as a major challenge, 29% the tension between standard processes and client-driven flexibility, and 25% insufficient training. At the same time, 37% reported improved software quality and 29% higher employee engagement. The authors recommend combining CMMI with Scrum, SAFe or Lean, rolling it out through pilot groups, and training by role rather than in general.
 
-## Organizational Culture Impact on CMMI Success
+## When to use it — and when not
 
-CMMI success is positively related to a strong project team culture {% cite tsai2020cmmi %}. Six cultural aspects are critical to implementation:
+Pursue a maturity level when customers or regulators require an appraisal, or when an organization of several teams needs common processes (Level 3). An Agile team that does not need an appraisal can borrow single process areas, configuration management or measurement, without adopting the model as a whole.
 
-| Cultural Aspect | Impact on CMMI Success |
-|-----------------|------------------------|
-| **Position on Reform** | Reform-oriented teams more aggressive in facilitating change |
-| **Decision-Making** | Concentrated decision-making matches CMMI L3 requirements |
-| **Motivation & Rewards** | Group-based rewards prevent "lonely warrior" competition |
-| **Team Subcultures** | Project teams develop advantages to overcome organizational obstacles |
+## Limitations
 
-### Culture-Process Alignment
+- **Small samples.** The Bangalore study has 24 participants, the Agile–CMMI review seven primary studies {% cite shelat2025cmmi ferdinansyah2021cmmi %}.
+- **Reported benefits come with self-selection:** organizations that completed an appraisal report on it; those that gave up rarely publish {% cite kuhrmann2016spi %}.
+- **Percentages are not exclusive.** Respondents could name several challenges, so the figures above do not add up to 100%.
 
-Research identifies that project teams often establish a subculture that develops its own advantages to conquer broader organizational obstacles {% cite tsai2020cmmi %}. While Agile favors self-governing, concentrated decision-making can better match CMMI Level 3 requirements for convergent data and integrated processes.
+## How solid is this?
 
-## Adoption Barriers
-
-Implementation often meets significant friction due to perceived bureaucracy and up-front investment {% cite shelat2025cmmi %} {% cite ferdinansyah2021cmmi %}:
-
-### Primary Barriers
-
-| Barrier | Percentage | Details |
-|---------|------------|---------|
-| **Employee Resistance** | **42%** | Major challenge in thematic analysis |
-| **Resistance to Change** | **38%** | Primary obstacle cited by practitioners |
-| **Documentation Burden** | **32-38%** | Top barrier for survey respondents |
-| **Knowledge Gaps** | **34%** | Lack of CMMI/Agile expertise |
-
-### Documentation Issues by Role
-
-| Role | Documentation Burden Rating |
-|------|----------------------------|
-| Compliance Managers | **45%** cite as major issue |
-| Quality Leads | **40%** cite as major issue |
-
-Misunderstandings often lead to an inflexible and bureaucratic documentation overhead that participants view as a "Complain Game" or a waste of time {% cite shelat2025cmmi %}.
-
-## Success Factors and Hybrid Approaches
-
-Successful adoption requires moving beyond "check-box compliance" toward a strategic, people-oriented approach {% cite shelat2025cmmi %} {% cite tsai2020cmmi %}.
-
-### The Agile-CMMI Hybrid Model
-
-This approach combines the process maturity of CMMI with the flexibility of Scrum, SAFe, or Lean Development {% cite shelat2025cmmi %}. It allows organizations to:
-- Meet compliance standards without constricting creativity
-- Maintain development team responsiveness
-- Balance process discipline with business agility
-
-### Key Success Factors
-
-| Factor | Impact |
-|--------|--------|
-| **Leadership-driven change** | **42%** - largest driver of success |
-| **Role-based training programs** | **38%** contribution to success |
-| **Phased rollout with pilots** | **30%** resistance (vs. 45% for external consulting) |
-
-### Critical Success Elements
-
-- **Executive sponsorship**: Critical for weathering the "initial dip" in productivity before improvements pay off
-- **Pilot projects**: Internal feedback loops experience lower resistance than external consulting-led adoptions
-- **Incremental adoption**: Start small and expand based on lessons learned
-
-## Case Study: Bangalore IT Organizations
-
-Evidence from IT companies in Bangalore highlights the practical realities of achieving CMMI Level 3 ("Defined" stage) {% cite shelat2025cmmi %}:
-
-### Context
-
-The study involved solution architects and quality leaders in Bangalore's fast-paced tech sector, where agility and client-driven customization are paramount.
-
-### Post-Implementation Results
-
-| Outcome | Respondents Reporting |
-|---------|----------------------|
-| Improved software quality | **37%** |
-| Higher employee engagement | **29%** |
-| Reduced defects | **35%** |
-| Enhanced customer satisfaction | **32%** |
-
-### Key Findings
-
-Despite initial struggles with documentation, the use of CMMI resulted in:
-- Improved project predictability
-- Better defect management
-- Enhanced customer satisfaction
-- More structured development processes
+- **Where it comes from.** Two systematic reviews of Agile–CMMI integration, one case study and one mixed-methods study {% cite astridita2024cmmi ferdinansyah2021cmmi tsai2020cmmi shelat2025cmmi %}.
+- **What is contested.** The 17%, 70% and 97% figures trace back to the CMMI Institute, which sells the model and its appraisals.
 
 ---
 

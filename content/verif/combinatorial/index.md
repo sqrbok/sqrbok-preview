@@ -8,100 +8,32 @@ has_children: true
 
 # Combinatorial Testing
 
-Combinatorial testing (CT) systematically tests interactions between parameters. Instead of exhaustively testing all possible combinations, CT covers all t-way combinations — every set of t parameter values appears in at least one test case.
+**Combinatorial testing** chooses test inputs so that every combination of values of any *t* parameters appears in at least one test, instead of trying every combination of all parameters {% cite kuhn2004fault cohen1997aetg %}. It targets **interaction faults**: failures that appear only when two or more inputs take particular values together.
 
----
+The arithmetic is the reason to use it. A system with 34 on/off switches has 2<sup>34</sup>, about 17 billion, settings; at one test per second, trying them all takes 544 years. Microsoft's PICT generator covers every combination of any 3 switches in 33 tests, and of any 4 switches in 87 {% cite microsoft_pict %}. No formula gives these sizes: the generator searches for a small suite, and another tool may need a few tests more or fewer.
 
-## Why Combinatorial Testing?
+![Workflow: input model, strength t, constraints, generator, covering array, concrete tests](ct-workflow.svg)
 
-Software failures are triggered by interactions between parameters. A function may work correctly for each input individually, but fail when specific combinations occur together:
+_From input model to tests. The values come from equivalence classes and boundaries; the generator chooses the combinations but not the expected results._
 
-```python
-# 1-way: single parameter triggers fault
-if account_balance <= 0:  # FAIL
+## Pages in this section
 
-# 2-way: pair of parameters triggers fault
-if account_balance <= 0 and overdraft_protection:  # FAIL
+| Page | What it covers | Best fit | Main cost |
+|---|---|---|---|
+| [Interaction Faults](interaction-faults.md) | how many inputs it takes to trigger a failure, in NASA, FDA, Mozilla and Apache data | arguing which strength *t* is enough | — |
+| [Covering Arrays](foundations.md) | orthogonal and covering arrays, *t*-way coverage, how test counts grow | reading and checking generator output | — |
+| [Combinatorial Input Models](practice.md) | choosing parameters and values, base choice versus pairwise, configuration versus input testing | a form, an API or a platform matrix | the model is only as good as its values |
+| [Constraints and Invalid Values](advanced.md) | invalid combinations, error values that mask faults, mixed strength | models with dependencies between parameters | writing and checking constraints |
+| [Covering Array Generation](algorithms.md) | AETG, IPOG and simulated annealing, traced on small examples | choosing or trusting a generator | — |
+| [Combinatorial Testing Tools](tools.md) | PICT, ACTS and CASA, with a real model and its output | running CT in a pipeline | learning a model format |
+| [Combinatorial Testing in Industry](effectiveness.md) | five industrial systems, Tricentis, a 3-way case, emergency braking, ML datasets | deciding whether CT pays off | reading company results critically |
 
-# 3-way: triple triggers fault
-if account_balance <= 0 and overdraft_protection and check_amount >= 100:  # FAIL
-```
+Read Interaction Faults first: it gives the evidence for the strength *t* that every later page assumes.
 
-Testing all possible combinations is usually infeasible. A system with 34 binary parameters has 2³⁴ ≈ 17 billion combinations. At one test per second, exhaustive testing would take **540 years**.
+## How solid is this?
 
-Combinatorial testing makes this practical: 4-way coverage requires only **85 tests** — a reduction factor of 200 million to one {% cite cohen1997aetg %}.
-
----
-
-## The ≤6-Way Interaction Insight
-
-NIST analyzed 329 error reports across multiple domains and found a remarkable pattern {% cite kuhn2004fault %}:
-
-| Domain | 2-way | 3-way | 4-way | 6-way |
-|--------|-------|-------|-------|-------|
-| NASA GSFC | 93% | 98% | 100% | — |
-| Medical Devices | 97% | 99% | 100% | — |
-| Mozilla | 76% | 95% | — | 100% |
-| Apache | 70% | — | — | 100% |
-
-**No failure in any studied project required more than 6-way interactions.** This means testing all 6-tuples is effectively exhaustive for practical purposes.
-
-Why are almost all faults triggered by few-way interactions? Code structure naturally limits complexity. A NASA study of 7,685 conditions found that 80% of `if`/`while` statements have 1-2 boolean operands {% cite hayhurst2001practical %}. Developers simply don't write deeply nested conditions.
-
----
-
-## When to Use Combinatorial Testing
-
-CT is most valuable when multiple independent parameters affect system behavior:
-
-- **Configuration testing:** OS × Browser × Database × Server
-- **Input testing:** Form fields, API parameters, feature flags
-- **Integration testing:** Service × version × protocol combinations
-- **Embedded systems:** Hardware × firmware × environmental conditions
-
-CT is less suited for sequential or stateful behavior, performance testing, or scenarios where parameter interactions are well understood and limited.
-
----
-
-## Topics in This Section
-
-### [Theory](foundations)
-Covering arrays, orthogonal arrays, t-way coverage, and logarithmic growth properties.
-
-### [Practice](practice)
-Building parameter models, choosing interaction strength, workflow, and worked examples.
-
-### [Algorithms](algorithms)
-Algorithm evolution from AETG to IPOG to CASA to hyper-heuristics.
-
-### [Tools](tools)
-ACTS, PICT, CASA comparison with practical guidance and seed reuse strategies.
-
-### [Industrial Evidence](effectiveness)
-Case studies from five industrial systems, Tricentis, autonomous driving, and quantitative ROI data.
-
-### [Advanced Topics](advanced)
-Constraint handling, mixed-strength arrays, CT for autonomous driving, ML dataset quality, and research frontiers.
-
----
-
-## Key Numbers
-
-| Fact | Value | Source |
-|------|-------|--------|
-| Max interaction strength needed | **≤6-way** for all studied projects | Kuhn 2004 |
-| Test count growth | **Logarithmic** in parameters | Cohen 1997 |
-| 34 binary params: exhaustive vs 4-way | 17 billion vs **85 tests** | Kuhn 2013 |
-| Multi-factor fault detection: CT vs manual | **93.3%** vs 6.7% | Hu 2020 |
-| Industrial test time savings | **48%** (394h → 205h) | Daoud 2025 |
-
----
-
-## Further Exploration
-
-- [Coverage Criteria](../coverage/) — CT in the context of test adequacy criteria
-- [Input Domain Testing](../domain/) — Complementary black-box techniques
-- [Static Analysis](../static/) — Finding bugs without execution
+- **Where it comes from.** Kuhn, Wallace and Gallo's fault-interaction study, the AETG and IPOG papers, Grindal, Offutt and Andler's survey of combination strategies, and the industrial studies by Hu et al. and Daoud et al. {% cite kuhn2004fault cohen1997aetg lei2007ipog grindal2005survey hu2020realworld daoud2025effectiveness %}.
+- **What is contested.** Whether "no failure needed more than six inputs" holds beyond the few systems studied; see [Interaction Faults](interaction-faults.md).
 
 ---
 

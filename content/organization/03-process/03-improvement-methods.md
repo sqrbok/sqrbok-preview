@@ -7,206 +7,48 @@ layout: default
 
 # Improvement Methods
 
-This page covers the major frameworks for achieving systematic process improvement: IBM's Defect Prevention Process, Theory of Constraints, Six Sigma, and Agile Retrospectives.
+An **improvement method** is a repeatable procedure for finding what limits a process and changing it. Four methods recur in software organizations; each starts from a different kind of problem, so the first step is to name the problem, not the method.
 
-## IBM's Defect Prevention Process (DPP)
+## 1. Four methods, four starting problems
 
-DPP represents a paradigm shift from **defect detection** to **defect prevention** through systematic root cause analysis {% cite mays1990defect %}. Originated at IBM in 1983, it spread to over 25 development organizations by 1990.
+| Method | Starts from | Core routine | Typical software use |
+|---|---|---|---|
+| [Defect Prevention Process (DPP)](05-defect-prevention.md), IBM 1983 | defects that keep recurring | causal-analysis meeting after defects are found; an action team removes the cause {% cite mays1990defect %} | a defect type returns release after release |
+| [Theory of Constraints (TOC)](06-theory-of-constraints.md), Goldratt 1984 | one stage limits the whole flow | five focusing steps on the bottleneck {% cite goldratt1984goal rahman1998toc %} | reviews or testing hold up every change |
+| [Six Sigma](07-six-sigma.md), Motorola 1985 | output varies too much | DMAIC: define, measure, analyze, improve, control {% cite antony2002sixsigma %} | build times or defect rates swing unpredictably |
+| [Agile retrospective](../05-practice/03-agile-retrospectives.md), 2001 | the team wants to work better | the team reflects at the end of each iteration and commits to actions {% cite lehtinen2017retrospectives %} | any team, every iteration |
 
-### The Four Key Components
+All four are forms of [double-loop learning](02-learning-improvement-models.md): they change the process, not just the result.
 
-| Component | Description | Purpose |
-|-----------|-------------|---------|
-| **Causal Analysis Meetings** | Teams analyze defects to identify root causes using fishbone diagrams | Understand why defects occur, not just what they are |
-| **Action Team** | Cross-functional group with authority to implement preventive actions | Ensure improvements happen across the organization |
-| **Stage Kickoff Meetings** | Review common error lists and action items at each development stage | Increase awareness and prevent known issues |
-| **Data Collection & Tracking** | Systematic tracking of defects, causes, and action status | Enable feedback and continuous improvement |
+## 2. DPP and retrospectives compared
 
-### Quantitative Results
+The two are often confused, because both are meetings that end with actions.
 
-| Metric | Improvement |
-|--------|-------------|
-| Defect reduction (development) | 54% |
-| Defect reduction (field) | 60% |
-| Resource cost | Only 0.5% of project |
-| ROI | Significant positive return |
+| | DPP | Retrospective |
+|---|---|---|
+| Trigger | defects found in a stage | end of an iteration |
+| Question | what in the process caused this defect? | what should the team change? |
+| Input | the defect records | the team's experience, ideally plus repository data |
+| Who acts | an action team with authority across projects | the team itself |
+| Typical output | a changed checklist, tool or training | a few action items for the next iteration |
 
-### Key Success Factors
+## 3. Example: choosing a method
 
-1. **Start small:** Begin with pilot project to demonstrate value
-2. **Developer-driven:** Involve developers in causal analysis, not just QA
-3. **Management support:** Visible leadership commitment required
-4. **Blame-free culture:** Honest root cause analysis needs psychological safety
-5. **Cross-project learning:** Share lessons across teams and projects
+A team ships every two weeks, but changes wait on average three days for code review while coding takes one. The problem is a bottleneck, not recurring defects or variation, so TOC fits: make review the drum that the rest of the work follows, and limit work in progress so that reviewers are not flooded. If, after that, reviews pass quickly but the same null-pointer defects keep escaping, the problem has changed and DPP's causal analysis becomes the right tool. (A constructed example.)
 
-### Connection to Double-Loop Learning
+## When to use a method — and when not
 
-DPP exemplifies double-loop learning {% cite argyris1978organizational %}:
-- Not just fixing bugs (single-loop)
-- Identifying and changing the processes that allow bugs to occur (double-loop)
+Use a named method when the problem is clear enough to measure; it gives the team a shared vocabulary and an order of steps. Do not adopt one because a competitor did: a Six Sigma program on a process that runs only a few times a year has too little data to analyze.
 
-## Theory of Constraints (TOC)
+## Limitations
 
-TOC is a philosophy based on the principle that **every system has at least one bottleneck** limiting higher performance {% cite goldratt1984goal %}{% cite rahman1998toc %}.
+- **Each method sees one kind of problem.** DPP does not find bottlenecks, TOC does not reduce defects, Six Sigma needs repeated measurements.
+- **None works without the people.** Surveys on Six Sigma and Lean Six Sigma rank management commitment and culture above every technical factor {% cite antony2002sixsigma laureani2012leansixsigma %}; see [Change Management](04-change-management.md).
 
-### The Five Focusing Steps
+## How solid is this?
 
-| Step | Name | Action |
-|------|------|--------|
-| 1 | **Identify** | Locate the physical (equipment) or managerial (policy) "weakest link" |
-| 2 | **Exploit** | Ensure the bottleneck is used as effectively as possible without expensive upgrades |
-| 3 | **Subordinate** | Align all non-constraints to support the bottleneck, even if it reduces their efficiency |
-| 4 | **Elevate** | Invest in rigorous improvement to increase the bottleneck's capacity |
-| 5 | **Repeat** | If constraint is broken, return to Step 1; do not let inertia become the new bottleneck |
-
-### Key Concepts
-
-| Concept | Description |
-|---------|-------------|
-| **Drum-Buffer-Rope (DBR)** | The "drum" (bottleneck's pace) dictates schedule; "rope" ensures synchronization |
-| **Throughput Accounting** | Focus on throughput rather than cost reduction |
-| **Thinking Processes** | Tools for identifying root problems and unintended consequences |
-
-### TOC Evolution {% cite simsit2014toc %}
-
-| Era | Book (Year) | Focus |
-|-----|-------------|-------|
-| 1 | The Goal (1984) | Five Focusing Steps, DBR |
-| 2 | The Race (1986) | Practitioner education |
-| 3 | The Haystack Syndrome (1990) | Performance measurement, Throughput Accounting |
-| 4 | It's Not Luck (1994) | Thinking Processes |
-| 5 | Critical Chain (1997) | Project management (CCPM) |
-
-### Software Application
-
-In software development, TOC applies to:
-- **Code review bottlenecks:** If reviews are slow, subordinate other activities
-- **Testing constraints:** If testing is the bottleneck, improve test automation
-- **Deployment pipeline:** Identify and eliminate slowest stage
-
-> "Every system has at least one constraint; otherwise unlimited results would be possible." — Goldratt
-
-## Six Sigma (DMAIC)
-
-Six Sigma is a data-driven methodology aimed at achieving stable and predictable process results by identifying and removing causes of variation {% cite motorola1985sixsigma %}{% cite antony2002sixsigma %}.
-
-### The DMAIC Cycle
-
-| Phase | Activity | Key Questions |
-|-------|----------|---------------|
-| **Define** | Identify project goals and customer requirements (CTQ) | What is the problem? Who is the customer? |
-| **Measure** | Determine how to measure the process; establish baseline | How do we measure success? What's our current state? |
-| **Analyze** | Use statistical methods to find root causes | What causes the defects? |
-| **Improve** | Implement solutions to remove causes | How do we fix it? Does the solution work? |
-| **Control** | Put systems in place to maintain improvements | How do we prevent regression? |
-
-### Quality Target
-
-Six Sigma aims for **no more than 3.4 defects per million opportunities** — a mathematical quality level representing near-perfection.
-
-### 12 Critical Success Factors {% cite antony2002sixsigma %}
-
-| Rank | CSF | Importance |
-|------|-----|------------|
-| 1 | Management commitment and involvement | PRIMARY — Most critical |
-| 2 | Cultural change | Secondary |
-| 3 | Linking Six Sigma to business strategy | Secondary |
-| 4 | Understanding of methodology, tools, techniques | |
-| 5 | Linking Six Sigma to customers | |
-| 6 | Project selection, reviews, and tracking | |
-| 7 | Organizational infrastructure | |
-| 8 | Project management skills | |
-| 9 | Training | |
-| 10 | Communication | |
-| 11 | Linking Six Sigma to suppliers | Lower priority |
-| 12 | Incentive programs / HR rewards | Lower priority |
-
-### Key Insight
-
-> "Six Sigma must be viewed as an overall theory for running an organization, rather than just a collection of statistical tools." {% cite antony2002sixsigma %}
-
-## Lean Six Sigma {% cite laureani2012leansixsigma %}
-
-Lean Six Sigma integrates:
-- **Lean:** Eliminate waste, improve flow
-- **Six Sigma:** Reduce variation, improve quality
-
-### Primary Motivation
-
-Survey results show **cost savings/avoidance** is the primary motivation (46%) across both manufacturing and service sectors.
-
-### Top 5 CSFs (Practitioner Survey)
-
-| Rank | CSF |
-|------|-----|
-| 1 | Management Commitment |
-| 2 | Organizational Culture |
-| 3 | Training |
-| 4 | Communication |
-| 5 | Leadership Style |
-
-## Agile Retrospectives
-
-Retrospectives serve as a **modern grassroots improvement mechanism**, embodying double-loop learning where teams modify objectives and strategies {% cite argyris1978organizational %}.
-
-### Core Mechanism
-
-At regular intervals, the team reflects on becoming more effective and adjusts its behavior accordingly:
-- **What went well?** — Identify practices to continue
-- **What didn't go well?** — Identify problems to address
-- **What will we change?** — Commit to specific actions
-
-### Structured Activities
-
-| Activity | Purpose |
-|----------|---------|
-| **Sailboat** | Identify threats (anchors) and opportunities (wind) |
-| **Five Whys** | Root cause analysis through iterative questioning |
-| **6 Thinking Hats** | View problems from different perspectives |
-| **Timeline** | Map events to understand patterns |
-
-### Data-Informed Retrospectives
-
-Modern approaches mine software repositories to supplement discussions:
-- **Health Checks:** Identify violations of best practices in code
-- **Remedy Appraisals:** Quantify if improvement actions actually worked
-
-### Empirical Findings
-
-A longitudinal study found {% cite kuhrmann2016spi %}:
-- **75%** of retrospective statements focused on controllable topics (sprint planning, implementation, testing)
-- **Risk:** Participant bias if not supplemented by objective repository data
-- **19%** of corrective actions addressed recurring discussions
-
-### Retrospectives vs DPP
-
-| Aspect | DPP | Retrospectives |
-|--------|-----|----------------|
-| Trigger | Defects discovered | Sprint/iteration end |
-| Focus | Root cause of defects | Team effectiveness |
-| Participants | Action team | Whole team |
-| Frequency | After defect discovery | Regular cadence (2-4 weeks) |
-| Data source | Defect database | Team discussion + repository data |
-
-## Comparing Methods
-
-| Method | Origin | Focus | Key Tool |
-|--------|--------|-------|----------|
-| **DPP** | IBM 1983 | Defect prevention | Causal analysis meetings |
-| **TOC** | Goldratt 1984 | Bottleneck elimination | Five Focusing Steps |
-| **Six Sigma** | Motorola 1985 | Variation reduction | DMAIC cycle |
-| **Retrospectives** | Agile 2001 | Team effectiveness | Structured reflection |
-
-> "Improving a process is like managing a relay race team. DPP is studying footage to prevent dropped batons. TOC is supporting the slowest runner. Six Sigma is measuring every stride for consistency. Retrospectives ask if your strategy is even correct."
-
-## Summary
-
-| Method | When to Use |
-|--------|-------------|
-| **DPP** | When defects are recurring; need systematic prevention |
-| **TOC** | When one area consistently limits overall performance |
-| **Six Sigma** | When variation and inconsistency cause quality issues |
-| **Retrospectives** | Regular team improvement regardless of specific problems |
+- **Where it comes from.** IBM's DPP reports, reviews of TOC, survey studies of Six Sigma's success factors, and a longitudinal study of retrospectives {% cite mays1990defect rahman1998toc antony2002sixsigma lehtinen2017retrospectives %}.
+- **What is contested.** No study compares the four methods head to head in software; the choice above is reasoning from what each method targets.
 
 ---
 

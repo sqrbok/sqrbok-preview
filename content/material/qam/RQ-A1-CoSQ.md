@@ -10,104 +10,120 @@ page_type: question-set
 
 # RQ A01: Cost of Quality
 
-**Purpose:** Self-study and exam preparation
-**Format:** Explain in your own words, give brief examples
+Revision questions for [SN A01: Cost of Quality](SN-A1-CoSQ.md). Each can be answered from the study notes and the linked handbook pages. Where a question asks for a number, show the calculation.
 
 ---
 
-## Question 1: Why Cost of Quality Matters
+## Part 1: The cost model
 
-Why is it important to express software quality issues in financial terms rather than technical metrics?
+### Question 1: Money as the unit
 
-Give an example of how you would reframe a technical quality problem (e.g., "fault density increased") into business language for management.
+Why express quality problems in money rather than in defect counts? Rewrite the statement "defect density rose from 0.8 to 1.4 per thousand lines" as a sentence a manager would act on, naming the cost category that will grow.
 
----
+### Question 2: Four categories
 
-## Question 2: The Four CoQ Categories
+Classify each item as prevention, appraisal, internal failure or external failure, and justify each choice in one line:
 
-The Cost of Quality framework divides costs into four categories: Prevention, Appraisal, Internal Failure, and External Failure.
+1. a coding-standard training day;
+2. running the regression suite;
+3. debugging a failure the regression suite found;
+4. a hot fix after a customer complaint;
+5. a code inspection.
 
-Explain the difference between **conformance costs** and **nonconformance costs**. For each of the four categories, give one concrete example from a software development project.
+Then explain why items 2 and 3 belong to different categories although one engineer may do both in an afternoon.
 
----
+### Question 3: Reading a CoSQ split
 
-## Question 3: Prevention vs Appraisal
+A release took 2,000 hours: 100 hours of training and reviews, 500 of testing, 300 of debugging and fixing test failures, 100 of customer-reported fixes, and the rest on development.
 
-Weinberg observed: "When managers say 'Testing takes too long,' what they should be saying is 'Fixing the bugs takes too long.'"
+1. Compute CoSQ in hours and as a share of the release.
+2. Compute the ratio of failure cost to prevention cost.
+3. Where would Knox advise investing the next hour, and why?
 
-Explain the difference between **appraisal costs** and **internal failure costs** using this insight. Why is this distinction important for quality planning?
+### Question 4: Maturity and the optimum
 
----
-
-## Question 4: The 1:10:100 Rule
-
-The 1:10:100 rule states that fixing a defect costs $1 in requirements, $10 in development, and $100+ after release.
-
-Explain why this cost escalation occurs. How does "shift-left" testing leverage this principle to reduce total CoQ?
-
----
-
-## Question 5: Traditional vs Modern CoQ Models
-
-The traditional CoQ model (1950s-1970s) suggested there is an optimal quality level below 100% conformance. The modern model (Kondo, Juran) argues the optimum can extend toward 100%.
-
-What is the key difference in assumptions between these models? What does Knox mean by "do something different"?
+1. What does Knox's model predict for total CoSQ between CMM Level 1 and Level 5?
+2. What did Raytheon's rework data show?
+3. The traditional model places an optimum short of perfection. In Houston and Keats' simulation, what happened to the minimum total CoSQ and to its location when inspections were added? What does this say about the traditional model's optimum?
 
 ---
 
-## Question 6: Process Maturity and CoQ
+## Part 2: Defect flow
 
-Raytheon's empirical data showed that moving from CMM Level 1 to Level 3 reduced total CoSQ from ~65% to ~20% of project costs.
+### Question 5: Tank and pipes
 
-Which CoQ category showed the largest reduction? Explain why process improvement has this effect on the cost structure.
+Describe the tank-and-pipes model. What are residual defects, and what are the only two ways to reduce them?
 
----
+### Question 6: Process signature
 
-## Question 7: Tank and Pipes Model
+In a project, 60 defects reach testing and each of three test levels removes 40% of the defects present.
 
-The "tank and pipes" model visualizes defects flowing into a system (injection) and being removed through V&V activities (removal).
+1. How many defects ship?
+2. Sketch the process signature (cumulative injected and removed by phase).
 
-Draw or describe this model and explain what "residual defects" represent. Why is it important to track both injection and removal rates?
+### Question 7: Two improvement options
 
----
+Use Miranda's model: each development phase doubles the defects it receives, 10 defects exist after requirements, three development phases follow (high-level design, low-level design, code), and three test levels remove 50% each.
 
-## Question 8: Improvement Strategies
+1. Compute the shipped defects if unit testing improves to 70%.
+2. Compute the shipped defects if 20% inspections are added after requirements, high-level design and code.
+3. How many defects are created in each option? Why does option 2 create fewer?
+4. Name the two pieces of information you would need to decide which option is cheaper.
 
-You have two options to reduce field defects:
-- **Option A:** Improve unit testing effectiveness from 50% to 70%
-- **Option B:** Add code inspections that catch 20% of defects before testing
+### Question 8: Removal efficiency in practice
 
-Both achieve the same residual defect count. Which option is more cost-effective and why?
-
----
-
-## Question 9: Making CoQ Actionable
-
-To implement a CoQ program, you need data from multiple sources.
-
-List three data sources for CoQ measurement and explain what quality cost information each provides. Why is defect classification (origin phase, detection phase, type) essential for improvement?
+Knox lists typical removal efficiencies. A project relies on unit testing (40%) and system testing (40%) only. What fraction of the defects present before testing ships? How would adding a formal inspection (65%) before testing change it?
 
 ---
 
-## Question 10: Technical Debt and CoQ
+## Part 3: Classification
 
-Technical debt can be viewed as a form of deferred quality cost.
+### Question 9: Origin and detection
 
-Explain how technical debt relates to the CoQ framework. What are the implications of quantifying technical debt as an increase in the "cost of change"?
+Kan's project recorded 122, 859, 939 and 1,537 defects originating in requirements, high-level design, low-level design and code. The high-level design inspection found 730, the low-level design inspection 729 and the code inspection 1,095.
+
+1. Compute the DRE of the code inspection.
+2. Of 3,465 defects, 81 were found in the field. Compute the overall DRE before release.
+3. List the three data sources a CoQ programme needs and what each provides.
+
+### Question 10: Richer schemes
+
+1. What does ODC record when a defect is found, and what when it is fixed?
+2. Huber classified the same defects with ODC and with HP's scheme. Why did HP attribute most of them to design while ODC pointed at the code?
+3. Why does HP weight a specification defect 14.25 and a code defect 2.5?
 
 ---
 
-## Topics Covered
+## Part 4: Modern practice
+
+### Question 11: Flaky tests
+
+From Leinen et al.'s case, explain in cost-of-quality terms why the company raised the number of automatic reruns. Name one risk of this strategy.
+
+### Question 12: Code review value
+
+A team's review comments are mostly about documentation and naming. Using the findings of Turzo and Bosu and of Yu et al., propose two changes that would raise the value of reviews, and say which finding supports each.
+
+### Question 13: Technical debt
+
+1. Define the principal and the interest of technical debt, and place each in a CoSQ category.
+2. Why should a team start repayment with the classes that several tools rank high?
+
+### Question 14: Defect prediction
+
+A defect-prediction model reports 95% accuracy on a data set where 5% of modules are defective. Why is this result not enough to adopt the model? Which measures would you ask for instead?
+
+---
+
+## Topics covered
 
 | Topic | Questions |
-|-------|-----------|
-| Business case for CoQ | Q1 |
-| Four CoQ categories (PAF) | Q2, Q3 |
-| Economics of quality | Q4, Q5 |
-| Process maturity impact | Q6 |
-| Defect injection/removal | Q7, Q8 |
-| CoQ implementation | Q9 |
-| Technical debt | Q10 |
+|---|---|
+| Cost categories and their size | Q1, Q2, Q3 |
+| Maturity and the optimum | Q4 |
+| Defect injection and removal | Q5, Q6, Q7, Q8 |
+| Classification and removal efficiency | Q9, Q10 |
+| Continuous delivery, review, debt, prediction | Q11, Q12, Q13, Q14 |
 
 ---
 

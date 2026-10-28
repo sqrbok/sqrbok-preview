@@ -1,169 +1,57 @@
 ---
-title: Technical Debt
+title: Technical Debt as a Quality Cost
 parent: Cost of Quality
-nav_order: 6
+nav_order: 7
 layout: default
 ---
 
-# Technical Debt Quantification
+# Technical Debt as a Quality Cost
 
-Technical Debt (TD) Quantification is a critical aspect of software quality management that translates technical inefficiencies into measurable effort and business risk {% cite amanatidis2020td %} {% cite bhatia2023satd %}. Current research highlights significant challenges in how debt is identified by automated tools versus how it is admitted by developers in specialized domains like Machine Learning.
+**Technical debt (TD)** is the extra maintenance cost a system carries because of sub-optimal code or design: its **principal** is the effort needed to remove the inefficiencies, and its **interest** is the additional maintenance effort the team pays every time it changes the affected code {% cite amanatidis2020td %}. In cost-of-quality terms, paying the principal is a prevention cost and the interest is an internal failure cost that recurs. How tools compute it (SQALE, the technical debt ratio) is on [Measuring Maintainability](../../attributes/maintainability/measurement.md); this page covers the two hard questions for a manager: **which tool to believe** and **where debt accumulates**.
 
-## What is Technical Debt?
+## 1. Tools disagree on where the debt is
 
-**Technical Debt** is a metaphor introduced by Ward Cunningham that compares sub-optimal code or design decisions to financial debt. When developers take shortcuts—whether intentionally for speed or unintentionally due to evolving requirements—they incur "debt" that must eventually be repaid through refactoring or rewriting. Like financial debt, TD accrues "interest" over time: the longer it remains, the more costly it becomes to maintain or extend the affected code.
+Amanatidis et al. ran three TD tools (CAST, Squore and SonarQube) on 50 open-source projects, 25 in Java and 25 in JavaScript, and measured how well the tools agreed on which classes carry the most debt. Each tool applies its own ruleset: CAST weighs complexity and coupling, Squore complexity measures and comment density, SonarQube code smells, duplications and cognitive complexity {% cite amanatidis2020td %}.
 
-| Aspect | Financial Debt Analogy |
-|--------|------------------------|
-| **Principal** | Initial shortcut or compromise |
-| **Interest** | Ongoing maintenance overhead |
-| **Repayment** | Refactoring or rewriting |
-| **Default** | System becomes unmaintainable |
+| Language | Agreement among the three tools (Kendall's W, mean) | Strength |
+|---|---:|---|
+| Java | 0.777 | strong |
+| JavaScript | 0.647 | moderate |
 
-## The TD Tool Agreement Problem
+Kendall's W runs from 0 (no agreement on the ranking) to 1 (identical rankings). The authors attribute the gap to more mature analysis tools for Java. Their proposal: treat the classes that **all** tools rank high as a benchmark of validated high-debt classes, and start repayment there {% cite amanatidis2020td %}.
 
-A major study by Amanatidis et al. (2020) evaluated the consistency of three leading TD assessment tools across 50 open-source projects {% cite amanatidis2020td %}:
+## 2. Self-admitted debt in machine-learning code
 
-### Study Parameters
+Developers often admit debt in comments ("ugly hack", "TODO: fix properly"). Bhatia et al. searched for such **self-admitted technical debt (SATD)** in 318 machine-learning projects and 318 other projects {% cite bhatia2023satd %}:
 
-| Parameter | Value |
-|-----------|-------|
-| Tools evaluated | CAST Highlight, Squore, SonarQube |
-| Projects analyzed | 50 (25 Java, 25 JavaScript) |
-| Research question | Do tools agree on which code is problematic? |
+| Finding | Value |
+|---|---|
+| Comments admitting debt, median | 1.87% in ML projects, 0.92% in others: about twice as many |
+| ML pipeline stage with most SATD | model building (29.0%), then data preprocessing (24.7%) |
+| Time until SATD is introduced | 10 days in ML projects, 1,405 days in others: about 140 times sooner |
+| How fast SATD is removed | 3.7 times faster in ML projects |
 
-### Kendall's W Agreement Scores
+Two kinds of debt specific to ML stood out in their sample: configuration debt (hard-coded settings, hyperparameters) and inadequate testing of ML components {% cite bhatia2023satd %}.
 
-| Language | Agreement (W) | Interpretation |
-|----------|---------------|----------------|
-| **Java** | **0.777** | Strong agreement |
-| **JavaScript** | 0.647 | Moderate agreement |
+## Example: planning a repayment sprint
 
-Java tools showed stronger agreement, likely due to more mature static analysis standards.
+A team has one sprint to reduce debt in a Java service that also trains its own recommendation model. SonarQube alone flags 120 classes. The team also runs a second tool and starts with the classes both rank in their top group, where the evidence is strongest; then it greps comments for "TODO" and "hack" in the model-training code, the stage where Bhatia et al. found most admitted debt in ML projects. _(Constructed example.)_
 
-### Validated High-TD Subset
+## When to use it, and when not
 
-The most striking finding was the lack of unanimity on which specific classes were problematic:
+- **Use multi-tool agreement** to rank where to repay first, and SATD comments as a cheap signal that developers themselves know about.
+- **Do not equate** one tool's remediation hours with real cost; the tools disagree, and none measures the interest.
 
-| Language | Classes Flagged "High TD" by ALL Tools |
-|----------|----------------------------------------|
-| Java | **3.2%** |
-| JavaScript | **15.0%** |
+## Limitations
 
-**Implication:** 70–85% of classes flagged by any single tool are NOT validated by all tools—potential wasted remediation effort.
+- **Interest is rarely measured.** All tools here estimate principal; the cost a team pays while living with the debt stays unknown.
+- **SATD is only what developers write down.** Debt nobody admits is invisible to this method.
 
-### Archetypal TD Profiles
+## How solid is this?
 
-| Profile Type | Description |
-|--------------|-------------|
-| **Max-Rulers** | All tools agree on high debt |
-| **Rebels** | Only one tool identifies high debt |
-| **Moderates** | Tools show mixed assessments |
-
-## Self-Admitted Technical Debt (SATD) in ML Software
-
-Bhatia et al. (2023) studied technical debt in Machine Learning software, which is distinct from traditional software due to its stochastic nature and heavy reliance on data {% cite bhatia2023satd %}:
-
-### ML vs. Non-ML Prevalence
-
-| Metric | ML Projects | Non-ML Projects | Ratio |
-|--------|-------------|-----------------|-------|
-| Median SATD % | **1.87%** | 0.92% | **2× higher** |
-
-### New ML-Specific TD Categories
-
-Traditional taxonomies miss two important debt types in ML systems:
-
-| Category | % of ML TD | Description |
-|----------|------------|-------------|
-| **Configuration Debt** | 12% | Sub-optimal hyperparameters, hardcoded settings |
-| **Inadequate Testing Debt** | 5% | Missing tests for ML components |
-
-### TD by ML Pipeline Stage
-
-| Stage | % of SATD | Notes |
-|-------|-----------|-------|
-| **Model Building** | **29.0%** | Primary "hotspot" due to experimentation |
-| **Data Preprocessing** | 24.7% | Second highest accumulation |
-| Data Reading | 8.6% | — |
-| Model Deployment | 7.5% | — |
-| **Model Validation** | 4.0% | **Lowest** accumulation |
-
-### Survival Dynamics
-
-| Metric | ML Projects | Non-ML Projects |
-|--------|-------------|-----------------|
-| Introduction timing | **140× earlier** (median 10 days) | Later in lifecycle |
-| Removal speed | **3.7× faster** | Slower remediation |
-
-This reflects the high-velocity, iterative nature of ML development.
-
-## Multi-Tool Consensus vs. Single-Tool Metrics
-
-Relying on a single tool for TD measurement can be misleading because each tool tests against a unique ruleset {% cite amanatidis2020td %}:
-
-### Why Single Tools Mislead
-
-| Tool | Primary Focus |
-|------|---------------|
-| CAST Highlight | Cyclomatic complexity, coupling |
-| SonarQube | Code smells, duplications |
-| Squore | Technical rules, maintainability |
-
-### The Tool Disagreement Tax
-
-| Risk | Description |
-|------|-------------|
-| **False positives** | Wasting effort on classes only one tool finds problematic |
-| **False negatives** | Missing debt that a different ruleset would catch |
-
-### Consensus Advantage
-
-A multi-tool approach identifies the "Validated High-TD" subset. **Remediation ROI is maximized** when focusing on modules with cross-tool agreement—high confidence they represent genuine structural issues rather than tool-specific subjective findings.
-
-## Practical Recommendations
-
-### For Traditional Software
-
-| Recommendation | Rationale |
-|----------------|-----------|
-| **Prioritize consensus** | Focus on "Max-Ruler" archetype modules |
-| **Align with churn** | Schedule refactoring after high-churn phases |
-| **Don't ignore simple files** | Low-complexity files often harbor lingering TD |
-
-### For ML Projects
-
-| Recommendation | Implementation |
-|----------------|----------------|
-| **Configuration management** | Version-control hyperparameters (YAML/JSON) |
-| **Use MLflow or similar** | Track experimental settings |
-| **Focus on Model Building** | Primary hotspot for TD accumulation |
-| **Test ML components** | Explicit tests for feature extraction, training |
-
-### For Quality Managers
-
-| Practice | Expected Benefit |
-|----------|------------------|
-| Multi-tool assessment | Reduces false positives/negatives |
-| Domain-specific metrics | Better business alignment |
-| Periodic TD audits | Prevents accumulation |
-
-## Economic Translation
-
-### Single-Tool vs. Multi-Tool ROI
-
-| Approach | Remediation Target | Confidence |
-|----------|-------------------|------------|
-| Single tool | 100% of flagged code | Low (many false positives) |
-| **Multi-tool consensus** | 3–15% validated High-TD | **High** |
-
-### Cost of Ignored TD
-
-| State | Cost Multiplier |
-|-------|-----------------|
-| Addressed early | 1× |
-| Accumulated over time | 10–100× |
-| In production incidents | **Unbounded** |
+- **Where it comes from.** Tool agreement from Amanatidis et al.; SATD in ML from Bhatia et al. {% cite amanatidis2020td bhatia2023satd %}. Debt that reviewers catch before merge is on [Value of Code Review](05-code-review-roi.md).
+- **What is contested.** Which ruleset represents "real" debt; agreement among tools is evidence, not proof.
+- **What we do not hold.** A study that measures the interest paid on debt in money or hours.
 
 ---
 

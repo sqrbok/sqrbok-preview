@@ -7,104 +7,47 @@ layout: default
 
 # Agile Retrospectives
 
-Agile Retrospectives are regular intervals where a software development team reflects on its performance to become more effective, tuning and adjusting its behavior accordingly {% cite lehtinen2017retrospectives %}. Grounded in the final principle of the Agile Manifesto, these meetings implement Software Process Improvement (SPI) principles of motivating all involved parties and creating a learning organization.
+An **Agile retrospective** is a meeting at the end of each iteration in which the team looks back at how it worked and agrees on a few changes for the next iteration, putting the Agile Manifesto's principle of regular reflection and adjustment into practice {% cite lehtinen2017retrospectives %}. It is the team-level, everyday form of [process improvement](../03-process/03-improvement-methods.md).
 
-## Purpose and Core Mechanism
+## 1. How a retrospective runs
 
-The primary purpose of a retrospective is to provide the team an "opportunity to inspect itself" {% cite lehtinen2017retrospectives %}. The core mechanism follows a structured five-phase model {% cite matthies2019retrospective %}:
+Most retrospectives follow Derby and Larsen's five phases, which Matthies and colleagues use to organize retrospective activities {% cite matthies2019retrospective %}: **set the stage** (make it safe to speak), **gather data** (what happened in the iteration), **generate insights** (why it happened), **decide what to do** (a few concrete actions) and **close**. The output is a short list of action items that someone owns.
 
-1. **Set the Stage**: Create a safe environment for discussion
-2. **Gather Data**: Collect observations about the iteration
-3. **Generate Insights**: Identify patterns and root causes
-4. **Decide What to Do**: Create actionable improvements
-5. **Close**: Wrap up and appreciate contributions
+Activities give each phase a format. In **Sailboat**, the team draws a boat and marks what pushed it forward (wind) and what held it back (anchors). **Five Whys** asks "why?" repeatedly to get from a symptom to a cause. **Six Thinking Hats** has everyone look at the iteration from one viewpoint at a time.
 
-### Key Elements
+## 2. Matching activities to problems
 
-- **Target Identification**: Teams discuss the finished iteration, focusing on both successes and challenges
-- **Reflection**: Practitioners use root cause analysis to investigate underlying causes of problems rather than just fixing immediate errors (double-loop learning)
-- **Actionable Output**: The tangible result is a list of action items to be implemented in the following iteration
+Retrospectives go stale in recognizable ways. Matthies and colleagues mapped ten common problems to thirteen activities that counter them {% cite matthies2019retrospective %}:
 
-## Structured Retrospective Activities
+| Problem | Countermeasure |
+|---|---|
+| Not speaking up | Sailboat, Peaks and Valleys timeline, Tweet My Sprint, Collective Painting |
+| Blame game | Peaks and Valleys, Guess Who, Team Oscars |
+| Group think | Six Thinking Hats |
+| All action, no talk | Six Thinking Hats, Five Whys |
+| All talk, no action | Reverse Brainstorming ("how could we make this worse?", then invert) |
 
-To facilitate team interaction and overcome "retrospective smells" like the "Blame Game," various activities are used {% cite matthies2019retrospective %}:
+## 3. Example: what teams actually discuss
 
-### Sailboat
+Lehtinen, Itkonen and Lassenius followed 37 retrospectives of seven Scrum teams in one company over almost three years and classified 879 statements {% cite lehtinen2017retrospectives %}. Half (51%) described negative experiences, 29% positive ones and 20% were corrective actions. Three process areas close to the team (sprint planning, implementation and testing) took 75% of the statements, while problems owned by others were rarely raised. Some topics returned again and again, yet only 19% of the corrective actions addressed those recurring discussions.
 
-A metaphor-based activity where the team identifies:
-- **Wind**: Positives/strengths pushing forward
-- **Anchors**: Negatives/weaknesses holding back
-- **Sun**: Opportunities on the horizon
-- **Icebergs**: Threats/dangers ahead
+The team said "low bug count" whenever the number of open bugs was roughly 90 or less, but nobody showed the actual count in the meeting: the discussion ran on impressions. Matthies and colleagues propose closing that gap with **data-informed retrospectives**: a health check that pulls measures such as test coverage, commit patterns or build failures from the repository before the meeting, and a **remedy appraisal** that measures whether a past action item changed the metric it targeted {% cite matthies2020mining %}.
 
-### Five Whys
+## When to use it — and when not
 
-A root-cause analysis tool where teams repeatedly ask "Why?" (typically four to seven times) to find the deepest cause of a specific technical or process issue.
+Hold one at the end of every iteration, short and with the whole team. It is the right tool for how the team itself works. It is the wrong tool for problems owned outside the team (a slow approval board, another team's API), which the Lehtinen data show retrospectives rarely touch; those need [change management](../03-process/04-change-management.md) at the organization's level.
 
-### Six Thinking Hats
+## Limitations
 
-Based on the work of Edward de Bono, this activity forces team members to look at iterations from six distinct metaphorical viewpoints (e.g., positive vs. negative framing) to mitigate Group Think {% cite matthies2019retrospective %}.
+- **Opinion over evidence.** Without data, strong opinions dominate (participant bias), as the bug-count example shows.
+- **Symptoms over causes.** Teams tended to act on visible symptoms rather than investigate root causes {% cite lehtinen2017retrospectives %}.
+- **One company.** The longitudinal study observed a single organization.
 
-### Peaks and Valleys Timeline
+## How solid is this?
 
-Participants plot their emotional journey through the sprint on a mood graph to relate different views on shared events.
-
-## Data-Driven Retrospectives
-
-Matthies et al. (2020) argue that traditional retrospectives are limited because they depend solely on the subjective perceptions of team members {% cite matthies2020mining %}. To complement these views, teams can use Mining Software Repositories (MSR) to build a data-informed perspective.
-
-### Repository Mining Approaches
-
-| Activity | Purpose | Data Source |
-|----------|---------|-------------|
-| **Health Checks** | Collect measurements on best practices (code coverage, commit frequency) | Version control, CI/CD |
-| **Remedy Appraisal** | Verify if previous actions were effective | Issue trackers, metrics |
-
-### Artifact Sources
-
-- **Version Control (git)**: Code diffs, commit frequency, unique contributors
-- **Issue Trackers (Jira)**: Status updates, bug counts, story completion
-- **Software Tests (Jenkins)**: Build status, test coverage, failure rates
-
-## Common Problems and Countermeasures
-
-Research by Matthies et al. (2019) mapped common "retrospective ailments" to specific activities that serve as countermeasures {% cite matthies2019retrospective %}:
-
-| Problem | Countermeasure | How It Helps |
-|---------|----------------|--------------|
-| **No Preparation** | Sailboat, Futurespective | Provide inherent agenda for topic clustering |
-| **Not Speaking Up** | Open the Box, Peaks and Valleys | Silent brainstorming gives thinking time |
-| **All Talk–No Action** | Reverse Brainstorming | "How to make it worst?" then invert results |
-| **Blame Game** | Guess Who | Answer from teammate's perspective to foster empathy |
-
-## Empirical Findings: What Teams Actually Discuss
-
-In a three-year longitudinal study of 37 retrospectives, Lehtinen et al. (2017) analyzed 879 statements to understand discussion trends {% cite lehtinen2017retrospectives %}:
-
-### Key Findings
-
-**Controllability Bias**: 75% of all statements were related to topics close to and controllable by the team, such as sprint planning and implementation.
-
-**Frequency Statistics**:
-- Implementation work discussed in **100%** of meetings
-- Negative experiences: **51%** of statements
-- Positive experiences: **29%** of statements
-
-### Types of Recurring Discussions
-
-| Type | Description | Example |
-|------|-------------|---------|
-| **Naturally Recurring** | Topics that naturally reappear | High bug counts |
-| **Unsolvable** | Persistent challenges | Estimation accuracy |
-| **Trivial Scapegoats** | Surface issues hiding deeper problems | Blaming poor specs to hide communication issues |
-
-### Data Alignment Findings
-
-The study revealed important biases {% cite matthies2020mining %}:
-- "Low bug count" statements typically occurred when repository registered ≤90 open defects
-- Comments on "poor estimation accuracy" often did not match actual repository data, suggesting participant bias
-
-This underscores the value of combining subjective retrospective discussions with objective repository data for more accurate process improvement.
+- **Where it comes from.** A longitudinal case study, a mapping of retrospective problems to activities, and a proposal for repository-based retrospectives {% cite lehtinen2017retrospectives matthies2019retrospective matthies2020mining %}.
+- **What is contested.** Whether data-informed retrospectives improve outcomes: the paper proposes the approach, and the area's review holds no evaluation of it.
+- **What we do not hold.** Derby and Larsen's book, the origin of the five phases.
 
 ---
 

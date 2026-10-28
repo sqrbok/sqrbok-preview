@@ -10,210 +10,189 @@ page_type: question-set
 
 # RQ A07: Combinatorial Testing
 
-**Format:** Explain in your own words, give brief examples
+These questions test [SN A07: Combinatorial Testing](SN_A07_Combinatorial.md); the handbook pages it links give the detail. Explain in your own words and give brief examples; for calculations, show each step.
 
 ---
 
-## Question 1: Covering Array Construction
+## Question 1: Interaction Faults
 
-Given a system with 3 parameters (A, B, C), each with 2 values (0, 1):
+a) Define an interaction fault and the FTFI number.
 
-a) List all possible 2-way (pairwise) combinations that must be covered.
-b) Construct a covering array that covers all pairs. What is the minimum number of rows?
-c) How does this compare to exhaustive testing (2³ = 8)?
+b) Write a small `if` condition that hides a fault with FTFI number 3. Which test inputs trigger it?
 
-*Hint: There are C(3,2) × 2² = 12 pairs to cover.*
+c) Why can testing every value of every input on its own miss your fault from (b)?
 
----
+## Question 2: Reading the NIST Data
 
-## Question 2: Logarithmic Growth Explanation
+Use the table in SN §1.
 
-A system has 20 parameters, each with 3 values.
+a) What does "93% at 2" mean for the NASA system, in terms of tests you would write?
 
-a) How many exhaustive test cases exist?
-b) Approximately how many pairwise tests are needed? (Use the AETG result: ~18 tests for this configuration.)
-c) If we double to 40 parameters, the pairwise count increases to ~21. Explain why doubling parameters barely changes the test count.
-d) If we increase from 2-way to 3-way for the original 20 parameters, how does the test count change? Explain why strength increases are expensive.
+b) The browser's 2-way figure is 76%, the medical devices' 97%. Give one possible reason for the difference. (Hint: compare the kind of system, its size and its release stage, from the list of systems in SN §1.)
 
----
+c) What is the largest FTFI number in any of the four systems? What does "pseudo-exhaustive" claim, and why "pseudo"?
 
-## Question 3: NIST Fault Interaction Data
+d) Name two reasons to be careful before applying these numbers to your own system.
 
-Kuhn et al. (2004) found these cumulative fault detection rates:
+## Question 3: A Covering Array by Hand
 
-| Domain | 2-way | 3-way | 4-way |
-|--------|-------|-------|-------|
-| NASA | 93% | 98% | 100% |
-| Medical | 97% | 99% | 100% |
-| Mozilla | 76% | 95% | — |
+Three parameters A, B and C each take the values 0 and 1.
 
-a) What does "93% at 2-way" mean practically?
-b) A safety-critical medical device team uses pairwise testing. Is this sufficient? What would you recommend?
-c) Why does Mozilla have a lower 2-way detection rate than medical devices?
-d) What is the maximum interaction strength needed across ALL studied projects? What does this imply for testing strategy?
+a) How many pairs of values must a pairwise array cover? Use C(*k*, *t*) · *v*<sup>*t*</sup>.
 
----
+b) What is the lower bound on the number of rows? Construct an array that reaches it.
 
-## Question 4: IPOG Algorithm Trace
+c) Is your array also an orthogonal array? Explain the difference between the two kinds.
 
-Trace the IPOG algorithm for 3 parameters (P1, P2, P3), each with values {0, 1, 2}, at strength t=2.
+d) Compare its size with exhaustive testing.
 
-a) **Phase 1:** What is the initial test set for P1 and P2?
-b) **Phase 2 (Horizontal Growth):** Extend each row with a value for P3 that covers the most uncovered (P1,P3) and (P2,P3) pairs.
-c) **Phase 3 (Vertical Growth):** Which pairs (if any) remain uncovered? Add rows with don't-care values to cover them.
-d) How many rows does your final array have?
+## Question 4: Logarithmic Growth
 
----
+A system has 20 parameters with 3 values each.
 
-## Question 5: AETG vs IPOG
+a) How many tests does exhaustive testing need?
 
-Compare the AETG (1997) and IPOG (2007) algorithms:
+b) How many pairs must a pairwise suite cover?
 
-a) What is the fundamental difference in their approach? (Hint: "one-X-at-a-time")
-b) Which has lower computational complexity and why?
-c) Which serves as the basis for the ACTS tool?
-d) In what scenario might AETG produce smaller test suites than IPOG?
+c) Estimate the pairwise test count with Cohen's rule of thumb, 4 · log<sub>2</sub> *k*.
 
----
+d) Doubling the parameters to 40 changes the estimate only a little. Explain why, using the greedy argument in SN §4.
 
-## Question 6: Constraint Handling
+e) Why does raising the strength from 2 to 3 cost far more than doubling the parameters? Use the IPOG figures for 10 parameters with 5 values.
 
-A date testing model has parameters: Day (1-31), Month (Jan-Dec), Year (leap/non-leap).
+## Question 5: Tracing IPOG
 
-a) Give two examples of invalid combinations.
-b) Explain the "Avoid" strategy for handling these constraints.
-c) Why can't you simply remove invalid rows from the covering array after generation?
-d) How does CASA handle constraints differently from ACTS?
+Parameters: P1 in {0, 1}, P2 in {0, 1, 2}, P3 in {0, 1}; strength 2; ties go to the smallest value.
 
----
+a) Write the six starting rows for P1 and P2.
 
-## Question 7: Industrial Evidence Analysis
+b) Apply horizontal growth for P3, row by row. For each row, write how many new pairs each value of P3 would cover.
 
-Hu et al. (2020) found that CT detected 93.3% of multi-factor faults while in-house teams detected only 6.7%.
+c) Which pairs remain uncovered? Does vertical growth add any rows?
 
-a) Why is the gap so dramatic for multi-factor faults?
-b) For single-factor faults, the gap narrows (89.3% vs 71.4%). Why does CT still outperform?
-c) Name three barriers to CT adoption that Hu identified.
-d) How would you address the barrier that "ACTS can't generate executable test scripts"?
+d) Compare the result with the trace in SN §7, where vertical growth was needed. What made the difference?
 
----
+## Question 6: AETG and IPOG
 
-## Question 8: Choosing Interaction Strength
+a) State the difference in one sentence each: "one test at a time" and "one parameter at a time".
 
-You are testing a web application with the following parameters:
-- Authentication: username, password, MFA method (3 params — security-critical)
-- UI: theme, language, font size (3 params — low risk)
-- Payment: card type, amount, currency (3 params — medium risk)
+b) What does AETG do with its 50 candidates, and why is it not deterministic?
 
-a) What interaction strength would you recommend for each group?
-b) How could mixed-strength arrays help reduce the total test count?
-c) If pairwise testing reveals no faults, does that prove the system is correct? Why or why not?
+c) What is a don't-care position, and when does IPOG fill it?
 
----
+d) Which generator does NIST's ACTS use by default?
 
-## Question 9: Autonomous Driving CT (Tao 2019)
+e) Zeb et al. sorted search-based strategies into five kinds. Name them, and say which algorithm stood out ([Covering Array Generation](../../verif/combinatorial/algorithms.md)).
 
-Tao et al. applied CT to Autonomous Emergency Braking at AVL List GmbH.
+## Question 7: Base Choice versus Pairwise
 
-a) Why is exhaustive physical testing infeasible for autonomous driving?
-b) Describe the end-to-end pipeline: from domain ontology to test results.
-c) The model had 37 parameters and 39 constraints. Why is constraint handling critical in this domain?
-d) Only 2-way (pairwise) coverage was used. What would be the implications of increasing to 3-way?
+a) Compute the base choice test count for the Find dialog in SN §5, and explain the formula.
 
----
+b) For four parameters with three values each, base choice gives 9 tests that cover 30 of 54 pairs. Show where 54 comes from.
 
-## Question 10: Seed Reuse Strategy
+c) Grindal et al. found base choice as good as pairwise in one experiment. Why not use it everywhere? What did the authors advise?
 
-A team has a pairwise (2-way) test suite of 500 tests and needs to increase to 3-way coverage.
+## Question 8: Constraints
 
-a) According to Bombarda (2025), should they use the existing tests as seeds? Which tool should they use?
-b) What happens if they try to use partial test cases (rows with missing values) as seeds?
-c) A different team wants to reuse tests to complete an incomplete 2-way suite (60% complete). Is seeding beneficial here?
+PICT generated these 9 pairwise rows for OS × Browser × Language, without the constraint "Safari runs only on macOS":
 
----
+| OS | Browser | Language |
+|---|---|---|
+| Windows | Safari | EN |
+| macOS | Chrome | EN |
+| Windows | Firefox | DE |
+| Linux | Chrome | DE |
+| Windows | Chrome | DE |
+| macOS | Firefox | EN |
+| macOS | Safari | DE |
+| Linux | Firefox | EN |
+| Linux | Safari | DE |
 
-## Question 11: CT for ML Dataset Quality
+a) Which rows are invalid?
 
-Lanus et al. (2021) found that a smaller dataset had higher 2-way combinatorial coverage (0.93) than a larger dataset (0.83).
+b) Delete them. Which valid pairs are no longer covered?
 
-a) What does "2-way combinatorial coverage of a dataset" mean?
-b) Why doesn't dataset size guarantee representativeness?
-c) How could the SDCCM metric predict transfer learning performance drops?
-d) Give one practical application of CCM metrics for an ML engineering team.
+c) How many valid pairs are there in total? Explain how a constraint-aware generator avoids the loss, and why it may need an extra row.
 
----
+d) When would you choose CASA over PICT for a constrained model? Use the 21-second finding.
 
-## Question 12: Tool Selection
+## Question 9: Invalid Values and Masking
 
-For each scenario, recommend a tool (ACTS, PICT, or CASA) and explain your reasoning:
+a) What is the masking effect? Give an example with two invalid inputs to an order form.
 
-a) A medical device with 15 parameters, strict constraints, and safety-critical testing requirements.
-b) A web application CI pipeline that needs to regenerate tests on every commit.
-c) An embedded system with 50 parameters and complex interdependent constraints.
-d) A team that needs to increase from 2-way to 3-way and has an existing 2-way suite.
+b) State the rule for invalid values in a combinatorial suite.
 
----
+c) How does PICT's `~` prefix apply the rule?
 
-## Question 13: Calculation Problem
+## Question 10: Industrial Evidence
 
-A mobile app has the following test parameters:
-- OS: {iOS, Android} (2 values)
-- Browser: {Chrome, Safari, Firefox} (3 values)
-- Screen: {Small, Medium, Large} (3 values)
-- Network: {WiFi, 4G, 3G} (3 values)
-- Language: {EN, FR, DE} (3 values)
+a) Hu et al.'s pairwise suites found 93.3% of faults needing several inputs; the in-house teams found 6.7%. Why is the gap so large?
 
-a) Calculate the exhaustive test count.
-b) Using the AETG logarithmic growth principle, estimate the pairwise test count. (Hint: for 5 params with max 3 values, expect ~15-18 tests.)
-c) If testing takes 10 minutes per test case, compare the total testing time for exhaustive vs pairwise.
-d) A constraint says "Safari only works on iOS." How does this affect the covering array?
+b) For faults needing one input the gap was smaller (89.3% against 71.4%). Where did the combinatorial team's advantage come from there?
 
----
+c) Why did Hu et al. use only pairwise suites? Name one other barrier they report.
 
-## Question 14: Algorithm Taxonomy
+d) At Tricentis, configuration testing fell from 394 to 205 hours. Compute the saving and say what made it a fair comparison.
 
-Zeb et al. (2025) classified CT algorithms into five categories.
+## Question 11: Is Pairwise Enough?
 
-a) Name the five categories and give one example algorithm for each.
-b) Which category has been the most successful historically?
-c) What is a "hyper-heuristic" and why is it considered the emerging frontier?
-d) Why might a mix strategy outperform a standard (single) metaheuristic?
+a) Summarize Bures and Ahmed's result: suite sizes, and in how many mutated versions only 3-way found the fault.
 
----
+b) About 40% of the tests in each suite found nothing. What does that say about efficiency per test?
 
-## Question 15: Comprehensive Comparison
+c) A medical-device team uses pairwise only. What would you recommend, and why?
 
-Compare the following three testing approaches for a system with 10 parameters, 3 values each:
+## Question 12: Choosing Strength
 
-| Approach | Tests | What It Guarantees |
-|----------|-------|-------------------|
-| 1-way | ? | ? |
-| 2-way (pairwise) | ? | ? |
-| Exhaustive | ? | ? |
+A web application has authentication parameters (username format, password state, MFA method; security-critical), UI parameters (theme, language, font size; low risk) and payment parameters (card type, amount class, currency; medium risk).
 
-a) Fill in the table with approximate test counts and what each guarantees.
-b) Which approach would you use for: (i) a prototype, (ii) a production web app, (iii) a medical device controller?
-c) What additional technique would you combine with CT for maximum effectiveness?
+a) Recommend a strength for each group and justify it.
+
+b) How would a mixed-strength array help, and what did mixed strength cost at Tricentis?
+
+c) If the pairwise suite finds no failures, is the system correct? Explain.
+
+## Question 13: Calculation
+
+A mobile app is tested on OS {iOS, Android}, Browser {Chrome, Safari, Firefox}, Screen {Small, Medium, Large}, Network {WiFi, 4G, 3G} and Language {EN, FR, DE}.
+
+a) Compute the exhaustive test count.
+
+b) What is the lower bound for a pairwise suite? PICT generated 13 rows. Why can a tool exceed the bound?
+
+c) At 10 minutes per test, compare the time for exhaustive and for the 13-row pairwise suite.
+
+d) Add the constraint "Safari only on iOS". Which pairs are no longer required? Should you delete rows or regenerate? Explain.
+
+## Question 14: Tools and Seeds
+
+a) Match each tool to a situation: PICT, ACTS, CASA. (i) a model regenerated in every CI build; (ii) a heavily constrained model with expensive tests; (iii) a team that wants the tool used in most industrial studies.
+
+b) A team has a pairwise suite of 500 tests and needs 3-way coverage. Should it use the suite as seeds? What did Bombarda and Gargantini find?
+
+c) When are seeds worth using anyway?
+
+## Question 15: Combinatorial Testing in New Settings
+
+a) Tao et al. generated 319 scenarios for an emergency-braking function. Why simulation, and what was missing from the study?
+
+b) Lanus et al. found that a satellite-image set of 10,849 images covered 67 of 72 label-centred pairs, while a set of 21,151 covered 60. Compute both coverage values and explain where 72 comes from (12 features, 3 bins, 2 labels).
+
+c) What does (b) imply for judging a training set by its size?
 
 ---
 
 ## Topics Covered
 
 | Topic | Questions |
-|-------|-----------|
-| Covering arrays | Q1, Q2, Q15 |
-| NIST fault interaction data | Q3 |
-| IPOG algorithm | Q4 |
-| AETG vs IPOG | Q5 |
-| Constraint handling | Q6 |
-| Industrial evidence | Q7 |
-| Interaction strength | Q3, Q8 |
-| Autonomous driving CT | Q9 |
-| Seed reuse | Q10 |
-| CT for ML datasets | Q11 |
-| Tool selection | Q12 |
-| Calculation problems | Q13 |
-| Algorithm taxonomy | Q14 |
+|---|---|
+| Interaction faults and NIST data | Q1, Q2 |
+| Covering arrays and growth | Q3, Q4, Q13 |
+| Generation algorithms | Q5, Q6 |
+| Input models and base choice | Q7, Q13 |
+| Constraints and invalid values | Q8, Q9, Q13 |
+| Industrial evidence and strength | Q10, Q11, Q12, Q15 |
+| Tools and seeds | Q14 |
 
 ---
 

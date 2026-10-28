@@ -1,147 +1,86 @@
 ---
-title: Defect Injection & Removal
+title: Defect Injection and Removal
 parent: Cost of Quality
 nav_order: 2
 layout: default
+vegalite: true
 ---
 
-# Defect Injection and Removal Models
+# Defect Injection and Removal
 
-Defect Injection and Removal Models provide a mathematical and conceptual framework for understanding how errors enter a software system and how various quality activities filter them out before the product reaches the customer {% cite chulani1999coqualmo %} {% cite jones2008applied %}.
+A **defect injection and removal model** follows defects through a project: each development phase adds defects, each verification activity removes a fraction of those present, and whatever is left reaches the customer {% cite miranda2013coq chulani1999coqualmo %}. It lets a team compare improvement options on paper before paying for them.
 
-## The "Tank and Pipes" Model
+## 1. Tank and pipes
 
-Originally proposed by Capers Jones in 1975, this is the simplest model for understanding defect flow through the development process {% cite jones2008applied %}:
+Picture a tank. Pipes into it are the phases that create defects (requirements, design, coding); pipes out of it are the activities that remove them (reviews, inspections, tests); what stays in the tank at release are the **residual defects**, the source of external failure costs. Residual defects fall in only two ways: put less in (prevention) or take more out (appraisal).
 
-### How It Works
+![Defects flow from requirements through design and coding into unit, integration and system testing; each test removes half, and 10 of 80 reach the customer](defect-flow.svg)
 
-| Component | Role | Description |
-|-----------|------|-------------|
-| **Introduction pipes** | Defect entry | Defects flow in during Requirements, Design, and Code phases |
-| **The tank** | Defect backlog | Cumulative pool of defects residing in the software |
-| **Removal pipes** | V&V filters | Reviews, unit testing, system testing drain defects |
-| **Residual defects** | Customer impact | What remains becomes external failure costs |
+_The baseline flow of Miranda's example: 80 defects reach testing and 10 escape._ {% cite miranda2013coq %}
 
-The model makes it intuitive that we can reduce residual defects either by reducing what flows in (prevention) or by improving what we remove (appraisal effectiveness) {% cite wyrwa2008software %}.
+**How much goes in.** COQUALMO, the quality model of COCOMO II, uses nominal introduction rates of 10, 20 and 30 defects per thousand source lines for requirements, design and code, adjusted by quality drivers such as analyst capability and process maturity {% cite chulani1999coqualmo %}.
 
-## COQUALMO (Constructive Quality Model)
+**How much comes out.** The fraction of present defects an activity removes is its **defect removal efficiency**. Knox collected typical values: formal inspections 65%, informal reviews 45%, unit testing 25–50%, system testing 25–50%, beta testing 25% {% cite knox1993modeling %}.
 
-Developed at USC by Chulani and Boehm, COQUALMO extends the COCOMO II cost model to relate defectivity to project cost and schedule {% cite chulani1999coqualmo %}:
+## 2. The process signature
 
-### Defect Introduction Submodel
+Plotting cumulative injected and removed defects by phase gives the project's **process signature**. In the baseline, nothing is removed until coding is finished, and each test removes half of what remains:
 
-Predicts defects introduced (DI) based on size and 21 Quality Adjustment Factors:
+```vega-lite
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 440, "height": 200,
+  "data": {"values": [
+    {"p": "Req", "o": 1, "s": "Injected", "v": 10}, {"p": "HLD", "o": 2, "s": "Injected", "v": 20},
+    {"p": "LLD", "o": 3, "s": "Injected", "v": 40}, {"p": "Code", "o": 4, "s": "Injected", "v": 80},
+    {"p": "UT", "o": 5, "s": "Injected", "v": 80}, {"p": "IT", "o": 6, "s": "Injected", "v": 80},
+    {"p": "ST", "o": 7, "s": "Injected", "v": 80},
+    {"p": "Req", "o": 1, "s": "Removed", "v": 0}, {"p": "HLD", "o": 2, "s": "Removed", "v": 0},
+    {"p": "LLD", "o": 3, "s": "Removed", "v": 0}, {"p": "Code", "o": 4, "s": "Removed", "v": 0},
+    {"p": "UT", "o": 5, "s": "Removed", "v": 40}, {"p": "IT", "o": 6, "s": "Removed", "v": 60},
+    {"p": "ST", "o": 7, "s": "Removed", "v": 70}]},
+  "mark": {"type": "line", "point": true, "strokeWidth": 3},
+  "encoding": {
+    "x": {"field": "p", "type": "ordinal", "sort": {"field": "o"}, "title": "Phase", "axis": {"labelAngle": 0}},
+    "y": {"field": "v", "type": "quantitative", "title": "Cumulative defects"},
+    "color": {"field": "s", "type": "nominal", "scale": {"range": ["#b42318", "#019546"]}, "title": null}},
+  "config": {"font": "Tahoma, sans-serif", "axis": {"labelFontSize": 13, "titleFontSize": 13}, "legend": {"labelFontSize": 13}, "view": {"stroke": null}}
+}
+```
 
-| Phase | Nominal Rate (defects/KSLOC) |
-|-------|------------------------------|
-| Requirements | **10** |
-| Design | **20** |
-| Code | **30** |
+_Baseline process signature: the gap at the last phase, 10 defects, ships to the customer._ {% cite miranda2013coq %}
 
-Rates are adjusted by drivers such as Analyst Capability (ACAP), Product Complexity (CPLX), Process Maturity (PMAT), and Tool Support (TOOL) {% cite chulani1999coqualmo %}.
+## 3. Worked example: two ways to ship fewer defects
 
-### Defect Removal Submodel
+Miranda's example assumes that every development phase **doubles** the defects it receives (10, 20, 40, 80): a requirements defect leads to wrong design, and wrong design to wrong code {% cite miranda2013coq %}. Testing removes 50% at each of three levels, so 80 × 0.5³ = 10 defects ship. Two improvements are compared:
 
-Three primary removal activities with Defect Removal Fraction (DRF) ratings from "Very Low" to "Extra High" {% cite chulani1999coqualmo %}:
+| Phase | Baseline | 1: unit testing 50% → 70% | 2: 20% inspections after requirements, high-level design and code |
+|---|---:|---:|---:|
+| after requirements | 10 | 10 | 10 × 0.8 = 8 |
+| after high-level design | 20 | 20 | 16 × 0.8 = 12.8 |
+| after low-level design | 40 | 40 | 25.6 |
+| after code | 80 | 80 | 51.2 × 0.8 = 40.96 |
+| after unit test | 40 | 24 | 20.48 |
+| after integration test | 20 | 12 | 10.24 |
+| shipped | **10** | **6** | **5.12** |
 
-| Activity | Focus | DRF Range |
-|----------|-------|-----------|
-| **Peer Reviews** | Static analysis of artifacts | VL to XH |
-| **Automated Analysis** | Tools, linters, static analyzers | VL to XH |
-| **Execution Testing** | Dynamic testing activities | VL to XH |
+Both options cut the shipped defects roughly in half. They differ in **where** the work happens. Option 1 removes 74 defects, all in testing. Option 2's inspections remove 2 + 3.2 + 10.24 = 15.44 defects early, and because each removed defect no longer doubles, only 56.4 defects are ever created instead of 80; testing then has 35.84 to remove instead of 70. Which option is cheaper depends on what an inspection hour and a test-and-fix hour cost in your organization, and on how likely each improvement is to deliver its assumed efficiency {% cite miranda2013coq %}.
 
-## Process Signatures
+## When to use it, and when not
 
-A process signature is a graphical profile showing cumulative defects injected versus removed across the lifecycle {% cite kan2002metrics %}:
+- **Use it** to compare process changes, to set removal targets per activity, and to explain to managers why late testing alone cannot reach a low residual count.
+- **Do not trust** its output as a forecast without your own injection and removal data; the result is only as good as the rates you feed in.
 
-### Baseline Example
+## Limitations
 
-| Phase | Cumulative Injected | Removed (50% each test) | Residual |
-|-------|---------------------|-------------------------|----------|
-| Requirements | 10 | 0 | 10 |
-| High-Level Design | 20 | 0 | 20 |
-| Low-Level Design | 40 | 0 | 40 |
-| Coding | **80** | 0 | 80 |
-| Unit Testing | 80 | 40 | 40 |
-| Integration Testing | 80 | 60 | 20 |
-| System Testing | 80 | 70 | **10** |
+- **The rates are rough.** When COQUALMO was fitted to space flight software projects, the nominal rates looked high; the modelled curves needed 0.5 to 6.1 defects per thousand lines to match the data {% cite houston2009coqualmo %}.
+- **The doubling assumption drives the result.** Without it, early inspections help much less; check whether defects in your project really cascade.
 
-**Key insight:** The vertical gap between "Injected" and "Removed" curves at shipment represents latent faults that escape to customers {% cite kan2002metrics %}.
+## How solid is this?
 
-## Improvement Scenarios
-
-Organizations use these models to evaluate two primary strategies for reducing residual defects:
-
-### Scenario 1: Better Testing
-
-Increase the yield of existing test phases:
-
-| Configuration | UT | IT | ST | Residual |
-|--------------|-----|-----|-----|----------|
-| Baseline | 50% | 50% | 50% | 10 |
-| **Improved UT** | **70%** | 50% | 50% | **6** |
-
-### Scenario 2: Introducing Inspections
-
-Add prevention/appraisal steps earlier in the cycle:
-
-| Phase | Injected | Inspection (20%) | After Inspection |
-|-------|----------|------------------|------------------|
-| Requirements | 10 | 2 removed | 8 |
-| HLD | 16 | 3 removed | 13 |
-| LLD | 26 | — | 26 |
-| Coding | 52 | 10 removed | 42 |
-
-After testing (50% each): **6 residual defects**
-
-### Comparison
-
-| Scenario | Final Residual | Economic Impact |
-|----------|----------------|-----------------|
-| Better Testing | 6 | Higher cost per defect (later detection) |
-| **Inspections** | 6 | **Lower cost** (earlier detection) |
-
-Both reach the same quality goal, but inspections are often economically superior because they catch defects in design phases where fixes are significantly cheaper {% cite houston1999cost %}.
-
-## Connection to Cost of Quality
-
-Defect models translate technical performance into financial outcomes to justify process investments {% cite houston1999cost %} {% cite knox1993modeling %}:
-
-### The 1:10:100 Rule
-
-| Phase Found | Relative Cost |
-|-------------|---------------|
-| Requirements | **$1** |
-| Development | **$10** |
-| Post-release | **$100+** |
-
-Models prove that "shifting left" avoids this exponential cost growth.
-
-### Defect Weighting
-
-Not all defects are equal. Research suggests fixing a Specification defect is **14.25× more expensive** than a Code defect due to the "rework cascade" required to update documentation and design {% cite kan2002metrics %}.
-
-### Empirical Evidence: Raytheon
-
-Real-world data shows significant ROI from prevention investment {% cite houston1999cost %}:
-
-| Metric | CMM Level 1 | CMM Level 3 |
-|--------|-------------|-------------|
-| Total CoSQ (% of project) | ~65% | ~20% |
-| Rework (failure costs) | ~50% | <10% |
-
-This represents a **3× reduction** in total CoSQ and **5× reduction** in rework costs.
-
-## Practical Analogy
-
-Defect injection and removal is like a water filtration system:
-
-- **Defect injection** = sediment entering pipes at different points
-- **Reviews and testing** = filters at various stages
-- **Scenario 1 (Better Testing)** = buying a bigger, more expensive filter at the tap
-- **Scenario 2 (Inspections)** = placing small, inexpensive screens at every joint
-
-The Cost of Quality tells you it is much cheaper to clean a small screen weekly than to replace an entire water heater clogged with accumulated sediment.
+- **Where it comes from.** The tank model, the example and its doubling assumption from Miranda's course notes; the rates from COQUALMO and Knox {% cite miranda2013coq chulani1999coqualmo knox1993modeling %}.
+- **What is contested.** Removal efficiencies vary widely between studies and teams; Knox gives ranges, not constants.
+- **What we do not hold.** Capers Jones' defect-potential tables are cited in the lecture but not held for this page.
 
 ---
 

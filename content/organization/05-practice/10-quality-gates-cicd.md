@@ -7,256 +7,51 @@ layout: default
 
 # Quality Gates & CI/CD
 
-Quality gates are checkpoints where code must meet specific criteria before proceeding to the next stage. This page synthesizes practices from Google, Microsoft, and SRE disciplines {% cite winters2020swe %} {% cite page2008mstesting %} {% cite beyer2016sre %}.
+A **quality gate** is a checkpoint in the delivery pipeline that a change must pass before it moves on, such as review approval, passing tests or a healthy canary; in continuous integration and delivery (CI/CD) most gates are automated so that they can run on every change {% cite winters2020swe beyer2016sre %}.
 
-## Quality Gates by Stage
+## 1. Gates by stage
 
-### Stage 1: Pre-submit (Before Merge)
+| Stage | Typical gates | Who or what decides |
+|---|---|---|
+| **Pre-submit** (before merge) | code review approval; static analysis; affected tests pass | reviewer plus automated checks {% cite sadowski2018codereview sadowski2015tricorder %} |
+| **Post-submit** (on the main line) | full build and test suite; the main line must stay green | CI system; a broken build is fixed or the change reverted first |
+| **Release** | error budget not exhausted; canary healthy; production readiness review for new services | SRE policy and automated canary analysis {% cite beyer2018sreworkbook %} |
 
-| Gate | Google | Microsoft |
-|------|--------|-----------|
-| **Code review** | Mandatory, no solo commits | Mandatory peer review |
-| **Certification** | Readability in language | — |
-| **Static analysis** | Tricorder | PREfast |
-| **Tests** | All affected tests pass | All tests pass |
-| **Coverage** | Varies by Test Certified level | 80% for new features |
+Microsoft's milestone model puts the same idea into a schedule: exit criteria and a bug bar at each milestone, and a ship-room decision at the end (see [Microsoft Quality Practices](09-microsoft-quality-practices.md)).
 
-### Stage 2: Post-submit (CI/Staging)
+## 2. Canary and staged rollout
 
-| Gate | Google | Microsoft |
-|------|--------|-----------|
-| **Build status** | TAP - main must stay green | Daily builds |
-| **Integration tests** | Dependency-based selection | Cross-component |
-| **Milestone criteria** | — | M2: 65%, M3: 70% coverage |
+A **canary** release sends a small share of real traffic to the new version and compares its error rate and latency with the version still serving everyone else; if it looks worse, the rollout stops and is rolled back {% cite beyer2018sreworkbook %}. A **staged rollout** then widens the share step by step, for example 1%, 10%, 50%, 100%, checking at each stage.
 
-### Stage 3: Release/Deployment
+**Example.** A new version has a bug that makes 20% of its requests fail. The share of all users' requests that fail is the canary's share times its error rate {% cite beyer2018sreworkbook %}:
 
-| Gate | Google/SRE | Microsoft |
-|------|------------|-----------|
-| **Error budget** | Must be positive to deploy | — |
-| **Canary** | 1% rollout first | — |
-| **PRR** | Production Readiness Review | — |
-| **Approval** | Automated (budget-based) | Ship Room committee |
+| Rollout | Overall error rate |
+|---|---|
+| Canary 1% | 0.01 × 20% = 0.2% |
+| Canary 5% | 0.05 × 20% = 1% |
+| No canary (100% at once) | 20% |
 
----
+With a 99.9% SLO the error budget is 0.1% of requests, so even the 5% canary burns budget fast, but for minutes, not for the whole user base. The canary limits the **blast radius**: how many users a bad change can reach before it is caught.
 
-## CI/CD Pipeline
+## 3. Feature flags and rollback
 
-### Pipeline Stages
+A **feature flag** separates deploying code from launching a feature: the code ships switched off and is turned on for chosen users. Turning a flag off is much faster than building, testing and redeploying, which the SRE book puts at 15 minutes or more, and it disables one feature without touching the others {% cite beyer2016sre winters2020swe %}. Each short-lived flag is technical debt and should be removed once the feature is stable.
 
-```
-Code → Build → Unit Test → Integration Test → Staging → E2E Test → Canary → Production
-```
+When a release goes wrong, the SRE practice is to **roll back first and fix afterwards**: restore the last good version, then diagnose the fault without users waiting {% cite beyer2016sre %}. Rolling back needs the previous version to be available and database changes that both versions can work with.
 
-### Key Practices
+## When to use gates — and when not
 
-| Practice | Description | Benefit |
-|----------|-------------|---------|
-| **Trunk-based development** | All developers commit to main | No merge conflicts |
-| **Pre-submit testing** | Tests run before merge | Catch bugs early |
-| **Post-submit testing** | Full test suite on main | Catch integration bugs |
-| **Canary deployment** | 1% rollout first | Limit blast radius |
-| **Automated rollback** | Revert if metrics degrade | Fast recovery |
+Automate every gate that can be checked by a machine and keep human gates for judgment (review, release of risky changes). A canary needs enough traffic to compare error rates; with a few dozen requests an hour a 1% canary sees almost nothing, and a short staged rollout with careful monitoring serves better.
 
-### Scale at Google (TAP)
+## Limitations
 
-Google's Test Automation Platform handles massive scale {% cite memon2017testing %}:
+- **Gates slow delivery when they are slow.** A pre-submit check that takes an hour encourages large, batched changes, the opposite of what the gates are for.
+- **A green gate is not proof.** Gates check what they check; a missing test passes every gate.
 
-| Metric | Value |
-|--------|-------|
-| Daily test runs | **150 million** |
-| Unique test targets | **5.5 million** |
-| Commit rate | **1 per second** |
-| Test failure rate | Only **1.15%** ever failed |
+## How solid is this?
 
-### Scale at Facebook
-
-Facebook's continuous deployment research shows {% cite savor2016facebook %}:
-
-| Metric | Value |
-|--------|-------|
-| Updates per dev/week | **3.5** (~daily) |
-| Critical issues vs deployments | **Nearly constant** |
-| Feedback time | **10 minutes** from smoke tests |
-
-> "The number of critical issues arising from deployments was almost constant regardless of the number of deployments." {% cite savor2016facebook %}
-
----
-
-## Deployment Strategies
-
-### Strategy Comparison
-
-| Strategy | Description | Rollback | Resources |
-|----------|-------------|----------|-----------|
-| **Canary** | Deploy to small % first | Stop rollout | 1x + canary |
-| **Blue-Green** | Two environments, switch traffic | Instant switch | 2x |
-| **Progressive** | 1% → 10% → 50% → 100% | Stop any stage | 1x |
-| **Feature Flags** | Decouple launch from deploy | Disable flag | 1x |
-
-### Canary Deployment Process
-
-1. **Deploy to ~1%** (canary segment)
-2. **Compare metrics** against "Live" control
-3. **Monitor** errors, latency regressions
-4. If OK → **expand**; If problems → **halt + rollback**
-
-### Staged Rollout
-
-| Stage | Population | Purpose |
-|-------|------------|---------|
-| Canary | ~1% | Initial risk detection |
-| Expand | ~10% | Broader validation |
-| Wide | ~50% | Near-full confidence |
-| Full | 100% | Complete rollout |
-
-### Error Budget Math for Canary
-
-> 5% canary serving 20% errors = only 1% overall error rate (SLO preserved)
-
-This allows teams to detect issues before they affect the full user base.
-
----
-
-## Feature Flags
-
-**Feature flags** separate feature launches from binary releases. The binary shows no behavior change when the flag is off {% cite winters2020swe %}.
-
-### Benefits
-
-| Benefit | Description |
-|---------|-------------|
-| **Gradual enablement** | Enable features one at a time |
-| **Phased adoption** | Roll out to early adopters first |
-| **Fast rollback** | Disable flag instantly (vs 15+ min redeploy) |
-| **Risk isolation** | Buggy feature X doesn't affect feature Y |
-
-### Feature Flag Lifecycle
-
-| Phase | Description |
-|-------|-------------|
-| **1. Design** | Architecture must support flags from start |
-| **2. Development** | Implement feature behind flag |
-| **3. Testing** | Verify behavior with flag on/off |
-| **4. Rollout** | Enable for subset of users |
-| **5. Monitor** | Track flag in monitoring dashboards |
-| **6. Stabilize** | Feature becomes default |
-| **7. Cleanup** | Remove flag, consolidate code paths |
-
-### Critical Rules
-
-- **Tag short-term flags as technical debt**
-- **Document how to prove a flag is no longer needed**
-- **Schedule cleanup** (don't accumulate)
-- **Monitor flag cardinality** (too many flags = complexity)
-
-> "If feature X is buggy, it can be disabled via flag without affecting unrelated feature Y." {% cite winters2020swe %}
-
----
-
-## Production Readiness Review (PRR)
-
-A **PRR** is a checklist-based review ensuring a service is ready for production operation {% cite beyer2016sre %}.
-
-### PRR Checklist Categories
-
-| Category | Items |
-|----------|-------|
-| **Monitoring** | SLIs defined, dashboards created, alerts configured |
-| **Logging** | Structured logs, retention policy, searchable |
-| **On-call** | Runbook exists, escalation path defined |
-| **Capacity** | Load tested, auto-scaling configured |
-| **Security** | Auth/authz, encryption, vulnerability scan |
-| **Disaster Recovery** | Backup strategy, tested restore |
-| **Dependencies** | Timeouts, circuit breakers, graceful degradation |
-
-### When PRR Happens
-
-- Before a service is "onboarded" by SRE team
-- Before reaching General Availability (GA)
-- After major architectural changes
-
----
-
-## Build Speed and Feedback
-
-### Targets
-
-| Metric | Target | Rationale |
-|--------|--------|-----------|
-| Pre-submit tests | < 30 minutes | Developer stays engaged |
-| Feedback loop | < 10 minutes | Ideal for iteration |
-| Full CI run | < 1 hour | Same-day feedback |
-
-### Google's Approach
-
-> "If feedback takes more than a few minutes, add more machines. CPU hours are cheaper than developer time."
-
-### Facebook's Approach
-
-- **10-minute feedback** from integration smoke tests
-- **Thousands of compute nodes** for test parallelization
-- **3.5 deploys per developer per week** sustained
-
----
-
-## Rollback Strategies
-
-### Roll Back vs Roll Forward
-
-| Strategy | When to Use | Speed |
-|----------|-------------|-------|
-| **Roll back** | Known-good previous version exists | Fast (seconds-minutes) |
-| **Roll forward** | Fix is simple, rollback is risky | Varies |
-
-### Automated Rollback Triggers
-
-| Trigger | Action |
-|---------|--------|
-| Error rate spike | Automatic revert |
-| Latency regression | Stop rollout |
-| Crash rate increase | Immediate rollback |
-| Error budget exhausted | Feature freeze |
-
-### Rollback Requirements
-
-For effective rollback capability:
-
-- **Immutable deployments** - Previous version still available
-- **Database compatibility** - Schema supports both versions
-- **Feature flags** - Can disable without redeploy
-- **Monitoring** - Know when to trigger
-
----
-
-## Comparison: Continuous vs Milestone
-
-| Aspect | Continuous (Google/Facebook) | Milestone (Microsoft) |
-|--------|------------------------------|----------------------|
-| **Release frequency** | Multiple times/day | Weeks to months |
-| **Quality gate** | Error budget | Bug bar |
-| **Ship decision** | Automated | Committee |
-| **Rollback** | Instant (flags, canary) | Patch release |
-| **Risk model** | Small changes, fast feedback | Staged stabilization |
-| **Test strategy** | Continuous, selective | Milestone exit criteria |
-
-Both models achieve high quality through different mechanisms. The choice depends on:
-
-- Product type (web service vs packaged software)
-- User expectations (continuous updates vs stability)
-- Regulatory requirements (audit trails, approvals)
-
----
-
-## Key Metrics Summary
-
-| Metric | Target | Source |
-|--------|--------|--------|
-| Canary population | 1% | Google, Netflix |
-| Pre-submit test time | < 30 min | Google |
-| Feedback loop | < 10 min | Facebook |
-| Deploys per dev/week | 3.5 | Facebook |
-| Test failure rate | ~1% | Google TAP |
+- **Where it comes from.** Google's SRE book and workbook, *Software Engineering at Google*, and Google's studies of code review and static analysis {% cite beyer2016sre beyer2018sreworkbook winters2020swe sadowski2018codereview sadowski2015tricorder %}.
+- **What we do not hold.** The books' full text; their content reaches this page through the area's notes on them.
 
 ---
 

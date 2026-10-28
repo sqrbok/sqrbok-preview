@@ -1,161 +1,60 @@
 ---
-title: Quality Economics in DevOps
+title: Quality Costs in Continuous Delivery
 parent: Cost of Quality
-nav_order: 4
+nav_order: 5
 layout: default
 ---
 
-# Quality Economics in DevOps
+# Quality Costs in Continuous Delivery
 
-Quality Economics in DevOps focuses on balancing early defect prevention with real-time production validation to optimize the total cost of software quality (CoSQ). By shifting quality activities across the entire lifecycle and leveraging AI-driven automation, organizations can significantly reduce expensive manual interventions and system downtime {% cite gottam2025convergent %} {% cite keating2024ai %}.
+In continuous delivery, **quality costs** are the same four categories as in any project, but they are spent in two places: before release (**shift-left**: reviews, test-driven development, static analysis, continuous-integration tests) and after release (**shift-right**: monitoring, canary releases, feature flags, chaos experiments) {% cite gottam2025convergent magori2024early %}. This page applies the [CoSQ categories](01-cosq-foundations.md) to both, and prices one of the commonest pipeline costs: flaky tests.
 
-## Shift-Left Testing: Early Defect Detection
+## 1. Shift-left and shift-right in CoSQ terms
 
-The Shift-Left paradigm emphasizes moving testing activities earlier in the development process to detect defects when they are cheaper and easier to fix {% cite magori2024early %}:
+**Shift-left** moves verification earlier. Magori's review of early-phase techniques (design review, code review, inspection, test-driven development) reports fewer defects, shorter development cycles and lower cost than testing after development {% cite magori2024early %}. **Shift-right** validates in production: telemetry, A/B tests, canary releases that expose new functionality to a few users first, and chaos engineering, which injects failures on purpose to test recovery {% cite gottam2025convergent %}. Gottam argues that the two must feed each other, with production findings shaping the next tests {% cite gottam2025convergent %}; AI-based observability adds anomaly detection and automated root-cause analysis on top of logs, metrics and traces {% cite keating2024ai %}.
 
-### Economic Rationale
+Applying the categories to these practices gives:
 
-Grounded in the principle that **$1 spent on prevention** (e.g., design reviews, code reviews) can save **$10+ in subsequent failure costs** {% cite knox1993modeling %}.
+| Practice | Category | Why |
+|---|---|---|
+| Code review, test-driven development, coding standards | prevention | effort to keep defects out |
+| Continuous-integration tests, static analysis, canary monitoring | appraisal | discovering the condition of the product |
+| Investigating and fixing a red pipeline, rolling back a canary | internal failure | spent because a defect exists, before most users see it |
+| Incident response, hot fixes, lost users | external failure | the defect reached customers |
 
-### Key Techniques
+A canary release caps the external failure: the same defect reaches 1% of users instead of all of them, and most of its cost becomes the internal cost of rolling back.
 
-| Technique | Phase | CoSQ Category |
-|-----------|-------|---------------|
-| Software design reviews | Requirements/Design | Prevention |
-| Code reviews & inspections | Development | Appraisal |
-| Test-Driven Development (TDD) | Development | Prevention |
-| Static analysis | Development | Appraisal |
-| Continuous Integration | Development | Appraisal |
+## 2. Worked example: the price of flaky tests
 
-### Economic Outcomes
+A **flaky test** passes or fails on unchanged code. Leinen et al. measured the cost over five years of a project with about 30 developers and about one million lines of code {% cite leinen2024flaky %}:
 
-Empirical evidence shows that early-phase V&V techniques lead to {% cite magori2024early %}:
-- Substantial reduction in defect counts
-- Shorter development cycles
-- Lower overall costs vs. traditional post-development testing
+| Measure | Value |
+|---|---|
+| Developer time spent on flaky tests | at least 2.5% of productive time |
+| of which investigating suspicious failures | 1.1% |
+| of which repairing flaky tests | 1.3% |
+| of which building tools to monitor them | 0.1% |
+| Manual investigation of one failed pipeline | USD 5.67 |
+| Automatically rerunning the failed test | USD 0.02 |
+| Test-suite executions with at least one flaky failure, found by the new rerun strategy in five months | 4.8%, about one in 20 |
 
-## Shift-Right Testing: Production Validation
+Investigating a failure costs about 280 times a rerun (5.67 / 0.02 ≈ 283), so the company shifted effort from developers to compute: it raised the number of automatic reruns before a pipeline is declared red. In CoSQ terms, cheap appraisal (reruns) replaced expensive internal failure (investigation).
 
-The Shift-Right paradigm extends quality validation into production environments to observe behavior under authentic usage conditions {% cite gottam2025convergent %}:
+## When to use it, and when not
 
-### Why Shift-Right?
+- **Use it** when a team argues about adding a pipeline stage, reruns or monitoring: price each option in the four categories and compare.
+- **Do not apply** the flaky-test figures directly elsewhere; the costs depend on the local pipeline, hourly rates and compute prices.
 
-Critical attributes like **resilience and performance** require real-world validation to identify unknown failure modes that cannot be fully replicated in simulation {% cite keating2024ai %}.
+## Limitations
 
-### Key Practices
+- **Reruns hide real defects.** A test that fails intermittently because of a race condition in the product is not flaky; rerunning it until green suppresses a true failure. Leinen et al.'s cost model counts time, not the defects that reruns mask.
+- **The shift-right sources are argument, not measurement.** Gottam and Keating describe frameworks; neither reports a controlled cost comparison.
 
-| Practice | Purpose | Risk Mitigation |
-|----------|---------|-----------------|
-| **Canary releases** | Gradual feature exposure | Limits blast radius |
-| **Feature flags** | Runtime toggling | Instant rollback |
-| **A/B testing** | Comparative validation | Data-driven decisions |
-| **Chaos engineering** | Deliberate failures | Tests recovery paths |
+## How solid is this?
 
-### Feedback Loops
-
-Production telemetry informs test scenario development and architectural adjustments, creating a continuous learning cycle {% cite gottam2025convergent %}.
-
-## Convergent Quality Engineering (CQE) Framework
-
-The Convergent Quality Engineering framework, proposed by Gottam (2025), integrates both paradigms into a unified "Continuous Quality Loop" {% cite gottam2025convergent %}:
-
-### Core Philosophy
-
-Quality must be **"built in"** through iterative verification at every stage rather than **"tested in"** at the end of the cycle.
-
-### Integrated Economics
-
-CQE links development-time activities with operational insights:
-
-| Development Activity | Production Insight |
-|---------------------|-------------------|
-| Design practices | Incident post-mortems |
-| Test scenarios | Production alerts |
-| Architecture decisions | Real-world performance data |
-
-### Integration Domains
-
-1. **Requirements & Design** — Validate early with production feedback
-2. **Testing & Validation** — Continuous across lifecycle
-3. **Infrastructure & Tooling** — Automated pipelines
-4. **Knowledge Management** — Lessons learned capture
-5. **Governance** — Quality metrics and SLAs
-
-## Cost of Flaky Tests: Industrial Case Study
-
-A flaky test non-deterministically passes or fails on unchanged code, posing a significant economic burden in Continuous Integration (CI) {% cite leinen2024flaky %}:
-
-### Study Parameters
-
-| Setting | Value |
-|---------|-------|
-| Duration | 5 years |
-| Team size | ~30 developers |
-| Codebase | ~1M SLOC |
-
-### Developer Time Impact
-
-| Activity | % of Productive Time |
-|----------|---------------------|
-| Investigating flaky failures | 1.1% |
-| Repairing flaky tests | 1.3% |
-| Maintaining flaky detection tools | 0.1% |
-| **Total** | **≥2.5%** |
-
-### Cost Comparison
-
-| Approach | Cost per Failure | Ratio |
-|----------|------------------|-------|
-| **Manual investigation** | **$5.67** | 283× |
-| Automated rerun | $0.02 | 1× |
-
-**Key finding:** Manual investigation is **283× more expensive** than automated reruns {% cite leinen2024flaky %}.
-
-### Monthly Economics
-
-| Metric | Value |
-|--------|-------|
-| Visible monthly costs | $5,171 |
-| Flaky failures detected (5x reruns) | 4.8% of runs |
-| Prevention strategy | Increase automated reruns |
-
-## AI-Driven Observability
-
-AI acts as an intelligence layer necessary to manage telemetry data that currently exceeds human analytical capacity {% cite keating2024ai %}:
-
-### AI Capabilities and CoSQ Impact
-
-| AI Capability | CoSQ Category | Economic Impact |
-|---------------|---------------|-----------------|
-| **Anomaly detection** | Appraisal | Reduces MTTD (Mean Time to Detect) |
-| **Automated RCA** | Internal Failure | Reduces MTTR (Mean Time to Resolution) |
-| **Predictive forecasting** | Prevention | Proactive remediation before impact |
-| **Test prioritization** | Appraisal | Reduced pipeline time, maintained coverage |
-
-### How It Works
-
-1. **Anomaly Detection:** ML models establish behavioral baselines to identify performance deviations early
-2. **Automated RCA:** AI correlates signals across distributed services to pinpoint failure sources
-3. **Predictive Forecasting:** Historical trend analysis enables proactive remediation
-4. **Intelligent Prioritization:** AI identifies high-risk components based on production behavior
-
-### Business Metrics
-
-| Metric | Improvement |
-|--------|-------------|
-| **MTTD** | Significantly reduced |
-| **MTTR** | Accelerated via automated correlation |
-| Pipeline execution time | Reduced with smart prioritization |
-| Coverage | Maintained despite optimization |
-
-## Economic Summary
-
-| Paradigm | Focus | Primary Benefit |
-|----------|-------|-----------------|
-| **Shift-Left** | Early prevention | Cheaper fixes (1:10:100 rule) |
-| **Shift-Right** | Production validation | Real-world resilience |
-| **CQE** | Integration of both | Continuous quality loop |
-| **Automation** | AI-driven observability | 283× cost reduction on flaky tests |
+- **Where it comes from.** The flaky-test case from Leinen et al.; shift-left evidence from Magori's review; shift-right practices from Gottam and Keating {% cite leinen2024flaky magori2024early gottam2025convergent keating2024ai %}.
+- **What is contested.** Leinen et al.'s abstract gives the rerun cost as "0.02 cents" and the introduction as USD 0.02; the ratio above uses the dollar figure. Either way a rerun is hundreds of times cheaper than an investigation.
+- **What we do not hold.** Measured cost data for chaos engineering or canary releases.
 
 ---
 

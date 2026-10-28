@@ -1,106 +1,70 @@
 ---
-title: Quality Gates & Criticality
+title: Criticality and Quality Gates
 parent: Quality Planning
 nav_order: 3
 layout: default
 ---
 
-# Quality Gates & Criticality
+# Criticality and Quality Gates
 
-Quality gates are predefined checkpoints that ensure software meets required criteria before progressing to the next development phase. This page covers quality gate definitions, criticality-based tailoring, and modern tooling.
+A **quality gate** is a predefined checkpoint in the life cycle where a work product must meet stated criteria before it may move on: **entry criteria** say when an activity may start, **exit criteria** when it is finished {% cite uzunova2024qualitygates miranda2015asa %}. How strict a gate is should depend on the **criticality** of what passes through it: the harm a failure would do to users, and the cost of recovering from it for the producer {% cite miranda2015asa %}.
 
-## What Are Quality Gates?
+![A gate between two phases: entry criteria admit work, the activity runs, exit criteria decide pass, which moves the work on, or fail, which sends it back](quality-gate.svg)
 
-Quality gates are predefined checkpoints within the SDLC positioned at various stages {% cite uzunova2024qualitygates %}:
+_A quality gate as entry and exit criteria around an activity._ {% cite uzunova2024qualitygates %}
 
-| Definition | Description |
-|------------|-------------|
-| **Structured Checkpoints** | Predefined quality criteria a project must meet to move between stages |
-| **Decision Points** | Critical junctures with quality-focused "go/no-go" criteria |
-| **Transparency Mechanism** | Formal checklists, sign-offs, and acceptance procedures |
+## 1. Criticality levels from two standards
 
-> "Quality gates are predefined checkpoints within the software development life-cycle." {% cite uzunova2024qualitygates %}
+Regulated domains define criticality levels and tie verification effort to them. Avionics software is classified by the failure condition it could cause or contribute to {% cite miranda2015asa rtca1992do178b %}:
 
-## Entry and Exit Criteria
+| DO-178B level | Failure condition | Structural coverage objective |
+|---|---|---|
+| A | catastrophic | modified condition/decision coverage (MC/DC) |
+| B | hazardous or severe | decision coverage |
+| C | major | statement coverage |
+| D | minor | none required |
+| E | no effect on aircraft or pilot workload | none required |
 
-IEEE 829-2008 specifies that test plans must define {% cite ieee829-2008 %}:
+IEEE Std 829-2008 uses four **integrity levels**, 4 catastrophic, 3 critical, 2 marginal, 1 negligible, and scales the documentation with them: a master test plan is expected at levels 4 and 3 but not at 2 or 1, and level 1 needs level documents only for integration and system testing {% cite ieee829-2008 %}. The [coverage criteria](../../verif/coverage/index.md) named here are explained in the verification section.
 
-- **Pass/Fail Criteria** — Criteria for determining if a test item passed or failed (typically based on anomaly count/severity)
-- **Suspension Criteria** — When to pause testing (e.g., defects make further testing valueless)
-- **Resumption Criteria** — What must be done to restart testing
+## 2. Gates by criticality
 
-**Principle:** Define entry/exit criteria according to artifact criticality.
+Early in a project, nobody knows yet which modules will be critical. Miranda's advice is to write **unequivocal criteria per criticality class** now and assign modules to classes later, which avoids planning paralysis {% cite miranda2015asa %}. His example uses three classes, labelled A to C in rising criticality (not the DO-178B letters):
 
-## Criticality Levels
+| Condition | Class A | Class B | Class C |
+|---|---|---|---|
+| Coverage | statement | branch | basis paths |
+| Code inspections | no | yes | yes |
+| Coding standards | yes | yes | yes |
+| Combinatorial testing strength | all pairs | all triples | all quadruples |
+| Robustness testing | data-input modules only | data-input modules only | all modules |
+| Cyclomatic complexity | below 20 | below 20 | below 15 |
 
-### DO-178B Avionic Software Criticality
+_Miranda's example of quality gates by criticality class._ {% cite miranda2015asa %}
 
-| Level | Safety Impact | Coverage Requirement |
-|-------|--------------|---------------------|
-| **A** | Catastrophic failure | 100% Modified Condition/Decision Coverage (MC/DC) |
-| **B** | Hazardous/severe failure | 100% Decision Coverage |
-| **C** | Major failure | 100% Statement Coverage |
-| **D** | Minor failure | 100% Requirements Coverage |
-| **E** | No adverse effect | No coverage requirements |
+## 3. Writing a gate criterion
 
-### Quality Gates by Criticality
+Uzunova et al. recommend documenting each criterion with four parts: the **metric**, the **desired value**, the **predicate** that compares them, and the **object** of measurement. Their example: cyclomatic complexity, below 10, for any single method, measured by a static analysis tool; a method at 10 or above fails the gate and triggers review and refactoring {% cite uzunova2024qualitygates %}. Tools such as SonarQube can enforce such criteria automatically and block a build that fails them {% cite uzunova2024qualitygates %}.
 
-| Condition | Low (C) | Medium (B) | High (A) |
-|-----------|---------|------------|----------|
-| Coverage | Statement | Branch | Basis paths |
-| Code inspections | No | Yes | Yes |
-| Coding standards | Yes | Yes | Yes |
-| Testing strength | All pairs | All triples | All quadruples |
-| Cyclomatic complexity | <20 | <20 | <15 |
+## Example: phasing a gate over milestones
 
-## Phased Quality Gates (Microsoft Example)
+A criterion need not be met at once. Microsoft raised its code-coverage gate over a product's milestones, 65% at the second milestone, 75% at the third and 80% at release {% cite page2009microsoft %}. The gate grows with the product, which is how phasing implements "good enough" quality within scope, time and cost {% cite miranda2015asa %}.
 
-Quality gates can be achieved progressively across milestones:
+## When to use it, and when not
 
-| Area | M1 | M2 | M3 | Release |
-|------|----|----|----|----|
-| Test execution | — | Priority 1 tests | Priority 1+2 tests | All tests |
-| Code coverage | Measured | 65% | 75% | 80% |
-| Stress testing | P1 nightly | 200 computers | 500 computers | 500 computers, no issues |
+- **Use gates** at every hand-over the team cares about: merge, integration, release. Write each criterion with all four parts so that two people reach the same verdict.
+- **Do not copy** another domain's levels; a web application is not avionics. Choose classes that match what your failures cost.
 
-> "Sometimes adequacy criteria could be achieved over time."
+## Limitations
 
-## Quality Gate Tools
+- **A gate measures what it measures.** 80% coverage can be reached with weak tests; pair coverage criteria with reviews.
+- **Gates invite gaming** when people are rewarded for passing them rather than for the quality they stand for.
 
-Modern tools automate quality gate enforcement {% cite uzunova2024qualitygates %}:
+## How solid is this?
 
-| Tool | Focus |
-|------|-------|
-| **SonarQube/SonarCloud** | Static analysis; blocks builds if bugs/coverage criteria not met |
-| **Sigrid (SIG)** | Risk management, architecture, technical debt monitoring |
-| **Veracode** | Security-focused static/dynamic analysis |
-| **Maverix.ai** | AI-driven issue detection, real-time feedback |
-| **Squore (Vector)** | Maintainability, technical debt dashboards |
-
-## Documenting Quality Gates
-
-For Quality Plan documentation {% cite uzunova2024qualitygates %}:
-
-1. **Document criteria explicitly** — metric, desired value, predicate, object of measurement
-2. **Use formal checklists** — Maintain transparency, ensure repeatable sign-off
-3. **Set clear thresholds** — e.g., "85% code coverage" for objective evaluation
-4. **Continuous refinement** — Review and update based on feedback
-5. **Hybrid balance** — Combine manual processes (code reviews) with automated tools
-
-## The Quality Triangle
-
-Quality gates help navigate the classic trade-off:
-
-```
-        Quality
-         /\
-        /  \
-       /    \
-      /______\
-   Scope    Time/Cost
-```
-
-Through phasing, quality gates implement "the good enough" approach — achieving acceptable quality within constraints.
+- **Where it comes from.** Gate definition and documentation from Uzunova et al.; DO-178B levels from Miranda's notes and RTCA; integrity levels from IEEE 829; the class table from Miranda; Microsoft's milestones from Page et al. {% cite uzunova2024qualitygates miranda2015asa rtca1992do178b ieee829-2008 page2009microsoft %}.
+- **What is contested.** The thresholds in Miranda's table are one teacher's example, not a standard.
+- **What we do not hold.** The DO-178B text itself; the coverage objectives are taken from its widely documented Table A-7.
 
 ---
 

@@ -1,123 +1,60 @@
 ---
-title: Test Effort Estimation
+title: Estimating Test Effort
 parent: Quality Planning
 nav_order: 4
 layout: default
 ---
 
-# Test Effort Estimation
+# Estimating Test Effort
 
-Estimating test effort is challenging due to the many factors affecting testing. This page covers estimation methods, tester-to-developer ratios, and practical calculation approaches.
+**Test effort estimation** predicts how many tests a project needs and how many hours designing, running and re-running them will take, so that the quality plan's seventh decision (cost and duration) rests on numbers rather than on what is left after development {% cite bluemke2021testeffort miranda2015asa %}.
 
-## Estimation Challenges
+## 1. Published methods
 
-> "Test effort estimation remains challenging due to the many factors affecting testing." {% cite bluemke2021testeffort %}
+Bluemke and Malanowska's review found that the literature relies on two analytical methods {% cite bluemke2021testeffort %}:
 
-**Key factors affecting test effort:**
-- System size and complexity
-- Tester experience
-- Test environment stability
-- Requirements volatility
-- Defect density
+- **Test Point Analysis (TPA)** estimates the hours for black-box testing from the system's size in function points, the test strategy (which quality characteristics are tested) and a productivity factor that turns test points into hours.
+- **Use Case Points (UCP)**, adapted for testing, weights use cases and actors by type and complexity and converts the adjusted points into hours for test planning, writing and execution.
 
-## Estimation Methods
+Many newer proposals, including machine-learning ones, modify one of these two. The review also warns that the body of good studies is small: fewer than 84 of the papers it found were valuable {% cite bluemke2021testeffort %}.
 
-A systematic review identified multiple approaches {% cite bluemke2021testeffort %}:
+## 2. Back-of-the-envelope estimates
 
-| Method | Description |
-|--------|-------------|
-| **Test Point Analysis (TPA)** | Function point-based, accounts for test complexity |
-| **Use Case Points (UCP)** | Estimates from use case specifications |
-| **Machine Learning** | Neural networks, regression for prediction |
-| **Expert Judgment** | Experience-based estimation |
-| **Analogy** | Based on similar past projects |
+When no calibrated method is available, Miranda proposes estimating in five steps: classify each function or user story by complexity and criticality, estimate the tests each needs, find the mean, scale it to the whole life cycle, and multiply by the effort per test case {% cite miranda2015asa %}.
 
-## Tester-to-Developer Ratios
+**White box.** Covering all basis paths of a piece of code needs n + 1 tests for n predicates, an upper bound for branch coverage. Code not yet written can be sized by its share of decisions: about 25% of lines in the SONAR database, so 1,000 lines suggest about 250 tests {% cite miranda2015asa %}.
 
-Ratios vary significantly by product type {% cite kaner2000measurement %}:
+**Black box.** Miranda assumes 2, 4 or 6 inputs for simple, uncertain and complex functions, two equivalence classes per input, and test techniques that grow with criticality: boundary values for non-critical functions, plus all-pairs for uncertain ones, plus combinatorial testing of strength 2 to 4 for critical ones. His resulting tests per function, which he tabulates rather than derives step by step {% cite miranda2015asa %}:
 
-| Product Type | Developers | Ratio (Dev:Tester) | Testers |
-|--------------|------------|-------------------|---------|
-| Commercial (Large Market) | 30 | 3:2 | 20 |
-| Commercial (Small Market) | 30 | 3:1 | 10 |
-| Heavy COTS Integration | 30 | 4:1 | 7 |
-| Government (Internal) | 30 | 5:1 | 6 |
-| Corporate (Internal) | 30 | 4:1 | 7 |
+| Complexity | Non-critical | Uncertain | Critical |
+|---|---:|---:|---:|
+| Simple | 8 | 12 | 12 |
+| Uncertain | 8 | 15 | 21 |
+| Complex | 8 | 16 | 40 |
 
-**Industry range:** From 1:5 through 5:1
+**Across the life cycle.** Total test cases = (1 + I + U) × the sum of tests per function, where 1 counts the system level, I is the extra fraction needed for integration (0 to 1) and U for unit testing (0 if unit tests are booked under development). Effort = total test cases × (design effort + (1 + R) × execution effort), where R is the fraction of re-runs {% cite miranda2015asa %}.
 
-**Microsoft:** 1:1 ratio
+## Example: twenty functions
 
-## Function Point-Based Estimation
+A system has 20 functions: 10 simple and non-critical (10 × 8 = 80 tests), 6 uncertain in both dimensions (6 × 15 = 90) and 4 complex and critical (4 × 40 = 160), so 330 system-level tests. Integration adds half again (I = 0.5) and unit tests are booked under development (U = 0): 1.5 × 330 = 495 test cases. With 0.5 hours to design a test, 0.25 hours to run it and every test run twice (R = 1), effort = 495 × (0.5 + 2 × 0.25) = 495 hours. _(Constructed example using Miranda's table.)_
 
-Test cases per function point by software type (Jones 2008):
+**Sanity check.** Compare with an independent estimate. Jones' rule of thumb gives the number of test cases as function points raised to the power 1.2 {% cite miranda2015asa %}: if the 20 functions measure 150 function points (an assumed size), 150^1.2 ≈ 409 test cases, the same order of magnitude as 495. Ten tests, or 5,000, would signal an error in the assumptions.
 
-| Test Type | Systems | MIS | Military | Commercial |
-|-----------|---------|-----|----------|------------|
-| Unit test | 0.30 | 0.20 | 0.50 | 0.30 |
-| New function test | 0.35 | 0.25 | 0.35 | 0.25 |
-| Regression test | 0.30 | 0.10 | 0.30 | 0.35 |
-| Integration test | 0.45 | 0.25 | 0.75 | 0.35 |
-| System test | 0.40 | 0.20 | 0.55 | 0.40 |
-| **Total** | **1.80** | **1.00** | **2.45** | **1.65** |
+## When to use it, and when not
 
-**Formula:** `TotalTestCases = FunctionPoints^1.2`
+- **Use it** early, to put testing into the schedule and budget before the first line of code, and again whenever the scope changes.
+- **Do not present** the result as precise; every input is an assumption, and the value lies in making those assumptions visible.
 
-*Example: 100 FP → ~251 test cases*
+## Limitations
 
-## Back-of-Envelope Calculations
+- **The constants are local.** The 25% decision ratio and the tests per function are one data set and one teacher's choices; calibrate them from your own history.
+- **Test counts are not effort.** One complex test can take a day to design, a simple one minutes.
 
-### White Box Estimation
+## How solid is this?
 
-Number of tests for branch coverage = **n + 1** (where n = number of predicates)
-
-- Average from SONAR database: **25% of LOC are decisions**
-- Example: 1000 LOC → 250 decisions → 250 test cases
-
-### Black Box Estimation
-
-Test cases per function based on complexity × criticality:
-
-| Complexity | Non-critical | Medium | Critical |
-|------------|--------------|--------|----------|
-| Simple (2 inputs) | 8 | 12 | 12 |
-| Medium (4 inputs) | 8 | 15 | 21 |
-| Complex (6 inputs) | 8 | 16 | 40 |
-
-**Assumptions:**
-- Each function may require up to 3× test cases (depending on unit/integration inclusion)
-- Each input has two equivalence classes
-- Number of tests depends on criticality
-
-### Total Effort Formula
-
-```
-TotalTestCases = (1 + I + U) × Σ TestCasesPerFunction[i,j]
-
-Where:
-  1 = System level tests
-  I = Fraction for integration (0 < I < 1)
-  U = Fraction for unit testing (0 if under development, else 0 < U < 1)
-
-Effort = TotalTestCases × [DesignEffort + (1 + R) × ExecutionEffort]
-
-Where:
-  R = Fraction of test re-runs (regression)
-```
-
-## Sanity Checks
-
-> "A sanity check is a final check to see whether your answer makes sense in the context of the problem." {% cite kaner2000measurement %}
-
-**Validation approaches:**
-- Compare with function point estimates
-- Check against industry ratios
-- Use alternative estimation methods
-- Testing is typically ~30% of total development effort
-
-**Example validation:**
-- FPA with Productivity 10 FP/MM
-- Testing ≈ 30% of total effort
+- **Where it comes from.** The methods from Bluemke and Malanowska's review; the back-of-the-envelope model, table and Jones' rule as presented in Miranda's notes {% cite bluemke2021testeffort miranda2015asa %}.
+- **What is contested.** Bluemke and Malanowska find the body of good studies small and some published methods untrustworthy; treat any estimate as approximate.
+- **What we do not hold.** Jones' original sizing sources.
 
 ---
 

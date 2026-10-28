@@ -1,170 +1,57 @@
 ---
-title: Defect Prediction with ML
+title: Defect Prediction with Machine Learning
 parent: Cost of Quality
-nav_order: 7
+nav_order: 8
 layout: default
 ---
 
-# ML-Based Defect Prediction
+# Defect Prediction with Machine Learning
 
-Machine Learning (ML)-based defect prediction leverages historical software metrics to identify potential source code anomalies early in the development lifecycle, aiming to save time and reduce the overall cost of software testing {% cite khleel2023bilstm %} {% cite bhutamapuram2022predictive %}. By moving beyond simple defect counting to predictive modeling, organizations can proactively allocate resources to high-risk modules.
+**Defect prediction** trains a classifier on metrics of past code (size, complexity, coupling, change history) to flag the modules most likely to contain defects, so that reviews and tests can be concentrated there {% cite khleel2023bilstm bhutamapuram2022predictive %}. Its value for the cost of quality is appraisal effort saved on modules predicted clean; its risk is the defects in modules predicted clean that nobody then examines.
 
-## Bi-LSTM for Defect Prediction
+## 1. Accuracy misleads on imbalanced data
 
-Khleel & Nehéz (2023) proposed a Bidirectional Long Short-Term Memory (Bi-LSTM) neural network for software defect prediction {% cite khleel2023bilstm %}:
+Defect datasets are imbalanced: most modules are clean. A model that predicts "clean" for everything scores high accuracy and finds nothing. Khleel and Nehéz trained a bidirectional LSTM (a neural network that reads a sequence in both directions) on six Java projects. On the original data, accuracy averaged 0.88 but the **F-measure** (the harmonic mean of precision and recall on the defective class) only 0.51. On the jEdit dataset the model reached 0.97 accuracy with precision and recall of 0.00: it never flagged a single defective module correctly {% cite khleel2023bilstm %}.
 
-### Architecture
+**Oversampling** adds copies or synthetic examples of the rare class before training. With random oversampling the averages rose to 0.94 accuracy, 0.94 F-measure and 0.96 AUC; with SMOTE, which synthesizes new minority examples, to 0.92, 0.92 and 0.95 {% cite khleel2023bilstm %}.
 
-Unlike standard LSTMs that process data in one direction, Bi-LSTMs use two separate hidden layers to process input in both:
-- **Forward direction** (past to future)
-- **Backward direction** (future to past)
+## 2. Measure what the project gains
 
-This allows the model to capture complex bidirectional temporal dependencies in code evolution.
+Bhutamapuram and Sadam argue that accuracy and F-measure say little about the project. They propose measures computed from the same confusion matrix, among them the **percent of saved budget** (code that testers need not visit because it is correctly predicted clean), the **remaining service time** (hours still needed for defective code the model missed) and the **gratuitous service time** (hours wasted on modules wrongly flagged) {% cite bhutamapuram2022predictive %}.
 
-### Experimental Results
+On four Java projects (Eclipse, Equinox, Mylyn, PDE), self-training changed the averages as follows:
 
-Averages across six Java projects:
+| Measure | Before | After | Change |
+|---|---:|---:|---:|
+| Accuracy (%) | 86.80 | 85.84 | −0.96 |
+| F-measure (%) | 86.92 | 86.80 | −0.12 |
+| Percent of saved budget | 65.51 | 65.84 | +0.33 |
+| Remaining service time (hours) | 388.36 | 377.63 | −10.73 |
+| Gratuitous service time (hours) | 154.66 | 143.93 | −10.73 |
 
-| Condition | Accuracy | F-Measure | AUC |
-|-----------|----------|-----------|-----|
-| Original (imbalanced) | 88% | **51%** | 76% |
-| **+ Random Oversampling (ROS)** | **94%** | **94%** | **96%** |
-| + SMOTE | 92% | 92% | 95% |
+_Averages from Bhutamapuram and Sadam's Table 6._ {% cite bhutamapuram2022predictive %}
 
-**Key improvement with ROS:** F-measure improved by **43 percentage points**.
+By the traditional measures the model got slightly worse; by the project measures it got slightly better: testers could skip about 66% of the code, and both kinds of wasted hours fell.
 
-## The Class Imbalance Problem
+## Example: choosing between two models
 
-Software defect datasets are inherently imbalanced, typically containing many clean instances and very few defective ones {% cite gong2023overlap %}:
+A release has 100 modules, 10 of them defective. Model A flags 5 modules, 3 of them defective; model B flags 25, 9 of them defective. Accuracy, the share of modules classified correctly, is (3 + 88) / 100 = 0.91 for A and (9 + 74) / 100 = 0.83 for B, so accuracy favors A. Now price the errors as the two service-time measures do. Say a defective module the model misses costs 20 hours later, and examining a wrongly flagged clean module wastes 4 hours. A misses 7 defective modules (140 hours remaining) and wastes 2 inspections (8 hours): 148 hours. B misses 1 (20 hours) and wastes 16 inspections (64 hours): 84 hours. For the test manager, B is the better model. _(Constructed example.)_
 
-### Why Traditional Accuracy Misleads
+## When to use it, and when not
 
-| Metric | What It Measures | Problem with Imbalanced Data |
-|--------|------------------|------------------------------|
-| **Accuracy** | % of correct predictions | Reflects majority class dominance |
-| **F-measure** | Harmonic mean of precision/recall | Reveals true minority class detection |
+- **Use it** to prioritize reviews and tests in a large code base with a defect history; report precision, recall or project measures, never accuracy alone.
+- **Do not use it** on a new project without history, or as a reason to skip testing modules predicted clean in safety-critical code.
 
-**Example from Bi-LSTM study:** The model achieved 88% accuracy on original data, yet F-measure was only **51%**. In extreme cases like the 'jedit' dataset, the model showed high accuracy while recording **0% precision and 0% recall**—failing to detect a single defect {% cite khleel2023bilstm %}.
+## Limitations
 
-### Why F-Measure Matters
+- **Predictions inherit the history.** A model trained on last year's defects flags last year's kind of code.
+- **Oversampling can inflate results.** If copies of defective rows end up in both the training and the test set, the test scores look better than real performance; Khleel and Nehéz report scores on "balanced datasets" without stating whether they oversampled before or after splitting.
 
-F-measure reveals the model's true ability to identify the minority class (defects) rather than simply reflecting the majority class's dominance.
+## How solid is this?
 
-## Data Balancing Solutions
-
-To mitigate bias toward non-defective code, oversampling techniques supplement the minority class {% cite khleel2023bilstm %}:
-
-### Techniques Compared
-
-| Technique | Method | How It Works |
-|-----------|--------|--------------|
-| **Random Oversampling (ROS)** | Replication | Randomly duplicates minority examples |
-| **SMOTE** | Synthetic generation | Creates new samples from feature space |
-
-### Impact on Performance (Bi-LSTM Study)
-
-| Metric | Original | ROS | SMOTE | ROS Improvement |
-|--------|----------|-----|-------|-----------------|
-| Accuracy | 88% | **94%** | 92% | +6% |
-| F-measure | 51% | **94%** | 92% | **+43%** |
-| AUC | 76% | **96%** | 95% | +20% |
-
-**Finding:** ROS consistently outperformed SMOTE in this study.
-
-## Project-Specific Prediction Metrics
-
-Bhutamapuram & Sadam (2022) argued that traditional ML metrics (accuracy, F-measure) fail to translate directly to project objectives like budget savings or risk mitigation {% cite bhutamapuram2022predictive %}:
-
-### New Measures Proposed
-
-| Measure | Full Name | What It Measures |
-|---------|-----------|------------------|
-| **RF** | Risk Factor | Risk from false negatives (missed severe defects) |
-| **PSB** | Percent Saved Budget | % budget saved by correctly identifying clean modules |
-| **RST** | Remaining Service Time | Hours needed to service remaining defective code |
-| **GST** | Gratuitous Service Time | Wasted hours inspecting false positives |
-
-### Traditional vs. Project Metrics
-
-**Critical finding:** These metrics often contradict traditional ones.
-
-| Metric | Traditional | Project-Specific |
-|--------|-------------|------------------|
-| Accuracy change | -0.96 pts | — |
-| Budget savings (PSB) | — | **+0.33 pts** |
-| Wasted time (GST) | — | **-10.73 hours** |
-
-**Insight:** A model can be "less accurate" statistically while being **more valuable** to a project {% cite bhutamapuram2022predictive %}.
-
-### Real-World Impact
-
-Applied to four Java projects, the DST-DSP (Decision tree-based Self-Training) model achieved:
-
-| Metric | Savings |
-|--------|---------|
-| Cost units saved | **4,302** |
-| Service time reduced | **4,293 hours** |
-
-## Economic Translation
-
-Effective defect prediction enables "shifting left," catching defects in development where they are significantly cheaper to resolve {% cite knox1993modeling %}:
-
-### Cost Assumptions
-
-| Phase | Cost per Defect |
-|-------|-----------------|
-| Development | $100 |
-| Post-release | $10,000 (100× multiplier) |
-
-### Example: 1,000 Potential Defects
-
-| Scenario | F-Measure | Caught Early | Escaped | Total Cost |
-|----------|-----------|--------------|---------|------------|
-| **Without balancing** | 51% | 510 | 490 | **$4.95M** |
-| **With ROS balancing** | 94% | 940 | 60 | **$694K** |
-
-### Net Business Value
-
-| Metric | Value |
-|--------|-------|
-| Cost savings | **$4.26M** |
-| Cost reduction | **86%** |
-| Investment required | Data balancing + training |
-
-## Practical Recommendations
-
-### For Data Scientists
-
-| Practice | Rationale |
-|----------|-----------|
-| **Always use F-measure or MCC** | Accuracy misleads with imbalanced data |
-| **Apply oversampling (ROS or SMOTE)** | Addresses class imbalance |
-| **Test on held-out imbalanced data** | Realistic evaluation |
-
-### For Project Managers
-
-| Practice | Rationale |
-|----------|-----------|
-| **Translate to project metrics** | PSB, RST, GST, RF map to business value |
-| **Budget for prediction infrastructure** | ROI is 86%+ cost reduction |
-| **Prioritize high-risk modules** | Focus testing resources effectively |
-
-### For Quality Engineers
-
-| Practice | Rationale |
-|----------|-----------|
-| **Integrate predictions into CI/CD** | Automated risk flagging |
-| **Track historical metrics** | Improves model over time |
-| **Combine with other quality gates** | Predictions are one signal among many |
-
-## Summary
-
-| Aspect | Traditional Approach | ML-Based Prediction |
-|--------|---------------------|---------------------|
-| Defect detection | Find after introduction | **Predict before testing** |
-| Resource allocation | Uniform coverage | **Risk-based prioritization** |
-| Cost structure | Reactive (failure costs) | **Proactive (prevention costs)** |
-| ROI potential | — | **86% cost reduction** |
+- **Where it comes from.** The imbalance results from Khleel and Nehéz, the project measures from Bhutamapuram and Sadam {% cite khleel2023bilstm bhutamapuram2022predictive %}.
+- **What is contested.** The improvements in section 2 are small; the paper reports them as significant at p < 0.05 for the saved budget and the remaining service time, not for accuracy.
+- **What we do not hold.** A study that converts prediction results into money for a real project.
 
 ---
 

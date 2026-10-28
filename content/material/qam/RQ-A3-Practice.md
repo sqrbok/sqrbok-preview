@@ -10,104 +10,115 @@ page_type: question-set
 
 # RQ A03: Industry Quality Practices
 
-**Purpose:** Self-study and exam preparation
-**Format:** Explain in your own words, give brief examples
+These questions test [SN A03: Industry Quality Practices](SN-A3-Practice.md). Explain in your own words and give brief examples; for calculations, show each step.
 
 ---
 
-## Question 1: The Test Pyramid
+## Question 1: The Test Mix
 
-Google recommends a 70/20/10 distribution for small (unit), medium (integration), and large (E2E) tests.
+*Software Engineering at Google* aims, as a very rough guideline, for about 80% unit, 15% integration and 5% end-to-end tests.
 
-Explain why this ratio exists. What problems occur when teams have an "inverted pyramid" with mostly E2E tests and few unit tests?
-
----
-
-## Question 2: Test Coverage Limitations
-
-Microsoft targets 80% code coverage at final release, yet the book states "coverage ≠ quality."
-
-Explain the difference between what coverage measures and what it cannot detect. Give a concrete example where 100% coverage fails to catch a bug.
+1. Define small, medium and large tests by the resources they may use.
+2. Why does the guideline favor small tests? What goes wrong in a suite that is mostly end-to-end tests?
 
 ---
 
-## Question 3: Code Review Speed and Size
+## Question 2: Flaky Tests
 
-Google's code review data shows median latency <4 hours and median change size of 24 lines.
-
-Why are small, fast reviews important? What happens to review quality when changes exceed 100 lines?
+What is a flaky test, and why is one flaky test a problem for the whole suite? Describe how a team can detect and handle flaky tests.
 
 ---
 
-## Question 4: Static Analysis Adoption
+## Question 3: Coverage Limitations
 
-Google disables any static analysis check with >10% false positive rate.
+Microsoft's final-release exit criteria include 80% code coverage from unit tests.
 
-Explain why false positives matter for tool adoption. What happens when developers receive too many false warnings?
-
----
-
-## Question 5: Canary Deployment
-
-Canary deployment exposes only 1% of users to new code initially.
-
-Explain how canary limits "blast radius." Calculate: if a bug causes 20% errors in the new code, what is the overall error rate with a 5% canary vs no canary?
+1. What does coverage measure, and what can it not detect?
+2. Give your own example of code with 100% line coverage and a passing test that still hides a bug.
 
 ---
 
-## Question 6: SLIs, SLOs, and SLAs
+## Question 4: LLM-Generated Tests
 
-The SRE model defines three levels: SLI (indicator), SLO (objective), and SLA (agreement).
-
-Explain the hierarchy. Why should your internal SLO be stricter than the external SLA you promise customers?
+Research finds that LLM-generated test assertions tend to capture a program's actual behavior rather than its expected behavior. Explain why such tests can pass on buggy code, and how a developer should review a generated assertion.
 
 ---
 
-## Question 7: Error Budgets
+## Question 5: Code Review Size and Speed
 
-Error budget equals 100% minus SLO. If you have a 99.9% SLO and serve 3 million requests per month:
+Google's median change is 24 lines, reviewed by one person, with a median review time under 4 hours.
 
-Calculate your monthly error budget. What actions does a team take when the error budget is exhausted? What can they do when budget remains?
-
----
-
-## Question 8: Four Golden Signals
-
-SRE monitors Latency, Traffic, Errors, and Saturation.
-
-Explain the difference between alerting on "symptoms" vs "causes." Give an example of a bad alert (cause) and a good alert (symptom) for the same underlying issue.
+1. Why do small changes make fast review possible?
+2. What did Microsoft find about who writes the most useful review comments, and about large changes?
+3. What is the main purpose of code review at Google?
 
 ---
 
-## Question 9: Toil and the 50% Rule
+## Question 6: False Alarms in Static Analysis
 
-Google SRE defines "toil" as manual, repetitive, automatable work with no enduring value, and limits it to 50% of SRE time.
-
-Give three examples of toil vs engineering work. Why is the 50% threshold important for team sustainability?
+Google's Tricorder puts an analyzer on probation when 10% or more of its findings are marked NOT USEFUL. Why do false alarms matter so much for adoption? What happens when developers receive too many?
 
 ---
 
-## Question 10: LLM Testing Risks
+## Question 7: Canary Deployment
 
-Research shows up to 68.1% of LLM-generated tests may "validate bugs" due to the "intent gap."
-
-Explain what the intent gap means. Why do LLM-generated tests often pass for buggy code? How should developers review AI-generated assertions?
-
----
-
-## Question 11: Chaos Engineering
-
-Netflix runs Chaos Monkey during business hours to randomly terminate production instances.
-
-Explain the difference between resilience testing and chaos engineering. Why is discovering unknown weaknesses valuable before customers do?
+1. Explain how a canary release limits the blast radius.
+2. A new version fails 20% of its requests. Ignoring the old version's own errors, compute the overall error rate with a 1% canary, a 5% canary and no canary.
+3. With a 99.9% SLO, what does the 5% canary mean for the error budget?
 
 ---
 
-## Question 12: AI Agent Trust Tiers
+## Question 8: Feature Flags and Rollback
 
-The trust tier framework (T0-T3) governs AI agent autonomy, from observational (T0) to full autonomy (T3).
+How does a feature flag separate deployment from release? Why is "roll back first, fix afterwards" the rule when a release goes wrong?
 
-What are the requirements for an AI agent to reach T3? Why does research show a 37.6% increase in vulnerabilities when AI iterates without human gates?
+---
+
+## Question 9: SLIs, SLOs and SLAs
+
+Explain the hierarchy of SLI, SLO and SLA with one example of each. Why should the internal SLO be stricter than the SLA?
+
+---
+
+## Question 10: Error Budgets
+
+A service has a 99.9% SLO and serves 3,000,000 requests in 30 days.
+
+1. Calculate the error budget in failed requests and the even burn rate per hour.
+2. How many days does the budget last at a burn rate of 10, that is, ten times the even rate?
+3. What does a team do when the budget is exhausted, and what can it do while budget remains?
+
+---
+
+## Question 11: Golden Signals and Paging
+
+Name the four golden signals. Explain the difference between alerting on symptoms and on causes, and give a bad (cause) and a good (symptom) alert for the same underlying problem.
+
+---
+
+## Question 12: Toil and On-Call
+
+Define toil. Give three examples of toil and three of engineering work that reduces it. Why does Google cap toil at 50% and on-call at two incidents per 12-hour shift?
+
+---
+
+## Question 13: Who Owns Quality
+
+Compare Facebook's continuous deployment without a separate test team with Microsoft's bug bar and ship room. Which suits an online service, and which a product that customers install? Why does Facebook's mobile app use a release train?
+
+---
+
+## Question 14: Chaos Engineering
+
+1. What is the difference between resilience testing and chaos engineering?
+2. List the steps of a chaos experiment and the safeguards that keep it from causing an outage.
+3. Why is finding an unknown weakness before customers do worth the risk?
+
+---
+
+## Question 15: AI Assistants
+
+Most professionals now use AI at work. Why does letting an LLM repeatedly "improve" code without human review increase security risk, according to the experiment in the notes? What practices should apply to AI-generated changes?
 
 ---
 
@@ -115,13 +126,13 @@ What are the requirements for an AI agent to reach T3? Why does research show a 
 
 | Topic | Questions |
 |-------|-----------|
-| Test pyramid & coverage | Q1, Q2 |
-| Code review practices | Q3, Q4 |
-| CI/CD & deployment | Q5 |
-| SRE fundamentals (SLO, budgets) | Q6, Q7 |
-| Monitoring & on-call | Q8, Q9 |
-| AI/LLM in quality | Q10, Q12 |
-| Chaos engineering | Q11 |
+| Testing practices | Q1, Q2, Q3, Q4 |
+| Code review and static analysis | Q5, Q6 |
+| CI/CD and deployment | Q7, Q8 |
+| SRE | Q9, Q10, Q11, Q12 |
+| Quality organization | Q13 |
+| Chaos engineering | Q14 |
+| AI in development | Q4, Q15 |
 
 ---
 

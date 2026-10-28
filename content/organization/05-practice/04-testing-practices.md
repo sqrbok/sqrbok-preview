@@ -7,118 +7,48 @@ layout: default
 
 # Testing Practices
 
-Modern software testing has evolved from a reactive, late-stage verification activity into a continuous, data-driven discipline that spans the entire software development lifecycle (SDLC) {% cite keating2024shift %}.
+Modern testing practice moves quality activities to both ends of the delivery pipeline: **shift-left** testing starts verification as early as possible (reviews, static analysis, tests written with the code), and **shift-right** testing continues it in production (canary releases, monitoring, experiments) {% cite keating2024shift %}. Test automation connects the two.
 
-## Shift-Left Testing: Early Verification and Validation
+## 1. Shift left: find defects where they are made
 
-Shift-left testing refers to the practice of moving testing activities earlier in the SDLC to identify defects as close to their point of origin as possible {% cite magori2024early %} {% cite keating2024shift %}.
+Shift-left moves verification closer to where defects are introduced: design reviews, code review and inspection, static analysis, acceptance criteria written as tests (ATDD), and unit and integration tests run on every change. A study comparing early-phase verification (design review, code review, inspection) with testing after development reports that the early techniques consistently did better at preventing defects {% cite magori2024early %}. The reasoning is the defect-cost argument of [Cost of Quality](../01-coq/index.md): a defect found in review is fixed before anyone builds on it.
 
-### Core Principles
+## 2. Shift right: keep testing in production
 
-The primary goal is **defect prevention** rather than mere detection, adhering to the principle that quality cannot be "tested in" but must be "built in" through iterative verification {% cite magori2024early %}.
+Some failures appear only with real users, data and load. Shift-right techniques test there under control {% cite keating2024shift %}:
 
-### Techniques
+- **Canary release:** send a small share of traffic to the new version and compare its errors and latency with the old one (see [Quality Gates & CI/CD](10-quality-gates-cicd.md)).
+- **Feature flags:** deploy code switched off and turn it on for chosen users.
+- **A/B testing:** run two variants and compare outcomes.
+- **Chaos engineering:** inject failures deliberately to check resilience (see [Chaos Engineering](12-chaos-engineering.md)).
+- **Observability:** logs, metrics and traces, increasingly with machine-learned anomaly detection, to notice problems before users report them.
 
-| Technique | Purpose |
-|-----------|---------|
-| **Software Design Reviews** | Validate architectural decisions early |
-| **Code Reviews** | Catch defects before testing phase |
-| **Static Code Analysis** | Identify vulnerabilities automatically |
-| **ATDD** | Acceptance Test-Driven Development for requirements validation |
-| **Unit/Integration Testing** | Automated verification at code level |
+Gottam's *convergent quality engineering* closes the loop: production telemetry decides which tests matter most, and test results decide where to watch production most closely {% cite gottam2025convergent %}.
 
-### Key Findings
+## 3. Example: test automation at F-Secure
 
-Research indicates that early-phase V&V techniques consistently outperform traditional post-development testing in terms of defect prevention {% cite magori2024early %}. Case studies show that code reviews catch a substantial portion of defects before they propagate to the testing phase, resulting in:
-- Shorter development cycles
-- Lower overall costs
-- Higher defect detection efficiency
+Wang and colleagues report on test automation improvement in "Epics", an 11-engineer DevOps team at the Finnish security company F-Secure that builds Windows endpoint-security software {% cite wang2020testautomation %}. The team named the factors behind its success:
 
-## Shift-Right Testing: Production Monitoring and Observability
+- **Whole-team effort:** everyone writes and maintains automation. In 2005 a separate two-person team built the tests for the feature teams, and the feature teams lacked the skills to maintain them.
+- **Tool choice and architecture:** test tools are treated as interchangeable "Lego bricks", each small enough to replace as the team learns.
+- **Product testability:** visibility and control designed into the product so it can be tested in isolation.
+- **Telemetry and an incremental approach:** measure, improve a little, repeat.
 
-Shift-right testing extends quality assurance into the production environment to validate system behavior under real-world conditions {% cite keating2024shift %}.
+The time from a release decision to the release reaching the first customer machines fell from 5 days in 2018 to 4 hours in 2019.
 
-### Techniques
+## When to use them — and when not
 
-| Technique | Description |
-|-----------|-------------|
-| **Canary Releases** | Deploy to subset of users to detect issues early |
-| **A/B Testing** | Compare variants to validate changes |
-| **Chaos Engineering** | Deliberately introduce failures to validate resilience |
-| **Feature Flags** | Control feature rollout dynamically |
+Every team benefits from shift-left basics (review, static analysis, fast unit tests). Shift-right needs a service the team runs itself, users whose experience can be measured, and the ability to roll back quickly; it is not available for software installed by customers on isolated machines, and it is no substitute for testing before release where failures are dangerous.
 
-### AI-Driven Observability
+## Limitations
 
-Modern observability focuses on analyzing logs, metrics, and traces to infer internal system states {% cite keating2024shift %}. AI-driven observability leverages machine learning to:
-- Automate pattern recognition
-- Provide real-time anomaly detection
-- Establish behavioral baselines that adapt to seasonality and workload variation
+- **Thin evidence.** The early-V&V study is a preprint that has not been peer reviewed; the convergent-quality and shift-right papers are conceptual frameworks, not measurements {% cite magori2024early gottam2025convergent keating2024shift %}.
+- **One team.** The F-Secure report is a self-reported experience report of one team.
 
-### Key Findings
+## How solid is this?
 
-These practices facilitate a proactive engineering approach, resulting in:
-- **73% reduction** in system outages
-- Significant improvements in Mean Time to Detection (MTTD)
-- Faster Mean Time to Resolution (MTTR) through automated diagnostics
-
-## Test Automation in DevOps Context
-
-In a DevOps environment, test automation is critical for supporting frequent release cycles and providing rapid feedback to developers {% cite wang2020testautomation %}.
-
-### Success Factors
-
-**Whole Team Effort**: Successful Test Automation Process Improvement (TAPI) relies on a model where all team members share responsibility for automation, rather than isolating it within a specialized team {% cite wang2020testautomation %}.
-
-**Modular Architecture**: Utilizing a "Lego brick" architecture allows for interchangeable tools that can be replaced as insight emerges {% cite wang2020testautomation %}.
-
-**Product Testability**: Automation success is highly dependent on product testability; visibility and control must be designed into the software architecture itself (e.g., using isolated components) to facilitate independent testing.
-
-### Quantitative Results
-
-Implementing these practices at scale can achieve remarkable improvements {% cite wang2020testautomation %}:
-
-| Metric | Before | After |
-|--------|--------|-------|
-| Daily test executions | Limited | 200,000+ tests/day |
-| Release lead time | 5 days | 4 hours |
-
-## Convergent Quality Engineering Framework
-
-The Convergent Quality Engineering framework proposes a holistic integration of shift-left and shift-right methodologies into a continuous quality loop {% cite gottam2025convergent %}.
-
-### The Closed-Loop System
-
-This framework views quality as a cyclical learning process where bidirectional information flows connect development-time testing with operational production insights {% cite gottam2025convergent %}:
-
-```
-┌─────────────────────────────────────────────────────────┐
-│                                                         │
-│  Development ──► Testing ──► Production ──► Analytics   │
-│       ▲                                        │        │
-│       │                                        │        │
-│       └────────── Feedback Loop ───────────────┘        │
-│                                                         │
-└─────────────────────────────────────────────────────────┘
-```
-
-### Integration Mechanisms
-
-- **Production → Development**: Production telemetry is fed back to inform intelligent test prioritization
-- **Development → Production**: Pre-release test results guide where observability focus is most needed
-
-### Organizational Requirements
-
-Implementation requires {% cite gottam2025convergent %}:
-- Cultural shift toward **shared quality ownership**
-- **Executive sponsorship** for transformation
-- Development of **T-shaped professionals** who possess both specialized quality knowledge and broad understanding of the DevOps lifecycle
-
-### Key Findings
-
-Organizations adopting this integrated approach report:
-- Measurable reductions in defect escape rates
-- System-wide performance gains as feedback loops mature
-- Better alignment between development and operations goals
+- **Where it comes from.** An experience report, a preprint on early verification, and two conceptual papers {% cite wang2020testautomation magori2024early keating2024shift gottam2025convergent %}.
+- **What is contested.** How much to test in production; it moves risk to users, and the frameworks above do not quantify that trade-off.
 
 ---
 

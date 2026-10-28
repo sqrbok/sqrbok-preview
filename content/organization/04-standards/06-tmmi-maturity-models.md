@@ -5,154 +5,53 @@ nav_order: 6
 layout: default
 ---
 
-# TMMi & Other Maturity Models
+# TMMi & Maturity Models
 
-Maturity models serve as structured frameworks that allow organizations to analyze behaviors, practices, and processes to achieve reliable and sustainable results {% cite mikusova2020maturity %}. While the Capability Maturity Model Integration (CMMI) is a global standard for overall software development, the Test Maturity Model Integration (TMMi) emerged to provide specific, dedicated guidance for software testing practices {% cite vanveenendaal2022tmmi %}.
+The **Test Maturity Model integration (TMMi)** is a staged maturity model for the test process alone: five levels, 16 process areas, 50 specific goals and 173 specific practices, built like [CMMI](01-cmmi-overview.md) but with the testing detail that CMMI lacks {% cite vanveenendaal2022tmmi %}. The TMMi Foundation was founded in 2010 and published the first stable version in 2012; it uses ISTQB's testing terminology.
 
-## TMMi Overview and Structure
+## 1. Levels and process areas
 
-The TMMi was developed to address a gap in general process improvement models like CMMI and SPICE, which often lack detailed recommendations for software testing despite it accounting for a significant portion of project budgets {% cite vanveenendaal2022tmmi %}.
+| Level | Name | Process areas |
+|---|---|---|
+| 1 | Initial | none: testing is ad hoc |
+| 2 | Managed | test policy and strategy, test planning, test monitoring and control, test design and execution, test environment |
+| 3 | Defined | test organization, test training program, test lifecycle and integration, non-functional testing, peer reviews |
+| 4 | Measured | test measurement, product quality evaluation, advanced reviews |
+| 5 | Optimization | defect prevention, quality control, test process optimization |
 
-### Foundation
+The counts add to 5 + 5 + 3 + 3 = 16. Each process area breaks down into goals and practices; test policy and strategy, for instance, has three specific goals: establish a test policy, establish a test strategy and establish test performance indicators {% cite vanveenendaal2022tmmi %}.
 
-- **Formally established**: 2010 by the TMMi Foundation
-- **First stable specification (v1.0)**: Published 2012
-- **Alignment**: Heavily aligned with ISTQB standards and terminology
+## 2. Example: why organizations adopt it
 
-### Hierarchical Structure
+Van Veenendaal, Garousi and Felderer surveyed the 114 companies and teams formally assessed by the TMMi Foundation; 74 responded (64.9%) {% cite vanveenendaal2022tmmi %}. The most common motives were better software quality (70%), higher test productivity (68%), lower product risk and the certificate itself (62% each). 87% said TMMi met or exceeded their expectations, and 88% saw benefits for product quality.
 
-TMMi is designed as a staged meta-model {% cite vanveenendaal2022tmmi %}:
+Respondents gave concrete figures, each from one organization: regression test execution cut from 4 hours to 30 minutes, defect leakage to production down from 10% to 5%, and a **defect detection percentage (DDP)** in system testing up from 60% to 70%. DDP is the number of defects a test phase finds divided by the number found by that phase and by everything afterwards. If system test finds 60 defects and 40 more turn up later, DDP is 60 / (60 + 40) = 60%; finding 70 of the same 100 gives 70%.
 
-| Component | Count |
-|-----------|-------|
-| Maturity Levels | 5 |
-| Process Areas (PAs) | 16 |
-| Specific Goals (SG) | 50 |
-| Specific Practices (SP) | 173 |
-| Generic Goals (GG) | Institutionalization objectives |
-| Generic Practices (GP) | Implementation activities |
+## 3. Other maturity models
 
-## TMMi Levels and Characteristics
+TMMi is one of many: a review cited in the survey counts 58 models for test maturity and capability alone {% cite vanveenendaal2022tmmi %}. Maturity models also exist for usability, where most are derived from CMMI or ISO/IEC 15504 but few are validated {% cite lacerda2018usability %}, and for universities, where a review of 23 studies found that CMMI-style models dominate but cover isolated areas and say *what* to reach rather than *how* {% cite mikusova2020maturity %}.
 
-TMMi provides a roadmap for evolving testing from an ad-hoc activity to an optimized process {% cite vanveenendaal2022tmmi %}:
+| Need | Model |
+|---|---|
+| Overall development process | [CMMI](01-cmmi-overview.md) |
+| Test process | TMMi |
+| IT service management | [ITIL](03-itil-framework.md) |
+| Certified quality management system | [ISO 9001](05-iso-9000-quality-systems.md) |
 
-### Level Overview
+## When to use it — and when not
 
-| Level | Name | Focus |
-|-------|------|-------|
-| **1** | Initial | Unmanaged, ad-hoc, chaotic |
-| **2** | Managed | Basic test management |
-| **3** | Defined | SDLC integration |
-| **4** | Measured | Quantitative evaluation |
-| **5** | Optimization | Continuous improvement |
+Use TMMi when testing is a large part of the cost and the organization wants a roadmap for it specifically, or alongside CMMI, which has verification and validation process areas but little testing detail. A team without a basic test plan should not start with an assessment; Level 2's five process areas are the practical checklist.
 
-### Level Details
+## Limitations
 
-**Level 1 - Initial**: Testing is unmanaged, ad-hoc, and often chaotic. Success depends on individual effort.
+- **Survey of the converted.** All respondents had already paid for a formal assessment, so satisfaction rates are likely to be high.
+- **Anecdotal metrics.** The before-and-after figures are single organizations' statements, not measured across the sample.
+- **The foundation reports on its own model.** The survey was run by the TMMi Foundation, whose CEO is one of the authors.
 
-**Level 2 - Managed**: Focuses on basic management with key process areas:
-- Test Policy and Strategy
-- Test Planning
-- Test Monitoring and Control
-- Test Design and Execution
-- Test Environment
+## How solid is this?
 
-**Level 3 - Defined**: Integration of testing into the SDLC with key process areas:
-- Non-Functional Testing
-- Peer Reviews
-- Test Training Programs
-- Test Organization
-- Test Lifecycle Integration
-
-**Level 4 - Measured**: Testing is measured and evaluated:
-- Test Measurement
-- Product Quality Evaluation
-- Advanced Peer Reviews
-
-**Level 5 - Optimization**: Focuses on continuous improvement:
-- Defect Prevention
-- Test Process Optimization
-- Quality Control
-
-## Adoption Motivations and Benefits
-
-According to a 2020 international survey of 74 certified companies, TMMi adoption is driven by the "Golden Triangle" of project management {% cite vanveenendaal2022tmmi %}:
-
-### Top Motivations
-
-| Motivation | Percentage |
-|------------|------------|
-| Enhancing software quality | **70%** |
-| Increasing testing productivity | **68%** |
-| Reducing product risk | **62%** |
-| Achieving formal certification | **62%** |
-
-### Reported Benefits
-
-| Benefit Area | Improvement Rate |
-|--------------|------------------|
-| Product Quality | **88%** observed improvement |
-| Compliance | **84%** improved standardization |
-| Test Efficiency | **77%** noted productivity gains |
-| Satisfaction | **87%** met or exceeded expectations |
-
-### Specific Improvements Reported
-
-| Metric | Before | After |
-|--------|--------|-------|
-| Defect leakage to production | 10% | 5% |
-| Regression test cycle | 4 hours | 30 minutes |
-
-## Comparison of Maturity Models
-
-The landscape of maturity models is vast, with at least 58 distinct models reported for testing alone {% cite vanveenendaal2022tmmi %}.
-
-### CMMI vs TMMi
-
-| Aspect | CMMI | TMMi |
-|--------|------|------|
-| **Scope** | Overall SDLC | Testing-specific |
-| **Testing guidance** | Limited | Comprehensive |
-| **Use case** | Defense/government projects | Testing process improvement |
-| **Relationship** | Primary framework | Specialized complement |
-
-CMMI is an "overall" SDLC model often required for defense or government projects, but it does not provide specific testing guidelines. TMMi acts as a specialized complement that fills this testing-specific gap {% cite vanveenendaal2022tmmi %}.
-
-### Other Maturity Model Categories
-
-| Category | Examples | Focus |
-|----------|----------|-------|
-| **General Process** | CMMI, SPICE/ISO 15504 | Overall software development |
-| **Testing-Specific** | TMMi, TPI | Software testing practices |
-| **Usability** | UCDM, UMM-P | User-centered design |
-| **Academic** | eMM, ICMM | Education, knowledge management |
-
-### Maturity Model Landscape
-
-Research by Mikušová & Čambál (2020) examines the application of maturity models across various domains {% cite mikusova2020maturity %}:
-
-- **Usability Maturity Models (UCMMs)**: Most are directly based on consolidated standards like CMMI or ISO/IEC 15504
-- **Academic Maturity Models**: Adapted for specific purposes such as e-Learning (eMM) and Intellectual Capital (ICMM)
-- **Evolving Trends**: Modern models shifting toward agility and automation
-
-### Selecting a Maturity Model
-
-| Consideration | Questions to Ask |
-|---------------|------------------|
-| **Scope** | Overall process or specific domain? |
-| **Compliance** | Certification requirements? |
-| **Resources** | Available budget and expertise? |
-| **Integration** | Existing frameworks in use? |
-
-## Summary: When to Use Which Model
-
-| Need | Recommended Model |
-|------|-------------------|
-| Overall software development maturity | CMMI |
-| Testing-specific improvement | TMMi |
-| IT service management | ITIL |
-| Quality management system | ISO 9001 |
-| Combined development + testing | CMMI + TMMi together |
+- **Where it comes from.** The TMMi Foundation's user survey, and reviews of usability and university maturity models {% cite vanveenendaal2022tmmi lacerda2018usability mikusova2020maturity %}.
+- **What we do not hold.** The TMMi specification; the process-area names above follow the published framework, which the survey cites but the review does not hold.
 
 ---
 
