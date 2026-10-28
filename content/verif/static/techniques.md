@@ -1,225 +1,134 @@
 ---
-title: Analysis Techniques
+title: Pattern, Type and Taint Checks
 parent: Static Analysis
 nav_order: 2
 layout: default
+page_type: deep-dive  # four real tool runs on one file plus the goto-fail case; each technique needs its output shown
 ---
 
-# Analysis Techniques
+# Pattern, Type and Taint Checks
 
-Static analysis encompasses a range of techniques that differ in what program representation they analyze, how deeply they reason about behavior, and what kinds of defects they can detect. This page covers the foundational techniques that underlie modern static analysis tools {% cite chess2007static %}.
+The everyday static checks look for **patterns** in the code's text or syntax tree, check **types**, follow **control flow**, and track **taint** from untrusted input to dangerous calls. They are cheap enough to run on every commit, and each sees a different slice of the faults {% cite chess2007static %}.
 
----
+## 1. Example: one file, four tools
 
-## Technique Overview
-
-| Technique | What It Analyzes | Precision | Cost | Example Tools |
-|-----------|-----------------|-----------|------|---------------|
-| Lexical / Style | Token patterns | Low | Very Low | ESLint, Pylint, RuboCop |
-| AST Pattern Matching | Code structure (syntax tree) | Medium | Low | PMD, SpotBugs, Semgrep |
-| Type Checking | Type annotations and inference | High | Low | TypeScript, mypy, Flow |
-| Control Flow Analysis | Execution paths (CFG) | Medium | Medium | Compiler warnings, Coverity |
-| Dataflow Analysis | Variable states through paths | Medium-High | Medium | Infer, Clang Static Analyzer |
-| Taint Analysis | Data flow from source to sink | Medium | Medium | CodeQL, Fortify, Checkmarx |
-| Abstract Interpretation | Program semantics over abstract domains | High | High | Polyspace, Astree |
-
-Each technique trades off depth of analysis against computational cost and the ability to scale to large codebases. A comparison of six Java static analysis tools found less than 0.4% agreement at the line level, confirming that different techniques detect fundamentally different defect types {% cite lenarduzzi2021comparison %}.
-
----
-
-## Lexical Analysis and Style Checking
-
-The simplest form of static analysis operates on the raw text or token stream of source code, without parsing it into a tree structure.
-
-**What it detects:**
-- Code formatting violations (indentation, spacing, line length)
-- Naming convention violations (camelCase vs. snake_case)
-- Use of banned functions or deprecated APIs
-- Comment quality and documentation coverage
-
-**How it works:**
-Pattern matching on tokens or regular expressions applied to source lines. No understanding of program semantics -- the analysis treats code as text.
-
-**Tools:** ESLint (JavaScript), Pylint (Python), RuboCop (Ruby), Checkstyle (Java)
-
-**Strengths and limitations:**
-
-| Strength | Limitation |
-|----------|-----------|
-| Extremely fast | Cannot understand program behavior |
-| Easy to configure | High false positive rate for complex rules |
-| Language-agnostic patterns possible | Misses semantic bugs entirely |
-| Low barrier to adoption | Limited to surface-level issues |
-
-Lexical analysis is the foundation of every linter and is typically the first static analysis technique adopted by a project.
-
----
-
-## AST Pattern Matching
-
-A step deeper than lexical analysis, AST (Abstract Syntax Tree) pattern matching parses source code into a tree representation and matches subtrees against known bug patterns {% cite chess2007static %}.
-
-**What it detects:**
-- Known bug patterns (null comparisons after dereference, double-checked locking)
-- Misuse of APIs (incorrect argument order, missing null checks)
-- Common coding mistakes (equality vs. assignment, fall-through in switch)
-- Unused variables, unreachable code, empty catch blocks
-
-**How it works:**
-1. Parse source code into an AST
-2. Walk the tree looking for subtree patterns that match known bugs
-3. Report matches with location and description
-
-**Example -- Double-checked locking (Java):**
-```java
-// Broken double-checked locking pattern
-if (instance == null) {
-    synchronized (lock) {
-        if (instance == null) {
-            instance = new Singleton(); // May be reordered!
-        }
-    }
-}
-```
-
-A tool like SpotBugs (formerly FindBugs) recognizes this AST pattern and flags it because the Java Memory Model allows instruction reordering that can expose a partially constructed object.
-
-**Tools:** PMD (Java, multi-language), SpotBugs (Java bytecode), Semgrep (multi-language, custom rules)
-
----
-
-## Type Checking
-
-Static type systems verify that operations are applied to compatible data types at compile time, catching an entire class of errors before the program runs.
-
-**What it detects:**
-- Type mismatches (passing a string where an integer is expected)
-- Null/undefined reference errors (with null-safe type systems)
-- Missing interface implementations
-- Incorrect generic type usage
-
-**Modern null safety:**
-
-Languages like Kotlin, Swift, and modern TypeScript distinguish nullable from non-nullable types at the type level:
-
-```typescript
-// TypeScript strict null checks
-function greet(name: string): string {
-    return "Hello, " + name;  // 'name' guaranteed non-null
-}
-
-function greetMaybe(name: string | null): string {
-    // return "Hello, " + name;  // Error: 'name' might be null
-    return name ? "Hello, " + name : "Hello, stranger";
-}
-```
-
-**Gradual typing** (TypeScript, mypy for Python, Flow for JavaScript) allows teams to incrementally add type annotations to existing codebases, getting increasing type safety without rewriting.
-
----
-
-## Control Flow Analysis
-
-Control flow analysis constructs a **Control Flow Graph (CFG)** -- a directed graph where nodes represent basic blocks (sequences of statements with no branches) and edges represent possible transfers of control.
-
-**What it detects:**
-- Unreachable code (dead code after unconditional return or break)
-- Missing return statements on some paths
-- Infinite loops
-- Missing error handling on exception paths
-
-**CFG construction example:**
-
-Consider this function:
+The file below is a constructed example with three planted faults: an unused variable, a value that may be `None`, and an SQL query built from user input.
 
 ```python
-def abs_value(x):
-    if x < 0:       # Block B1: condition
-        x = -x      # Block B2: then branch
-    return x         # Block B3: exit
+"""User lookup for a small shop."""
+import sqlite3
+from typing import Optional
+
+
+def find_user(db: sqlite3.Connection, name: str) -> Optional[tuple]:
+    query = "SELECT id, name FROM users WHERE name = '" + name + "'"
+    return db.execute(query).fetchone()
+
+
+def greeting(db: sqlite3.Connection, name: str) -> str:
+    user = find_user(db, name)
+    return "Hello, " + user[1]
+
+
+def total(prices: list[float]) -> float:
+    result = 0.0
+    for p in prices:
+        tax = p * 0.2
+        result += p
+    return result
 ```
 
-```mermaid
-flowchart TD
-    B1["B1: if x < 0"] -- "true" --> B2["B2: x = -x"]
-    B1 -- "false" --> B3["B3: return x"]
-    B2 --> B3
+Each tool, run with its default settings, reports a different fault (pylint's three missing-docstring messages and Bandit's summary lines omitted; long lines wrapped):
+
+```text
+$ pylint users.py
+users.py:19:8: W0612: Unused variable 'tax' (unused-variable)
+$ flake8 users.py
+users.py:19:9: F841 local variable 'tax' is assigned to but never used
+$ mypy users.py
+users.py:13: error: Value of type "tuple[Any, ...] | None"
+    is not indexable  [index]
+$ bandit users.py
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection
+   vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89
+   Location: ./users.py:7:12
 ```
 
-The CFG makes control flow explicit. Static analysis algorithms traverse this graph to reason about what happens on each path. For instance, if `B3` were unreachable from any predecessor, the tool would flag dead code.
+| Tool (version) | Technique | Found | Missed |
+|---|---|---|---|
+| pylint 4.1.3 | AST rules | unused `tax` (line 19) | the `None` index, the injection |
+| flake8 7.4.1 | AST rules (pyflakes) | unused `tax` (line 19) | the `None` index, the injection |
+| mypy 2.4.0 | type checking | `user` may be `None` (line 13) | the unused variable, the injection |
+| Bandit 1.9.4 | AST security patterns | SQL built by concatenation (line 7) | the unused variable, the `None` index |
 
-**Applications:**
-- **Unreachable code detection**: Find blocks with no incoming edges (except the entry block)
-- **Loop analysis**: Identify natural loops, detect unbounded loops
-- **Exception flow**: Track which exceptions can propagate to which handlers
-- **Resource leak detection**: Verify that resources opened on one path are closed on all paths
+No single tool found all three faults; together they did. The same pattern holds at scale: six Java tools run on 47 projects agreed on fewer than 0.4% of their warnings ([Comparing Static Analysis Tools](tools.md)) {% cite lenarduzzi2021comparison %}. The fixed file, with a parameterised query, a `None` check and no unused variable, raises no warning from any of the four; only pylint's docstring reminders remain.
 
----
+## 2. Patterns on the syntax tree
 
-## Taint Analysis
+Pylint and flake8 parse the file into an **abstract syntax tree (AST)** and match rules against it: "a name assigned in a function and never read". Bandit matches a security pattern: a string that looks like SQL built by concatenation. It cannot know whether `name` comes from a user, which is why it rates its own confidence Low. The same technique finds known faulty idioms in other languages: FindBugs (now SpotBugs), for example, recognises the broken double-checked locking idiom in Java {% cite chess2007static %}. Pattern checks are fast and exact about syntax, but they see no values and no paths.
 
-Taint analysis tracks the flow of untrusted data from **sources** (user input, network, files) to security-sensitive **sinks** (SQL queries, shell commands, HTML output) {% cite chess2007static %}.
+## 3. Types
 
-**The core idea:**
-1. **Sources** introduce tainted data (e.g., `request.getParameter("id")`)
-2. **Propagation rules** define how taint flows through operations (e.g., string concatenation preserves taint)
-3. **Sanitizers** remove taint (e.g., `escapeHtml()`, parameterized queries)
-4. **Sinks** are dangerous if reached by tainted data (e.g., `executeQuery(sql)`)
+`mypy` knows that `find_user` may return `None` and that `None` cannot be indexed, so it rejects `user[1]` until the code checks for `None`. Within the annotated code a type checker is sound for this property: no unchecked `Optional` slips through, even in a branch no test reaches. The guarantee stops where types stop: values typed `Any` and unannotated functions are not checked, which is why mypy's `--strict` mode also reports them. The cost is annotations, and reports where the programmer knows more than the types say ([Soundness and Completeness](limits.md)).
 
-If tainted data reaches a sink without passing through an appropriate sanitizer, the tool reports a vulnerability.
+## 4. Control flow: the goto-fail bug
 
-**Common vulnerability patterns:**
+In 2014 Apple's TLS code accepted forged server keys because a duplicated `goto fail;` skipped the signature check (CVE-2014-1266) {% cite nist_cve_2014_1266 %}. A reduced C file, `gotofail.c`, shows the shape (line numbers added):
 
-| Vulnerability | Source | Sink | Sanitizer |
-|---------------|--------|------|-----------|
-| SQL Injection | HTTP parameter | SQL query | Parameterized query |
-| Cross-Site Scripting (XSS) | User input | HTML output | `escapeHtml()` |
-| Command Injection | User input | `exec()` / `system()` | Input validation |
-| Path Traversal | URL parameter | File open | Path canonicalization |
-
-**Example -- SQL injection:**
-
-```java
-// VULNERABLE: tainted data flows directly to sink
-String id = request.getParameter("id");           // Source (tainted)
-String sql = "SELECT * FROM users WHERE id=" + id; // Propagation
-stmt.executeQuery(sql);                            // Sink - ALERT!
-
-// SAFE: sanitizer (parameterized query) removes taint
-String id = request.getParameter("id");           // Source (tainted)
-PreparedStatement ps = conn.prepareStatement(
-    "SELECT * FROM users WHERE id=?");
-ps.setString(1, id);                              // Sanitizer
-ps.executeQuery();                                // Sink - OK
+```c
+ 1  static int check(int a, int b) { return a - b; }
+ 2
+ 3  int verify(int a, int b, int c) {
+ 4      int err;
+ 5      if ((err = check(a, b)) != 0)
+ 6          goto fail;
+ 7          goto fail;          /* duplicated: always jumps, err == 0 */
+ 8      if ((err = check(b, c)) != 0)
+ 9          goto fail;
+10      err = 0;                /* signature verified */
+11  fail:
+12      return err;
+13  }
 ```
 
-**Taint propagation rules** are critical for accuracy. If the rules are too conservative (everything is tainted), the tool produces too many false positives. If too permissive (taint lost through wrappers), it misses real vulnerabilities.
+Apple clang 21 warns twice, once with `-Wall` and once with `-Wunreachable-code` (first line wrapped):
 
-Modern tools like **CodeQL** (GitHub) and **Semgrep** allow users to define custom taint specifications, adapting the analysis to project-specific frameworks and sanitization patterns.
+```text
+gotofail.c:7:9: warning: misleading indentation; statement is not part
+    of the previous 'if' [-Wmisleading-indentation]
+gotofail.c:8:16: warning: code will never be executed [-Wunreachable-code]
+```
 
----
+The second warning comes from the **control flow graph** (explained on [Dataflow Analysis](dataflow.md)): no path reaches the second check, so its code is dead. A test that only sends valid signatures passes, because the function returns success either way.
 
-## Choosing Techniques
+## 5. Taint: from source to sink
 
-No single technique is sufficient. The choice depends on the project's risk profile and resources:
+**Taint analysis** marks values from untrusted **sources** (a web form, a file, the network), follows them through assignments and string operations, and reports when one reaches a **sink** such as `db.execute` without passing a **sanitizer** {% cite chess2007static %}. In a web shop, `name` would come from a request: tainted. It flows into `query`, then into `db.execute`, the sink. The sanitizer here is parameter binding, `db.execute("... WHERE name = ?", (name,))`, which keeps the value out of the SQL text. The same scheme covers the common injection faults {% cite chess2007static %}:
 
-| Project Context | Recommended Techniques |
-|-----------------|----------------------|
-| Any project (baseline) | Linting + type checking |
-| Web application | Add taint analysis for injection vulnerabilities |
-| Safety-critical system | Add dataflow analysis + abstract interpretation |
-| Concurrent/distributed | Add model checking for deadlock/race conditions |
-| Large codebase (millions of LOC) | Platform approach: combine multiple lightweight analyzers {% cite sadowski2015tricorder %} |
+| Vulnerability | Typical source | Sink | Sanitizer |
+|---|---|---|---|
+| SQL injection | request parameter | database query | parameter binding |
+| Cross-site scripting | form input | HTML page | HTML escaping |
+| Command injection | user input | shell command | no shell; fixed argument list |
 
-The key principle is **defense in depth**: layer multiple techniques, each catching different defect classes, rather than relying on a single deep analysis.
+Unlike Bandit's pattern, a taint analyzer such as CodeQL reports the injection only when it can trace that flow, but it needs a specification of every source, sink and sanitizer in the libraries used. Missing specifications are its main source of missed bugs, the gap the LLM-assisted tools on [Comparing Static Analysis Tools](tools.md) try to close {% cite li2024iris %}.
 
----
+## 6. What to do with a warning
 
-## Further Exploration
+Every warning still needs a decision: fix it, or record why it is a false alarm. [Triaging Static Analysis Warnings](warnings.md) works through both on this file.
 
-- [Static Analysis Overview](./) -- Why static analysis matters and the soundness-completeness tradeoff
-- [V&V Overview](../overview/analysis/) -- Foundational definitions and properties
-- [Test Coverage Criteria](../coverage/) -- How dynamic testing measures thoroughness
+## When to use them
+
+- Run style, AST and type checks on every commit; they cost seconds.
+- Add security patterns (Bandit) or taint analysis (CodeQL, Semgrep) for code that handles untrusted input.
+- Do not read a clean run as "no bugs": each tool checks only its own properties.
+
+## How solid is this?
+
+- **Where it comes from.** The tool outputs above were produced on 28 October 2026 with the versions listed; the technique taxonomy follows Chess and West {% cite chess2007static %}.
+- **What is contested.** Default rule sets change between releases, so another version may report more or fewer findings on the same file.
 
 ---
 

@@ -1,218 +1,100 @@
 ---
 title: Symbolic Execution
 parent: Static Analysis
-nav_order: 4
+nav_order: 5
 layout: default
+vegalite: true
+page_type: deep-dive  # worked example with solver output plus the KLEE evidence chart
 ---
 
 # Symbolic Execution
 
-Symbolic execution treats program inputs as **symbolic variables** rather than concrete values, systematically exploring execution paths to find bugs and generate test inputs. It occupies a unique position on the analysis continuum: more precise than pure static analysis (it reasons about specific paths) and more systematic than testing (it explores paths methodically rather than relying on manually chosen inputs).
+**Symbolic execution** runs a program on symbols instead of values: each input is an unknown, each branch adds a constraint, and a constraint solver turns the constraints of every path into a concrete test input that takes that path {% cite bailey2025symexec %}. It sits between static analysis, which reasons about paths, and testing, which produces runnable inputs.
 
----
-
-## What is Symbolic Execution?
-
-In conventional testing, you run a program with concrete inputs (e.g., `x = 5, y = 3`) and observe the output. **Symbolic execution** instead assigns symbolic values to inputs (e.g., `x = alpha, y = beta`) and executes the program symbolically:
-
-- **Symbolic state:** Variables hold symbolic expressions instead of concrete values (e.g., `z = alpha + beta`)
-- **Path condition:** A logical formula that accumulates the constraints from each branch decision (e.g., `alpha > 0 AND beta = alpha + 1`)
-- **Path forking:** At each conditional branch, execution forks into two paths -- one where the condition is true and one where it is false
-- **SMT solving:** An **SMT solver** (Satisfiability Modulo Theories) such as Z3 or STP checks whether a path condition is satisfiable. If so, it produces a concrete input that exercises that path
-
-The result: symbolic execution can automatically generate test inputs that reach specific code locations, trigger specific branches, or expose specific bugs.
-
----
-
-## How It Works: Step-by-Step
-
-Consider this simple C function:
+## 1. Worked example: three paths, three tests
 
 ```c
 int foo(int x, int y) {
     if (x > 0) {
-        if (y == x + 1) {
-            // Target: generate test reaching here
-            error();
-        }
+        if (y == x + 1)
+            error();        /* the target */
     }
     return 0;
 }
 ```
 
-A random fuzzer would struggle to find the input `y == x + 1` by chance. Symbolic execution solves it systematically.
+The engine gives the unknown inputs names: x = α and y = β, so α and β stand for whatever values x and y will have. At `x > 0` it forks: one path assumes α ≤ 0, the other α > 0. The second path forks again at `y == x + 1`. Each path collects a **path condition (PC)**, the conjunction of the branch decisions along it. A solver checks whether each PC is satisfiable and, if so, gives a model, an input that satisfies it. Z3 5.3.2 returns:
 
-### Symbolic Execution Tree
-
-```mermaid
-flowchart TD
-    A["Start: x=α, y=β"] --> B{"x > 0?"}
-    B -- "α > 0" --> C{"y == x+1?"}
-    B -- "α ≤ 0" --> D["return 0
-    PC: α ≤ 0"]
-    C -- "β = α+1" --> E["error()
-    PC: α>0 ∧ β=α+1"]
-    C -- "β ≠ α+1" --> F["return 0
-    PC: α>0 ∧ β≠α+1"]
+```text
+x <= 0                 sat   x=0, y=0
+x > 0, y != x + 1      sat   x=1, y=3
+x > 0, y == x + 1      sat   x=1, y=2
 ```
 
-**Path analysis:**
+![Tree of the three paths of foo, each with its path condition and the input Z3 found; the error path is red](symbolic-tree.svg)
 
-| Path | Path Condition | SMT Solution | Outcome |
-|------|---------------|--------------|---------|
-| A to D | alpha <= 0 | x = -1, y = 0 | Returns 0 |
-| A to F | alpha > 0 AND beta != alpha + 1 | x = 1, y = 0 | Returns 0 |
-| A to E | alpha > 0 AND beta = alpha + 1 | **x = 1, y = 2** | **Reaches error()** |
+_The symbolic execution tree of `foo`: α and β are the unknown inputs x and y; three paths, three path conditions, three generated tests._ {% cite bailey2025symexec %}
 
-The SMT solver finds that `alpha > 0 AND beta = alpha + 1` is satisfiable with `x = 1, y = 2`. This concrete input is a test case that reaches the `error()` call. No human had to guess the relationship between `x` and `y`.
+The input x = 1, y = 2 reaches `error()`. A random tester would need luck to hit y = x + 1; the solver derives it from the code.
 
----
+## 2. Concolic execution
 
-## Concolic Testing: Concrete + Symbolic
+Solving every path is expensive, and code such as a hash function or a system call is hard to express as constraints. **Concolic** (concrete plus symbolic) execution runs the program on a real input, records the path condition of that run, negates one branch condition, and asks the solver for an input that takes the other side. The concrete run proves the current path feasible, so the solver is asked only about the flipped branch; that removes its largest bottleneck {% cite bailey2025symexec %}.
 
-Pure symbolic execution can struggle with operations that are hard to model symbolically, such as hash functions, system calls, or complex library functions. **Concolic testing** (concrete + symbolic) combines both approaches {% cite bailey2025symexec %}:
+## 3. Evidence: KLEE on GNU Coreutils
 
-1. **Run the program concretely** with an initial input (e.g., `x = 0, y = 0`)
-2. **Collect symbolic constraints** along the executed path
-3. **Negate one branch condition** in the path constraint
-4. **Solve** the modified constraint to get a new input that takes a different path
-5. **Repeat** until all reachable paths are explored or a budget is exhausted
+KLEE, a symbolic execution tool for C, was run for about an hour on each of the 89 stand-alone programs of GNU Coreutils, the command-line utilities of Unix systems, and compared with the developers' own test suites, built up over fifteen years {% cite cadar2008klee %}.
 
-### Concolic Testing Workflow
-
-```mermaid
-flowchart LR
-    A["Initial concrete
-    input"] --> B["Execute
-    concretely"]
-    B --> C["Collect symbolic
-    constraints"]
-    C --> D["Negate one
-    branch"]
-    D --> E["SMT solve for
-    new input"]
-    E --> B
-    E -- "unsatisfiable or
-    budget exhausted" --> F["Done"]
+```vega-lite
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 420, "height": 170,
+  "data": {"values": [
+    {"m": "Total lines covered", "s": "KLEE tests", "v": 84.5},
+    {"m": "Total lines covered", "s": "Developer tests", "v": 67.7},
+    {"m": "Average per tool", "s": "KLEE tests", "v": 90.9},
+    {"m": "Average per tool", "s": "Developer tests", "v": 68.4},
+    {"m": "Median per tool", "s": "KLEE tests", "v": 94.7},
+    {"m": "Median per tool", "s": "Developer tests", "v": 72.5}
+  ]},
+  "encoding": {
+    "y": {"field": "m", "type": "nominal", "title": null, "sort": null, "axis": {"labelFontSize": 13}},
+    "yOffset": {"field": "s", "sort": ["KLEE tests", "Developer tests"]},
+    "x": {"field": "v", "type": "quantitative", "title": "Line coverage (%)", "scale": {"domain": [0, 100]}},
+    "color": {"field": "s", "type": "nominal", "title": null, "sort": ["KLEE tests", "Developer tests"],
+              "scale": {"range": ["#019546", "#9bbf9b"]}, "legend": {"orient": "bottom", "labelFontSize": 13}}
+  },
+  "layer": [
+    {"mark": {"type": "bar"}},
+    {"mark": {"type": "text", "align": "left", "dx": 4, "fontSize": 12}, "encoding": {"text": {"field": "v", "type": "quantitative"}}}
+  ],
+  "config": {"font": "Tahoma", "axis": {"titleFontSize": 13, "labelFontSize": 12}, "view": {"stroke": null}}
+}
 ```
 
-**Pioneering tools:**
-- **DART** (Godefroid, Klarlund, Sen, 2005) -- first concolic testing tool
-- **CUTE** (Sen, Marinov, Agha, 2005) -- concolic unit testing engine
-- **SAGE** (Godefroid et al., 2008) -- whitebox fuzz testing at Microsoft, found 1/3 of all security bugs in Windows 7 file parsers
+_Line coverage of the 89 Coreutils programs by KLEE's generated tests and by the developers' test suites._ {% cite cadar2008klee %}
 
-**Advantages over pure symbolic execution:**
-- Handles complex operations via concrete fallback (hashing, encryption, native calls)
-- Always makes progress (each iteration explores at least one concrete path)
-- No need to model the entire environment symbolically
+KLEE's tests covered 84.5% of all Coreutils lines against the developers' 67.7%, the "16.8%" improvement the paper headlines, which is 16.8 percentage points. Applied as a bug finder to 452 programs with over 430,000 lines, it found 56 serious bugs, including three in Coreutils that had been missed for over fifteen years {% cite cadar2008klee %}.
 
-**Disadvantages:**
-- May miss paths if concrete execution diverges from symbolic model
-- Path exploration order depends on initial input choice
-- Still subject to path explosion for programs with many branches
+## 4. The limits
 
----
+The number of paths grows exponentially with the branches: n independent `if` statements give up to 2<sup>n</sup> paths, and a loop over symbolic data multiplies them further. Bailey and Nicholas group the remedies into three families {% cite bailey2025symexec %}:
 
-## Key Tools
+- **Scope reduction** analyses one function or module instead of the whole program.
+- **Guidance heuristics** steer the search toward uncovered code or likely bugs.
+- **Hybrid analysis** combines a fuzzer, a tool that runs the program on large numbers of random or mutated inputs, which covers easy paths quickly, with symbolic execution for the branches the fuzzer cannot pass.
 
-| Tool | Type | Domain | Key Feature |
-|------|------|--------|-------------|
-| **KLEE** | Source-level | C/C++ | High coverage, open source, LLVM-based |
-| **SAGE** | Binary-level | Windows | Whitebox fuzzing at Microsoft, found critical security bugs |
-| **angr** | Binary-level | Multi-architecture | Python framework, popular in CTF competitions and security research |
-| **Driller** | Hybrid | Binary | Combines AFL fuzzing with angr symbolic execution |
-| **SymCC** | Source-level | C/C++ | Compilation-based symbolic execution (faster than interpretation) |
-| **S2E** | System-level | Full system | Analyzes entire system stacks including kernel and firmware |
-| **Java PathFinder** | Source-level | Java | NASA-developed, combines model checking with symbolic execution |
+The engines the survey covers include KLEE and SymCC for source code, angr and Triton for binaries, S2E for whole systems including kernels, and Driller, which pairs the widely used AFL fuzzer with angr {% cite bailey2025symexec %}. Constraints the solver handles badly (non-linear arithmetic, floating point) and the program's environment (files, network, libraries) are the other two limits; KLEE models the file system and command line to get around the second, and against path explosion it alternates two search heuristics: random path selection and a search that favours states likely to cover new code {% cite cadar2008klee %}.
 
----
+## When to use it — and when not
 
-## KLEE: Landmark Results
+- Use it to generate tests for code with narrow conditions: parsers, protocol handlers, command-line tools.
+- Avoid it for code dominated by the environment, deep loops or floating point, where paths explode or constraints cannot be solved; fuzzing or ordinary testing is cheaper there.
 
-KLEE {% cite cadar2008klee %} demonstrated the practical power of symbolic execution in a landmark 2008 study:
+## How solid is this?
 
-### Experimental Results on GNU COREUTILS
-
-| Metric | Result |
-|--------|--------|
-| Programs tested | 452 GNU COREUTILS programs |
-| Median line coverage | **94.7%** |
-| Programs with 90%+ coverage | Majority of the 452 programs |
-| Improvement over developer tests | **+16.8%** additional coverage |
-| Serious bugs found | **56** real bugs |
-| Bugs undetected for 15+ years | 3 bugs in well-tested tools |
-| Affected tools | Established utilities like `sort`, `cut`, `paste` |
-
-**Significance:** KLEE's automated analysis outperformed **15 years of manually-written developer test suites** that had been maintained and extended by the open-source community. It found bugs in programs that were considered thoroughly tested and stable, demonstrating that symbolic execution can find defects that conventional testing misses.
-
-The bugs KLEE found were not contrived edge cases -- they included buffer overflows, memory errors, and incorrect behavior triggered by specific combinations of command-line flags and input patterns.
-
----
-
-## Challenges
-
-Symbolic execution faces several fundamental challenges that limit its applicability {% cite bailey2025symexec %}:
-
-### Path Explosion
-
-The number of execution paths grows **exponentially** with the number of branches: a program with `n` independent branch points has up to `2^n` paths. A single loop executed up to `k` times multiplies paths by `k`. Real-world programs with nested loops and function calls can have astronomically many paths.
-
-### Constraint Solving Limitations
-
-SMT solvers handle linear arithmetic and bit-vector operations well, but struggle with:
-- **Non-linear arithmetic** (multiplication of two symbolic variables)
-- **Floating-point operations** (IEEE 754 semantics are complex)
-- **String operations** (regex matching, concatenation constraints)
-- **Cryptographic functions** (by design, these resist constraint solving)
-
-### Environment Modeling
-
-Programs interact with the operating system, file system, network, and libraries. Symbolic execution must either:
-- **Model** these interactions (build symbolic stubs -- labor-intensive, incomplete)
-- **Concretize** them (use real values -- loses symbolic precision)
-- **Ignore** them (unsound -- may miss bugs or explore infeasible paths)
-
-### Scalability
-
-Analysis time grows with program size and path count. Symbolic execution of a small utility (hundreds of LOC) can take minutes; analysis of a large application (millions of LOC) may not terminate within practical time budgets.
-
-### Mitigation Strategies
-
-| Strategy | How It Helps | Example |
-|----------|-------------|---------|
-| **Scope reduction** | Analyze functions or modules, not whole programs | Unit-level symbolic execution |
-| **Search heuristics** | Prioritize paths likely to reach uncovered code or trigger bugs | Coverage-optimized search in KLEE |
-| **Hybrid analysis** | Combine with fuzzing: use fuzzing for easy paths, symbolic execution for hard-to-reach branches | Driller (AFL + angr) |
-| **Compositional analysis** | Summarize functions symbolically, reuse summaries at call sites | Compositional symbolic execution |
-| **Selective symbolic execution** | Keep most variables concrete, only symbolize interesting inputs | S2E approach |
-
----
-
-## Relationship to Static Analysis and Testing
-
-Symbolic execution occupies a unique position on the analysis continuum:
-
-| Dimension | Pure Static Analysis | Symbolic Execution | Dynamic Testing |
-|-----------|---------------------|-------------------|-----------------|
-| **Inputs** | All (abstract) | Symbolic (forked per path) | Concrete (specific values) |
-| **Paths explored** | All (approximated) | Some (systematically selected) | One per test case |
-| **Precision** | Lower (over-approximation) | High (per-path exact) | Exact (for that input) |
-| **Coverage guarantee** | All code analyzed | Paths within budget | Only executed paths |
-| **False positives** | Yes (conservative) | Rare (path conditions verified) | None (observed behavior) |
-| **Automation** | Fully automatic | Fully automatic | Requires test design |
-
-**Compared with fuzzing**, symbolic execution is guided by program structure rather than random mutation. A fuzzer might spend hours trying random inputs without discovering that `y` must equal `x + 1`, while symbolic execution solves this constraint directly. However, fuzzers are faster per execution and handle complex environments more naturally.
-
-**Hybrid fuzzing** combines both strengths: use fast fuzzing for broad coverage, switch to symbolic execution when the fuzzer gets stuck at complex branch conditions. This approach is the current state of the art for automated vulnerability detection {% cite bailey2025symexec %}.
-
----
-
-## Further Exploration
-
-- [Dataflow Analysis](dataflow.md) -- Tracking variable states through program paths using abstract domains
-- [Analysis Techniques](techniques.md) -- The full spectrum from lexical analysis to abstract interpretation
-- [Static Analysis Overview](./) -- Foundational concepts including the soundness-completeness tradeoff
-- [V&V Overview](../overview/) -- The broader landscape of verification and validation techniques
+- **Where it comes from.** The Z3 output above was produced with Z3 5.3.2; the KLEE figures are from Cadar and colleagues' 2008 paper {% cite cadar2008klee %}; the taxonomy of remedies is from Bailey and Nicholas's survey {% cite bailey2025symexec %}.
+- **What is contested.** KLEE's comparison is on Coreutils, which the authors chose because it is heavily tested; coverage gains on other code bases may differ.
 
 ---
 

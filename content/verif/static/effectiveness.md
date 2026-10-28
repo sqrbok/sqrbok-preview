@@ -1,150 +1,75 @@
 ---
-title: Empirical Effectiveness
+title: Static Analysis Effectiveness
 parent: Static Analysis
-nav_order: 7
+nav_order: 10
 layout: default
+page_type: deep-dive  # the evidence page: per-release yields, costs and their caveats
+vegalite: true
 ---
 
-# Empirical Effectiveness of Static Analysis
+# Static Analysis Effectiveness
 
-Static analysis effectiveness depends on false positive rates, cost relative to alternatives, and tool precision. This page synthesizes empirical evidence from industry studies to answer a practical question: **how well does static analysis actually work?**
+How effective is automated static analysis (ASA) compared with inspection and testing? The best industrial evidence, from three Nortel products, says: it finds about as large a share of the faults present as code inspection does, at a lower cost per fault, and different kinds of fault from testing {% cite zheng2006static %}.
 
----
+## 1. Example: the Nortel study
 
-## The 10% False Positive Rule
+Zheng and colleagues analysed fault data from three large network-service products at Nortel Networks, over three million lines of C and C++, with faults reported by more than 200 inspectors and testers and by customers. The ASA tools were FlexeLint, Klocwork and Reasoning's Illuma {% cite zheng2006static %}. Their measure is the **fault-detection yield**: the share of the faults present when a phase starts that the phase finds. The faults present are counted afterwards, as those the phase found plus those every later phase found:
 
-The single most important metric for static analysis adoption is not accuracy -- it is **developer tolerance for false positives**. Two large-scale industrial studies converge on the same threshold.
+yield = 100 × (faults found by the phase) / (faults found by the phase and by all later phases).
 
-**Google** enforces a strict false positive policy for all Tricorder analyzers {% cite sadowski2015tricorder %}:
+The usual order is inspection, then testing, then customers. Static analysis was slotted in differently per release: before inspection in release C.1, during testing in release C.2 and in product A; release C.0 had none. For example, if static analysis finds 12 faults and inspection, testing and customers later find 8, 20 and 4, its yield is 100 × 12 / 44 ≈ 27%.
 
-| Threshold | Action |
-|-----------|--------|
-| **< 10%** effective false positive rate | Analyzer remains active |
-| **> 10%** | Analyzer placed on **probation** |
-| **> 25%** | Analyzer **disabled immediately** |
+```vega-lite
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 360, "height": 200,
+  "data": {"values": [
+    {"r": "A", "t": "ASA", "y": 23.39},
+    {"r": "C.0", "t": "Inspection", "y": 39.55}, {"r": "C.0", "t": "Testing", "y": 96.73},
+    {"r": "C.1", "t": "ASA", "y": 31.00}, {"r": "C.1", "t": "Inspection", "y": 20.48}, {"r": "C.1", "t": "Testing", "y": 98.18},
+    {"r": "C.2", "t": "ASA", "y": 36.53}, {"r": "C.2", "t": "Inspection", "y": 33.21}, {"r": "C.2", "t": "Testing", "y": 62.57}
+  ]},
+  "encoding": {
+    "x": {"field": "r", "type": "nominal", "title": "Product or release", "axis": {"labelAngle": 0}},
+    "xOffset": {"field": "t", "sort": ["ASA", "Inspection", "Testing"]},
+    "y": {"field": "y", "type": "quantitative", "title": "Fault-detection yield (%)", "scale": {"domain": [0, 100]}},
+    "color": {"field": "t", "type": "nominal", "title": null, "sort": ["ASA", "Inspection", "Testing"],
+              "scale": {"range": ["#019546", "#c99700", "#9bbf9b"]}, "legend": {"orient": "bottom", "labelFontSize": 13}}
+  },
+  "layer": [
+    {"mark": {"type": "bar"}},
+    {"mark": {"type": "text", "dy": -6, "fontSize": 11}, "encoding": {"text": {"field": "y", "type": "quantitative", "format": ".0f"}}}
+  ],
+  "config": {"font": "Tahoma", "axis": {"titleFontSize": 13, "labelFontSize": 12}, "view": {"stroke": null}}
+}
+```
 
-Platform-wide, Tricorder achieves approximately 5% "not useful" rate. Critically, Google measures **developer perception** -- the rate at which developers click "not useful" on findings -- rather than theoretical accuracy metrics.
+_Fault-detection yield per practice in each Nortel product or release where it could be computed (Table 4); C.0 used no ASA; product A had no inspection, and its testing yield could not be computed because test and customer failures were not told apart; product B is missing because its inspection records were unavailable. In C.2, ASA ran during testing, so ASA's faults count in testing's denominator._ {% cite zheng2006static %}
 
-**eBay** reached the same threshold through a different path {% cite jaspan2007understanding %}:
+## 2. What the numbers say
 
-| Phase | False Positive Rate | Developer Response |
-|-------|--------------------|--------------------|
-| Initial deployment (default config) | **50%** | Declared tool "useless" |
-| After customization (75% of checks disabled) | **10%** | Acceptance and adoption |
+- **Yield.** ASA found 23% (product A) to 37% (release C.2) of the faults present, inspection 20% (C.1) to 40% (C.0). The authors found the two "not significantly different". Testing found 63% to 98% of the faults present when it started. Comparing testing's yield with static analysis's yield in the same release gives 1.7 for C.2 (62.57 / 36.53) and 3.2 for C.1 (98.18 / 31.00), the paper's "two to three times". It remains the main way to find the faults left by that point {% cite zheng2006static %}.
+- **Cost.** The cost of ASA per fault found, divided by the cost of inspection per fault found, was 0.72 for release C.1 and 0.61 for C.2: ASA was cheaper per fault, but of the same order of magnitude {% cite zheng2006static %}.
+- **Fault types.** Classified with IBM's Orthogonal Defect Classification, ASA faults were mostly **Checking** (a missing or wrong validation) and **Assignment** (a wrong or missing initial value). Test and customer failures were mostly **Function** and **Algorithm** faults. About 90% of inspection faults were Algorithm, Documentation or Checking {% cite zheng2006static %}.
+- **Problem modules.** The number of ASA faults in a module was a fairly good predictor, before testing, of which modules would turn out fault-prone {% cite zheng2006static %}.
+- **Product quality.** Whether adding ASA made the final products better was inconclusive: the releases varied too much {% cite zheng2006static %}.
 
-> **Key insight:** The threshold for developer tolerance is remarkably consistent across organizations -- around 10%. Above this, developers simply ignore all warnings.
+The overall conclusion: ASA is "an economical complement" to inspection and testing, catching mechanical faults early so later phases can focus on functional ones {% cite zheng2006static %}.
 
----
+## 3. Other evidence on this site
 
-## Cost-Effectiveness Benchmarks
+The other pages add pieces the Nortel study lacks. The eBay evaluation relied on an estimate that a defect found during development costs about ten times less than one found in testing, a figure it took from earlier literature rather than measured {% cite jaspan2007understanding %}; at Google, developers marked about 5% of shown findings not useful ([Deploying Static Analysis](deployment.md)) {% cite sadowski2015tricorder %}. Six Java tools ranged from 18% to 86% precision and shared fewer than 0.4% of their warnings ([Comparing Static Analysis Tools](tools.md)) {% cite lenarduzzi2021comparison %}. And KLEE's symbolic execution covered 84.5% of GNU Coreutils lines against the developers' 67.7% ([Symbolic Execution](symbolic-execution.md)) {% cite cadar2008klee %}.
 
-Static analysis is not a replacement for testing or inspection -- it is a cheaper complement that catches different fault types.
+## When to use this evidence — and when not
 
-| Metric | Value | Source |
-|--------|-------|--------|
-| Development vs. Testing cost | **10x cheaper** to find defects during development | {% cite jaspan2007understanding %} |
-| ASA vs. Inspection cost | **60-72%** of manual inspection cost | {% cite zheng2006static %} |
-| ASA defect yield | 23-37% | {% cite zheng2006static %} |
-| Testing defect yield | 63-98% | {% cite zheng2006static %} |
-| Combined (ASA + Testing) | Higher than either alone | {% cite zheng2006static %} |
+- Use it to argue for ASA next to inspection and testing, aimed at checking and assignment faults, and to rank modules for extra testing.
+- Do not use it to argue for ASA instead of testing: testing's yield was 1.7 to 3.2 times that of static analysis in the same release.
 
-**Interpretation:** ASA does not replace testing -- it complements it. ASA catches assignment and checking faults that testing misses. Testing catches functional and algorithmic faults that ASA misses. The combination yields better results than either technique alone.
+## How solid is this?
 
----
-
-## Tool Precision in Practice
-
-A comparative study of six Java static analysis tools {% cite lenarduzzi2021comparison %} reveals wide variation in precision and coverage:
-
-| Tool | Precision | Coverage | Notes |
-|------|-----------|----------|-------|
-| SonarQube | 18% | Broadest rule set | Many rules, many false positives |
-| Better Code Hub | 29% | Design quality | SIG-based metrics |
-| Coverity Scan | 37% | Deep analysis | More precise, fewer rules |
-| LGTM (CodeQL) | -- | Security focus | Taint analysis strength |
-| FindSecBugs | -- | Security focus | Java-specific |
-| CheckStyle | 86% | Style only | High precision because issues are trivial |
-
-{: .warning }
-> **Critical finding:** Less than 0.4% agreement between tools at the line level. Different tools detect fundamentally different defect types. No single tool is sufficient.
-
-The implication is clear: organizations serious about static analysis must deploy **multiple tools** covering different defect categories, rather than relying on a single tool for comprehensive coverage.
-
----
-
-## Scale at Google
-
-Google's static analysis infrastructure demonstrates that SA can operate at extreme scale {% cite sadowski2015tricorder %}:
-
-| Metric | Value |
-|--------|-------|
-| Findings per day | **~93,000** across ~31,000 changelists |
-| Code reviews per day | **~50,000** -- SA findings integrated into review |
-| "Not useful" rate | **~5%** platform-wide |
-| Unique Linter users | **18,000+** (separate from Tricorder) |
-
-Key architectural decisions that enable this scale:
-
-- **Analyzers contributed by domain experts** across the company, not a central SA team
-- **Suggested fixes** significantly increase the fix rate -- developers are more likely to act when the tool provides a one-click resolution
-- **Project-level configuration**, not per-user -- ensures team consistency
-- **Code review integration** -- findings appear as review comments, not standalone reports
-
----
-
-## Symbolic Execution Effectiveness
-
-Symbolic execution bridges static and dynamic analysis. KLEE results on the COREUTILS suite {% cite cadar2008klee %} demonstrate what automated analysis can achieve:
-
-| Metric | Value |
-|--------|-------|
-| Programs tested | **452** automatically |
-| Line coverage | **90%+** (median 94.7%) |
-| Coverage improvement | Beat 15 years of manually-maintained developer tests by **16.8%** |
-| Bugs found | **56 serious bugs**, 3 undetected for 15+ years |
-| Notable discoveries | Bugs in tools considered "thoroughly tested" (sort, cut, comm) |
-
-These results demonstrate that automated techniques can surpass manual test suite construction for coverage, even on mature, well-tested software.
-
----
-
-## Complementary Strengths of V&V Techniques
-
-No single verification technique catches all fault types. The Nortel Networks study {% cite zheng2006static %} quantified the complementary strengths:
-
-| Fault Type | ASA | Testing | Inspection |
-|------------|-----|---------|------------|
-| Assignment faults | **Strong** | Weak | Medium |
-| Checking faults | **Strong** | Medium | Medium |
-| Functional faults | Weak | **Strong** | Medium |
-| Algorithmic faults | Weak | **Strong** | **Strong** |
-| Interface faults | Medium | Medium | **Strong** |
-| Design faults | Weak | Weak | **Strong** |
-
-{: .important }
-> **Best practice:** Combine all three techniques. Each catches fault types the others miss. ASA excels at mechanical errors (wrong assignment, missing check), testing excels at behavioral errors (wrong output, wrong algorithm), and inspection excels at structural errors (bad interface, poor design).
-
----
-
-## Summary
-
-| Dimension | Key Finding |
-|-----------|-------------|
-| False positive threshold | **10%** -- consistent across Google and eBay |
-| Cost advantage | **10x cheaper** than finding defects in testing |
-| ASA vs. inspection cost | **60-72%** of manual inspection cost |
-| Tool agreement | **< 0.4%** at line level -- no single tool suffices |
-| Symbolic execution | **90%+ coverage** automatically, beats manual tests |
-| Best strategy | **Combine ASA + testing + inspection** |
-
----
-
-## Further Exploration
-
-- [Analysis Techniques](techniques.md) -- The building blocks from lexical analysis to taint tracking
-- [Industrial Deployment](deployment.md) -- Case studies of SA deployment at Google, eBay, Microsoft, and Nortel
-- [Static Analysis Overview](./) -- Why static analysis matters and the soundness-completeness tradeoff
-- [Inspection Effectiveness](../inspection/effectiveness.md) -- Complementary data on manual inspection ROI
+- **Where it comes from.** One company, three products, C and C++ code, three ASA tools from the mid-2000s {% cite zheng2006static %}.
+- **What is contested.** Yields depend on the phase order. For C.2 the paper explains testing's relatively low yield (63%) by ASA running during testing, so that ASA's faults are in the denominator of testing's yield; it gives no further breakdown. Severity was not considered, and most customer failures were classified as Function faults after the fact for lack of root-cause data.
+- **What we do not hold.** A comparable study of modern tools (SonarQube, CodeQL, Infer) against inspection and testing on the same code.
 
 ---
 
