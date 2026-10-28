@@ -8,129 +8,196 @@ layout: default
 page_type: question-set
 ---
 
-# RQ A10: Software Maintainability and Design Structure Matrix
+# RQ A10: Maintainability & DSM
+
+**Format:** Explain in your own words, give brief examples, and show every calculation step. These questions test the lecture summarised in [SN A10: Maintainability & DSM](SN_A10_MaintainabilityDSM.md). Throughout, X → Y means X depends on Y, drawn as a mark in row X, column Y.
 
 ---
 
 ## Part 1: Why Maintainability Matters
 
-### Q1
-If most maintenance effort goes to perfective changes (enhancements) rather than bug fixes, what does this imply about how organizations should allocate their maintenance budgets?
+### Question 1: Lehman's Laws
 
-### Q2
-Lehman's Law I says software must adapt, and Law II says adaptation increases complexity. How does this tension manifest in a real project, and what strategies break the cycle?
+Law I says a used program must keep changing; Law II says changing it increases its complexity. Describe how this tension shows up in a project you know, and name two practices that keep Law II in check.
 
-### Q3
-Parnas identifies "Lack of Movement" and "Ignorant Surgery" as two causes of software aging. Can a system suffer from both simultaneously? Give a scenario where this happens.
+### Question 2: Parnas's Two Causes
 
-### Q4
-A startup says "we'll fix the architecture later — right now we need to ship features." Using Lehman's Laws and the compounding effect of technical debt, argue for or against this strategy.
+A clinic's booking system is not updated for a year after the insurer changes its API. When the update is finally rushed through, a new developer copies the old API client into three modules and edits each copy.
 
-### Q5
-Why does Parnas prescribe "seek second opinions" (code reviews) as a remedy for software aging? How does this connect to the concept of Ignorant Surgery?
+1. Which of Parnas's causes of aging does each event show?
+2. Which of his three preventive measures would have stopped each one?
 
-### Q6
-The lecture states that 80-85% of lifecycle cost is committed during requirements and design. If this is true, what are the implications for when maintainability decisions should be made?
+### Question 3: "We'll Fix the Architecture Later"
 
----
+A startup postpones all structural work to ship features. Argue for or against this, using Law II and the real-options view of modularity. Under what condition is postponing reasonable?
 
-## Part 2: Measuring Maintainability
+### Question 4: A Maintainability Requirement
 
-### Q7
-The SIG model uses quality profiles (risk distributions) while the Maintainability Index uses averages. Construct a scenario where MI gives a misleading "good" score but SIG correctly identifies a problem.
-
-### Q8
-Why does the SIG star rating use a 5%/30%/30%/30%/5% calibration rather than equal quintiles? What would change if they used 20%/20%/20%/20%/20%?
-
-### Q9
-A developer argues that Cognitive Complexity is unnecessary because "Cyclomatic Complexity already measures code complexity." Using the switch statement and nested-if examples, explain why CC and CogC measure fundamentally different things.
-
-### Q10
-The Maintainability Index formula includes Halstead Volume, which is rarely used in modern practice. If you were designing a replacement for MI, which metrics would you include and why?
-
-### Q11
-The lecture contrasts code metrics (symptoms of local problems) with structural metrics (root causes of systemic problems). Can you have good code metrics but poor structural metrics? Give an example.
-
-### Q12
-A system scores 4 stars on all SIG properties except Module Coupling (2 stars). What does this tell you about the system, and what would you investigate next?
+"A developer should be able to identify the module causing a problem in no more than three hours." Which ISO/IEC 25010 sub-characteristic does this target? How would you test it (hint: think of a timed exercise in which developers locate seeded faults)?
 
 ---
 
-## Part 3: Modularity Fundamentals
+## Part 2: Measuring the Code
 
-### Q13
-Sullivan et al.'s NOV theory treats each module as a "real option." Why does this make modularity more valuable when future requirements are highly uncertain compared to when they are stable?
+### Question 5: A SIG Quality Profile
 
-### Q14
-In the KWIC case study, the information-hiding decomposition is more modular than the processing-step decomposition. What design principle distinguishes the two, and how would you recognize this distinction in a real codebase?
+A system's code splits by unit cyclomatic complexity into 62% low, 28% moderate, 9% high and 1% very high risk.
 
-### Q15
-Coupling and cohesion often trade off against each other — splitting a module reduces cohesion but may reduce coupling. How would you decide when a module should be split versus kept together?
+1. Use the SIG thresholds to rate its unit complexity in stars.
+2. Which single improvement would raise the rating by one star?
+3. Why does SIG rate a profile rather than the average complexity?
 
-### Q16
-The lecture lists six quality attributes enabled by modularity (testability, scalability, comprehensibility, changeability, concurrent development, reusability). Are there situations where modularity works against any of these attributes?
+### Question 6: Star Calibration
 
-### Q17
-A microservices architecture has low coupling between services but each service internally is a monolith with high coupling. Is this system truly modular? Why or why not?
+SIG calibrates stars so that 5%, 30%, 30%, 30% and 5% of benchmark systems get 5 to 1 stars. Why not 20% each? What does a 5-star rating tell a buyer?
 
----
+### Question 7: Technical Debt Ratio
 
-## Part 4: DSM Fundamentals
+A 12,000-line system has 40 hours of estimated remediation work. Assume 30 minutes to develop each line.
 
-### Q18
-Two architects examine the same DSM but one uses the convention "rows depend on columns" while the other uses "columns depend on rows." What errors could result from this confusion?
+1. Compute the technical debt ratio, and rate it on the SQALE example grid and on SonarQube's default grid.
+2. Repeat for 150 hours of remediation. Why can two tools give different letters for the same code?
 
-### Q19
-After partitioning a DSM, three marks remain above the diagonal. What do these marks tell you about the system, and what are your options for addressing them?
+### Question 8: MI Against SIG
 
-### Q20
-A DSM has a large cluster of 15 mutually dependent elements. From a maintainability perspective, why is this concerning, and what would clustering reveal about this group?
+Construct two systems with the same average complexity, where a Maintainability Index computed with average complexity (as in Coleman's form) would rate both alike but SIG's profile would rate one clearly worse.
 
-### Q21
-Explain why the ordering of rows and columns in a DSM matters even though the mathematical dependency information is the same regardless of ordering.
+### Question 9: Cognitive Complexity
 
-### Q22
-Compare the Tearing and Partitioning operations. When would you use each, and can they produce contradictory recommendations?
+```python
+def total(cart):
+    s = 0
+    for item in cart:
+        if item.qty > 0:
+            if item.discount and item.member:
+                s += item.price * 0.9
+            else:
+                s += item.price
+    return s
+```
 
-### Q23
-A system has a module that appears as both a vertical bus (many modules depend on it) and it depends on several other modules. Is this a library, a controller, or something else? What are the architectural implications?
+1. Compute its cognitive complexity, increment by increment.
+2. Its cyclomatic complexity, counting the `and` as radon does, is 5. Which measure better reflects how hard it is to read, and why?
+3. Rewrite it so that the cognitive complexity falls without changing what it computes.
 
-### Q24
-The lecture shows that a single above-diagonal mark in a layered DSM represents an upward dependency violation. In practice, are all violations equally harmful? What factors determine severity?
+### Question 10: Code Metrics and Structure
 
----
-
-## Part 5: Propagation Cost and Case Studies
-
-### Q25
-Linux has more absolute dependencies than Mozilla v1 (9,110 vs 6,717) but much lower propagation cost (5.82% vs 17.35%). Explain how this is possible and what it reveals about the relationship between dependency count and modularity.
-
-### Q26
-Geipel and Schweitzer found that >50% of dependencies are "change neutral." What are the implications of this finding for teams that use static dependency analysis to prioritize refactoring?
-
-### Q27
-Nord et al.'s enhanced PC assigns dependency weights. What practical challenges would a team face when trying to assign these weights in a real system with thousands of dependencies?
-
-### Q28
-The ABB case study achieved 75-83% effort reduction through refactoring with only ~3 hours/week of expert consultation. Why might such a small investment produce such large returns? Under what conditions would this approach fail?
-
-### Q29
-The lecture lists "vertical buses penalized unfairly" as a limitation of propagation cost. A logging library used by every module in a 100-module system contributes significantly to PC. Should this library be refactored to reduce PC? Why or why not?
-
-### Q30
-Mozilla's redesign reduced PC from 17.35% to 2.78%. Kim et al. found that refactoring at Microsoft reduced dependencies for the top 5% of modules but increased module size (LOC). How can refactoring simultaneously improve structure while making modules larger?
-
-### Q31
-If you could only choose one metric to track over time — Maintainability Index, SIG star rating, or Propagation Cost — which would you choose for a 10-year enterprise system, and why?
-
-### Q32
-The lecture says "DSM is a tool for insight, not a definitive measure." What could go wrong if a team treats propagation cost as a KPI and optimizes for it without considering other factors?
+Can a system have good code metrics and poor structure? Give an example and name the measure that would reveal the problem.
 
 ---
 
-### References
+## Part 3: Modularity
 
-{% bibliography --cited %}
+### Question 11: Options Under Uncertainty
+
+Why does a modular design gain value when future requirements are uncertain, and gain little when they are stable?
+
+### Question 12: KWIC
+
+What principle separates Parnas's information-hiding design of KWIC from the processing-step design? How would you recognise the difference in a real codebase?
+
+### Question 13: Split or Keep
+
+Splitting a module can lower or raise coupling. How would you decide whether to split a module, and what would you look for in a DSM before deciding?
+
+### Question 14: Microservices
+
+A system has loosely coupled services, but each service is internally a tangle of mutually dependent classes. Is the system modular? Answer for the system level and for the service level.
+
+---
+
+## Part 4: Design Structure Matrices
+
+### Question 15: Layers and a Violation
+
+Four modules have the intended layers, bottom to top, L (logging), D (data), S (services), U (user interface). The dependencies are S → D, S → L, U → S, D → L and D → S.
+
+1. Draw the DSM in the order L D S U.
+2. Which mark is above the diagonal, and what does it mean for the layering?
+3. Which pattern do D and S form, and what is the risk?
+
+### Question 16: Conventions
+
+Two architects read the same DSM, one assuming rows depend on columns and the other the reverse. What wrong conclusions could the second one draw about a vertical bus and about a layering violation?
+
+### Question 17: Partitioning and Tearing
+
+Five elements have the dependencies P → R, Q → P, R → T, S → Q and S → T.
+
+1. Partition the DSM and give the order.
+2. Now add R → P. Partition again and name the block. P is meant to be the higher layer, using R: which mark do you tear, and how would you break it in code?
+
+### Question 18: An Element That Is Both a Bus and a Client
+
+An element has a full column and depends on several other elements. Is it a library, a controller or something else? What are the architectural risks?
+
+### Question 19: How Bad Is a Violation?
+
+Are all marks above the diagonal of a layered DSM equally harmful? Name factors that decide the severity.
+
+---
+
+## Part 5: Propagation Cost
+
+### Question 20: Computing Propagation Cost
+
+Five elements have A → B, B → C, C → D and E → D.
+
+1. Build the visibility matrix and compute the propagation cost.
+2. Add D → A and compute it again. Explain the jump.
+
+### Question 21: Mozilla and Linux
+
+Linux 2.1.105 had more dependencies than the first open-source Mozilla of April 1998, a version of similar size (9,110 against 6,717), but a much lower propagation cost (5.82% against 17.35%). How is this possible, and what does the redesigned Mozilla of December 1998 (2.78%) show about architecture?
+
+### Question 22: Change-Neutral Dependencies
+
+Geipel and Schweitzer found that in most of 35 projects, more than half of the dependencies never carried a change. What does this mean for a team that prioritises refactoring from a static DSM, and what data would they add?
+
+### Question 23: Weighted Dependencies
+
+Nord et al. weight dependencies by how well they are shielded (0.1, 0.5 or 1). What would make it hard to assign these weights in a system with thousands of dependencies?
+
+### Question 24: The Logging Library
+
+A logging library used by all 100 modules raises the propagation cost. Should it be refactored to lower the number? Why or why not?
+
+### Question 25: Propagation Cost as a KPI
+
+What could go wrong if a team were rewarded for lowering propagation cost? (Hint: see SN §10; an interface that hides a decision can raise PC.)
+
+---
+
+## Part 6: Evidence
+
+### Question 26: ABB's Return
+
+In the ABB case (a 30 kloc system; the tool counts compare 15 kloc of the old code with 5 kloc of the new), duplicated code fell from 5,647 lines to 338 lines.
+
+1. Compute the raw reduction and the reduction per kloc.
+2. Adding a magnetic component fell from 6–8 to 1–2 weeks, and a cooling method from 8–12 to 1–2 weeks (the paper's 75% and 83%, comparing the upper ends). The experts reviewed the structure and answered the developer's questions. Why might about three hours a week of such help for three months produce such a cut? When would this approach fail?
+
+### Question 27: Smaller Coupling, Bigger Modules
+
+At Microsoft, the most preferentially refactored Windows 7 modules reduced their inter-module dependencies but gained lines of code. How can both happen, and what does it say about judging refactoring by one metric?
+
+### Question 28: One Metric for Ten Years
+
+You may track one measure for a ten-year enterprise system: the Maintainability Index, the SIG rating or propagation cost. Which would you choose, and what would you miss?
+
+---
+
+## Topics Covered
+
+| Topic | Questions |
+|---|---|
+| Lehman, Parnas, ISO sub-characteristics | 1, 2, 3, 4 |
+| SIG, SQALE, Maintainability Index | 5, 6, 7, 8, 28 |
+| Cognitive complexity; code vs structure | 9, 10 |
+| Modularity, options, coupling and cohesion | 11, 12, 13, 14 |
+| DSM reading, layering, buses, operations | 15, 16, 17, 18, 19 |
+| Propagation cost and its limits | 20, 21, 22, 23, 24, 25, 28 |
+| Refactoring evidence | 26, 27 |
 
 ---
 
