@@ -10,333 +10,110 @@ page_type: study-notes
 
 # SN A07: Combinatorial Testing
 
-## Purpose
-These study notes cover combinatorial testing (CT) — a systematic approach to testing parameter interactions. CT is grounded in 30 years of research and validated across industrial domains from aerospace to autonomous driving.
+The lecture asks how to test software whose inputs can interact when trying every combination is impossible, and how few tests are enough to cover every combination that is likely to matter. [RQ A07: Combinatorial Testing](RQ_A07_Combinatorial.md) tests this lecture.
 
-**Primary Source:**
-- Kuhn, Kacker & Lei, *Introduction to Combinatorial Testing* (2013) {% cite kuhn2013combinatorial %}
+## 1. Most failures need only a few interacting inputs
 
-**Key Research Papers:**
-- NIST fault interaction study: ≤6-way for all projects {% cite kuhn2004fault %}
-- AETG: first greedy algorithm, logarithmic growth {% cite cohen1997aetg %}
-- IPOG: parameter-order growth, basis of ACTS {% cite lei2007ipog %}
-- CASA: SA + SAT solver for constrained systems {% cite garvin2011casa %}
-- Hu 2020: 93.3% multi-factor fault detection {% cite hu2020realworld %}
-- Daoud 2025: 48% time savings at Tricentis {% cite daoud2025effectiveness %}
+An **interaction fault** causes a failure only when several inputs take particular values together. The number of inputs that must take such values is the failure's **FTFI number** (failure-triggering fault interaction). For example, `if balance <= 0 and overdraft:` hides a fault with FTFI number 2: it needs one value of each of two inputs in the same test: a **value pair**. A suite has **t-way coverage** when every combination of values of any *t* inputs appears in some test (with *t* = 2, every value pair); *t* = 2 is called **pairwise**. Such a suite finds every fault whose FTFI number is at most *t*, provided the triggering values are among those tested.
 
----
+Kuhn, Wallace and Gallo, at the US National Institute of Standards and Technology (NIST) and NASA, counted FTFI numbers in four systems {% cite kuhn2004fault %}: 329 error reports from a NASA data-management system in development, 109 FDA recalls of medical-device software, and bug reports of early Mozilla and Apache releases (the paper does not give their counts).
 
-## Part 1: Why Interactions Break Software
+| Cumulative % of failures with FTFI number ≤ | 1 | 2 | 3 | 4 | 5 | 6 |
+|---|---|---|---|---|---|---|
+| NASA system | 68 | 93 | 98 | 100 | | |
+| Medical devices | 66 | 97 | 99 | 100 | | |
+| Browser (Mozilla) | 29 | 76 | 95 | 97 | 99 | 100 |
+| Server (Apache) | 42 | 70 | 89 | 96 | 96 | 100 |
 
-### 1.1 Parameter Interactions
+No failure needed more than six inputs. Hence the field's central claim: if every fault is triggered by at most *t* inputs, testing all *t*-way combinations is **effectively exhaustive**. Because each input is reduced to a few classes of values first, the authors call it **pseudo-exhaustive**. Four systems are a small sample, and sequence-dependent software, such as real-time control, may behave differently.
 
-Software failures occur when specific combinations of parameter values trigger a fault. Most failures involve interactions between a small number of parameters.
+→ [Interaction Faults](../../verif/combinatorial/interaction-faults.md)
 
-**Types of interactions:**
+## 2. Industrial studies find what intuition misses
 
-| Interaction | Example | Description |
-|-------------|---------|-------------|
-| 1-way | `if (balance <= 0)` | Single parameter triggers fault |
-| 2-way | `if (balance <= 0 && overdraft)` | Pair triggers fault |
-| 3-way | `if (balance <= 0 && overdraft && amount >= 100)` | Triple triggers fault |
-| t-way | General case | t parameters together trigger fault |
+Three studies give the practical case {% cite hu2020realworld daoud2025effectiveness bures2017effectiveness %}. The first two generated their suites with NIST's ACTS tool (§7).
 
-Each additional parameter **multiplies** the possible combinations. For n binary parameters, there are 2^n total combinations.
+- **Hu et al., five industrial systems.** Pairwise suites (at most about 120 tests each, the sponsors' limit) found 28 of 30 faults needing several inputs. The in-house teams found 2 (93.3% against 6.7%). The authors' explanation: in-house teams chose values from experience and requirements, so triggering pairs rarely met in one test; a pairwise suite contains every pair by construction. For faults needing one input it was 25 of 28 against 20 of 28 (89.3% against 71.4%); that edge came from random and boundary values within classes. The barriers the authors report: the size of suite testers will run by hand, the need for detailed requirements to build the model, and masking (§9), which they counter by checking each test's output as it runs.
+- **Daoud et al., Tricentis.** In a first study, on two input forms, pairwise tests found all 22 defects, the original tests 18. The defects were real past defects plus **seeded** ones, copies planted on purpose in nearby code. (Seeded defects have nothing to do with the seed tests of §8.) A second, separate study ran all of the product's commands on 12 pairwise configurations of operating system, browser and product version. Execution took 205 hours instead of 394 (48% less), and both test sets found the same 90 past defects, which makes the hours comparable.
+- **Bures and Ahmed, JTrac.** They made 10 **mutants**: copies of the system in which the handling of the input fields was changed on purpose, for example a value or a logical operator altered. A 3-way suite of 322 tests found the fault in 3 mutants that the 48-test pairwise suite missed. Per test the two were alike: about 40% of tests in each found nothing.
 
-### 1.2 The NIST Fault Interaction Study
+Pairwise therefore finds most, not all, interaction faults: it is one layer of testing, not a replacement for the others.
 
-Kuhn, Wallace, and Gallo {% cite kuhn2004fault %} analyzed 329 error reports from NASA, medical devices, Mozilla, and Apache. Their findings form the empirical foundation of CT:
+→ [Combinatorial Testing in Industry](../../verif/combinatorial/effectiveness.md)
 
-| Domain | 1-way | 2-way | 3-way | 4-way | 6-way |
-|--------|-------|-------|-------|-------|-------|
-| NASA GSFC | 68% | **93%** | 98% | 100% | — |
-| Medical Devices | 66% | **97%** | 99% | 100% | — |
-| Mozilla | 29% | 76% | 95% | — | 100% |
-| Apache | 42% | 70% | — | — | 100% |
+## 3. Covering arrays drop the balance that experiments need
 
-**Key insight:** No failure in any studied project required more than 6-way interactions. If you test all 6-tuples, you achieve effectively exhaustive coverage {% cite kuhn2004fault %}.
+An **orthogonal array** contains every combination of values of any *t* columns *exactly* the same number of times. Agricultural experiments need that balance to average out noise. A **covering array** of strength *t*, a table with one row per test and one column per input, only requires every such combination *at least once* {% cite cohen1997aetg %}. Software tests are repeatable, so one occurrence is enough, and dropping balance allows smaller arrays for any number of parameters. A suite built from a covering array of strength *t* has *t*-way coverage (§1). A 3-way array is also a 2-way array.
 
-### 1.3 Why Code Limits Interaction Depth
+Two counts let you check any array. For *k* parameters with *v* values each it must cover C(*k*, *t*) · *v*<sup>*t*</sup> combinations: 7,020 pairs for 40 three-valued parameters. With different value counts, add *v*<sub>*i*</sub> · *v*<sub>*j*</sub> over every pair of parameters (72 pairs for the Find dialog in §5). And it needs at least as many rows as the product of the *t* largest value counts.
 
-A NASA study of 7,685 conditions found that most `if`/`while` statements have only 1-3 boolean operands {% cite hayhurst2001practical %}:
+→ [Covering Arrays](../../verif/combinatorial/foundations.md)
 
-| Operands | % of Conditions |
-|----------|-----------------|
-| 1 | ~45% |
-| 2 | ~35% |
-| 3 | ~15% |
-| 4+ | ~5% |
+## 4. Adding parameters is cheap; raising the strength is not
 
-Developers naturally limit the complexity of individual conditions, which is why most faults involve few-way interactions.
+Cohen et al. proved that a greedy generator always covers at least 1/*v*<sup>2</sup> of the remaining pairs with its next test. After *r* tests at most *N*(1 − 1/*v*<sup>2</sup>)<sup>*r*</sup> of the *N* pairs remain, so about *v*<sup>2</sup> · ln *N* tests suffice; since *N* grows only with *k*<sup>2</sup>, the count grows with log *k*. That bound is loose (about 80 tests for 40 three-valued parameters). The paper's own **rule of thumb** for three-valued parameters, from the arrays it reports, is about 4 · log<sub>2</sub> *k*: 15 tests for 13 parameters and 21 for 40, where exhaustive testing needs 3<sup>40</sup> ≈ 1.2 × 10<sup>19</sup> {% cite cohen1997aetg %}.
 
-{: .highlight }
-> **Exam Tip:** Memorize the NIST table percentages. The key number is **≤6-way for all projects**. For pairwise (2-way), the detection rate ranges from 70% (Apache) to 97% (Medical Devices).
+Raising *t* costs far more. For 10 parameters with 5 values each, the IPOG generator (§7) needed 48 tests at *t* = 2, 308 at *t* = 3 and 1,843 at *t* = 4 {% cite lei2007ipog %}. The practical rule is: many parameters are cheap; many values and high strength are not. Spend strength where a missed failure costs most: pairwise by default, 3-way or more for safety-critical parts.
 
----
+→ [Covering Arrays](../../verif/combinatorial/foundations.md)
 
-## Part 2: Theory & Foundations
+## 5. A model turns a dialog into parameters and values
 
-### 2.1 From Orthogonal Arrays to Covering Arrays
+An **input model** lists the parameters and a few values for each, usually one per equivalence class. The lecture's Find dialog has FindWhat (8 classes: Empty, lowercase, MixedCase, UPPER, space, multiword, special, long), MatchCase (Yes, No), Direction (Up, Down) and File (None, Single, Multiple).
 
-**Orthogonal Array (OA):** Each t-way combination appears **exactly** the same number of times (λ times). Developed for agricultural experiments in the 1920s where statistical balance was required.
+**Base choice** is the cheapest systematic strategy: start from one base test of the most likely values, then vary one parameter at a time through its other values, so it needs 1 + Σ(*v*<sub>*i*</sub> − 1) tests.
 
-**Covering Array (CA):** Each t-way combination appears **at least once**. More flexible, always exists, always ≤ equivalent OA size.
+| Strategy | Tests | Guarantees |
+|---|---|---|
+| All combinations | 8 · 2 · 2 · 3 = 96 | everything |
+| 3-way (PICT) | 49 (lower bound 8 · 2 · 3 = 48) | every triple |
+| Pairwise (PICT) | 24 (lower bound 8 · 3 = 24) | every pair |
+| Base choice | 1 + 7 + 1 + 1 + 2 = 12 | every value once, against a base test |
 
-| Property | Orthogonal Array | Covering Array |
-|----------|-----------------|----------------|
-| Frequency | Exactly λ times | At least once |
-| Flexibility | Limited configs | Always constructible |
-| Size | Often larger | ≤ equivalent OA |
-| Use case | Statistics (replication) | Software (one test suffices) |
+With four three-valued parameters, base choice's 9 tests cover only 30 of the 54 pairs {% cite cohen1997aetg %}. Yet in Grindal et al.'s survey, one experiment with seeded faults found that it found as many faults as pairwise; the authors advise base choice for less important software and both together for critical software {% cite grindal2005survey %}.
 
-**Why covering arrays suit software:** Software testing produces binary results (pass/fail). One test case is enough to reveal a fault. No replication needed.
+Each row names classes, so someone still chooses concrete values and expected results.
 
-### 2.2 T-Way Coverage
+→ [Combinatorial Input Models](../../verif/combinatorial/practice.md)
 
-**Definition:** A test suite achieves t-way coverage if every combination of t parameter values appears in at least one test case.
+## 6. The same idea reaches simulation and training data
 
-| Strength | Meaning | Subsumes |
-|----------|---------|----------|
-| 1-way | Each individual value tested | — |
-| 2-way (pairwise) | All pairs covered | 1-way |
-| 3-way | All triples covered | 2-way, 1-way |
-| t-way | All t-tuples covered | All lower strengths |
+Tao et al. modelled an autonomous emergency-braking function from the Euro NCAP test protocols as 37 parameters with 39 constraints. The IPOG generator (§7) produced 319 pairwise scenarios, each run in a driving simulator, a plan the authors called impossible with real vehicles {% cite tao2019industrial %}. The study had no automatic pass or fail check.
 
-**Subsumption:** Higher strength automatically satisfies all lower strengths.
+Lanus et al. turned coverage around to judge machine-learning data {% cite lanus2021metrics %}. Each satellite image was described by 12 features, each split into 3 bins, plus its label (plane or no plane). A **label-centred pair** is one feature bin together with one label, so there are 12 · 3 · 2 = 72 of them. The northern image set held 67 of the 72 (coverage 0.93), the southern set 60 (0.83), although the southern set had about twice as many images (21,151 against 10,849). Size is not the same as variety.
 
-### 2.3 Logarithmic Growth — The Key Property
+→ [Combinatorial Testing in Industry](../../verif/combinatorial/effectiveness.md)
 
-The test count formula {% cite cohen1997aetg %}:
+## 7. AETG adds tests; IPOG adds parameters
 
-> N ∝ v^t × log(k)
->
-> v = values per parameter, t = strength, k = number of parameters
+Generators do not search for the smallest array; they use heuristics {% cite cohen1997aetg lei2007ipog %}.
 
-**Implications:**
-- **Adding parameters is cheap:** Doubling parameters from 20 to 40 adds ~3 tests (pairwise)
-- **Raising strength is expensive:** The v^t factor means 2-way → 3-way multiplies by ~v
+- **AETG** builds one test at a time. It picks the value in the most uncovered pairs, orders the other parameters randomly, and gives each the value covering the most new pairs. It makes 50 such candidates and keeps the best.
+- **IPOG** covers one parameter at a time. It starts with all combinations of the first *t* parameters. **Horizontal growth** gives each existing test the value of the new parameter that covers the most uncovered combinations. **Vertical growth** then covers the rest one combination at a time. A new test gets values only in the positions that combination needs; the others are **don't-care** positions, marked \*, which a later missing combination may fill. Any \* still left at the end takes any value.
 
-**Example (10 parameters × 3 values each):**
+For example, with P1 and P2 in {0, 1} and P3 in {0, 1, 2}, horizontal growth turns rows 00, 01, 10, 11 into 000, 011, 101, 110 (ties go to the smallest value). P3 = 2 is still unpaired, so vertical growth adds 0\*2 for (P1 = 0, P3 = 2), fills the \* with 0 to cover (P2 = 0, P3 = 2), and adds 112 for the last two pairs: 6 tests, the minimum, since P1 and P3 alone have 6 pairs. NIST's ACTS tool, used by the first two studies in §2, generates with IPOG by default {% cite daoud2025effectiveness %}.
 
-| Strength | Exhaustive | Covering Array | Reduction |
-|----------|-----------|----------------|-----------|
-| 1-way | 30 | 3 | 10× |
-| 2-way | 810 | 15 | 54× |
-| 3-way | 19,683 | 33 | 596× |
-| 4-way | 531,441 | 54 | 9,841× |
+→ [Covering Array Generation](../../verif/combinatorial/algorithms.md)
 
-**Example (scaling parameters, pairwise, 3 values each):**
+## 8. Search algorithms and tools
 
-| Parameters | Exhaustive | Pairwise |
-|------------|-----------|----------|
-| 10 | 59,049 | 15 |
-| 20 | 3.5 × 10⁹ | 18 |
-| 40 | 1.2 × 10¹⁹ | **21** |
-| 100 | 5.2 × 10⁴⁷ | **25** |
+Search algorithms improve a whole array step by step. Zeb et al.'s review of 91 studies sorts them into five kinds: **standard** (one algorithm), **mix** (a search algorithm plus a greedy or algebraic method), **adaptive** (self-tuning), **hybrid** (several search algorithms) and **hyper-heuristic** (choosing among algorithms). **Simulated annealing** makes small random changes to an array, keeps the ones that help, and early on sometimes keeps a change that hurts, so the search does not get stuck. It stood out in the review: it was the one search algorithm used in the best-performing strategies of four of the five kinds {% cite zeb2025systematic %}. Three free tools cover most needs: **PICT** (text model, command line), **ACTS** (IPOG, the tool of the first two studies in §2) and **CASA** (annealing with a SAT solver for complex constraints). **Seed tests**, existing tests the output must contain, rarely make a suite smaller, as Bombarda and Gargantini found; use them to keep tests you must keep {% cite bombarda2025completion %}.
 
-{: .highlight }
-> **Exam Tip:** The formula N ∝ v^t × log(k) explains two facts: (1) why CT scales to huge parameter spaces, and (2) why raising strength is so expensive. Be ready to explain both.
+→ [Combinatorial Testing Tools](../../verif/combinatorial/tools.md)
 
----
+## 9. Constraints and invalid values need their own rules
 
-## Part 3: Practical Application
+A **constraint** forbids combinations, such as Safari on anything but macOS. Deleting invalid rows from an unconstrained array loses coverage. For example, take OS (Windows, macOS, Linux), Browser (Chrome, Firefox, Safari) and Language (EN, DE). PICT's 9-row pairwise array, listed in RQ Q8, has two Safari rows on other systems; deleting them loses the valid pairs (Windows, EN) and (Safari, EN). With the constraint in the model, PICT gives 8 rows covering all 19 valid pairs {% cite microsoft_pict %}. Eight is the minimum: the 7 valid OS-browser pairs each need a row, and (macOS, Safari) needs two, because Safari must meet both languages and runs only on macOS. CASA, built for heavy constraints, produced arrays 25% smaller than a greedy tool on 35 constrained problems, and paid off when a test suite took over 21 seconds to run {% cite garvin2011casa %}.
 
-### 3.1 Building a Parameter Model
+An **invalid** value is one the system should reject. Two in one test cause **masking**: the first error stops processing, so the second value is never handled. More generally, anything that ends a test early hides what it would have checked afterwards. The rule is at most one invalid value per test, all others valid {% cite grindal2005survey %}. PICT applies it automatically: values marked with `~` in the model, such as `~0` for a quantity, appear at most once per generated test {% cite microsoft_pict %}.
 
-**Step 1:** Identify parameters (inputs, configurations, environment factors).
+**Mixed strength** gives different parameter groups different *t*. At Tricentis, Daoud et al. required pairs only among a few chosen sets of interacting parameters: on one form the plain pairwise suite had 58 tests, the mixed one 52, which missed one defect plain pairwise found {% cite daoud2025effectiveness %}.
 
-**Step 2:** Define equivalence classes for each parameter.
+→ [Constraints and Invalid Values](../../verif/combinatorial/advanced.md)
 
-**Worked example — Find Dialog:**
+## Where this goes next
 
-| Parameter | Equivalence Classes | Count |
-|-----------|---------------------|-------|
-| FindWhat | Empty, lowercase, MixedCase, UPPER, space, multi-word, special chars, long string | 8 |
-| MatchCase | Yes, No | 2 |
-| Direction | Up, Down | 2 |
-| File | No occurrence, Single, Multiple | 3 |
-
-**Exhaustive:** 8 × 2 × 2 × 3 = **96 tests**
-**Pairwise:** **24 tests** (75% reduction)
-**Triples:** **48 tests** (50% reduction)
-
-### 3.2 Configuration vs. Input Testing
-
-| Aspect | Configuration Testing | Input Testing |
-|--------|----------------------|---------------|
-| What varies | Environment (OS, browser, DB) | User inputs |
-| What's fixed | Test cases | Environment |
-| Goal | Works across platforms | Handles input combos |
-| Example | Win+Chrome+MySQL | New user, $500, credit |
-
-The math is identical — covering arrays don't distinguish between input and configuration parameters.
-
-### 3.3 Choosing Interaction Strength
-
-| Risk Level | Strength | Approx. Detection | Domain Examples |
-|------------|----------|-------------------|-----------------|
-| Low | 2-way | ~90% | Web forms, UI config |
-| Medium | 3-way | ~98% | Business logic, APIs |
-| High | 4-way | ~100% | Medical devices, aerospace |
-| Very High | 5-6-way | 100% | FAA, nuclear, automotive safety |
-
-Evidence: Bures & Ahmed {% cite bures2024effectiveness %} showed 3-way detected faults that 2-way missed entirely in **30%** of tested systems. Start with 2-way; increase for critical subsystems.
-
-### 3.4 Positive vs. Negative Testing
-
-**Problem:** Invalid inputs can mask real faults. An error handler terminates early, preventing later code with real bugs from executing.
-
-**Solution:** Generate **separate** covering arrays for positive and negative tests.
-
-{: .highlight }
-> **Exam Tip:** Know the masking effect. If asked "what goes wrong when you mix valid and invalid values in one covering array?", explain that error handlers can prevent later code from being reached.
-
----
-
-## Part 4: Algorithms & Tools
-
-### 4.1 AETG — First Greedy Algorithm (1997)
-
-Cohen et al. {% cite cohen1997aetg %} introduced the one-**test**-at-a-time approach:
-
-1. Find parameter/value appearing in most uncovered pairs
-2. Order remaining parameters by uncovered pairs
-3. Generate M=50 random candidates, keep the best
-4. Repeat until all t-tuples covered
-
-**Key result:** Proved logarithmic growth — 40 params × 3 values = only 21 tests.
-
-### 4.2 IPOG — Parameter-Order Growth (2007)
-
-Lei et al. {% cite lei2007ipog %} introduced the one-**parameter**-at-a-time approach:
-
-**Three phases:**
-1. Build t-way covering set for first t parameters
-2. **Horizontal growth:** Extend existing rows with new parameter (greedy assignment)
-3. **Vertical growth:** Add new rows for uncovered t-tuples (use don't-care `*` values)
-
-**Advantages:** Lower complexity than AETG, deterministic, generalizes to any t. Foundation of ACTS.
-
-### 4.3 CASA — Constrained CT (2011)
-
-Garvin, Cohen & Dwyer {% cite garvin2011casa %} addressed systems with constraints:
-
-- Two-layer SA search + SAT solver (MiniSAT)
-- **90× faster** than base SA
-- **25% smaller** suites than greedy on constrained problems
-- Break-even: use SA when test execution >21 seconds
-
-### 4.4 Algorithm Evolution
-
-Zeb et al. {% cite zeb2025systematic %} classified 91 studies into 5 categories:
-
-| Category | Approach | Example | Key Trait |
-|----------|----------|---------|-----------|
-| Standard | Single metaheuristic | SA, GA, PSO | Simple, proven |
-| Mix | Two algorithms | Greedy+SA | Better than either |
-| Adaptive | Self-tuning | Fuzzy TLBO | Adjusts during search |
-| Hybrid | Search + greedy | REH | Speed + quality |
-| Hyper-heuristic | Meta-selector | HHSA | Selects best per instance |
-
-**SA is the most successful** algorithm across all categories. Hyper-heuristics are the emerging frontier.
-
-### 4.5 Tool Comparison
-
-| Tool | Algorithm | Constraints | Best For |
-|------|-----------|-------------|----------|
-| **ACTS** | IPOG | Yes | General, industry standard |
-| **PICT** | Greedy | Yes | CLI, CI/CD integration |
-| **CASA** | SA+SAT | Yes (complex) | Constrained systems |
-| **Hexawise** | Commercial | Yes | Enterprise |
-
-### 4.6 Seed Reuse (Bombarda 2025)
-
-Bombarda & Gargantini {% cite bombarda2025completion %} studied when to reuse existing tests:
-
-| Scenario | Use Seeds? | Best Tool |
-|----------|-----------|-----------|
-| Strength increase (2→3) | **Yes** | ACTS (smallest suites) |
-| Suite completion (>70%) | Maybe | PICT |
-| Partial test cases | **No** | Overhead negates benefit |
-
-{: .highlight }
-> **Exam Tip:** Know AETG vs IPOG: AETG = one-test-at-a-time (greedy candidates), IPOG = one-parameter-at-a-time (horizontal + vertical growth). IPOG is lower complexity and the basis of ACTS.
-
----
-
-## Part 5: Advanced Topics
-
-### 5.1 Constraint Handling
-
-Four strategies for invalid combinations:
-
-| Strategy | Description | When to Use |
-|----------|-------------|-------------|
-| Abstract | Combine conflicting params | Few conflicts |
-| Partition | Split into sub-models | Independent groups |
-| Avoid | Generator excludes invalid | ACTS, PICT support |
-| Replace | Post-process conflicting rows | Legacy models |
-
-### 5.2 Mixed-Strength Arrays
-
-Assign different interaction strengths to different parameter groups:
-- Security-critical parameters: 3-way
-- UI parameters: 2-way
-- Cross-group: 2-way
-
-ACTS supports mixed-strength specification directly.
-
-### 5.3 CT for Autonomous Driving
-
-Tao et al. {% cite tao2019industrial %} applied CT at AVL List GmbH:
-- **Domain:** Autonomous Emergency Braking (AEB)
-- **Model:** 37 parameters, 39 constraints from Euro NCAP
-- **Result:** 319 pairwise tests executed in VTD simulation
-- **Key:** Physical testing is impossible; CT + simulation makes it feasible
-
-### 5.4 CT for ML Dataset Quality
-
-Lanus et al. {% cite lanus2021metrics %} bridged CT and ML quality:
-- **CCM_t:** Measures t-way coverage of a dataset
-- **SDCCM_t:** Coverage difference between datasets
-- **Finding:** Smaller dataset had HIGHER 2-way coverage (0.93 vs 0.83)
-- **Lesson:** Dataset size ≠ representativeness
-
-### 5.5 Research Directions
-
-- **RL integration:** Q-Graph framework (100× faster FSM testing)
-- **Hyper-heuristics:** Meta-selectors that pick best algorithm per instance
-- **Reproducibility concern:** Only 21% of ML-testing studies are reproducible (Pan 2022)
-
-{: .highlight }
-> **Exam Tip:** For the autonomous driving case study, remember the numbers: 37 parameters, 39 constraints, 319 tests. The pipeline is: Ontology → CT Model → IPOG → OpenScenario → VTD Simulation.
-
----
-
-## Part 6: Industrial Evidence Summary
-
-### Key Numbers to Remember
-
-| Fact | Value | Source |
-|------|-------|--------|
-| Max interactions needed | **≤6-way** all projects | Kuhn 2004 |
-| Pairwise detection (medical) | **97%** | Kuhn 2004 |
-| Multi-factor CT vs manual | **93.3% vs 6.7%** | Hu 2020 |
-| Defect detection CT vs ad-hoc | **100% vs 81.8%** | Daoud 2025 |
-| Test time savings | **48%** (394h→205h) | Daoud 2025 |
-| 3-way catches extra faults in | **30%** of systems | Bures 2017 |
-| CASA speedup over base SA | **90×** | Garvin 2011 |
-| CASA suite size vs greedy | **25% smaller** | Garvin 2011 |
-| 34 binary switches: 4-way | 17B → **85 tests** | Kuhn 2013 |
-
-### Barriers to Adoption
-
-| Barrier | Mitigation |
-|---------|-----------|
-| Manual execution limits (<200 tests) | Automate execution |
-| Tools don't generate scripts | Add mapping layer |
-| Depends on specification quality | Invest in parameter model |
-| Masking effect | Separate positive/negative tests |
+Combinatorial testing starts from an input model, but says little about how to find its parameters and classes. A08's classification trees build that model systematically and then use the combination strategies from this lecture to choose the tests.
 
 ---
 

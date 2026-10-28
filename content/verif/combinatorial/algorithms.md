@@ -1,188 +1,56 @@
 ---
-title: Algorithms
+title: Covering Array Generation
 parent: Combinatorial Testing
-nav_order: 4
+nav_order: 5
 layout: default
 ---
 
-# Algorithms & Evolution
+# Covering Array Generation
 
-Building minimum covering arrays is NP-hard. Practical tools rely on heuristic algorithms that produce near-optimal solutions efficiently. Over three decades, these algorithms have evolved from simple greedy approaches to sophisticated meta-selectors.
+**Covering array generation** is the task of building a small table of tests that covers every *t*-way combination of an input model. Tools do not search for the smallest array; they use heuristics that build a good one quickly: greedy algorithms such as AETG and IPOG, and search algorithms such as simulated annealing {% cite grindal2005survey zeb2025systematic %}.
 
----
+## 1. AETG builds one test at a time
 
-## The Generation Problem
+AETG, from Bellcore, adds tests one by one, each covering as many still-uncovered pairs as it can find {% cite cohen1997aetg %}. To build one test it:
 
-Given parameters, values, and interaction strength t, find the **smallest** array where every t-way combination appears at least once.
+1. picks the parameter value that appears in the most uncovered pairs;
+2. puts the remaining parameters in a random order;
+3. gives each parameter in turn the value that covers the most new pairs with the values already chosen.
 
-Three main algorithm families:
+It repeats this to make M = 50 candidate tests and keeps the best. Raising M barely helped; running the whole generator with 50 different random-number seeds and keeping the best suite sometimes saved 10% to 20% of the tests. At Bellcore, AETG covered all pairs of a telephone-switch model with 336 valid scenarios, each taking a few hours to run, in 30 tests; on the Unix `sort` command, 29 pairwise tests reached 90% block coverage (they executed 90% of the program's basic blocks, the straight-line stretches of code) {% cite cohen1997aetg %}.
 
-| Family | Approach | Trade-off |
-|--------|----------|-----------|
-| **Greedy** | Build test cases one at a time | Fast, larger suites |
-| **Metaheuristic** | Search for optimal arrays | Slower, smaller suites |
-| **Algebraic** | Construct from mathematical formulas | Fastest, limited configurations |
+## 2. IPOG covers one parameter at a time
 
-Most practical tools use greedy or metaheuristic approaches {% cite grindal2005survey %}.
+IPOG reverses the loop: it starts with all combinations of the first *t* parameters, then adds the other parameters one by one {% cite lei2007ipog %}. Each new parameter is added in two steps:
 
----
+- **Horizontal growth** gives every existing test a value for the new parameter, each time the value that covers the most uncovered combinations.
+- **Vertical growth** covers what is left, one combination at a time. It fills a don't-care position in an existing test if it can, and adds a new test otherwise. A **don't-care** is a position whose value no combination needs yet.
 
-## AETG: The First Greedy Algorithm (1997)
+![IPOG on P1 and P2 with values 0 and 1, and P3 with values 0, 1 and 2: four rows, P3 added to each, then two new rows](ipog-growth.svg)
 
-AETG (Automatic Efficient Test Generator) was the first practical tool for generating covering arrays for software testing {% cite cohen1997aetg %}.
+_IPOG at strength 2, traced by a script. Ties go to the smallest value._ {% cite lei2007ipog %}
 
-**Approach:** One-**test**-at-a-time
+For example, trace the figure. P3 must form 12 new pairs, 6 with P1 and 6 with P2. Row (0, 0) gains 2 new pairs whichever value it gets, so it gets 0. Row (0, 1) gains 1 pair with 0 but 2 with 1 or 2, so it gets 1, and so on. After horizontal growth, P3 = 2 still lacks all four of its pairs. Vertical growth first adds (0, \*, 2) for (P1 = 0, P3 = 2), then fills the don't-care with P2 = 0 to cover (P2 = 0, P3 = 2) too; (1, 1, 2) covers the last two. The result has 6 tests, the minimum, since P1 and P3 alone have 2 · 3 = 6 pairs.
 
-1. Identify parameter and value appearing in most uncovered pairs
-2. Order remaining parameters by number of uncovered pairs
-3. For each remaining parameter, greedily select value covering most uncovered pairs
-4. Generate M=50 random candidates this way, keep the best one
-5. Repeat until all t-tuples are covered
+Lei et al.'s IPOG tool, FireEye, beat four other generators (ITCH, Jenny, TConfig, TVG) in both test count and time, most clearly at strengths 5 and 6. NIST's ACTS tool generates with IPOG by default {% cite lei2007ipog daoud2025effectiveness %}.
 
-**Key contribution:** Proved that test suite size grows **logarithmically** in the number of parameters. This meant CT could scale to systems with 80+ parameters.
+## 3. Search algorithms trade time for size
 
-**Performance examples:**
-- 40 parameters × 3 values: **21 tests** (vs. 1.2 × 10¹⁹ exhaustive)
-- 800-service telecom project: 336 scenarios → **30 pairwise tests**
-- Achieved >90% block coverage on Unix commands
+Search algorithms start from a whole array and change it step by step to remove uncovered combinations. Simulated annealing, which sometimes accepts a worse step to escape a dead end, is the best known; CASA adds a SAT solver for constraints and is covered on [Constraints and Invalid Values](advanced.md) {% cite garvin2011casa %}. Zeb et al. reviewed 91 studies (2003 to 2025) and sorted search-based strategies into five kinds: standard (one search algorithm), mix (a search algorithm plus a greedy, exact or algebraic method), adaptive (tuning its own settings), hybrid (several search algorithms together) and hyper-heuristics that choose among algorithms while running. Simulated annealing stood out: it was the one search algorithm used in the best-performing strategies of four of the five kinds. The same search methods could build related structures that remain largely open, such as error-locating arrays, which also point to the failing combination {% cite zeb2025systematic %}.
 
-**Limitation:** Random candidate generation (M=50 per test) makes AETG slow for large models.
+## When to use it — and when not
 
----
+- **Use** a greedy or heuristic generator (IPOG in ACTS, or PICT) by default. It is fast, and for a few parameters it can reach the lower bound (24 rows for the Find dialog); for many it stays well above it (27 rows for 40 three-valued parameters, against a bound of 9).
+- **Use** simulated annealing when each test is expensive and a smaller array is worth a longer generation.
 
-## IPOG: Parameter-Order Growth (2007)
+## Limitations
 
-IPOG (In-Parameter-Order-General) takes a fundamentally different approach {% cite lei2007ipog %}.
+Every generator returns an upper bound. Two tools, or one tool with two random seeds, can return arrays of different sizes for the same model.
 
-**Approach:** One-**parameter**-at-a-time
+## How solid is this?
 
-### Three Phases
-
-**Phase 1:** Build a complete t-way covering set for the first t parameters.
-
-**Phase 2 — Horizontal Growth:** For each remaining parameter, extend every existing test case by adding a value that covers the most uncovered t-tuples.
-
-| P1 | P2 | → | P1 | P2 | P3 |
-|----|----|----|----|----|-----|
-| 0 | 0 | | 0 | 0 | **0** |
-| 0 | 1 | | 0 | 1 | **1** |
-| 1 | 0 | | 1 | 0 | **2** |
-| 1 | 1 | | 1 | 1 | **0** |
-
-**Phase 3 — Vertical Growth:** Add new rows for any t-tuples not yet covered. Use "don't-care" values (marked `*`) in positions that don't affect coverage.
-
-| P1 | P2 | P3 |
-|----|----|----|
-| 0 | 0 | 0 |
-| 0 | 1 | 1 |
-| 1 | 0 | 2 |
-| 1 | 1 | 0 |
-| **0** | **\*** | **2** |
-| **1** | **\*** | **1** |
-
-**Advantages over AETG:**
-- Lower computational complexity
-- Deterministic (no random candidates)
-- Naturally generalizes to any strength t
-- Foundation of the NIST ACTS tool
-
----
-
-## CASA: Constrained CT with Simulated Annealing (2011)
-
-Real systems have constraints — not all parameter combinations are valid. CASA (Covering Arrays by Simulated Annealing) was designed specifically for this challenge {% cite garvin2011casa %}.
-
-**Approach:** Two-layer metaheuristic search
-
-- **Outer loop:** Minimize array size (try progressively smaller arrays)
-- **Inner loop:** Simulated Annealing finds a valid array of the target size
-- **SAT solver** (MiniSAT) integration for constraint satisfaction
-
-### Key Innovations
-
-| Innovation | Problem Solved |
-|-----------|---------------|
-| **t-Set Replacement** | Writes entire missing t-tuple to escape infeasible states |
-| **One-Sided Narrowing** | Only narrows upper bound (handles false negatives) |
-| **Row Replacement** | Generates new valid row when trapped |
-| **Row Sorting** | Moves valuable rows early to avoid discarding them |
-| **State Preservation** | Preserves array state between successive inner searches |
-
-### Performance
-
-- **90× faster** than base SA
-- **25% smaller** test suites than greedy on constrained problems
-- Cost-effective when test execution time >21 seconds
-
----
-
-## Algorithm Evolution Timeline
-
-The field has progressed through increasingly sophisticated strategies:
-
-```
-1997: AETG (Greedy) → 2007: IPOG (Parameter-order) → 2011: CASA (SA+SAT) → 2020s: Hyper-heuristics
-```
-
-Zeb et al. {% cite zeb2025systematic %} analyzed 91 studies (2003-2025) and identified five algorithm categories:
-
-| Category | Description | Examples | Key Trait |
-|----------|-------------|----------|-----------|
-| **Standard** | Single metaheuristic | SA, GA, PSO, ACO | Simple, proven |
-| **Mix** | Two algorithms combined | Greedy + SA (2SSA) | Better than either alone |
-| **Adaptive** | Self-tuning parameters | Fuzzy TLBO | Adjusts during search |
-| **Hybrid** | Search + greedy/algebraic | REH | Speed + quality |
-| **Hyper-heuristic** | Meta-level selector | HHSA, HHH | Selects best strategy per instance |
-
-**Key finding:** Simulated Annealing is the most successful algorithm across all categories {% cite zeb2025systematic %}. Hyper-heuristics represent the emerging frontier — they select which low-level algorithm to use for each specific problem instance.
-
----
-
-## Nature-Inspired Algorithms (2020-2024)
-
-Recent years show a trend toward nature-inspired optimization {% cite ibrahim2025advancements %}:
-
-| Year | Algorithm | Inspiration | Target Niche |
-|------|-----------|-------------|--------------|
-| 2020 | DEO | Dynamic event ordering | Event-driven systems |
-| 2021 | EMBO-GA | Migrating birds + genetic | Complex interactions |
-| 2022 | TSWOA | Whale optimization | High-dimensional models |
-| 2023 | SCIPOG | Enhanced IPOG + seeding | Constrained systems |
-| 2024 | ImpARO | Asexual reproduction | Diverse parameter spaces |
-
-Each algorithm targets a different niche, reflecting the increasing specialization of the field.
-
----
-
-## Reinforcement Learning Integration
-
-Machine learning is beginning to transform CT algorithm selection and test prioritization {% cite pan2022testcase %}:
-
-- **Q-Graph framework:** 100× faster and 99.99% less memory than brute-force for FSM testing
-- **Multi-Armed Bandit:** Adaptive test prioritization in CI environments
-- **RL advantage:** Adapts to changing codebases without retraining (unlike supervised learning)
-
-However, a significant concern: only 21% of ML-based test prioritization studies are reproducible {% cite pan2022testcase %}, raising questions about the reliability of reported results.
-
----
-
-## Choosing an Algorithm
-
-| If you need... | Use... | Because... |
-|----------------|--------|-----------|
-| General-purpose generation | IPOG (via ACTS) | Fast, deterministic, industry standard |
-| Smallest suites | SA-based (CASA) | Best optimization, worth the time |
-| Fast generation | Greedy (PICT) | Simple, CLI-friendly |
-| Complex constraints | CASA | SAT solver handles difficult constraints |
-| Very large models | REH | 33% faster than alternatives |
-
----
-
-## Further Reading
-
-- [Tools](tools) — Which tools implement which algorithms
-- [Foundations](foundations) — Mathematical theory behind covering arrays
-- [Industrial Evidence](effectiveness) — Algorithm impact on real projects
+- **Where it comes from.** The AETG and IPOG papers, the CASA evaluation, and Zeb et al.'s systematic review {% cite cohen1997aetg lei2007ipog garvin2011casa zeb2025systematic %}.
+- **What is contested.** Size comparisons between tools depend on the benchmark models; FireEye was compared with four tools available in 2007, not with AETG.
 
 ---
 
