@@ -7,134 +7,51 @@ layout: default
 
 # Personal Software Process & Team Software Process
 
-The Personal Software Process (PSP) and Team Software Process (TSP) are disciplined methodologies designed to improve software quality and project predictability by transferring process management skills directly to individual engineers and their teams {% cite humphrey1995discipline %} {% cite hayes1997psp %} {% cite mcandrews2000tsp %}.
+The **Personal Software Process (PSP)** is a defined and measured process for one engineer: the engineer follows scripts to plan, design, review and code, and records time, size and every defect, so that their own data show what improves their work {% cite humphrey1995discipline hayes1997psp %}. The **Team Software Process (TSP)** builds self-directed teams out of PSP-trained engineers {% cite mcandrews2000tsp %}. Both come from Watts Humphrey at the SEI.
 
-## Personal Software Process (PSP) Methodology
+## 1. PSP: measure yourself
 
-The PSP is a defined and measured process designed for individual use to guide the planning and development of software modules {% cite humphrey1995discipline %}. It is structured into seven process levels (PSP0 to PSP2.1) that use a "self-convincing" learning strategy, where engineers use their own data to see the impact of disciplined methods on their performance.
+PSP is taught in a course of programming exercises through levels from PSP0 to PSP2.1. At each level the engineer adds practices and keeps the same records:
 
-### Methodology Focus
+- **Time** spent in each phase (plan, design, code, compile, test, postmortem);
+- **Defects**: type, the phase where each was injected and the phase where it was removed;
+- **Size** of the product, in lines of code.
 
-Engineers follow defined scripts to plan, design, code, and review software, recording:
-- **Time**: Effort spent on each activity
-- **Defects**: Type, injection phase, removal phase
-- **Product Size**: Lines of code, function points
+With these data the engineer estimates size and effort from past projects (Humphrey's PROBE method), reviews design and code against a personal checklist built from their own most frequent defects, and tracks progress with earned value.
 
-### Key Techniques
+**Example.** Hayes and Over analyzed 298 engineers in 23 PSP classes {% cite hayes1997psp %}. Median improvements over the course were:
 
-| Technique | Purpose |
-|-----------|---------|
-| **PROBE Method** | Proxy-Based Estimating for size and effort forecasting |
-| **Checklist-guided Reviews** | Personal design and code reviews to improve quality |
-| **Earned Value** | Schedule tracking and progress measurement |
+| Measure | Median improvement |
+|---|---|
+| Size estimates | 2.5 times more accurate |
+| Effort estimates | 1.75 times more accurate |
+| Product quality (defects found in unit test) | 2.5 times better |
+| Process quality (share of defects removed before compiling) | up by 50% |
+| Productivity (lines of code per hour) | no significant change |
 
-## Hayes & Over (1997) Study Results
+The underestimates of size and effort that engineers began with turned into a balanced mix of over- and underestimates, which cancel out over many tasks.
 
-This foundational study analyzed the performance of 298 software engineers across 23 classes {% cite hayes1997psp %}:
+## 2. TSP: a team that plans itself
 
-### Estimation Accuracy
+A TSP project starts with a **launch**, a four-day planning process in which the whole team sets goals, chooses its process, assigns roles (team leader plus managers for planning, process, quality and support) and builds a detailed, balanced plan {% cite mcandrews2000tsp %}. Every member takes at least one role; on teams of more than eight, roles are shared {% cite davis2003tsp %}. During the project the team tracks its own data weekly and re-plans when needed.
 
-| Metric | Improvement Factor |
-|--------|-------------------|
-| Size estimation accuracy | **2.5x** improvement |
-| Effort estimation accuracy | **1.75x** improvement |
+Davis and Mullaney summarized more than 20 TSP projects in 13 organizations, including Microsoft, Honeywell and Hill Air Force Base {% cite davis2003tsp %}. The teams finished on average **6% later than planned** (range: 20% early to 27% late), improved productivity by an average of **78%**, and delivered **0.06 defects per thousand lines of code** against 7.5 for typical projects, more than two orders of magnitude better. In system test they averaged 0.4 defects per thousand lines, and they spent an average of 4% of their total effort in system test, against 40% in typical projects; failure cost of quality was 17% against 50%. One first-time TSP team reported ten times fewer problems logged by its testers than in the previous release and an eight times shorter system test.
 
-### Quality Gains
+## When to use them — and when not
 
-- **Product quality** (defects found in unit tests): **2.5x** improvement
-- **Process yield** (defects removed before first compile): increased by **50%**
+Use PSP training to give engineers estimation and review skills based on evidence about themselves; use TSP where predictability and very low defect rates are worth the overhead of detailed personal data, as in the organizations Davis and Mullaney report on. The data collection is heavy for teams that release many small changes a day, where automated metrics from the pipeline replace manual logs.
 
-### Key Finding: Quality Without Productivity Loss
+## Limitations
 
-The study found **no significant change in personal productivity** (LOC/hour), meaning quality gains were achieved without a loss in efficiency {% cite hayes1997psp %}.
+- **Course data.** PSP improvements were measured on course exercises, not on industrial projects.
+- **Reported by the method's home.** Both studies are SEI technical reports on the SEI's own methods; the TSP data come from organizations that chose to report.
+- **Self-recorded data.** The results depend on engineers logging time and defects honestly and completely.
 
-### Bias Correction
+## How solid is this?
 
-The initial bias toward underestimating both size and effort shifted to a more balanced mix of over- and underestimates, allowing errors to cancel each other out in larger projects.
-
-## Team Software Process (TSP) Overview
-
-The TSP provides a team environment that supports disciplined PSP work and builds self-directed teams capable of managing their own projects {% cite mcandrews2000tsp %}.
-
-### The TSP Launch
-
-A critical four-day, nine-meeting process where the entire team (and management) {% cite mcandrews2000tsp %}:
-- Sets goals and objectives
-- Assigns roles (Quality Manager, Planning Manager, etc.)
-- Creates a detailed, balanced plan
-- Establishes team working agreements
-
-### Team Roles
-
-| Role | Responsibility |
-|------|----------------|
-| **Team Leader** | Overall coordination and external interface |
-| **Planning Manager** | Schedule and resource planning |
-| **Quality Manager** | Process quality and defect tracking |
-| **Process Manager** | Process adherence and improvement |
-| **Support Manager** | Tools and infrastructure |
-
-### Organizational Adoption
-
-Adoption typically starts with pilot projects. Successful implementation requires {% cite mcandrews2000tsp %}:
-- Executive training (1.5 days)
-- Middle-management training (3 days)
-- PSP training for all participating engineers (2 weeks)
-
-## Quality and Productivity Results from TSP in Practice
-
-Summary data from 20 TSP projects across 13 organizations (including Microsoft, Xerox, and Boeing) demonstrate performance that exceeds typical industry standards {% cite davis2003tsp %}:
-
-### Schedule Performance
-
-TSP teams delivered products an average of only **6% later than planned**, with a range of 20% early to 27% late {% cite davis2003tsp %}.
-
-### Productivity Improvements
-
-| Organization | Productivity Improvement |
-|--------------|-------------------------|
-| Average across organizations | **78%** improvement |
-| Hill Air Force Base (first project) | **123%** improvement |
-
-### Delivered Quality
-
-TSP software quality is often **two orders of magnitude higher** than typical products {% cite davis2003tsp %}:
-
-| Metric | TSP Projects | Industry Typical |
-|--------|-------------|------------------|
-| Defects/KLOC | **0.06** | 7.5 |
-
-## Key Metrics and Defect Reduction Findings
-
-TSP shifts the focus from defect detection (testing) to defect prevention through rigorous reviews and inspections {% cite davis2003tsp %}.
-
-### Yield as Primary Metric
-
-**Yield** is the primary process quality metric—the percentage of defects removed before system test {% cite hayes1997psp %}:
-- Mature TSP teams achieve an average of **0.4 defects/KLOC** in system test
-- Several teams report **zero defects** in system test
-
-### Reduction in Rework
-
-Compared to previous releases, TSP teams achieved {% cite davis2003tsp %}:
-- **10x reduction** in problems logged by testing groups
-- **8x reduction** in system test duration
-
-### Cost of Quality (COQ)
-
-| Activity | TSP Projects | Industry Norm |
-|----------|-------------|---------------|
-| System testing effort | **4%** of total | 40% of total |
-| Failure COQ reduction | **58%** average | — |
-
-## Summary: PSP/TSP Benefits
-
-| Dimension | PSP Benefits | TSP Benefits |
-|-----------|-------------|--------------|
-| **Quality** | 2.5x defect reduction | 0.06 defects/KLOC |
-| **Estimation** | 2.5x size accuracy | 6% schedule variance |
-| **Productivity** | No loss with quality gains | 78% average improvement |
-| **Learning** | Self-convincing with own data | Team synergy and roles |
+- **Where it comes from.** The SEI's empirical study of PSP, an overview of TSP and a summary of TSP results {% cite hayes1997psp mcandrews2000tsp davis2003tsp %}.
+- **What is contested.** Whether the gains come from the process or from the type of organization that invests in it; the reports have no control groups.
+- **What we do not hold.** Humphrey's PSP book, cited from the lecture.
 
 ---
 

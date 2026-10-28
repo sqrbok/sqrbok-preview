@@ -10,431 +10,104 @@ page_type: study-notes
 
 # SN A01: Cost of Quality
 
-## Purpose
+This lecture asks how much quality costs and where the money should go. It answers by sorting all quality-related effort into four categories, following defects from the phase that creates them to the activity that removes them, and showing that early removal usually costs less than late removal. The second half applies the same lens to modern practice: classification schemes, continuous delivery, code review, technical debt and defect prediction.
 
-These study notes explain the Cost of Software Quality (CoSQ) framework. Designed for MS students preparing for exams.
+## 1. Poor quality is a large, mostly hidden cost
 
-{: .note }
-**Related Pages:** For detailed coverage, see [CoSQ Foundations](01-cosq-foundations.md), [Defect Injection & Removal](02-defect-injection-removal.md), [Defect Classification](03-defect-classification.md), and [Quality Economics in DevOps](04-quality-economics-devops.md).
+When manufacturers first measured quality-related costs, they found 10 to 30 percent of sales, far more than their accounts showed, and most of it avoidable {% cite miranda2013coq %}. Software is worse. Houston and Keats report a **cost of software quality (CoSQ)** of 20 to 70 percent of development cost, roughly twice the manufacturing figure; organizations that had not started process improvement spent 60 percent and more {% cite houston1999cost %}. At national scale, NIST estimated that an inadequate infrastructure for software testing cost the US economy USD 59.5 billion a year, about 60% of it borne by users, and that feasible improvements could save USD 22.2 billion {% cite tassey2002economic %}. Expressing quality in money is what lets a quality engineer argue with managers in their own unit.
 
----
+→ [Cost of Software Quality](../../organization/01-coq/01-cosq-foundations.md)
 
-## Overview
+## 2. Four categories separate achieving quality from failing
 
-The Cost of Software Quality (CoSQ) provides a financial framework for translating technical quality metrics into business language. Understanding CoSQ enables data-driven decisions about where to invest in quality activities.
+CoSQ has four categories {% cite houston1999cost knox1993modeling %}:
 
-**Learning Objectives:**
-
-- Describe the components of the Cost of Quality
-- Understand the economics of defect prevention vs. detection
-- Create a strategy to minimize total CoQ
-
----
-
-## 1. Why Cost of Quality Matters
-
-### The Business Reality
-
-Quality-related costs are much larger than accounting reports typically show. During the 1950s, quality specialists discovered that these costs ran **10–30% of sales** or **25–40% of operating expenses** {% cite garvin1984quality %}.
-
-> **Key insight:** Money is the basic language of upper management. The concept of studying quality-related costs provides vocabulary to communicate between quality staff and company managers.
-
-**What has greater impact?**
-
-- "Our fault density jumped from 3 to 5 per KSLOC"
-- OR "The defects delayed launch by 3 months, losing $3,000,000 in revenue"
-
-### Modern Failures: The Cost is Real
-
-|Incident|Year|Impact|
+| Category | Definition | Software examples |
 |---|---|---|
-|CrowdStrike update|2024|$5.4B estimated, 8.5M Windows devices affected|
-|Log4j vulnerability|2021|~$100M+ industry-wide remediation|
-|SolarWinds supply chain|2020|Months of undetected compromise|
+| Prevention | efforts to ensure product quality | SQA administration, inspections, process improvement, metrics |
+| Appraisal | discovering the condition of the product | testing, product quality audits |
+| Internal failure | failures detected before shipment | defect management, rework, retesting |
+| External failure | failures detected after shipment | support, complaints, fixes, lost sales |
 
-These examples illustrate that quality failures have quantifiable business consequences—lost revenue, remediation costs, and reputation damage.
+Prevention and appraisal are the **cost of achieving quality** (also called conformance); the two failure categories are the **cost of failing** (nonconformance). The categories separate activities that look alike. Running a test is appraisal: it discovers the product's condition. Debugging the failure it exposes, fixing it and retesting is internal failure: that effort exists only because a defect does. "Testing takes too long" often means "fixing takes too long".
 
-### National Economic Impact
+**Example.** A release of 1,000 hours has 60 hours of reviews and training (prevention), 200 of testing (appraisal), 150 of debugging and fixing (internal failure) and 90 of fixing customer-reported defects (external failure). CoSQ is 500 hours, half the release, and failure (240) is four times prevention (60).
 
-The NIST study by Tassey (2002) quantified the staggering cost of inadequate software testing infrastructure {% cite tassey2002economic %}:
+→ [Cost of Software Quality](../../organization/01-coq/01-cosq-foundations.md)
 
-|Metric|Value|
-|---|---|
-|Annual cost to U.S. economy|**$22.2 – $59.5 billion**|
-|Cost borne by users|**~60%**|
-|Cost borne by developers|**~40%**|
+## 3. Process maturity moves effort from failure to prevention
 
-**Critical finding:** Over half of quality costs are shifted to users via error avoidance and mitigation. Organizations underestimate true costs because they don't see what customers spend working around defects.
+Knox mapped the categories onto the five levels of the Capability Maturity Model. His model predicts total CoSQ falling by about two-thirds, from about 60 percent of development cost at Level 1 to about 20 percent at Level 5 {% cite knox1993modeling %}. Measured data point the same way: Raytheon cut rework fourfold, from about half of development effort to under 10 percent, after a process improvement programme started in 1988 {% cite houston1999cost %}.
 
-### Software vs. Manufacturing
+The **traditional** cost-of-quality model puts an optimum short of perfection: past some point, preventing the last defects costs more than the failures they avoid; in manufacturing it lies at 95–100% conformance. Knox's **emerging** model argues that software shows no point of diminishing returns yet {% cite knox1993modeling %}. Houston and Keats simulated an 80,000-line project: adding inspections lowered the minimum total CoSQ from 3,500 to 2,900 hours and moved it from 2.7 to 1.6 defects per thousand lines {% cite houston1999cost %}. A better process does not just save money at the same quality; it moves the cheapest point towards higher quality.
 
-Software CoSQ is proportionally **twice as high** as manufacturing {% cite houston1999cost %}:
+→ [Cost of Software Quality](../../organization/01-coq/01-cosq-foundations.md)
 
-|Industry|CoQ as % of Costs|
-|---|---|
-|Manufacturing|5–25% of sales|
-|Software|20–70% of development costs|
+## 4. Defects flow through a project like water through a tank
 
-This explains why software quality improvement has such high ROI potential.
+The **tank-and-pipes** model treats each development phase as a pipe pouring defects into a tank and each verification activity as a pipe draining them; what is left at release are the **residual defects** {% cite miranda2013coq %}. Two numbers describe the pipes:
 
----
+- **Injection rates.** COQUALMO uses nominal rates of 10, 20 and 30 defects per thousand source lines for requirements, design and code {% cite chulani1999coqualmo %}, though fitted projects needed far lower rates, 0.5 to 6.1 {% cite houston2009coqualmo %}.
+- **Defect removal efficiency (DRE)**: the fraction of present defects an activity removes. Knox's typical values: formal inspections 65%, informal reviews 45%, unit and system testing 25–50% each, beta testing 25% {% cite knox1993modeling %}.
 
-## 2. Understanding Quality: Garvin's Five Views
+Plotting cumulative injected and removed defects by phase gives the **process signature**. In Miranda's baseline, 80 defects reach testing, three test levels each remove 50%, and 80 × 0.5³ = 10 ship.
 
-Garvin (1984) established that "quality" is frequently a source of confusion because different stakeholders use different definitions {% cite garvin1984quality %}:
+→ [Defect Injection and Removal](../../organization/01-coq/02-defect-injection-removal.md)
 
-|View|Definition|Example|
-|---|---|---|
-|**Transcendent**|Innate excellence, recognized but not defined|"I know quality when I see it"|
-|**Product-based**|Measurable attributes|"More features = higher quality"|
-|**User-based**|Fitness for purpose|"It does what I need"|
-|**Manufacturing**|Conformance to specification|"Zero defects, built to spec"|
-|**Value-based**|Excellence at acceptable cost|"Best quality I can afford"|
+## 5. Early removal wins when defects multiply
 
-**Why this matters for CoQ:** The manufacturing view assumes that preventing deviations leads to lower total costs. This directly connects to CoSQ principles—investing in prevention and appraisal reduces costly failures.
+Miranda's example assumes that each development phase **doubles** the defects it receives (10 after requirements, 20 after high-level design, 40 after low-level design, 80 after code), because a wrong requirement produces wrong design and wrong code {% cite miranda2013coq %}. Two improvements are compared:
 
-> **Discussion:** The iPhone 4 antenna problem—"Just don't hold it that way" (Steve Jobs). Which view of quality does this response reflect? How would you explain a quality issue using business language?
+- **Option 1**, unit testing from 50% to 70%: 80 × 0.3 × 0.5 × 0.5 = **6** defects ship; testing removes 74.
+- **Option 2**, 20% inspections after requirements, high-level design and code: requirements 10 → 8 after inspection; high-level design doubles that to 16 → 12.8; low-level design, not inspected, doubles to 25.6; code doubles to 51.2 → 40.96, which reach testing, and 40.96 × 0.5³ = **5.12** ship. The inspections remove only 15.44 defects, but because each early removal stops a doubling, only 56.4 defects are ever created instead of 80.
 
----
+Both options roughly halve the shipped defects. Which is cheaper depends on the cost of an inspection hour against a test-and-fix hour, and on how likely each option is to reach its assumed efficiency. The model's value is to make that comparison before paying for either.
 
-## 3. The Cost of Quality Framework
+→ [Defect Injection and Removal](../../organization/01-coq/02-defect-injection-removal.md)
 
-### Definition
+## 6. Classifying defects by origin and detection makes CoQ actionable
 
-> Quality costs measure the costs associated with achievement and non-achievement of product/service quality, including all requirements established by company, contracts, customers, and society. — C. Borror, _Certified Quality Engineer Handbook_ (2009)
+The minimum classification records, for every defect, its **origin** (the phase that introduced it) and **where it was found**. The data come from time reports (appraisal and rework hours), the bug tracker (counts and escapes) and the classification itself {% cite miranda2013coq %}. Kan's project recorded 3,465 defects; from the margins of its origin / where-found matrix, the DRE of each activity follows {% cite kan2002metrics miranda2013coq %}:
 
-### The Four Categories
+DRE = found by the activity / (introduced so far − found earlier)
 
-```mermaid
-flowchart TD
-    CoQ["💰 <b>Cost of Quality</b>"]
-    
-    CoQ --> Conf
-    CoQ --> NonConf
-    
-    subgraph Conf["✅ Conformance Costs"]
-        direction TB
-        Prev["🛡️ <b>1. Prevention</b>"]
-        Appr["🔍 <b>2. Appraisal</b>"]
-        
-        Prev --- P1[Training] & P2[Reviews] & P3[Tools]
-        Appr --- A1[Testing] & A2[Inspections] & A3[Audits]
-    end
-    
-    subgraph NonConf["❌ Nonconformance Costs"]
-        direction TB
-        IntF["🔧 <b>3. Internal Failure</b>"]
-        ExtF["💥 <b>4. External Failure</b>"]
-        
-        IntF --- I1[Rework] & I2[Retesting] & I3[Debugging]
-        ExtF --- E1[Support] & E2[Patches] & E3[📉 Hidden costs]
-    end
-```
+In Kan's project, requirements, high-level design and low-level design introduced 122, 859 and 939 defects; the high-level design inspection found 730 and the low-level design inspection 729. So for the low-level design inspection: 729 / ((122 + 859 + 939) − 730) = 729 / 1,190 = 61.3%. Overall, only 81 of 3,465 defects reached the field: 97.7% were removed before release, most of them by inspections, while unit testing removed only 36.7% of what reached it.
 
-### Category Details
+→ [Defect Origin and Detection](../../organization/01-coq/03-defect-classification.md)
 
-**Prevention Costs** — Proactive investments to avoid defects:
+## 7. Richer schemes add triggers, types and cost weights
 
-- SQA infrastructure (procedures, templates, checklists)
-- Training (new employees, certifications)
-- Process improvement activities
-- Configuration management systems
-- Code review processes, PR workflows
-- Static analysis tools, linters
+**Orthogonal Defect Classification (ODC)** records non-overlapping attributes: activity, trigger and impact when a defect is found; target, defect type, qualifier, source and age when it is fixed. At one IBM product, ODC showed most field escapes coming from function verification test, mostly with the *variation* trigger, so the team added variation test cases {% cite butcher2002improving %}. HP's scheme records where a defect **could have been prevented** and weights defects by origin: specification 14.25, design 6.25, code 2.5, because a specification defect forces changes to the specification, the design and the code {% cite huber1999comparison %}.
 
-**Appraisal Costs** — Investments to detect existing defects:
+→ [Defect Classification Schemes](../../organization/01-coq/04-classification-schemes.md)
 
-- Testing (unit, integration, system, acceptance)
-- Code reviews and inspections
-- Quality audits and assessments
-- CI pipeline checks, automated verification
+## 8. Continuous delivery prices quality in new places
 
-**Internal Failure Costs** — Fixing defects found before release:
+The same four categories apply to pipelines: tests in continuous integration are appraisal, investigating a red pipeline is internal failure. Leinen et al. measured flaky tests (tests that pass or fail on unchanged code) in a project of about 30 developers: at least 2.5% of developer time went on them, and investigating one failed pipeline cost USD 5.67 against USD 0.02 for an automatic rerun, so the company raised the number of reruns {% cite leinen2024flaky %}.
 
-- Debugging and rework
-- Redesign after review findings
-- Retesting after fixes
-- Defect triage and management
+→ [Quality Costs in Continuous Delivery](../../organization/01-coq/04-quality-economics-devops.md)
 
-**External Failure Costs** — Fixing defects found after release:
+## 9. Reviews pay when they find defects and propose fixes
 
-- Customer support and complaint handling
-- Emergency patches and hotfixes
-- Warranty costs and returns
-- Liability and penalties
-- **Hidden:** Lost sales, reputation damage, customer churn
+In the OpenDev community, comments that find functional defects were rated most useful but made up only 0.48% of sampled comments; a third concerned documentation {% cite turzo2023useful %}. In OpenStack and Qt, security defects raised in review were fixed in 81.3% of cases when the reviewer proposed a solution, against 59.5% when the reviewer only pointed out the problem {% cite yu2023security %}. Reviewers also catch potential technical debt before merge; 81.0% of it was resolved there {% cite fu2022ptd %}.
 
-### The Weinberg Insight
+→ [Value of Code Review](../../organization/01-coq/05-code-review-roi.md)
 
-> "When managers say, 'Testing takes too long,' what they should be saying is, 'Fixing the bugs in the product takes too long'—a different cost category." — G. Weinberg, _Perfect Software And Other Illusions About Testing_ (2010)
+## 10. Debt tools disagree, and accuracy misleads
 
-**Key distinction:**
+Technical debt's **principal** is the effort to remove the inefficiencies; its **interest** is the extra maintenance paid while they stay {% cite amanatidis2020td %}. Three debt tools agreed strongly on Java projects (Kendall's W = 0.777) and only moderately on JavaScript (0.647), so the classes all tools rank high are the safest place to start repayment {% cite amanatidis2020td %}. **Defect prediction** flags modules likely to be defective; on imbalanced data, accuracy misleads: on jEdit a model reached 0.97 accuracy while finding no defective module at all (precision and recall 0.00) {% cite khleel2023bilstm %}.
 
-- Testing = **Appraisal** cost (finding defects)
-- Debugging/Rework = **Internal failure** cost (fixing defects)
+→ [Technical Debt as a Quality Cost](../../organization/01-coq/06-technical-debt.md) · [Defect Prediction with Machine Learning](../../organization/01-coq/07-defect-prediction-ml.md)
 
-The complaint "we don't have time to test" really means "we'd rather spend time fixing in production"—which is far more expensive.
+## Where this goes next
 
-> Extended discussion on PAF model history and applications is available in
-> supplementary notes: [CoSQ Foundations](01-cosq-foundations.md)
+The cost categories and removal efficiencies are the inputs to the next questions: how to improve the process that injects the defects (A02) and how to plan which quality activities one project will run, when and at what cost (A04, quality planning). The revision questions for this lecture are in [RQ A01: Cost of Quality](RQ-A1-CoSQ.md).
 
 ---
 
-## 4. The Economics of Quality
-
-### The 1:10:100 Rule
-
-This rule illustrates the exponential cost of delayed defect detection {% cite knox1993modeling %}:
-
-|Phase Found|Relative Cost|
-|---|---|
-|Requirements|**$1**|
-|Development|**$10**|
-|Post-release|**$100+**|
-
-**Modern framing:** This is why **shift-left** works economically. CI/CD automates early detection, catching defects when they're cheapest to fix.
-
-### Traditional vs. Modern CoQ Models
-
-**Traditional Model (1950s–1970s):**
-
-- Costs of achieving quality and costs due to lack of quality have an inverse relationship
-- Total CoQ has a **point of diminishing returns**—a minimum _prior to_ 100% quality
-- Premise: If you continue doing more of the same, you eventually hit negative returns
-
-**Modern Model (Kondo 1978, Juran & Gryna 1988):**
-
-- Manufacturing experience showed increased attention to prevention leads to large reductions in appraisal costs
-- The minimum Total CoQ can extend toward 100% conformance
-- Premise: You do something **different**—improve your process—rather than just doing more of the same
-
-> **Key insight from Knox (1993):** "You will not experience a point of diminishing returns from investing in quality-attaining processes." The revised model suggests the optimum can shift toward 100% conformance through **process improvement** {% cite knox1993modeling %}.
-
-### Empirical Validation: Knox and Raytheon
-
-**Knox's Hypothesis (1993)** — Hewlett Packard:
-
-- As process maturity increases (CMM Level 1 → 5), total CoSQ decreases
-- Prevention and appraisal costs remain relatively stable
-- Failure costs drop dramatically
-
-**Raytheon Empirical Data (1996):** Real data validated Knox's hypothesis {% cite houston1999cost %}:
-
-|Metric|CMM Level 1 (1987)|CMM Level 3 (1996)|
-|---|---|---|
-|Total CoSQ|~65% of project|~20% of project|
-|Rework|~50%|<10%|
-
-**Result:** Fourfold reduction in rework over 8 years of process improvement.
-
-> Modern applications of quality economics in CI/CD and DevOps are explored in
-> supplementary notes: [Quality Economics in DevOps](04-quality-economics-devops.md)
-
-### Process Maturity Impact
-
-|CMM Level|TCoSQ (% of dev costs)|Source|
-|---|---|---|
-|Level 1|55–67%|Raytheon baseline|
-|Level 3|40–50%|Industry average|
-|Level 5|~15%|Raytheon achieved|
-
----
-
-## 5. Defect Injection and Removal
-
-### The "Tank and Pipes" Model
-
-This model, proposed by Capers Jones and formalized in COQUALMO {% cite chulani1999coqualmo %}, visualizes defect flow:
-
-```mermaid
-flowchart LR
-    subgraph Injection["🔴 INJECTION"]
-        direction TB
-        R[Requirements<br>+10]
-        D[Design<br>+20]
-        C[Code<br>+50]
-    end
-    
-    R --> T
-    D --> T
-    C --> T
-    
-    T[("🪣<br>Defect Pool<br>(80)")] 
-    
-    T --> Rev
-    T --> UT
-    T --> IT
-    T --> ST
-    T -->|"5 escape"| EXT[💥 Field<br>Failure]
-    
-    subgraph Removal["🟢 REMOVAL"]
-        direction TB
-        Rev[Reviews<br>−30]
-        UT[Unit Test<br>−20]
-        IT[Int Test<br>−15]
-        ST[Sys Test<br>−10]
-    end
-```
-
-**Key concepts:**
-
-- **Injection pipes:** Defects flow INTO the system at each development phase
-- **The tank:** Cumulative "backlog" of defects residing in the system
-- **Removal pipes:** V&V activities act as filters, removing defects
-- **Residual defects:** What remains after all removal activities—these become field defects
-
-### Process Signatures
-
-A **process signature** shows the characteristic defect profile of a development process:
-
-**Typical Injection Profile:**
-
-|Phase|Cumulative Defects|
-|---|---|
-|Requirements|10|
-|High-Level Design|20|
-|Low-Level Design|40|
-|Code|80|
-
-**Baseline Removal (50% effectiveness at each stage):**
-
-|Stage|Remaining Defects|
-|---|---|
-|After Code|80|
-|After Unit Test (50%)|40|
-|After Integration Test (50%)|20|
-|After System Test (50%)|10|
-|**Reaching Customer**|**10**|
-
-> The gap between the "injected" and "detected" curves at ship time represents **latent faults**—defects that escape to customers and become external failure costs.
-
-Mathematical models and detailed analysis of defect injection/removal are in
-supplementary notes: [Defect Injection & Removal](02-defect-injection-removal.md)
-
-### Improvement Strategies
-
-**Three levers to reduce CoSQ:**
-
-1. **Inject fewer** — Prevention (training, better tools, clearer requirements)
-2. **Detect earlier** — Shift-left (CI, pre-commit hooks, code review)
-3. **Detect more** — Higher test coverage (but diminishing returns apply)
-
-### Comparing Improvement Approaches
-
-**Scenario A: Improve Unit Testing by 20%**
-
-- UT effectiveness: 50% → 70%
-- IT and ST remain at 50%
-- Result: 6 defects reach customer (vs. 10 baseline)
-
-**Scenario B: Add Inspections (20% removal each)**
-
-- Requirements inspection → catches defects at source
-- Design inspection → catches design defects early
-- Code inspection → catches code defects before testing
-- Result: 6 defects reach customer (vs. 10 baseline)
-
-**Both achieve same residual count, but:**
-
-- Scenario A: Finds defects later (higher fix cost per defect)
-- Scenario B: Finds defects earlier (lower fix cost per defect)
-
-> **How do you choose?** Analyze the cost of each alternative AND the likelihood of achieving the assumed improvements. A 10–20% improvement is achievable; a 2× improvement is unlikely unless current processes are severely broken {% cite houston1999cost %}.
-
-For detailed analysis of code review effectiveness and ROI calculations, see
-supplementary notes: [Code Review ROI](05-code-review-roi.md)
-
----
-
-## 6. Making CoQ Actionable
-
-### Where Does Data Come From?
-
-|Source|What It Provides|
-|---|---|
-|**Time reports**|Appraisal costs, rework time (internal failure)|
-|**Bug tracking**|Defect density, escape rates, field failures|
-|**Defect classification**|Root cause patterns, prevention targets|
-
-### Defect Classification Basics
-
-To make CoQ actionable, you need to classify defects systematically. 
-At minimum, track:
-
-1. **Origin phase** — Where was the defect injected? (Requirements, Design, Code)
-2. **Detection phase** — Where was it found? (Review, Unit Test, System Test, Field)
-3. **Defect type** — What kind of defect? (Logic, Interface, Data, Timing)
-
-**Kan's Origin/Where Found Matrix** cross-tabulates origin vs detection:
-- Defects on the diagonal are caught early (low cost)
-- Defects far from diagonal escaped multiple phases (high cost)
-- Patterns reveal which phases need stronger V&V
-
-> Detailed classification schemes (ODC, HP Model) are covered in 
-> supplementary notes: [Defect Classification](03-defect-classification.md)
-
-### The 5-Step Approach to CoQ Programs
-
-```mermaid
-journey
-    title CoQ Program Journey
-    section Prepare
-      Estimate costs: 5: You
-      Assess mgmt: 3: You, Mgmt
-    section Prove
-      Run pilot: 4: Team
-    section Scale
-      Plan program: 4: You
-      Present: 5: You, Mgmt
-```
-
-### Goals of CoQ Analysis
-
-Understanding CoSQ helps answer critical quality planning questions:
-
-1. **Which techniques** should be used?
-2. **When** should they be applied?
-3. **In what sequence?**
-4. **How much effort** to invest?
-5. **On which components?**
-
-These questions form the core of **Quality Planning**—the subject of the next lecture (A2).
-
----
-
-## 7. Key Takeaways
-
-1. **Money talks:** Frame quality in financial terms to communicate with management
-    
-2. **Prevention beats detection:** Investing in prevention reduces total CoQ more effectively than increasing testing
-    
-3. **Earlier is cheaper:** The 1:10:100 rule—shift-left to reduce costs
-    
-4. **Process improvement shifts the curve:** Don't just do more of the same; do something different
-    
-5. **Measure to manage:** Without data (time reports, bug tracking, classification), you can't optimize CoQ
-
-For deeper exploration of related topics, see supplementary notes:
-
-- [Technical Debt](06-technical-debt.md) — Understanding tech debt as deferred quality costs
-- [Defect Prediction with ML](07-defect-prediction-ml.md) — Using machine learning to predict defect-prone components
-
----
-
-## References
+### References
 
 {% bibliography --cited %}
-
-### Other Primary Sources
-
-- Campanella, J. (1999). _Principles of Quality Costs_ (3rd ed.). ASQ Quality Press.
-- Weinberg, G. (2010). _Perfect Software And Other Illusions About Testing_.
-
-### Further Reading
-
-- Kan, S.H. (2002). _Metrics and Models in Software Quality Engineering_ (2nd ed.). Addison-Wesley.
-- Jones, C. (2008). _Applied Software Measurement_ (3rd ed.). McGraw-Hill.
-- Borror, C. (2009). _Certified Quality Engineer Handbook_ (3rd ed.).
 
 ---
 

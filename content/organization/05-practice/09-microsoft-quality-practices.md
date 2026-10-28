@@ -7,272 +7,39 @@ layout: default
 
 # Microsoft Quality Practices
 
-Microsoft has documented its quality engineering practices through *How We Test Software at Microsoft* (Page, Johnston, Rollison) and numerous empirical studies. These practices evolved over decades of shipping complex software products to millions of users {% cite page2008mstesting %}.
+**Microsoft's quality practices** grew out of shipping large packaged products such as Windows and Office on fixed schedules: development runs in milestones with quality gates, a **bug bar** decides which defects must be fixed before release, and dedicated test engineers work alongside developers. They are described in *How We Test Software at Microsoft* and studied in Microsoft Research papers {% cite page2008mstesting bosu2015codereview bird2009vista kim2014refactoring %}.
 
-## Milestone-Based Development
+## 1. Milestones, bug bars and the ship room
 
-Microsoft organizes development into milestones with progressively stricter quality gates {% cite page2008mstesting %}.
+A product moves through milestones (M1, M2, M3, Beta, Release), and each milestone has **exit criteria** that tighten as release approaches; for the final release the book names, among others, no open severity-1 bugs and 80% code coverage from unit tests {% cite page2008mstesting %}. A **bug bar** is the predefined threshold for which bugs must be fixed at a given stage. Bugs are triaged by severity: a severity-1 bug (a crash, data loss, a main feature unusable) always blocks release; lower-severity bugs are classed as must-fix or should-fix against the current bar. Near release a **ship room** (or war room), a committee of development, test and program-management leads, reviews the remaining bugs and decides to fix, defer or ship.
 
-### Milestone Progression
+Work is organized in **feature crews**: a program manager with three to five developers and three to five testers; the crew reports to three leads, one each for development, test and program management. Test engineers who write code to test the product are **SDETs** (software development engineers in test), held to the same coding standard as developers (SDEs) {% cite page2008mstesting %}.
 
-```
-M1 → M2 → M3 → Beta → Release → MQ (Quality Milestone)
-```
+## 2. What Microsoft's research found
 
-### Exit Criteria by Milestone
+| Study | Data | Finding |
+|---|---|---|
+| Code review usefulness {% cite bosu2015codereview %} | 1.5 million review comments in five projects (Azure, Bing, Visual Studio, Exchange, Office) | reviewers who had reviewed a file before wrote useful comments 65–71% of the time, first-time reviewers 32–37%; usefulness rose with prior reviews up to about five, then plateaued; more files in a change meant a lower share of useful comments |
+| Distributed development {% cite bird2009vista %} | post-release failures of Windows Vista binaries | binaries developed by distributed teams had slightly more failures, but after controlling for team size the difference was negligible |
+| Refactoring {% cite kim2014refactoring %} | survey of 328 engineers and Windows 7 history | the 5% most refactored modules decreased their dependencies by a factor of 0.85 while the rest increased by 1.10, relative to the average change per module |
 
-| Milestone | Code Coverage | Crash Fixes | Test Requirements |
-|-----------|---------------|-------------|-------------------|
-| **M2** | 65% | 60% | P1 + P2 tests pass |
-| **M3** | 70% | 70% | All tests pass |
-| **Final** | **80%** | 100% critical | All tests pass |
+**Example.** The review finding has a direct use: when choosing a reviewer, prefer someone who has already reviewed or changed the files involved. If a newcomer must learn the code through reviews, adding an experienced reviewer to the same change keeps the comments useful while the newcomer learns.
 
-Each milestone serves a specific purpose:
+## When to use these practices — and when not
 
-| Milestone | Focus |
-|-----------|-------|
-| M1 | Feature planning, architecture |
-| M2 | Core feature implementation |
-| M3 | Feature complete, stabilization begins |
-| Beta | External validation |
-| Release | Ship decision |
-| MQ | Post-release quality assessment |
+Milestones, bug bars and a ship room suit products released on a schedule to customers who install them, where a fix after release is expensive. For an online service that deploys daily, an [error budget](06-site-reliability-engineering.md) and automated [quality gates](10-quality-gates-cicd.md) do the same job continuously. The research findings on reviewers and distributed teams apply to both.
 
----
+## Limitations
 
-## Bug Bars
+- **The book describes Microsoft around 2008.** The practices above are a model of milestone-based delivery, not a description of how Microsoft works today.
+- **Book figures are not measured results.** The 80% coverage criterion and the crew sizes are the book's guidance.
+- **One company.** All three studies use Microsoft data.
 
-A **bug bar** is a predefined quality threshold that determines which bugs must be fixed before shipping {% cite page2008mstesting %}.
+## How solid is this?
 
-### Severity Classifications
-
-| Severity | Definition | Ship Decision |
-|----------|------------|---------------|
-| **Sev 1** | Crash, primary feature unusable, data loss | Always blocks ship |
-| **Priority 1-2** | Significant user impact | Must resolve |
-| **Must Fix** | Falls below bug bar | Required before ship |
-| **Should Fix** | Desirable improvement | May defer to next release |
-
-### Release Blockers
-
-The following always block release:
-
-- Sev 1 bugs or system crashes
-- Exit criteria not met
-- Security, privacy, or legal issues
-- Feature crew gates failed
-- Unresolved accessibility violations
-
-### The War Room (Ship Room)
-
-The **War Room** is a ship-quality oversight committee that:
-
-- Reviews the bug backlog ("wave")
-- Makes fix/cut/postpone decisions
-- Has final authority on ship decision
-- Meets regularly during stabilization phase
-
-> "The bug bar is the line that separates 'ship' from 'don't ship' quality."
-
----
-
-## Testing Roles at Microsoft
-
-Microsoft developed specialized testing roles that evolved alongside their engineering practices {% cite page2008mstesting %} {% cite bosu2015codereview %}.
-
-### Role Structure
-
-| Role | Title | Focus |
-|------|-------|-------|
-| **SDE** | Software Development Engineer | Feature code |
-| **SDET** | Software Dev Engineer in Test | Code to test software |
-| **IC** | Individual Contributor Tester | Execute testing discipline |
-| **TA** | Test Architect | Long-term quality strategy |
-
-### Key Distinction: SDET vs SDE
-
-SDETs write code, but their code tests the product rather than building features:
-
-| Aspect | SDE | SDET |
-|--------|-----|------|
-| Primary output | Product features | Test automation, frameworks |
-| Success metric | Feature shipped | Bugs found, coverage achieved |
-| Skills emphasis | Domain, architecture | Testability, automation |
-
-### Historical Ratios
-
-| Ratio | Value | Context |
-|-------|-------|---------|
-| Dev:Tester | ~1:1 | Historical (9,000 testers at peak) |
-| Current trend | Higher dev:test | More developer-owned testing |
-
----
-
-## Feature Crews
-
-Microsoft organizes work around small, cross-functional **Feature Crews** {% cite page2008mstesting %}:
-
-### Crew Composition
-
-| Role | Typical Count |
-|------|---------------|
-| Program Manager | 1 |
-| Developers | 3-5 |
-| Testers | 3-5 |
-
-### The Leadership Triad
-
-Each feature area has a leadership triad jointly responsible for quality decisions:
-
-- **Program Management Lead** - Requirements, schedule
-- **Development Lead** - Architecture, implementation
-- **Test Lead** - Quality strategy, test planning
-
-This structure ensures quality is a shared responsibility, not siloed to testers.
-
----
-
-## Static Analysis at Microsoft
-
-Microsoft integrates static analysis throughout the development process {% cite page2008mstesting %}.
-
-### Tools
-
-| Tool | Target | Focus |
-|------|--------|-------|
-| **PREfast** | Native code (C/C++) | Memory errors, security |
-| **Managed analyzers** | .NET code | Best practices, performance |
-| **Security analyzers** | All code | OWASP vulnerabilities |
-
-### Integration Points
-
-| Stage | Action |
-|-------|--------|
-| IDE | Real-time feedback during coding |
-| Pre-commit | Gates in source control |
-| Build | Automated analysis in CI |
-| Release | Security review gates |
-
----
-
-## Code Review Research
-
-Microsoft research on code review effectiveness provides guidance for practitioners {% cite bosu2015codereview %}.
-
-### Key Finding: Experience Doubles Effectiveness
-
-Analysis of **1.5 million review comments** across 5 Microsoft projects revealed:
-
-| Factor | Useful Feedback Rate |
-|--------|---------------------|
-| **Experienced reviewer** (≥5 prior reviews of file) | **65-71%** |
-| **First-time reviewer** | **32-37%** |
-
-### Review Effectiveness by File Type
-
-| File Type | Useful Feedback Rate |
-|-----------|---------------------|
-| Source code files | 70% |
-| Config files | 57% |
-| Build files | 53% |
-
-### Practical Implications
-
-- Effectiveness plateaus after **5 prior reviews** of a file
-- Larger changesets → lower usefulness (shallow reviews)
-- Surprisingly: **no difference** between same-team vs. cross-team reviewers
-
-> "Reviewers with prior file experience are nearly 2x more useful." {% cite bosu2015codereview %}
-
----
-
-## Refactoring Practices
-
-Research on Microsoft refactoring practices reveals practical challenges {% cite kim2014refactoring %}:
-
-### Survey of 328 Engineers
-
-| Aspect | Finding |
-|--------|---------|
-| Refactoring context | **46%** during bug fixes or feature additions |
-| Top triggers | Poor readability (22%), duplication (13%), maintainability (11%) |
-| **Primary risk** | **76%** cite subtle bugs and regressions |
-| Tool usage | **86% manual**; 51% don't use automated tools |
-
-### The Validation Gap
-
-Developers avoid automated refactoring tools due to trust issues:
-
-> "What we need is a better validation tool that checks correctness of refactoring, not a better refactoring tool." {% cite kim2014refactoring %}
-
-### Refactoring Impact on Dependencies
-
-| Module Category | Dependency Change |
-|-----------------|-------------------|
-| Top 5% refactored | Decreased by factor of **0.85** |
-| Non-refactored | Increased by factor of **1.10** |
-
-Refactoring is preferentially applied to modules with **higher test coverage** (safer to change).
-
----
-
-## Distributed Development
-
-Microsoft's Windows Vista study provides evidence on distributed team effectiveness {% cite bird2009vista %}:
-
-### Study Scale
-
-- ~3,000 developers
-- 3,300+ binaries
-- Multiple global sites
-
-### Key Finding: Geography is Negligible
-
-| Finding | Detail |
-|---------|--------|
-| Initial difference | 8-9% more failures in distributed binaries |
-| **After controlling for team size** | Difference becomes **negligible** |
-
-### Success Factors
-
-| Practice | Why It Works |
-|----------|--------------|
-| Consistent tooling | Same CI/CD, build systems, defect tracking everywhere |
-| Strong code ownership | Single developer "owner" per binary |
-| Cultural liaisons | Experienced engineers moved between sites |
-| Integrated management | Developers at multiple sites report to same manager |
-
-> "Teams that were distributed wrote code that had virtually the same number of post-release failures as those that were collocated." {% cite bird2009vista %}
-
----
-
-## Key Numbers to Remember
-
-| Metric | Value | Source |
-|--------|-------|--------|
-| Final coverage target | 80% | MS Test Book |
-| M2 coverage | 65% | MS Test Book |
-| M3 coverage | 70% | MS Test Book |
-| Review experience threshold | 5 prior reviews | Bosu 2015 |
-| Experienced reviewer usefulness | 65-71% | Bosu 2015 |
-| First-time reviewer usefulness | 32-37% | Bosu 2015 |
-| Refactoring risk cited | 76% | Kim 2014 |
-| Manual refactoring | 86% | Kim 2014 |
-
----
-
-## Comparison: Microsoft vs Google
-
-| Aspect | Microsoft | Google |
-|--------|-----------|--------|
-| **Development model** | Milestone-based | Continuous |
-| **Quality gates** | Bug bars, War Room | Error budgets, SLOs |
-| **Test org** | Feature Crews (embedded) | Engineering Productivity (centralized) |
-| **Coverage target** | 80% (final) | 60% (Test Certified L5) |
-| **Review model** | Experienced reviewers | Readability certification |
-| **Ship decision** | Committee (War Room) | Automated (error budget) |
-
-Both approaches achieve high quality at scale through different mechanisms suited to their organizational culture.
+- **Where it comes from.** *How We Test Software at Microsoft* and three Microsoft Research studies {% cite page2008mstesting bosu2015codereview bird2009vista kim2014refactoring %}.
+- **What is contested.** Milestone exit criteria for M2 and M3 are quoted with different values in the area's notes on the book, so they are left out here.
+- **What we do not hold.** The book's text; its content reaches this page through the area's notes on it.
 
 ---
 

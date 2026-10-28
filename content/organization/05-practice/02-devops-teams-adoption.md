@@ -7,91 +7,49 @@ layout: default
 
 # DevOps Teams & Adoption
 
-The adoption of DevOps is a multi-dimensional transformation that unifies technical practices, organizational structures, and cultural philosophies to enhance software delivery performance {% cite luz2019devops %} {% cite macarthy2020devops %}.
+**DevOps adoption** is the reorganization of teams and responsibilities that puts [DevOps](01-devops-foundations.md) into practice; studies find that *how* development and operations people are grouped predicts delivery performance more than which tools they use {% cite lopez2021devops macarthy2020devops %}.
 
-## Team Structures and Collaboration Patterns
+## 1. Four team patterns
 
-Research by López-Fernández et al. (2021) identifies a taxonomy of four team structure patterns based on their level of maturity and autonomy {% cite lopez2021devops %}:
+López-Fernández and colleagues interviewed 46 people in 31 companies and found four recurring structures, from least to most integrated {% cite lopez2021devops %}:
 
-**Pattern A: Interdepartmental Dev & Ops Collaboration**: Characterized by sporadic collaboration between members of different departments. It features multiple managers, a lack of shared ownership, and significant organizational and cultural silos.
+| Pattern | Structure |
+|---|---|
+| A. Interdepartmental collaboration | Dev and Ops stay in separate departments and collaborate occasionally; several managers, no shared ownership |
+| B. Interdepartmental Dev-Ops team | a stable product team whose members still report to different departments |
+| C. Boosted cross-functional team | a development team temporarily "boosted" by DevOps experts who coach it until it can build and run its own product |
+| D. Full cross-functional team | one autonomous team with one leader runs the whole lifecycle ("you build it, you run it") |
 
-**Pattern B: Interdepartmental Dev-Ops Team**: A stable product team where members still technically belong to different departments. While they collaborate frequently, they often face a "multiple management" hurdle with conflicting goals.
+The more mature the pattern, the better the delivery: pattern correlated negatively with lead time (Spearman ρ = −0.505, p = 0.004) and with MTTR (ρ = −0.382, p = 0.037), but not significantly with deployment frequency. Mean lead time for pattern D teams was about a quarter of pattern A's (83.75 against 306.43 in the study's units), though the spread within each pattern was large and only 30 teams had full data.
 
-**Pattern C: Boosted Cross-functional DevOps Team**: Traditional development teams are "boosted" by experts from horizontal support teams (such as Centers of Excellence or Chapters) who mentor them until the team reaches "you build it, you run it" capability.
+Macarthy and Bass, interviewing 11 practitioners in nine organizations, found four *implementation modes* driven by the infrastructure: developers working with a classic operations team, developers alone in a pure cloud with no operations team, a DevOps team running the cloud and pipelines, and, the most common, a **DevOps bridge team** between developers and IT operations {% cite macarthy2020devops %}. They found DevOps to be both a culture and a job title.
 
-**Pattern D: Full Cross-functional DevOps Team**: These are poly-skilled, highly autonomous teams that manage the entire product lifecycle with a single leader and no silos.
+## 2. A maturity path
 
-### Implementation Modes
+Sethupathy's Lean-Agile DevOps Maturity Framework, built from 78 papers, rates six domains (deployment automation, telemetry, testing, build and release, security, architecture) on five levels from Novice to Expert {% cite sethupathy2025devops %}. In its literature base the most cited capabilities were continuous integration (79% of papers) and automated testing (74%).
 
-Macarthy & Bass (2020) present an empirical taxonomy of four implementation modes driven by the technical environment {% cite macarthy2020devops %}:
+**Example.** One of the three enterprises studied, a bank ("F-Bank"), moved from Intermediate to Advanced {% cite sethupathy2025devops %}:
 
-| Mode | Environment | Description |
-|------|-------------|-------------|
-| **Developers-Ops** | Hybrid cloud | Senior developers manage automated pipelines; IT operations handle physical infrastructure |
-| **Developers-Outsourced Ops** | Pure cloud | Senior developers write infrastructure code; no internal Ops team needed |
-| **Developers-DevOps** | Cloud | DevOps specialists manage cloud infrastructure and pipelines |
-| **DevOps Bridge Team** | Mixed | Dedicated DevOps team sits between Developers and IT Ops (most prevalent mode) |
+| Measure | Before | After | Change |
+|---|---|---|---|
+| Deployments per week | 2.1 | 12.6 | 12.6 / 2.1 = 6.0× |
+| Lead time (hours) | 23 | 4.1 | 82% shorter |
+| MTTR (hours) | 4.8 | 3.0 | (4.8 − 3.0) / 4.8 = 37.5% shorter |
+| Change failure rate | 9.1% | 5.3% | 3.8 points lower |
 
-## Adoption Guidelines and Maturity Models
+## When to use this — and when not
 
-### Lean-Agile DevOps Maturity Framework (LADMF)
+Move toward pattern C or D when the team owns a service it can deploy independently; the boosted pattern C is a practical way to get there without hiring a full team of specialists. A bridge team suits organizations with legacy infrastructure that an operations department must still run. Do not copy a pattern without the matching responsibility: a team that "runs" its service but cannot deploy it is pattern A with a new name.
 
-Sethupathy (2025) introduces the LADMF, which benchmarks engineering capabilities across six domains and five maturity levels (Novice, Beginner, Intermediate, Advanced, and Expert) {% cite sethupathy2025devops %}:
+## Limitations
 
-1. **Deployment Automation**: Scripting and orchestrating workflows
-2. **Telemetry & Observability**: Real-time feedback via logs, metrics, and traces
-3. **Testing Maturity**: Breadth and depth of automated tests
-4. **Build & Release Management**: Versioning and rollback strategies
-5. **Security Integration**: Shift-left practices and policy-as-code
-6. **Architecture & Design**: Modular design enabling independent deployability
+- **Small samples.** 30 teams with full data in the pattern study, 11 interviewees in the taxonomy, three enterprises in the maturity framework.
+- **Before-and-after, no control.** The bank's gains came with other changes over the same period; the study triangulates with interviews but has no comparison group.
 
-### Strategic Adoption Guidelines
+## How solid is this?
 
-Hamza et al. (2024) propose adoption guidelines categorized into four strategic pillars {% cite hamza2024devops %}:
-
-- **Methodology**: Involving and convincing stakeholders while ensuring expertise and tool availability
-- **Practices**: Focusing on continuous maintenance, testing, monitoring, integration, and deployment
-- **Principles**: Implementing automation, shared feedback loops, and a blameless culture
-- **Strategies**: Aligning requirements with automated tool selection
-
-### Three-Step Adoption Model
-
-Luz et al. (2019) provide a three-step model for real-world adoption {% cite luz2019devops %}:
-1. Disseminate the importance of collaborative culture (the essence of DevOps)
-2. Select and develop suitable enablers (e.g., automation and transparency)
-3. Check outcomes to ensure alignment with business needs
-
-## Case Studies
-
-### Mayo Clinic (Healthcare Adoption)
-
-Mayo Clinic served as a pioneer in applying DevOps to healthcare {% cite akinola2023devops %}. They established a CI/CD pipeline, automated testing, and infrastructure as code (IaC) to reduce application deployment time. This resulted in:
-- Improved system stability
-- Minimized failure rates
-- Faster software updates addressing patient needs more rapidly
-
-### Multi-Industry Enterprise Adoption
-
-Sethupathy (2025) validates DevOps effectiveness through case studies at three major enterprises {% cite sethupathy2025devops %}:
-
-| Organization | Industry | Results |
-|--------------|----------|---------|
-| **F-Bank** | Finance | Moving from "Intermediate" to "Advanced" maturity: 6x increase in deployment frequency, 38% reduction in MTTR |
-| **Telecom** | Telecommunications | Achieving "Expert" maturity: daily deployments, 26% MTTR reduction through modular services |
-| **TCU** | Government | Brazilian Federal Court of Accounts: weekly releases to 29 deployments/day, downtime reduced to near zero |
-
-## Metrics and Success Measurement
-
-Key performance indicators (KPIs), often referred to as DORA metrics, are critical for measuring DevOps success {% cite hamza2024devops %} {% cite sethupathy2025devops %}:
-
-| Metric | High Performers |
-|--------|-----------------|
-| **Deployment Frequency** | 46x more frequent deployments |
-| **Lead Time for Changes** | 440x faster from commit to deployment |
-| **Mean Time to Recovery (MTTR)** | 32% reduction with SRE practices |
-| **Change Failure Rate** | 30-40% reduction with automation and shift-left testing |
-
-López-Fernández (2021) found that pattern maturity presents a strong negative correlation with Lead Time (r = -0.505, p = 0.004) and MTTR (r = -0.382, p = 0.037), confirming that consolidated, autonomous team structures lead to statistically significant performance gains {% cite lopez2021devops %}.
+- **Where it comes from.** A mixed-methods study of team structures, a grounded-theory taxonomy, and a maturity framework validated in three enterprises {% cite lopez2021devops macarthy2020devops sethupathy2025devops %}.
+- **What is contested.** Whether a separate "DevOps team" is a step toward DevOps or a new silo; the studies above found it common and workable.
 
 ---
 

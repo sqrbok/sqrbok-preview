@@ -7,126 +7,50 @@ layout: default
 
 # Test Documentation (IEEE 829)
 
-IEEE 829-2008 provides the standard structure for software test documentation. This page covers the Master Test Plan structure, tailoring guidelines, and the "addressed" principle.
+**IEEE Std 829-2008** defines the content of software and system test documents, from the plans written before testing to the reports written after it, and scales how many of them a project needs to the integrity level of the system {% cite ieee829-2008 %}. Its plans are where a quality plan's testing decisions are written down in detail.
 
-## Master Test Plan Structure
+## 1. Two kinds of test plan
 
-The Master Test Plan (MTP) provides the overarching test management structure {% cite ieee829-2008 %}:
+The **Master Test Plan (MTP)** covers the total test effort of a project; a **Level Test Plan (LTP)** covers one test level, such as component, component integration, system or acceptance testing {% cite ieee829-2008 %}.
 
-### Part 1: Introduction
+| Master Test Plan | Level Test Plan |
+|---|---|
+| 1 Introduction: identifier, scope, references, system overview, test overview (organization, master schedule, integrity level scheme, resources, responsibilities, tools and techniques) | 1 Introduction: identifier, scope, references, the level's place in the sequence, test classes and conditions |
+| 2 Details: test processes and the definition of test levels; documentation, administration and reporting requirements | 2 Details: test items, traceability matrix, features to be tested and not tested, approach, pass/fail criteria, suspension criteria and resumption requirements, deliverables |
+| 3 General: glossary, document change procedures and history | 3 Test management: activities, environment, responsibilities, interfaces, resources, training, schedules and costs, risks and contingencies |
+| | 4 General: quality assurance procedures, metrics, test coverage, glossary, change history |
 
-| Section | Content |
-|---------|---------|
-| **Identifier** | Unique document identifier |
-| **Scope** | What is and isn't covered |
-| **References** | Related documents |
-| **System Overview** | High-level description of system under test |
-| **Test Overview** | Schedule, resources, responsibilities, tools/methods |
+_The section outline of the MTP (clause 8) and LTP (clause 9) of IEEE 829-2008._ {% cite ieee829-2008 %}
 
-### Part 2: Details
+Three LTP entries carry most of the decisions: **features not to be tested** (with the reason), **item pass/fail criteria**, and **suspension criteria and resumption requirements**, which state when all or part of the testing is suspended and which activities must be repeated when it resumes {% cite ieee829-2008 %}. These are the [quality gates](03-quality-gates-criticality.md) of the test level.
 
-| Section | Content |
-|---------|---------|
-| **Test Processes** | How testing will be conducted |
-| **Test Levels** | Component, integration, system, acceptance |
-| **Documentation Requirements** | What documents will be produced |
-| **Administration** | How testing will be managed |
-| **Reporting** | How results will be communicated |
+## 2. Scaling to integrity
 
-### Part 3: General
+The standard maps documents to its four integrity levels. At level 4 (catastrophic) and level 3 (critical), a project writes a master test plan, plans, designs, cases, procedures, logs and reports for every level, and a master test report. At level 2 (marginal) the master documents drop out. At level 1 (negligible) only integration and system testing are documented {% cite ieee829-2008 %}.
 
-| Section | Content |
-|---------|---------|
-| **Glossary** | Definitions of terms |
-| **Change Procedures** | How plan changes are handled |
-| **Version History** | Document revision history |
+## 3. "Addressed", not "filled in"
 
-## Level Test Plans
+The standard does not require every section to be written. It requires every content topic to be **addressed**: a decision is made whether the topic is documented before test execution (in a document or in a tool), documented after execution, not documented because the process covers it, or excluded {% cite ieee829-2008 %}. A section that says "excluded: no third-party components" is complete; a blank section is not.
 
-Each test level (component, integration, system, acceptance) has its own Level Test Plan (LTP) containing:
+## Example: a one-page level test plan
 
-1. **Test Items** — What will be tested
-2. **Features to Test** — Specific features covered
-3. **Features Not to Test** — Excluded features with rationale
-4. **Approach** — Testing techniques and methods
-5. **Pass/Fail Criteria** — How success is determined
-6. **Suspension/Resumption Criteria** — When to pause/restart
-7. **Environmental Needs** — Hardware, software, tools required
+A small team's system test plan for a booking web application, addressing the main LTP topics in one page: **test items**, the web API and booking UI of release 1.2; **features not tested**, payment provider internals, covered by the provider's certification; **approach**, scenario tests from user stories plus API tests generated from the specification; **pass/fail**, all severity-1 scenarios pass and no open severity-1 defect; **suspension**, the test environment or database is unavailable, or more than five severity-1 failures in a day; **environment**, the staging server and a copy of production data without personal fields; **responsibilities**, the tester runs, developers fix within a day; **schedule**, three days before each release; **risks**, a late feature freeze shortens the window. _(Constructed example.)_
 
-## The "Addressed" Principle
+## When to use it, and when not
 
-> All topics must be formally decided: include, record in tool, or exclude with rationale. {% cite ieee829-2008 %}
+- **Use the outline** as a checklist even when the team writes one page: each topic gets a decision.
+- **Do not produce** the full document set for a low-integrity product; the standard itself scales it down.
 
-For each required topic, you must:
+## Limitations
 
-| Option | Meaning |
-|--------|---------|
-| **Include** | Document the information in the plan |
-| **Record in Tool** | Reference where information is stored (e.g., in test management tool) |
-| **Exclude with Rationale** | Explicitly state why not applicable |
+- **Documents are not tests.** A complete plan says nothing about whether the tests it describes find defects.
+- **Templates age.** In iterative projects the plan must be revised whenever scope changes, or it describes a product that no longer exists.
 
-**Never leave topics unaddressed.**
+## How solid is this?
 
-## Integrity-Level Mapping
-
-Documentation depth should be commensurate with criticality {% cite ieee829-2008 %}:
-
-| Integrity Level | Documentation Depth |
-|----------------|---------------------|
-| High (safety-critical) | Full documentation, formal reviews |
-| Medium | Standard documentation |
-| Low | Abbreviated documentation allowed |
-
-## Tailoring Guidelines
-
-**Combine documents** when:
-- Project is small
-- Single test level
-- Resources limited
-
-**Separate documents** when:
-- Project is complex
-- Multiple teams involved
-- Regulatory requirements
-
-**Reference existing data:**
-- Avoid duplication by referencing PM plans, QA plans
-- Use hyperlinks to related documents
-
-## IEEE 829 Outline
-
-Standard test plan sections:
-
-1. Test Plan Identifier
-2. Table of Contents
-3. References
-4. Glossary
-5. Introduction
-6. Test Items
-7. Software Risk Issues
-8. Features to Be Tested
-9. Features Not to Be Tested
-10. Approach
-11. Item Pass/Fail Criteria
-12. Suspension Criteria and Resumption Requirements
-13. Test Deliverables
-14. Testing Tasks
-15. Environmental Needs
-16. Responsibilities
-17. Staffing and Training Needs
-18. Schedule
-19. Planning Risks and Contingencies
-20. Approvals
-
-## Iterative Updates
-
-> Update plans when requirements change. {% cite ieee829-2008 %}
-
-Test documentation is living documentation:
-- Review at each milestone
-- Update when scope changes
-- Re-baseline after major changes
-- Track version history
+- **Where it comes from.** IEEE Std 829-2008, clauses 5, 7, 8 and 9 {% cite ieee829-2008 %}.
+- **What is contested.** How much documentation an iterative team needs; the standard leaves the amount to the integrity level and to tailoring.
+- **What we do not hold.** ISO/IEC/IEEE 29119-3, the test documentation standard that has since replaced IEEE 829.
 
 ---
 

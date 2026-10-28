@@ -8,57 +8,38 @@ has_children: true
 
 # Process Improvement
 
-Software Process Improvement (SPI) is a systematic approach to enhancing organizational performance through deliberate modification of technical, organizational, and cultural structures.
+**Software process improvement (SPI)** is the deliberate change of how an organization develops software (its technical practices, its structure and its culture) to get better and more predictable results {% cite kuhrmann2016spi %}. It treats a recurring problem as a property of the process that produced it, not of the person who made the last mistake.
+
+## Why it is hard
+
+Most improvement programs do not last. Jeff Pfeffer's "one-eighth rule" estimates that only one organization in eight sees the full benefit of a management practice, because each step from belief to persistence loses half of those still trying {% cite pfeffer1998human %}. Repenning and Sterman explain one mechanism: improvement takes time away from production, so performance first gets worse, and managers under pressure stop before it gets better {% cite repenning2001nobody %}.
+
+## Pages in this section
+
+| Page | What it covers | Best fit | Main cost |
+|---|---|---|---|
+| [Why Process Improvement?](01-why-process-improvement.md) | motives for SPI, Columbia, Humphrey's credibility gap | making the case to management | none: it is the argument |
+| [Learning & Improvement Models](02-learning-improvement-models.md) | single- and double-loop learning, PDCA, Kaizen | framing any improvement step | time to reflect, not just fix |
+| [Improvement Methods](03-improvement-methods.md) | choosing between DPP, Theory of Constraints, Six Sigma and retrospectives | picking a method for a problem | learning the method |
+| [Defect Prevention Process](05-defect-prevention.md) | IBM's causal analysis of defects | recurring defect types | about 0.5% of a team's effort |
+| [Theory of Constraints](06-theory-of-constraints.md) | five focusing steps on the bottleneck | one stage limits throughput | finding the true bottleneck |
+| [Six Sigma](07-six-sigma.md) | DMAIC, variation, 3.4 defects per million | measurable, repetitive processes | statistics skills, trained roles |
+| [Change Management](04-change-management.md) | worse-before-better, capability trap, two levels of change | keeping an improvement alive | management attention for months |
+
+Maturity frameworks such as CMMI, which define *what* a mature process contains, are in [Quality Standards](../04-standards/index.md); team-level practices such as retrospectives and DevOps are in [Industry Practices](../05-practice/index.md).
+
+## How solid is this?
+
+- **Where it comes from.** IBM's defect-prevention reports, Repenning and Sterman's case studies, and a mapping study of 769 SPI publications {% cite mays1990defect repenning2001nobody kuhrmann2016spi %}.
+- **What is contested.** Of 769 SPI papers, 38.2% propose solutions and 34.3% are philosophical, while only 14.8% evaluate an approach; counted separately by topic, 16.4% look for success factors, and failed programs are rarely published {% cite kuhrmann2016spi %}.
 
 ---
 
-## Why Process Improvement?
+### References
 
-Organizations pursue process improvement for several interconnected reasons:
-
-- **Operational failures** - Recurring bugs, quality escapes, customer complaints
-- **Competitive pressure** - Faster time-to-market, better quality than competitors
-- **Predictability** - Ability to estimate and deliver on commitments
-- **Cultural change** - Moving from heroics to disciplined engineering
-
-The key insight is that **organizational failure precedes physical failure** - improving processes prevents problems rather than just fixing them.
-
----
-
-## Topics in This Section
-
-### [Why Process Improvement?](01-why-process-improvement.md)
-The business case for SPI, including motivations, barriers, and the Columbia disaster case study.
-
-### [Learning & Improvement Models](02-learning-improvement-models.md)
-Single-loop vs. double-loop learning, organizational learning theory, and improvement feedback cycles.
-
-### [Improvement Methods](03-improvement-methods.md)
-PDCA, DMAIC, Theory of Constraints, Six Sigma, and other systematic improvement approaches.
-
-### [Change Management](04-change-management.md)
-The human side of process improvement - overcoming resistance, sustaining change, and the "worse-before-better" dynamic.
-
----
-
-## Study Materials
-
-### [Study Notes](../../material/qam/SN-A2-Proc.md)
-Comprehensive study notes covering all Process Improvement concepts for exam preparation.
-
-### [Revision Questions](../../material/qam/RQ-A2-Proc.md)
-Self-assessment questions to test your understanding of Process Improvement concepts.
-
----
-
-## Key Principles
-
-1. **Culture eats process for breakfast** - Technical changes fail without cultural support
-2. **Improvement takes time** - The "worse-before-better" dynamic is normal
-3. **Measure to improve** - Data-driven decisions outperform intuition
-4. **Double-loop learning** - Question assumptions, not just correct errors
+{% bibliography --cited %}
 
 ---
 
 {: .highlight }
-**Disclaimer:** AI is used for text polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.

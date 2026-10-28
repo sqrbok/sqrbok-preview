@@ -7,120 +7,50 @@ layout: default
 
 # ITIL Framework
 
-The Information Technology Infrastructure Library (ITIL) is the global de facto standard for IT Service Management (ITSM), providing a framework of best practices to align IT services with business needs {% cite itil2007v3 %} {% cite iden2013itil %}. While ITSM is the general concept of managing the IT function as a service provider, ITIL is the specific set of prescribed practices used to achieve it.
+The **IT Infrastructure Library (ITIL)** is a collection of best practices for **IT service management (ITSM)**, managing IT as a provider of services to the business, and is counted as the de facto ITSM standard worldwide {% cite iden2013itil %}. Where CMMI looks at how software is developed, ITIL looks at how it is run and supported once it is in use.
 
-## ITIL Overview and Service Lifecycle
+## 1. From version 1 to the service lifecycle
 
-ITIL v3 (introduced in 2007) shifted the focus from process-oriented management to a Service Lifecycle approach, emphasizing how an IT service moves from conception to delivery and improvement {% cite itil2007v3 %}.
+ITIL version 1 was written in the 1980s by a British public body, the Central Computer and Telecommunications Agency, from practices observed in industry. Version 2 (2000–2002) made it popular worldwide. Version 3 (2007, revised in 2011) organized it around a **service lifecycle** in five volumes {% cite iden2013itil itil2007v3 %}:
 
-### The Five Phases of the Service Lifecycle
+| Phase | Question it answers | Examples of processes |
+|---|---|---|
+| Service Strategy | which services create value, for whom? | service portfolio, financial management |
+| Service Design | how will a new or changed service meet its targets? | service level, capacity and availability management |
+| Service Transition | how do we bring it into operation safely? | change management, release and deployment, testing |
+| Service Operation | how do we deliver it day to day? | incident, problem and request management |
+| Continual Service Improvement | how do we get better? | measuring services against targets |
 
-| Phase | Focus | Key Activities |
-|-------|-------|----------------|
-| **Service Strategy** | Business value and competitive advantage | Capacity development, resource planning |
-| **Service Design** | Designing services for live environment | Service catalogs, SLAs, capacity management |
-| **Service Transition** | Validation and deployment | Testing, change implementation |
-| **Service Operation** | Daily service delivery | Incident resolution, operational management |
-| **Continual Service Improvement** | Ongoing enhancement | 7-step improvement process |
+## 2. Incident, problem and change
 
-### Phase Details
+Three processes do most of the quality work, and students often mix them up:
 
-**Service Strategy**: The core of the lifecycle; it focuses on developing capacities and planning resources to provide a competitive advantage and business value {% cite itil2007v3 %}.
+- **Incident management** restores normal service as quickly as possible after a disruption. It does not need to know the cause.
+- **Problem management** finds the root cause of one or more incidents and removes it, or documents a *known error* with a workaround.
+- **Change management** controls every change to the live infrastructure, assessing its risk and approving it, so that fixes do not cause new outages.
 
-**Service Design**: Responsible for designing new or changed services for the live environment, including service catalogs, service level agreements (SLAs), and capacity/availability management.
+**Example.** An online shop's checkout fails three evenings in a row. Each evening the on-call engineer restarts the payment service: three *incidents*, each closed within minutes. The repetition opens a *problem*; the analysis finds a connection pool that runs out under evening load, and a workaround (restart at 18:00) is recorded as a known error. The permanent fix, a larger pool and a timeout, goes through *change management*, which schedules it for a quiet hour and prepares a rollback. (A constructed example.)
 
-**Service Transition**: Manages the validation, testing, and deployment of services into production, ensuring that changes are implemented effectively.
+Incident management is ITIL's single-loop learning and problem management its double loop (see [Learning & Improvement Models](../03-process/02-learning-improvement-models.md)).
 
-**Service Operation**: The most critical phase for customer perception; it focuses on daily management practices to deliver services at agreed-upon levels and solve operational problems.
+## 3. Why organizations adopt it
 
-**Continual Service Improvement (CSI)**: Uses a "7-step improvement process" to monitor and assess the quality of services, ensuring they continue to meet evolving business requirements.
+A systematic review of 37 ITSM studies found three main motives (more efficient operations, lower IT costs and better customer service) and similar success factors to other improvement programs: senior management involvement, training, communication and a process-oriented culture {% cite iden2013itil %}. Reported benefits include better service quality, higher customer satisfaction and standardized processes. Certification is possible for the organization against ISO/IEC 20000, and for individuals through ITIL's own qualification scheme.
 
-## Core ITIL Processes
+## When to use it — and when not
 
-Among the many processes defined within the lifecycle, three are considered foundational for maintaining stability and quality {% cite iden2013itil %}:
+Use ITIL when an IT function supports many users and services and needs predictable handling of incidents, changes and service levels. For a small product team that runs its own service, the full framework is heavy; teams usually start with incident management and add others as needed (see [ITIL Implementation](04-itil-implementation.md)).
 
-### Incident Management (Service Operation)
+## Limitations
 
-**Purpose**: Restore normal service operation as quickly as possible following a disruption to minimize impact on the business.
+- **It says what, not how:** ITIL v3 describes what each process should do but not how to introduce it {% cite cruzhinojosa2016itil %}.
+- **Change approval can slow delivery** if every change waits for a board; DevOps and SRE practices instead automate low-risk changes (see [Industry Practices](../05-practice/index.md)).
+- **Benefits are mostly self-reported;** the review notes that many studies use no explicit theory {% cite iden2013itil %}.
 
-Key activities:
-- Incident detection and recording
-- Classification and prioritization
-- Investigation and diagnosis
-- Resolution and recovery
-- Closure and documentation
+## How solid is this?
 
-### Problem Management (Service Operation)
-
-**Purpose**: Identify the root causes of incidents to prevent them from recurring, shifting the IT team from "firefighting" to proactive resolution.
-
-Key activities:
-- Problem detection and logging
-- Root cause analysis
-- Workaround development
-- Known error documentation
-- Permanent resolution
-
-### Change Management (Service Transition)
-
-**Purpose**: Standardize methods for efficient and prompt handling of all changes to IT infrastructure to minimize the risk of service downtime.
-
-Key activities:
-- Change request submission
-- Impact and risk assessment
-- Change approval (CAB)
-- Implementation planning
-- Post-implementation review
-
-## ITIL Evolution
-
-ITIL has evolved significantly since its inception by the UK's Central Computer and Telecommunications Agency (CCTA) {% cite iden2013itil %}:
-
-| Version | Year | Description |
-|---------|------|-------------|
-| **ITIL V1** | 1980s | 31 associated books covering IT service provision |
-| **ITIL V2** | 2000-2002 | Consolidated into 7 connected books; became universal standard |
-| **ITIL v3** | 2007 | 5 core volumes representing lifecycle phases |
-| **ITIL 2011** | 2011 | Revised v3 for consistency improvements |
-| **ITIL 4** | 2019 | Focus on value co-creation and modern practices |
-
-### V2 to V3 Transition
-
-The transition from V2 to v3 represented a fundamental shift {% cite itil2007v3 %}:
-- From **process-focused** to **service lifecycle-focused**
-- From **operational efficiency** to **business value alignment**
-- From **IT-centric** to **customer-centric** perspective
-
-## Benefits and Organizational Value
-
-Research indicates that ITIL adoption is primarily motivated by the desire to improve operational efficiency, service orientation, and customer satisfaction {% cite iden2013itil %}:
-
-### Adoption Statistics
-
-| Metric | Finding |
-|--------|---------|
-| US IT managers using ITIL | **45%** (2009 survey) |
-| Planning to adopt | **15%** additional |
-| Firms at CMM Level 2 | **31%** of itSMF members |
-| Firms at CMM Level 3 | **25%** of itSMF members |
-
-### Reported Performance Improvements
-
-Organizations implementing ITIL report {% cite iden2013itil %}:
-- **Improved response times**: Faster incident resolution
-- **Reduced downtime**: Better service availability
-- **Better resource utilization**: Optimized IT capacity
-- **Standardized processes**: Consistent service delivery
-- **Higher ROI**: Long-term financial gains through maturity
-
-### Primary Adoption Motivations
-
-| Motivation | Priority |
-|------------|----------|
-| Operational efficiency | High |
-| Service orientation | High |
-| Customer satisfaction | High |
-| Cost reduction | Lower initial, improves with maturity |
+- **Where it comes from.** Iden and Eikebrokk's systematic review of ITSM research and the ITIL v3 publications {% cite iden2013itil itil2007v3 %}.
+- **What we do not hold.** ITIL 4 (2019) and the ITIL books themselves; the description above is of version 3 as presented in the review. ITIL 4 replaced the five-volume lifecycle with a service value system, and the processes described here reappear in it as practices.
 
 ---
 

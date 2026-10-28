@@ -1,165 +1,57 @@
 ---
-title: Code Review ROI
+title: Value of Code Review
 parent: Cost of Quality
-nav_order: 5
+nav_order: 6
 layout: default
 ---
 
-# Code Review ROI
+# Value of Code Review
 
-The Return on Investment (ROI) of code review is significantly influenced by how participants prioritize high-value findings, manage potential debt, and provide actionable guidance to minimize rework costs {% cite turzo2023useful %} {% cite fu2022ptd %}.
+**Code review** is an appraisal activity in which developers other than the author read a proposed change before it is merged; its value in cost-of-quality terms is the defects and future rework it removes, weighed against the reviewing effort it consumes {% cite turzo2023useful %}. The effort is large: developers spend 10–15% of their time on review, and between 20% and 44% of review comments are marked "not useful" by authors, according to the studies Turzo and Bosu cite {% cite turzo2023useful %}. Three studies of open-source communities show where the value lies.
 
-## Code Review Usefulness Factors
+## 1. What makes a comment useful
 
-Research into the OpenDev community by Turzo & Bosu (2023) identifies several technical and non-technical factors that determine if a review is perceived as useful by developers, who typically spend **10–15% of their time** on review tasks {% cite turzo2023useful %}:
+Turzo and Bosu classified review comments from the OpenDev community and surveyed its developers (160 usable responses). Comments that find **functional defects** were rated most useful, yet they were rare: 0.48% of the sampled comments, and the whole functional group (functional defects, validation, logic, interfaces, resources, timing) stayed under 20%. A third of all comments (33.32%) concerned documentation, rated in the middle {% cite turzo2023useful %}.
 
-### Key Usefulness Criteria
+| Comment category | Share of comments | Average usefulness (1–5) |
+|---|---:|---:|
+| Functional defect | 0.48% | 4.38 |
+| Validation | 3.68% | 4.16 |
+| Logical | 2.28% | 4.11 |
+| Documentation | 33.32% | 3.73 |
+| Visual representation | 3.92% | 2.92 |
 
-| Factor | % Respondents |
-|--------|---------------|
-| **Finds defects** | 44.4% |
-| **Improves code quality** | 42.5% |
-| Uses appropriate language | 28.1% |
-| **Maintainability** | 28.1% |
-| Facilitates knowledge sharing | 25.0% |
+_Selected rows of Turzo and Bosu's Table 5._ {% cite turzo2023useful %}
 
-### Linguistic Characteristics
+Usefulness also depended on how comments were written (clear, respectful, concrete) and on who wrote them: a reviewer's coding experience was associated with more useful comments, while mutual "you review mine, I review yours" pairs were associated with less useful ones {% cite turzo2023useful %}.
 
-**Surprising finding:** ~28% of developers judge usefulness based on **how feedback is communicated**—specifically looking for {% cite turzo2023useful %}:
-- Constructive criticism
-- Respectful tone
-- Clear, concrete examples
+## 2. Security defects in review
 
-### Participant Factors
+Yu et al. searched 432,585 review comments from the OpenStack and Qt communities; only 614 were about security, covering 539 security defects. The most frequent were race conditions (39.0%), crashes (22.8%) and resource leaks (10.9%). Of those 539 defects, 355 (65.9%) were resolved; when the reviewer proposed a specific solution the fix rate rose to 81.3%, against 59.5% when the reviewer only captured the problem. The main reasons for leaving a defect unresolved were "not worth fixing now" (45.4%) and disagreement between author and reviewer (34.0%) {% cite yu2023security %}.
 
-| Factor | Impact on Usefulness |
-|--------|---------------------|
-| Reviewer coding experience | **Positive** association |
-| Mutual "quid pro quo" reviews | **Negative** association |
+## 3. Potential technical debt caught before merge
 
-## The "Usefulness Gap" Problem
+Fu et al. call a sub-optimal solution spotted during review **potential technical debt (PTD)**: debt that has not yet entered the code base. In the same two communities, 8.0% of review comments raised PTD, and reviewers (not the authors) raised 87.7% of it. Overall, 81.0% of PTD was resolved before merge, but the rate varied by type: test PTD 90.5%, code PTD 89.1%, requirement PTD only 16.7% {% cite fu2022ptd %}. What is not resolved becomes [technical debt](06-technical-debt.md).
 
-A major challenge to CR ROI is the high volume of low-value feedback, with **20–44% of reviews** often being marked as "not useful" by authors {% cite turzo2023useful %}:
+## Example: raising the value of a review
 
-### Comment Distribution
+A team's reviews produce mostly documentation and naming remarks. From these findings, three changes follow: assign reviewers with experience in the changed code, rotate reviewer pairs rather than letting the same two people swap reviews, and when a reviewer spots a defect, ask them to propose the fix, the condition under which Yu et al. saw the highest resolution rate. _(Constructed example.)_
 
-| Comment Category | % of Comments | Avg. Usefulness |
-|------------------|---------------|-----------------|
-| **Functional Defect** | <20% | Highest (4.38/5) |
-| Documentation | 33.32% | Medium (3.73/5) |
-| Visual/Styling | 3.92% | **Lowest** (2.92/5) |
+## When to use it, and when not
 
-### The "Shallow Review" Trap
+- **Use these findings** to set review guidelines and to decide which review comments to track as defects or debt.
+- **Do not read** the percentages as targets; they describe two open-source ecosystems, not your team.
 
-Large code changes (high churn) often lead to shallow reviews where reviewers opt for easy "Documentation" comments rather than the high-effort task of finding functional defects {% cite turzo2023useful %}.
+## Limitations
 
-**Key insight:** Most effort goes to low-value comments; **<20% address functional defects**.
+- **Correlation, not cause.** The studies observe associations; a reviewer who proposes a fix may also choose easier defects.
+- **Counts of comments are not costs.** None of the studies prices review time against the defects avoided.
 
-## Security Defects in Code Review
+## How solid is this?
 
-Yu et al. (2023) studied the OpenStack and Qt communities to determine how effectively human reviewers catch security issues {% cite yu2023security %}:
-
-### Study Parameters
-
-| Metric | Value |
-|--------|-------|
-| Total comments analyzed | 432,585 |
-| Security-related comments | 614 (<1%) |
-| Communities | OpenStack, Qt |
-
-### Top Security Defect Types Found
-
-| Defect Type | % of Security Issues |
-|-------------|---------------------|
-| **Race Conditions** | 39.0% |
-| **Crashes** | 22.8% |
-| **Resource Leaks** | 10.9% |
-
-### Resolution Rates
-
-| Condition | Fix Rate |
-|-----------|----------|
-| Overall | 65.9% |
-| **With specific solution** | **81.3%** |
-| Without guidance | 59.5% |
-
-**Key insight:** Providing specific solutions increases fix rate by **22 percentage points** {% cite yu2023security %}.
-
-### The 30% Escape Problem
-
-Even when identified, ~30% of security defects remain unresolved due to:
-- "Not worth fixing now" (45.4%)
-- Developer-reviewer disagreement (34.0%)
-
-## Potential Technical Debt (PTD) Detection
-
-Fu et al. (2022) defined Potential Technical Debt (PTD) as sub-optimal implementations identified during review that can be resolved **before** being merged into the codebase {% cite fu2022ptd %}:
-
-### PTD Prevalence
-
-| Metric | Value |
-|--------|-------|
-| Comments containing PTD | ~8.0% |
-| PTD identified by reviewers | **87.7%** |
-| Developers unaware of their PTD | ~88% |
-
-### PTD Types and Resolution Rates
-
-| PTD Type | % of Total PTD | Resolution Rate |
-|----------|----------------|-----------------|
-| **Code PTD** | 33.7% | 89.1% |
-| **Documentation PTD** | 27.6% | 86.7% |
-| **Test PTD** | 12.9% | **90.5%** |
-| **Design PTD** | 12.3% | 80.0% |
-| **Requirement PTD** | 7.4% | **16.7%** (problematic) |
-
-**Average resolution:** 81% of PTD resolved during review; **19% escapes to become actual TD** {% cite fu2022ptd %}.
-
-### Requirement PTD Challenge
-
-Requirement PTD has the lowest resolution rate (16.7%) because it often depends on:
-- External stakeholder decisions
-- Future sprints/releases
-- Budget constraints
-
-## ROI Optimization Recommendations
-
-To maximize the value of code reviews, organizations should move away from "checkbox" compliance toward a data-informed approach {% cite turzo2023useful %} {% cite bakhtiary2020tdd %}:
-
-### Practice Recommendations
-
-| Practice | Expected Impact |
-|----------|-----------------|
-| **Rotate reviewers** | Avoids quid pro quo pairs |
-| **Assign experienced reviewers to critical code** | +Functional defect detection |
-| **Keep changesets small** | +Thorough reviews |
-| **Provide specific solutions** | +22% fix rate for security issues |
-| **Track unresolved PTD explicitly** | Prevents TD accumulation |
-
-### Shift to Prevention
-
-Implementing Test-Driven Development (TDD) can reduce pre-release defects by **61–62%**, significantly lowering the appraisal burden during code review {% cite bakhtiary2020tdd %}.
-
-## Economic Model
-
-### PTD Resolution Cost Example
-
-| Timing | Cost per Issue | Multiplier |
-|--------|----------------|------------|
-| During review (context fresh) | ~$50 | 1× |
-| After merge (as TD) | ~$500 | 10× |
-
-**Code review ROI:** ~73% reduction in total remediation costs when PTD is caught early {% cite fu2022ptd %}.
-
-### ROI Summary
-
-| Metric | Value |
-|--------|-------|
-| Developer time on reviews | 10–15% |
-| Reviews marked "not useful" | 20–44% |
-| PTD caught by reviewers | 87.7% |
-| Security fix rate with guidance | 81.3% |
-| Cost multiplier (TD after merge) | 10× |
+- **Where it comes from.** Usefulness from Turzo and Bosu, security defects from Yu et al., PTD from Fu et al. {% cite turzo2023useful yu2023security fu2022ptd %}.
+- **What is contested.** The 10–15% effort and 20–44% "not useful" figures come from the earlier studies Turzo and Bosu cite, not from their own data.
+- **What we do not hold.** A controlled cost comparison of reviewed and unreviewed changes.
 
 ---
 

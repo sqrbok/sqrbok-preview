@@ -8,63 +8,33 @@ has_children: true
 
 # Quality Standards
 
-Frameworks and certifications that provide structured approaches to quality management and process improvement.
+A **quality standard** or **maturity framework** is a published model of what a good process contains, against which an organization can be assessed or certified by an outside party. It gives a shared vocabulary, a roadmap and, for customers, evidence that a supplier works in a controlled way. It does not tell a team how to do the work, and a certificate does not by itself show that the work got better {% cite stelzer1997iso9000 kuhrmann2016spi %}.
+
+## Pages in this section
+
+| Page | What it covers | Assessed how | Best fit |
+|---|---|---|---|
+| [CMMI Overview](01-cmmi-overview.md) | 22 process areas, five maturity levels, staged and continuous use | appraisal to a maturity level | organizations needing a development-process roadmap or an appraisal for contracts |
+| [CMMI Adoption & Integration](02-cmmi-adoption-integration.md) | combining CMMI with Agile, culture, adoption barriers | (as above) | teams that must reach Level 2 or 3 while working in Agile |
+| [ITIL Framework](03-itil-framework.md) | the service lifecycle, incident, problem and change management | ISO/IEC 20000 for organizations, ITIL qualifications for people | IT functions running services for many users |
+| [ITIL Implementation](04-itil-implementation.md) | where to start, scaling ITIL down for SMEs, a failed project | (as above) | introducing ITIL in a working organization |
+| [ISO 9000 Quality Systems](05-iso-9000-quality-systems.md) | ISO 9001 certification and what the research finds | certified or not, by an external auditor | any organization whose customers require a certified quality system |
+| [TMMi & Maturity Models](06-tmmi-maturity-models.md) | 16 test process areas, five levels; other maturity models | assessment to a maturity level | organizations improving their test process specifically |
+
+Start with CMMI: TMMi copies its structure, and ITIL and ISO 9000 are easiest to understand by contrast with it.
+
+## How solid is this?
+
+- **Where it comes from.** Systematic reviews and surveys of CMMI, ITIL, ISO 9000 and TMMi adoption {% cite astridita2024cmmi iden2013itil boiral2012iso9000 vanveenendaal2022tmmi %}.
+- **What is contested.** Most benefit figures are self-reported by organizations that completed an assessment; failed adoptions are rarely published {% cite kuhrmann2016spi %}.
 
 ---
 
-## Why Standards Matter
+### References
 
-Standards provide:
-
-- **Common vocabulary** - Shared language for discussing quality
-- **Best practices** - Distilled wisdom from industry experience
-- **Benchmarking** - Ability to compare against peers
-- **Certification** - External validation of capabilities
-- **Contractual requirements** - Many customers require certification
-
----
-
-## Topics in This Section
-
-### [CMMI Overview](01-cmmi-overview.md)
-Capability Maturity Model Integration - structure, maturity levels, and process areas.
-
-### [CMMI Adoption & Integration](02-cmmi-adoption-integration.md)
-Implementing CMMI, integrating with Agile, and overcoming adoption challenges.
-
-### [ITIL Framework](03-itil-framework.md)
-IT Infrastructure Library - service lifecycle, key processes, and ITSM principles.
-
-### [ITIL Implementation](04-itil-implementation.md)
-Practical guidance for implementing ITIL in organizations of different sizes.
-
-### [ISO 9000 Quality Systems](05-iso-9000-quality-systems.md)
-International quality management standards and certification process.
-
-### [TMMi Maturity Models](06-tmmi-maturity-models.md)
-Test Maturity Model integration - testing-specific process improvement.
-
----
-
-## Choosing a Standard
-
-| Standard | Focus | Best For |
-|----------|-------|----------|
-| **CMMI** | Development processes | Organizations seeking comprehensive process improvement |
-| **ITIL** | IT service management | IT operations and service delivery |
-| **ISO 9001** | Quality management systems | Organizations needing broad certification |
-| **TMMi** | Testing processes | Organizations focused on test improvement |
-
----
-
-## Key Principles
-
-1. **Standards are guides, not prescriptions** - Adapt to your context
-2. **Certification is not the goal** - Focus on actual improvement
-3. **Start where you are** - Assess current state before planning
-4. **Integrate, don't replace** - Standards complement existing practices
+{% bibliography --cited %}
 
 ---
 
 {: .highlight }
-**Disclaimer:** AI is used for text polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.

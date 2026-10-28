@@ -7,137 +7,59 @@ layout: default
 
 # Learning & Improvement Models
 
-Learning and improvement models in software process improvement (SPI) focus on how organizations transition from merely fixing errors to fundamentally changing the systems that produce those errors.
+**Improvement models** describe how an organization learns from its mistakes: whether it only corrects each error, or also changes the assumptions and rules that produced it. Argyris and Schön call these **single-loop** and **double-loop learning** {% cite argyris1978organizational %}; PDCA and Kaizen are the routines that make the second loop a habit.
 
-## Single-Loop vs Double-Loop Learning
+## 1. Single loop fixes the error, double loop fixes the system
 
-Chris Argyris and Donald Schon introduced these concepts to explain different levels of organizational learning {% cite argyris1978organizational %}.
+In **single-loop learning** a team detects an error and corrects it while keeping its goals, strategies and rules unchanged. In **double-loop learning** it also asks which rule or assumption let the error happen and changes that, so the next similar situation is handled differently {% cite argyris1978organizational %}.
 
-### Definitions
+| Situation | Single-loop response | Double-loop response |
+|---|---|---|
+| A server runs out of memory | restart it | ask why no one saw memory grow; add monitoring to every deployment checklist |
+| Tests fail after a release | fix the tests | ask why the tests were written after the code; change when tests are written |
+| A release is late | work overtime | ask why the estimate was wrong; change how the team estimates |
 
-| Type | Description | Focus |
-|------|-------------|-------|
-| **Single-Loop** | Recognizing an error and correcting it while continuing to rely on current strategies, techniques, or policies | "Fixing the problem" — reactive |
-| **Double-Loop** | Modifying personal objectives, strategies, or policies so that when a similar situation arises, a new framing system is employed | "Fixing the system" — proactive |
+IBM's Defect Prevention Process is double-loop learning built into the development process: after a defect is fixed, a team meeting asks what in the process allowed it, and an action team changes that {% cite mays1990defect %}. See [Defect Prevention Process](05-defect-prevention.md).
 
-### Key Distinction
+## 2. PDCA: the improvement loop
 
-- **Single-Loop:** "Someone is screwing up" — blame individuals
-- **Double-Loop:** "The system is failing" — change the process
+**Plan–Do–Check–Act** (PDCA, also Plan–Do–Study–Act) is a four-step cycle for testing one change at a time, going back to Shewhart and popularized by Deming {% cite shewhart1931economic deming1986crisis %}:
 
-### Software Engineering Application
+1. **Plan:** state the problem, a target and a measurable change.
+2. **Do:** try the change on a small scale.
+3. **Check:** compare the results with the target.
+4. **Act:** keep and standardize the change if it worked; otherwise adjust and run the cycle again.
 
-IBM's Defect Prevention Process (DPP) exemplifies double-loop learning {% cite mays1990defect %}:
+**Example.** A team finds that 12 of the 40 bugs reported in a quarter were escapes, bugs found by customers rather than by the team. *Plan:* require a test for every bug fix, aiming to halve escapes. *Do:* apply the rule in one team for one quarter. *Check:* count that team's escapes again. *Act:* if they fell, make the rule part of the definition of done for all teams. (A constructed example.)
 
-| Approach | Action | Learning Type |
-|----------|--------|---------------|
-| Fix the bug | Patch the code and move on | Single-loop |
-| Root cause analysis | Identify process flaws (communication gaps, tool deficiencies) and implement preventive actions | Double-loop |
+A Scrum sprint follows the same shape: planning, the sprint itself, the review, and the retrospective that decides what to change next.
 
-### Example
+## 3. Kaizen: small improvements by everyone
 
-| Scenario | Single-Loop Response | Double-Loop Response |
-|----------|---------------------|---------------------|
-| Server crashes | Restart the server | Identify lack of automated memory monitoring; implement policy requiring monitoring in all deployments |
-| Test failures | Fix the failing tests | Analyze why tests weren't written earlier; improve TDD practices |
-| Late delivery | Work overtime to catch up | Examine estimation process; improve planning methodology |
+**Kaizen** (Japanese for "change for the better") is the habit of continuous, small improvements made by everyone, not only by managers. The lecture summarizes it in four principles:
 
-## PDCA/PDSA Cycle (Deming)
+- **Change is incremental:** many small steps rather than one big transformation.
+- **Everyone takes part,** from senior managers to developers.
+- **Ideas come from the bottom up:** the people doing the work see the problems first; IBM found defect prevention worked best when developers led it {% cite mays1990defect %}.
+- **It never stops:** improvement is part of daily work, not a project with an end date.
 
-The Plan-Do-Check-Act (PDCA) cycle, also known as the Deming Cycle, is a four-stage iterative method for continuous improvement.
+Retrospectives, continuous integration with small frequent changes, and code review are Kaizen in software: each makes a small adjustment every few days or weeks.
 
-### The Four Stages
+## When to use them — and when not
 
-| Stage | Activity | Questions |
-|-------|----------|-----------|
-| **Plan** | Establish objectives and processes | What do we want to achieve? How will we measure success? |
-| **Do** | Implement the plan/process | Execute the planned changes on a small scale |
-| **Check** | Measure results against goals | Did we achieve what we planned? What did we learn? |
-| **Act** | Adjust based on learning | Standardize if successful; revise if not |
+Use double-loop questions when a problem recurs; use PDCA to test one change with data before rolling it out; use Kaizen routines for steady, low-risk improvement. They do not replace a larger redesign when the whole process is wrong, and a PDCA cycle without a measurable target ("we'll see if it feels better") cannot reach a real Check step.
 
-### Application in Software
+## Limitations
 
-| Framework | PDCA Manifestation |
-|-----------|-------------------|
-| **CMMI** | Fundamental tool for assessing and enhancing process implementation plans |
-| **Scrum** | Sprint planning (Plan) → Sprint work (Do) → Sprint demo (Check) → Retrospective (Act) |
-| **TOC** | 5 Focusing Steps create continuous loop of identifying and breaking bottlenecks |
+- **Double-loop learning is uncomfortable.** It questions decisions managers made, so organizations tend to stay in the single loop.
+- **Small steps can miss the bottleneck.** Many local improvements may not change overall throughput; the [Theory of Constraints](06-theory-of-constraints.md) addresses that.
+- **Improvement costs time first.** The short-term dip is covered in [Change Management](04-change-management.md).
 
-## Kaizen Philosophy
+## How solid is this?
 
-Kaizen is a Japanese philosophy meaning "continuous improvement" — involving every employee from the CEO to the front-line worker.
-
-### Core Principles
-
-- **Incremental change:** Small, frequent improvements rather than "Big Bang" transformations
-- **Everyone participates:** Not just management-driven initiatives
-- **Bottom-up:** Developer-driven rather than top-down mandates {% cite mays1990defect %}
-- **Continuous:** Improvement never stops; it's part of daily work
-
-### Software Kaizen
-
-In software engineering, Kaizen manifests as:
-
-| Practice | Kaizen Element |
-|----------|----------------|
-| **Agile Retrospectives** | Regular reflection and adjustment by the team |
-| **CI/CD Pipelines** | Small, frequent deployments with real-time feedback |
-| **DevOps Culture** | Continuous improvement embedded in daily operations |
-| **Code Reviews** | Incremental quality improvement through peer feedback |
-
-### Example: DevOps Implementation
-
-Rather than waiting for massive releases, teams make small, frequent updates:
-- **Traditional:** Quarterly releases with extensive change logs
-- **Kaizen/DevOps:** Dozens of deployments per day, each improving based on real-time feedback
-
-## The "Worse-Before-Better" Dynamic
-
-A critical insight from Repenning & Sterman is that "Working Smarter" (double-loop/Kaizen) often causes a short-term drop in performance before long-term gains {% cite repenning2001nobody %}.
-
-### The Dynamic
-
-| Phase | What Happens |
-|-------|--------------|
-| **Initial Investment** | Time taken from production for improvement activities |
-| **Performance Dip** | Short-term metrics decline as team learns new approaches |
-| **Capability Building** | Skills and processes improve through practice |
-| **Long-term Gains** | Performance exceeds original baseline with less effort |
-
-### The Capability Trap
-
-If managers cannot tolerate the short-term dip, they revert to "Working Harder":
-- Leads to a vicious cycle of firefighting
-- Lower capability → more pressure → less time for improvement
-- Eventually erodes organizational capability and leads to burnout
-
-### Implications for Learning
-
-| Management Response | Short-term | Long-term |
-|--------------------|------------|-----------|
-| **Tolerate the dip** | Performance drops temporarily | Sustainable high performance |
-| **Revert to "Working Harder"** | Immediate recovery | Capability erosion, burnout |
-
-## Connecting the Models
-
-| Model | Focus | Key Mechanism |
-|-------|-------|---------------|
-| **Single-Loop** | Fix errors | Correct and continue |
-| **Double-Loop** | Fix systems | Question assumptions, change processes |
-| **PDCA** | Structured iteration | Plan-Do-Check-Act cycle |
-| **Kaizen** | Continuous small steps | Everyone improves daily |
-
-> "Relying only on single-loop learning is like a homeowner who constantly mops up a puddle on the floor (fixing the error) but never looks up to see the leaking roof (the process flaw). Double-loop learning and Kaizen require stopping to patch the roof — even if the puddle grows slightly larger first."
-
-## Summary
-
-| Concept | Definition | Application |
-|---------|------------|-------------|
-| Single-Loop | Fix errors, keep same strategy | Bug fixes, incident response |
-| Double-Loop | Change strategy based on learning | Root cause analysis, process redesign |
-| PDCA | Four-stage improvement cycle | Sprint cycles, CMMI assessment |
-| Kaizen | Continuous incremental improvement | CI/CD, retrospectives, DevOps |
-| Worse-Before-Better | Short-term dip before long-term gains | Change management, capability building |
+- **Where it comes from.** Argyris and Schön's theory of organizational learning, Shewhart's and Deming's quality cycle, and IBM's defect-prevention experience {% cite argyris1978organizational shewhart1931economic deming1986crisis mays1990defect %}.
+- **What is contested.** Kaizen's four principles are the lecture's summary of the practice, not a formal standard.
+- **What we do not hold.** The books by Argyris and Schön, Shewhart and Deming are cited from the lecture; the area's review holds none of them.
 
 ---
 

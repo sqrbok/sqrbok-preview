@@ -7,151 +7,40 @@ layout: default
 
 # ITIL Implementation
 
-The implementation of the Information Technology Infrastructure Library (ITIL) framework is a complex organizational endeavor that requires moving from technology-centric attitudes to a customer-oriented service perspective {% cite iden2013itil %}.
+**ITIL implementation** is the introduction of [ITIL](03-itil-framework.md) (IT Infrastructure Library, a public set of IT service management practices) processes into a working IT organization, during daily operations, usually a few processes at a time. There is no single accepted procedure: ITIL v3 says what each process should do but not how to introduce it {% cite cruzhinojosa2016itil %}.
 
-## Implementation Approaches and Sequences
+## 1. Where organizations start
 
-There is no single standardized or generally accepted procedure for implementing ITIL; however, researchers have identified common logical routes {% cite schmidtbauer2013itil %}.
+Most organizations begin with **incident management**, because restoring service is the most visible need {% cite cruzhinojosa2016itil %}. A systematic review of 39 studies on ITIL in small and medium enterprises (SMEs) found that research on SMEs is scarce, and that complexity, cost and a shortage of skilled staff are their main barriers. It also noted an advantage: SMEs tend to show lower resistance to change than large companies {% cite cruzhinojosa2016itil %}.
 
-### Standard 11-Step Sequence
+## 2. Example: a scaled-down ITIL at Nordex
 
-Schmidtbauer et al. (2013) identify an exemplary implementation approach {% cite schmidtbauer2013itil %}:
+Nordex, a German manufacturer of wind turbines, introduced ITIL for the IT that supports its products {% cite schmidtbauer2013itil %}. Full ITIL, with a separate person for every role, was too heavy for a medium-sized company, so it was scaled down:
 
-| Step | Activity |
-|------|----------|
-| 1 | Project preparation |
-| 2 | Service structure definition |
-| 3 | Role selection |
-| 4 | "As-is" analysis |
-| 5 | "To-be" definition |
-| 6 | Process interface definition |
-| 7 | Establishing process control |
-| 8 | Detailed process elaboration |
-| 9 | Selection of application systems |
-| 10 | Intensive training |
-| 11 | Implementation |
+- **Few processes:** request fulfilment, incident management and problem management, with access management folded into request fulfilment.
+- **Combined roles:** one person holds several ITIL roles where the workload is small.
+- **Three layers of description:** a high-level picture of the help desk's function, the detailed processes, then concrete instructions and checklists for each role.
+- **Internal change management:** the company's own staff led the introduction rather than outside consultants, and all process diagrams used one standard format.
 
-### "Light" Sequence for SMEs
+The authors' conclusion is that ITIL is a reference model to be interpreted and tailored, not a cookbook.
 
-Cruz-Hinojosa & Gutiérrez-de-Mesa (2016) describe a sequence tailored for smaller firms {% cite cruzhinojosa2016itil %}:
+## 3. Example: a failed implementation analyzed
 
-1. Assess needs
-2. Train at Foundation level
-3. Create a tactical plan
-4. Create a Configuration Management Database (CMDB)
-5. Control Incident Management
-6. Implement Problem and Change Management
-7. Address specific business requirements
+Ahmad and Shamsudin collected 17 critical success factors from the literature and grouped them into seven classes, including top-management support, change management and culture, communication, project management, and training {% cite ahmad2013itil %}. They then asked fifteen people involved in a failed ITIL project at a financial firm in the United Arab Emirates (five IT staff, five managers, five end users) to weigh the factors with the analytic hierarchy process (AHP), a method for ranking options by pairwise comparison. IT staff and managers ranked top-management support first; end users ranked communication first. The project had treated ITIL as an IT matter: end users had been left out of decisions, training was not mandatory, and the need for ITIL was never explained to them.
 
-### Initial Focus
+## When to use this — and when not
 
-Most organizations begin their journey by adopting the **Incident Management** process to restore normal operations as quickly as possible following disruptions {% cite ahmad2013itil %}.
+Start small and with the process whose failure hurts most, usually incidents; add problem and change management once incidents are recorded consistently, because problem management needs that record. Do not try to introduce all lifecycle processes at once in a small organization: the Nordex case shows that a deliberately reduced set can work.
 
-## ITIL in SMEs: Challenges and Adaptations
+## Limitations
 
-Small and Medium Enterprises (SMEs) face distinct challenges because the standard ITIL framework is often considered too large and resource-intensive for their limited labor and budgets {% cite cruzhinojosa2016itil %} {% cite schmidtbauer2013itil %}.
+- **Case studies, not comparisons.** Both examples describe one organization each; neither compares implementation strategies.
+- **Success factors repeat across frameworks.** Management support, training and communication top the lists for ITIL, CMMI and Six Sigma alike, which says more about change in general than about ITIL (see [Change Management](../03-process/04-change-management.md)).
 
-### Primary Barriers
+## How solid is this?
 
-| Barrier | Description |
-|---------|-------------|
-| **Technical talent** | Shortage of skilled personnel |
-| **Financial resources** | Limited implementation budgets |
-| **Framework complexity** | ITIL perceived as too comprehensive |
-| **Documentation overhead** | Extensive documentation requirements |
-
-### SME Adaptations
-
-To keep operations "short and simple," SMEs often implement adaptations {% cite cruzhinojosa2016itil %} {% cite schmidtbauer2013itil %}:
-
-| Adaptation | Approach |
-|------------|----------|
-| **"Light" ITIL** | Scaled-down ITSM landscape |
-| **Hybrid processes** | Merge incident, request, and problem management |
-| **Phased rollout** | Implement core processes first |
-| **Simplified documentation** | Reduce administrative overhead |
-
-### SME Advantages
-
-Despite resource constraints, SMEs may have advantages {% cite cruzhinojosa2016itil %}:
-- **Lower resistance to change** than large corporations
-- **Faster culture transformation** possible
-- **More rapid customer service focus** development
-
-## Critical Success Factors (CSFs)
-
-Successful ITIL adoption is largely dependent on human factors and user acceptance rather than just technical tool selection {% cite ahmad2013itil %}.
-
-### Seven Key CSF Classes
-
-Ahmad & Shamsudin (2013) identify 17 CSFs grouped into seven classes {% cite ahmad2013itil %}:
-
-| Class | Examples |
-|-------|----------|
-| **Top management support** | Executive sponsorship, resource allocation |
-| **Change management & culture** | Organizational readiness, cultural alignment |
-| **Monitoring & evaluation** | KPIs, progress tracking |
-| **Communication & cooperation** | Stakeholder engagement, collaboration |
-| **Project management & governance** | Formal methodology, oversight |
-| **Training & competence** | Staff education, certification |
-| **Process implementation & technology** | Tool selection, process design |
-
-### Stakeholder Priority Divergence
-
-Findings show that priorities differ by role {% cite ahmad2013itil %}:
-
-| Stakeholder Group | Top Priority |
-|-------------------|--------------|
-| IT Staff | Top management support |
-| IT Management | Top management support |
-| End-Users | Communication and cooperation |
-
-### The Project Champion
-
-Effective implementation often requires a **champion** to advocate for the framework and promote its benefits to stakeholders {% cite ahmad2013itil %}.
-
-## Case Studies
-
-### Nordex (Medium-Sized Enterprise)
-
-The wind turbine manufacturer Nordex implemented ITIL Service Operation processes for its "product-related IT" {% cite schmidtbauer2013itil %}.
-
-**Method**: Customized process flow diagrams according to specific requirements captured in workshops and modeling sessions.
-
-**The 3-Layered Approach**:
-
-| Layer | Focus |
-|-------|-------|
-| 1 | Organizational function of the Help Desk |
-| 2 | Detailed ITIL V3 processes |
-| 3 | Specific instructions/checklists for roles |
-
-**Outcome**: Achieved **ISO 20000 certification in less than one year**.
-
-### Financial Services (Failed Implementation → Recovery)
-
-Ahmad & Shamsudin (2013) analyzed a financial firm in the UAE where the ITIL project initially failed {% cite ahmad2013itil %}.
-
-**Initial Failure**:
-- Took **five years** to implement only a few selected processes
-- Lack of formal project management strategies
-- Non-mandatory training
-- Failure to communicate the "need for ITIL" to employees
-
-**Resolution**:
-- Applied Analytical Hierarchy Process (AHP) to re-evaluate stakeholder priorities
-- Involved end-users in decision-making (previously excluded due to lack of technical background)
-- Implemented structured communication plan
-
-### Lessons Learned
-
-| Success Factor | Nordex | Financial Services (Initial) |
-|----------------|--------|------------------------------|
-| Project management | Strong methodology | Weak/informal |
-| Training | Intensive, mandatory | Non-mandatory |
-| Communication | Stakeholder workshops | Poor communication |
-| User involvement | Active engagement | End-users excluded |
-| Timeline | < 1 year to ISO 20000 | 5 years, incomplete |
+- **Where it comes from.** A review of ITIL in SMEs, the Nordex case study and the AHP study of a failed project {% cite cruzhinojosa2016itil schmidtbauer2013itil ahmad2013itil %}.
+- **What we do not hold.** The Nordex paper's full text could not be machine-read, so its details come from the area's summary of it.
 
 ---
 

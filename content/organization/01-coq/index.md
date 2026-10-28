@@ -8,77 +8,28 @@ has_children: true
 
 # Cost of Quality
 
-The Cost of Software Quality (CoSQ) provides a financial framework for translating technical quality metrics into business vocabulary that executives can use for data-driven decision-making.
+**Cost of quality** expresses quality in the unit managers decide with, money or effort: what a project spends to prevent and find defects, and what it loses when defects escape. Software spends far more on quality than manufacturing does, and most of it goes on rework that earlier prevention could avoid {% cite houston1999cost %}. The pages in this section answer three questions in order: **how big** the cost is and how it splits, **where defects come from and where they are caught**, and **which modern practices** move the cost.
+
+| Page | What it answers | Main sources |
+|---|---|---|
+| [Cost of Software Quality](01-cosq-foundations.md) | the four cost categories, their size, and how process maturity shifts them | Knox; Houston and Keats |
+| [Defect Injection and Removal](02-defect-injection-removal.md) | how defects flow through phases, and how to compare improvement options | Miranda; COQUALMO |
+| [Defect Origin and Detection](03-defect-classification.md) | where defects were made and found; removal efficiency per activity | Kan |
+| [Defect Classification Schemes](04-classification-schemes.md) | ODC, HP and LiDeC for richer process feedback | Butcher; Huber; Mellegård |
+| [Quality Costs in Continuous Delivery](04-quality-economics-devops.md) | shift-left and shift-right in cost terms; the price of flaky tests | Leinen; Gottam |
+| [Value of Code Review](05-code-review-roi.md) | which review comments pay off | Turzo; Yu; Fu |
+| [Technical Debt as a Quality Cost](06-technical-debt.md) | which tool to believe, where debt accumulates | Amanatidis; Bhatia |
+| [Defect Prediction with Machine Learning](07-defect-prediction-ml.md) | why accuracy misleads, and what to measure instead | Khleel; Bhutamapuram |
+
+The study notes and revision questions for this section are [SN A01: Cost of Quality](../../material/qam/SN-A1-CoSQ.md) and [RQ A01: Cost of Quality](../../material/qam/RQ-A1-CoSQ.md). Quality planning, which turns these costs into decisions for one project, is the next section, [Quality Planning](../02-plan/index.md).
 
 ---
 
-## Why Cost of Quality?
+### References
 
-Quality has costs, but so does poor quality. Understanding these costs enables:
-
-- **Investment justification** - Make the business case for quality initiatives
-- **Trade-off analysis** - Balance prevention vs. detection vs. failure costs
-- **Resource allocation** - Invest where it has the greatest impact
-- **Executive communication** - Speak the language of business
-
----
-
-## Topics in This Section
-
-### [CoSQ Foundations](01-cosq-foundations.md)
-The traditional cost model (prevention, appraisal, internal failure, external failure) and economic justification.
-
-### [Defect Injection & Removal](02-defect-injection-removal.md)
-Where defects come from, how they're removed, and the "tank and pipes" model.
-
-### [Defect Classification](03-defect-classification.md)
-Orthogonal Defect Classification (ODC), HP's model, and practical classification schemes.
-
-### [Quality Economics in DevOps](04-quality-economics-devops.md)
-Shift-left economics, flaky test costs, and quality in continuous delivery environments.
-
-### [Code Review ROI](05-code-review-roi.md)
-The return on investment of code review practices and what makes reviews effective.
-
-### [Technical Debt](06-technical-debt.md)
-Quantifying, tracking, and managing technical debt as a quality cost.
-
-### [Defect Prediction with ML](07-defect-prediction-ml.md)
-Machine learning approaches to predicting defect-prone modules.
-
----
-
-## Study Materials
-
-### [Study Notes](../../material/qam/SN-A1-CoSQ.md)
-Comprehensive study notes covering all CoSQ concepts for exam preparation.
-
-### [Revision Questions](../../material/qam/RQ-A1-CoSQ.md)
-Self-assessment questions to test your understanding of Cost of Quality concepts.
-
----
-
-## The Cost of Quality Model
-
-| Category | Type | Examples |
-|----------|------|----------|
-| **Conformance** | Prevention | Training, reviews, tools, process improvement |
-| | Appraisal | Testing, inspections, audits |
-| **Nonconformance** | Internal Failure | Rework, retesting, debugging |
-| | External Failure | Support, patches, reputation damage |
-
-**Key insight**: Investing in prevention and appraisal reduces total cost by avoiding expensive failures.
-
----
-
-## Key Principles
-
-1. **The 1:10:100 rule** - Defects cost 10x more at each subsequent phase
-2. **Prevention over detection** - It's cheaper to prevent than to find and fix
-3. **Measure to manage** - Track quality costs to optimize investment
-4. **External failure is most expensive** - Defects found by customers have hidden costs
+{% bibliography --cited %}
 
 ---
 
 {: .highlight }
-**Disclaimer:** AI is used for text polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.

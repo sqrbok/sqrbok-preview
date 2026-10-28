@@ -7,124 +7,53 @@ layout: default
 
 # ISO 9000 Quality Systems
 
-The ISO 9000 family is a collection of international standards for quality management and quality assurance designed to manage organizational processes and provide confidence to stakeholders that quality requirements are being met {% cite stelzer1997iso9000 %}. While these standards are widely used as a reference model for quality management, their real-world impact on organizational effectiveness remains a subject of academic and practitioner debate {% cite boiral2012iso9000 %}.
+**ISO 9000** is a family of international standards for quality management systems; its best-known member, **ISO 9001**, states the requirements an organization must meet to be certified by an external auditor as having a documented, controlled quality system {% cite stelzer1997iso9000 boiral2012iso9000 %}. Unlike CMMI it is not specific to software and has no maturity levels: an organization is certified or not.
 
-## ISO 9000 Family Overview
+## 1. The family
 
-The family consists of several standards with distinct objectives {% cite stelzer1997iso9000 %}:
+In the version that the software studies examined, the family had distinct parts {% cite stelzer1997iso9000 %}:
 
-| Standard | Purpose | Focus |
-|----------|---------|-------|
-| **ISO 9000-1** | "Road map" for the family | Guidelines for selection and use |
-| **ISO 9001** | External quality assurance | Certification requirements |
-| **ISO 9004** | Internal quality management | TQM, continuous improvement, staff motivation |
-| **ISO 9000-3** | Software-specific guidance | Development, supply, maintenance of software |
+| Standard | Purpose |
+|---|---|
+| ISO 9001 | requirements for external quality assurance: the basis of certification |
+| ISO 9004 | guidance for internal quality management and improvement, beyond the minimum |
+| ISO 9000-3 | guidelines for applying ISO 9001 to software development, supply and maintenance |
 
-### ISO 9001 vs ISO 9004
+Stelzer and colleagues found that software organizations worked mostly from ISO 9001 and largely ignored ISO 9000-3 and ISO 9004, which is where the improvement-oriented guidance was {% cite stelzer1997iso9000 %}.
 
-| Aspect | ISO 9001 | ISO 9004 |
-|--------|----------|----------|
-| **Focus** | Conformity and certification | Excellence and improvement |
-| **Purpose** | External assurance to customers | Internal quality management |
-| **Approach** | Minimum requirements | Best practice guidance |
-| **Mindset** | Compliance | Total Quality Management (TQM) |
+## 2. Example: certified, but not improved
 
-## ISO 9000 for Software Quality
+Stelzer, Mellis and Herzwurm surveyed software houses in two studies (20 German and 36 European) {% cite stelzer1997iso9000 %}. They asked about five elements of a quality system: code reviews and inspections, software testing, product and process measurement, measurement of quality costs, and demonstration of quality improvements. The paper reports the results below for the surveys together, without the number behind each share. **Forty percent** of the software houses had not changed any of the five. Yet no respondent called the quality system a failure: 47% said their expectations were met and 53% that they were partly met. The authors' conclusion is that the benefit of ISO 9000 for software comes less from its technical content than from the culture created by a company-wide improvement program, and that smaller firms (20 to 100 employees) often gained the most, because they had less structure to begin with.
 
-While ISO 9000 was originally designed for the production of tangible manufacturing goods, it has been adapted to the intangible, design-intensive nature of software {% cite stelzer1997iso9000 %}.
+## 3. What the research reports
 
-### Adaptation Challenges
+Boiral reviewed 111 empirical papers on ISO 9000 published between 1994 and 2008 {% cite boiral2012iso9000 %}. Most reported benefits; the share of papers that found a positive effect, among those that measured it, was:
 
-| Challenge | Description |
-|-----------|-------------|
-| **Design intensity** | Software is primarily design work, not manufacturing |
-| **Requirements elicitation** | Standard underestimates software-specific problems |
-| **Defect detection** | Different approaches needed for intangible products |
+| Effect | Papers measuring it | Share reporting a positive effect |
+|---|---|---|
+| Operational efficiency | 27 | 96.3% |
+| Customer satisfaction | 38 | 94.7% |
+| Productivity | 32 | 93.7% |
+| Organizational image | 26 | 96.2% |
+| Financial results | 34 | 82.4% |
 
-### Benefits for Software Organizations
+Boiral's own reading is critical: the studies rely mostly on the perceptions of quality managers, few investigate negative effects such as bureaucracy, paperwork and cost, and their conclusions, he writes, "do not necessarily represent the reality of ISO impacts, but rather the dominant measurements of this reality."
 
-Despite challenges, software development often suffers from universal organizational problems—such as poor documentation and inadequate communication—which the ISO 9000 framework effectively addresses {% cite stelzer1997iso9000 %}:
+## When to use it — and when not
 
-- **Documentation discipline**: Structured documentation practices
-- **Communication improvement**: Clearer processes and interfaces
-- **Process visibility**: Better understanding of workflows
+Seek ISO 9001 certification when customers require it, which is common in supplier relationships, or when an organization wants an externally checked, documented quality system across all its activities, not only software. If the goal is to improve how software is built, certification alone is weak evidence; the Stelzer surveys show that a certificate can coexist with unchanged practice.
 
-### Software-Specific Findings
+## Limitations
 
-**Usage in Practice**: Research indicates that many software quality managers ignore the specific ISO 9000-3 guidelines and use the core ISO 9001 requirements as their primary basis for certification {% cite stelzer1997iso9000 %}.
+- **Certification checks conformance, not outcomes.** An auditor checks that the documented process exists and is followed, not that the product is good.
+- **Paperwork can become the goal,** the "paper certificate" problem the Stelzer study describes.
+- **The evidence is old.** The software surveys date from the 1990s and the review's papers end in 2008; the standard has been revised several times since.
 
-**Benefits for Small Firms**: Contrary to the belief that ISO 9000 only suits large companies, empirical findings suggest that smaller software houses (20–100 employees) often achieve more substantial improvements because they typically lack established organizational structures before implementation {% cite stelzer1997iso9000 %}.
+## How solid is this?
 
-## Organizational Effectiveness of Certification
-
-A systematic review of 111 empirical papers by Boiral (2012) found that the majority of studies report significant positive impacts from certification {% cite boiral2012iso9000 %}:
-
-### Internal Operational Benefits
-
-| Benefit Area | Studies Showing Improvement |
-|--------------|-----------------------------|
-| Operational Efficiency | **96.3%** |
-| Productivity | **93.7%** |
-| Product Quality | **90%** |
-
-### External and Strategic Benefits
-
-| Benefit Area | Studies Showing Improvement |
-|--------------|-----------------------------|
-| Organizational Image | **96.2%** |
-| Customer Satisfaction | **94.7%** |
-| Sales and Exports | **85%+** |
-
-### Financial Impact
-
-**82.4%** of studies measured positive financial results, such as increased net profit or return on investment {% cite boiral2012iso9000 %}.
-
-## Benefits vs the 'Paper Certificate' Trap
-
-A critical concern in ISO 9000 research is the distinction between the "spirit" of the standard and the "letter" of certification {% cite boiral2012iso9000 %}.
-
-### The 'Paper Certificate' Problem
-
-Many organizations seek a "paper certificate" where certification is an end in itself rather than a tool for genuine improvement {% cite stelzer1997iso9000 %}:
-
-| Finding | Statistic |
-|---------|-----------|
-| Software houses with no actual quality improvements | **40%** (despite holding certificate) |
-| Studies finding increased bureaucracy | **100%** (when explicitly measured) |
-
-### Common Pitfalls
-
-| Pitfall | Description |
-|---------|-------------|
-| **Bureaucracy increase** | Most frequently cited negative outcome |
-| **Paperwork overhead** | Documentation becomes burden, not tool |
-| **Compliance focus** | Meeting requirements without improvement |
-| **Ceremonial adoption** | External validation without internal change |
-
-### Reverse Causality
-
-Researchers note that the reported high performance of certified firms may be due to "reverse causality"—better-managed, more efficient organizations are simply more likely to seek certification in the first place {% cite boiral2012iso9000 %}.
-
-### Success Factors
-
-The primary driver of success is not the technical content of the standard but the cultural change and team spirit created by a company-wide improvement program {% cite boiral2012iso9000 %}:
-
-| Factor | Impact |
-|--------|--------|
-| **Cultural commitment** | Essential for real improvements |
-| **Leadership support** | Drives organization-wide adoption |
-| **Employee engagement** | Quality becomes everyone's responsibility |
-| **Continuous improvement mindset** | ISO 9004 "spirit" over ISO 9001 "letter" |
-
-## Recommendations
-
-Based on the research, organizations should {% cite stelzer1997iso9000 %} {% cite boiral2012iso9000 %}:
-
-1. **Focus on improvement, not just certification**: Use ISO 9004 principles alongside ISO 9001 requirements
-2. **Invest in cultural change**: Technical compliance alone yields limited benefits
-3. **Avoid bureaucratic overload**: Keep documentation practical and useful
-4. **Measure real outcomes**: Track quality metrics, not just certification status
-5. **Engage all employees**: Quality improvement is a company-wide effort
+- **Where it comes from.** Two surveys of European software houses and a systematic review of 111 empirical studies {% cite stelzer1997iso9000 boiral2012iso9000 %}.
+- **What is contested.** Whether the reported benefits are real: Boiral points out that the studies use heterogeneous measures that are hard to compare and rest largely on quality managers' perceptions {% cite boiral2012iso9000 %}, and a perception survey cannot separate the effect of certification from that of being a firm that seeks it.
+- **What we do not hold.** The current ISO 9001 text; the descriptions above follow the versions the studies examined.
 
 ---
 

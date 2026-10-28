@@ -7,68 +7,48 @@ layout: default
 
 # DevOps Foundations
 
-DevOps, a portmanteau of "development" and "operations," is a software engineering culture and philosophy that aims to unify traditionally separate IT functions to build, test, and release software faster and more reliably through automation {% cite luz2019devops %}.
+**DevOps** is a way of organizing software delivery in which development and operations stop working as separate departments and share responsibility for building, releasing and running the software, supported by heavy automation of build, test and deployment {% cite luz2019devops williams2019devops %}. It is a culture first and a toolchain second.
 
-## Definition and Cultural Principles
+## 1. Culture is the core
 
-DevOps is defined not merely as a set of tools, but as a transformative cultural shift that fuses Lean product thinking, Agile planning, and continuous delivery automation {% cite williams2019devops %}. Existing research categorizes it through collaborative, philosophical, and methodological perspectives {% cite lopez2021devops %}.
+Luz and colleagues built a grounded theory of DevOps adoption from interviews in 15 adoption scenarios in five countries {% cite luz2019devops %}. Their first candidate for the central concept was **automation**; the data pushed them to **collaborative culture** instead, the one category that explained the others. In their model:
 
-### Key Cultural Principles
+- **Collaborative culture** is the core: operations tasks become part of developers' everyday work, and failures are a shared problem, not someone else's.
+- **Enablers** make the culture possible: automation, transparency and sharing of information, continuous measurement and quality assurance.
+- **Outcomes** follow: agility (frequent, low-risk releases) and resilience (fast recovery).
 
-**Collaborative Culture**: This is identified as the "core category" and essence of DevOps; it aims to remove functional silos between teams so that operations tasks become regular, day-to-day development activities {% cite luz2019devops %}.
+Their adoption model has three steps: first spread the importance of a collaborative culture between development and operations, then select the enablers that suit the company's context, then check the outcomes against the company's needs.
 
-**Shared Responsibility and Blamelessness**: Teams move away from the "blaming game" toward joint accountability for project success, focusing on systemic fixes rather than pointing fingers when failures occur {% cite luz2019devops %}.
+Williams' study of teams after adoption describes the same shift in practice: silos broken down, shared responsibility in place of blame, servant leadership instead of top-down control, and continuous learning {% cite williams2019devops %}.
 
-**Product Thinking**: Development and operations are replaced by a unified vision where software is viewed as a continuous product rather than a set of completed instructions {% cite williams2019devops %}.
+## 2. The technical enablers
 
-**Continuous Learning**: A culture of experimentation is encouraged, where teams "fail fast" and learn from mistakes to drive innovation {% cite luz2019devops %} {% cite hamza2024devops %}.
+- **Continuous integration (CI):** every change is merged into the main line and built and tested automatically, many times a day.
+- **Continuous delivery or deployment (CD):** every change that passes the pipeline can be, or is, released to production automatically.
+- **Infrastructure as code (IaC):** servers and environments are described in version-controlled files, so environments can be rebuilt and reviewed like code.
+- **Monitoring and telemetry:** the team running the service sees how it behaves in production and learns from it.
 
-**Decentralized Leadership**: Traditional top-down management is replaced by servant leadership, empowering autonomous teams and fostering trust {% cite luz2019devops %}.
+Four delivery measures are widely used to track the result: **deployment frequency** (how often changes reach production), **lead time** for changes (from commit to running in production), **mean time to recovery (MTTR)** after a failure in production, and **change failure rate** (the share of deployments that cause one) {% cite sethupathy2025devops %}.
 
-## CI/CD Pipelines and Continuous Delivery
+## 3. Example: TCU
 
-Continuous Integration (CI) and Continuous Deployment/Delivery (CD) are the core technical practices that support a DevOps culture by enabling the delivery of small, incremental changes frequently {% cite hamza2024devops %}.
+The Brazilian Federal Court of Accounts (TCU) is the case Luz and colleagues used to test their adoption model {% cite luz2019devops %}. Before DevOps, the operations team's rigid policies allowed deployments of the most important systems once a week. After the adoption, the team made 29 deployments of one of those systems in a single day. The gain came less from new tools than from operations and developers agreeing to own releases together.
 
-**Automation of Repetitive Tasks**: DevOps emphasizes automating build, test, and release processes to reduce manual intervention and minimize human error {% cite luz2019devops %} {% cite wang2020testautomation %}.
+## When to use it — and when not
 
-**Closed Feedback Loops**: Multidisciplinary pipelines (including automated regression testing, code analysis, and infrastructure provisioning) provide real-time feedback, making software delivery more natural and less "ceremonial" {% cite luz2019devops %}.
+DevOps fits services that change often and that the organization runs itself. Regulated domains can adopt it but need audit trails and approvals built into the pipeline: a study of U.S. healthcare names the Mayo Clinic as an early adopter, and found regulation (HIPAA) and patient-data sensitivity slowing adoption elsewhere {% cite akinola2023devops %}. It is a poor fit for software shipped once to customers who install it themselves, where frequent deployment has no meaning.
 
-**Infrastructure as Code (IaC)**: This allows teams to version control their entire infrastructure in a common language, increasing transparency and reproducibility across environments {% cite williams2019devops %}.
+## Limitations
 
-## DevOps vs Traditional Approaches
+- **"DevOps" means different things.** It is both a culture and a job title (DevOps engineer), and organizations implement it very differently; see [DevOps Teams & Adoption](02-devops-teams-adoption.md).
+- **Adoption is hard to start.** A review of 358 articles plus interviews in six organizations names missing standard guidelines and skills, resistance and management hesitation, and tool costs as the main obstacles {% cite hamza2024devops %}.
+- **Headline multipliers lack sources here.** Figures such as "46 times more deployments" come from industry surveys that the area's review does not hold.
 
-The transition to DevOps represents a fundamental departure from rigid, sequential lifecycles {% cite hamza2024devops %}:
+## How solid is this?
 
-| Feature | Traditional Approach | DevOps/SRE Approach |
-|---------|---------------------|---------------------|
-| Structure | Siloed "Dev" and "Ops" teams with rigid barriers | Integrated, cross-functional teams with shared goals |
-| Communication | Bureaucratic ticket systems and SLAs | Straightforward, real-time channels |
-| Release Cycle | Massive, infrequent releases with high risk | Frequent, small releases (multiple times per day) |
-| Measurement | Focused on system uptime | Use of SLOs, error budgets, and telemetry |
-
-## Adoption Challenges and Organizational Impact
-
-Successfully adopting a DevOps culture requires a holistic approach encompassing both technical and human elements {% cite luz2019devops %} {% cite hamza2024devops %}.
-
-### Adoption Challenges
-
-**Resistance to Change**: This is a major hurdle, especially in hierarchical organizations with deeply entrenched processes {% cite hamza2024devops %}.
-
-**Knowledge and Skill Gaps**: Organizations often lack trained personnel or specialized expertise in automation and modern methodologies {% cite hamza2024devops %}.
-
-**Initial Investment**: High up-front costs for tools, training, and restructuring can deter management {% cite hamza2024devops %}.
-
-**Regulatory/Compliance Hurdles**: In sectors like healthcare (HIPAA), strict data sensitivity and audit requirements can slow implementation {% cite akinola2023devops %}.
-
-### Organizational Impact and Statistics
-
-**High Performance**: High-performing DevOps organizations deploy code 46 times more frequently and have 440 times faster lead times from commit to deploy {% cite hamza2024devops %}.
-
-**System Reliability**: Transitioning to structured Site Reliability Engineering (SRE) results in 47% higher system reliability and a 73% reduction in system outages {% cite venkatesh2024sre %}.
-
-**Recovery and Efficiency**: Mature practices lead to a 32% reduction in mean time to recovery (MTTR) and an 89% reduction in manual intervention {% cite venkatesh2024sre %}.
-
-**Government Case Study (TCU)**: After applying a DevOps adoption model, a Brazilian government institution increased its maximum deployments from one per week to 29 per day, while reducing downtime from 15 minutes to near zero {% cite luz2019devops %}.
+- **Where it comes from.** A grounded theory of DevOps adoption, a mixed-methods study of cultural change, a review-plus-interview study of adoption, and a maturity-framework study {% cite luz2019devops williams2019devops hamza2024devops sethupathy2025devops %}.
+- **What is contested.** Whether automation or culture comes first; in Luz and colleagues' analysis automation was the first candidate for the core and lost to culture because it explained less of the data {% cite luz2019devops %}.
+- **What we do not hold.** The State of DevOps (DORA) survey reports behind the most quoted performance comparisons.
 
 ---
 

@@ -78,8 +78,11 @@ Systematic approaches to enhancing organizational performance:
 
 - **[Why Process Improvement?](03-process/01-why-process-improvement.md)** - Business case, motivations, and barriers
 - **[Learning & Improvement Models](03-process/02-learning-improvement-models.md)** - Single-loop vs. double-loop learning
-- **[Improvement Methods](03-process/03-improvement-methods.md)** - PDCA, DMAIC, Theory of Constraints, Six Sigma
+- **[Improvement Methods](03-process/03-improvement-methods.md)** - Choosing between DPP, Theory of Constraints, Six Sigma and retrospectives
 - **[Change Management](03-process/04-change-management.md)** - Overcoming resistance and sustaining change
+- **[Defect Prevention Process](03-process/05-defect-prevention.md)** - IBM's causal analysis of defects
+- **[Theory of Constraints](03-process/06-theory-of-constraints.md)** - Five focusing steps on the bottleneck
+- **[Six Sigma](03-process/07-six-sigma.md)** - DMAIC and defects per million opportunities
 
 ### [Quality Standards](04-standards/)
 
@@ -96,7 +99,7 @@ Frameworks and certifications for quality management:
 
 Learn from leading technology companies and proven methodologies:
 
-- **[DevOps Foundations](05-practice/01-devops-foundations.md)** - CALMS framework and core principles
+- **[DevOps Foundations](05-practice/01-devops-foundations.md)** - Collaborative culture, CI/CD and delivery measures
 - **[DevOps Teams & Adoption](05-practice/02-devops-teams-adoption.md)** - Team structures and transformation
 - **[Agile Retrospectives](05-practice/03-agile-retrospectives.md)** - Continuous improvement through reflection
 - **[Testing Practices](05-practice/04-testing-practices.md)** - Shift-left, shift-right, and continuous testing
@@ -106,6 +109,8 @@ Learn from leading technology companies and proven methodologies:
 - **[Google Engineering Practices](05-practice/08-google-engineering-practices.md)** - Test pyramid, code review, static analysis
 - **[Microsoft Quality Practices](05-practice/09-microsoft-quality-practices.md)** - Milestones, bug bars, testing roles
 - **[Quality Gates & CI/CD](05-practice/10-quality-gates-cicd.md)** - Pre-submit/post-submit/release gates
+- **[Continuous Deployment at Facebook](05-practice/11-facebook-continuous-deployment.md)** - Daily web deployment and mobile release trains
+- **[Chaos Engineering](05-practice/12-chaos-engineering.md)** - Fault-injection experiments and safeguards
 
 ---
 
