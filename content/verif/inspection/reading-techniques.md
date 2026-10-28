@@ -7,213 +7,49 @@ layout: default
 
 # Inspection Reading Techniques
 
-The **reading technique** determines how inspectors analyze an artifact during preparation. Research shows that systematic techniques like Perspective-Based Reading (PBR) detect **21-30% more defects** than ad hoc approaches {% cite basili1996empirical %}.
+A **reading technique** tells an inspector how to examine a product during individual preparation: what to look for, and in what order {% cite laitenberger2000survey %}. It matters because preparation is where most defects are found: 90–95% of them, with the meeting adding only about 5–10% new ones {% cite aurum2002inspections laitenberger2000survey %}.
 
----
+## 1. Four techniques, from no guidance to a task
 
-## Why Techniques Matter
+| Technique | The inspector | Reported effect |
+|---|---|---|
+| **Ad hoc** | reads with no guidance, relying on experience | the baseline; varies with the person |
+| **Checklist** | answers a list of questions about the product | better than ad hoc; says *what* to check, not *how* |
+| **Scenario-based** | follows a procedure aimed at one aspect: in **defect-based reading** each inspector gets a different defect class; other variants are organized around inputs, files and outputs | about 35% more defects than ad hoc and checklist reading in some experiments {% cite aurum2002inspections %} |
+| **Perspective-based (PBR)** | takes a stakeholder's role and builds that stakeholder's work product from the document | 21–30% better individual detection than NASA's usual technique {% cite basili1996empirical %} |
 
-{: .highlight }
-> "90% to 95% of defects can be identified during the preparation stage, while only 10% are found during the actual inspection meeting" {% cite aurum2002inspections %}
+The two percentages come from different experiments with different baselines, so they cannot be added or ranked against each other.
 
-Since preparation is where most defects are found, **how** reviewers read directly impacts inspection effectiveness.
+## 2. Checklists catch omissions
 
----
+A checklist works best when it is short and targets the organization's own common mistakes: Cohen recommends 10 to 20 items {% cite cohen2006secrets %}. Typical items for code: are parameters validated at the start of each function; are locks and memory released on every error path; are units of measurement documented for numeric values. Checklists are strongest at **omissions**, the defects hardest to see because there is nothing on the page to look at: each item names something that should be present, so its absence becomes visible.
 
-## Technique Comparison
+A security review is a scenario: Howard reviews first old or legacy code, code running by default or with elevated privileges, anonymously accessible or network-listening code, code in memory-unsafe languages (C, C++, assembly) and code with past vulnerabilities, then traces input from each entry point through its validation {% cite howard2006process %}.
 
-| Technique | Description | Effectiveness |
-|-----------|-------------|---------------|
-| **Ad hoc** | No guidance, relies on experience | Baseline |
-| **Checklist** | Questions to answer | Better than ad hoc |
-| **Scenario-based** | Focus on specific defect types | **35% more** than checklist |
-| **PBR** | Assume stakeholder perspectives | **21-30% improvement** |
+## 3. Perspective-based reading builds a model
 
-### Effectiveness Hierarchy
+In PBR each reviewer reads a requirements document as one of its consumers and builds what that consumer needs {% cite basili1996empirical shull2000perspective %}:
 
-```mermaid
-%%{init: {'theme': 'base'}}%%
-flowchart LR
-    subgraph effectiveness["Defect Detection Effectiveness"]
-        direction LR
-        A["Ad hoc<br>📊 Baseline"]
-        C["Checklist<br>📊 +10-15%"]
-        S["Scenario-based<br>📊 +35%"]
-        P["PBR<br>📊 +21-30%"]
-    end
+![A requirements document read by a tester building a test plan, a designer building a design and a user building a user manual; where a model cannot be built, there is a defect](pbr-perspectives.svg)
 
-    A -->|"+10-15%"| C
-    C -->|"+20%"| S
-    S -.->|"similar"| P
+_The three PBR perspectives; a defect shows up as a step where the reviewer cannot continue._ {% cite basili1996empirical %}
 
-    style A fill:#ffcdd2,stroke:#d32f2f
-    style C fill:#fff3e0,stroke:#f57c00
-    style S fill:#c8e6c9,stroke:#388e3c
-    style P fill:#bbdefb,stroke:#1976d2,stroke-width:3px
-```
+**Example** (constructed). The requirement reads: "After three failed login attempts the account is locked." The **tester** writes test cases and gets stuck: do the three attempts have to be consecutive, and does a successful login reset the count? The **designer** needs to store the counter and cannot tell whether a lock expires or needs an administrator. The **user** writes the manual page "What to do when your account is locked" and finds nothing to write. Three perspectives find three kinds of defect: the tester a requirement with no testable value or rule, the designer missing or inconsistent data and interfaces, the user a missing user task. The rule behind all three: where the model cannot be built, there is a defect. For [capture-recapture](capture-recapture-practice.md), count one defect per needed fix: these three gaps need three separate additions to the requirement, so they are three defects, each found by one inspector; had one rewrite fixed all three, it would be one defect found by three. Basili's procedures give each perspective its own questions to answer while building its model {% cite basili1996empirical %}. ("Tester" here is a perspective, not Fagan's tester role nor a person who runs tests.)
 
-**Note:** PBR and scenario-based show similar effectiveness, but PBR produces additional useful artifacts (test plans, designs).
+## When to use it — and when not
 
----
+Use PBR for requirements and other documents read by several roles, especially in a domain the reviewers do not know well, and to train new reviewers {% cite shull2000perspective %}. Teams using PBR covered more of the document between them than teams using NASA's usual technique, and the method gives a definite procedure: less experienced reviewers who followed it closely often did better than seniors who fell back on their own habits {% cite basili1996empirical %}. Use a focused checklist for code and for short reviews. Ad hoc reading is acceptable only when nothing else fits the time available.
 
-## Ad Hoc Reading
+## Limitations
 
-**Approach:** No systematic guidance; reviewers rely entirely on personal experience and intuition.
+- **PBR costs more time:** up to 30% more effort than the usual approach, partly repaid because the test plan and design sketches are useful later {% cite shull2000perspective %}.
+- **Experts may not gain.** Reviewers with well-developed personal heuristics may see no significant benefit {% cite shull2000perspective %}.
+- **Checklists go stale.** A list that is never pruned turns into box-ticking and misses defects that are not on it.
 
-**Characteristics:**
-- Fast to implement (no training needed)
-- Highly variable results
-- Dependent on individual skill
-- No repeatability
+## How solid is this?
 
-**When to use:** Only when time prohibits other approaches.
-
----
-
-## Checklist-Based Reading
-
-**Approach:** Reviewers answer a predefined list of questions while examining the artifact.
-
-**Example Questions:**
-- Are all variables initialized before use?
-- Are array bounds checked?
-- Are error conditions handled?
-- Is the code properly commented?
-
-**Strengths:**
-- Easy to create and customize
-- Captures organizational knowledge
-- Provides structure for novices
-
-**Limitations:**
-- Questions without guidance on **how** to find answers
-- Can become rote ("checkbox mentality")
-- May miss issues not on the list
-
-**Best Practice:** Keep checklists short (10-20 items) and focused on common mistakes {% cite cohen2006secrets %}.
-
----
-
-## Scenario-Based Reading
-
-**Approach:** Reviewers follow specific scenarios targeting particular defect types.
-
-**Example Scenarios:**
-- "Find all places where null pointers could be dereferenced"
-- "Identify all error handling paths"
-- "Trace data flow from input to output"
-
-**Effectiveness:**
-
-> "Scenario-based reading has shown a higher detection rate than ad hoc and checklist methods, finding **35% more defects** in some experiments" {% cite aurum2002inspections %}
-
-**Variants:**
-- **Defect-Based Reading (DBR):** Different reviewers focus on different defect classes
-- **Function Point-Based:** Scenarios organized around inputs, files, outputs
-
----
-
-## Perspective-Based Reading (PBR)
-
-PBR is the most researched and effective technique for requirements inspection {% cite basili1996empirical %} {% cite shull2000perspective %}.
-
-### The Core Idea
-
-Different stakeholders need different information from requirements:
-- **Testers** need testable criteria
-- **Designers** need sufficient detail for architecture
-- **Users** need clear functionality descriptions
-
-By having reviewers **assume a stakeholder role**, they naturally encounter defects relevant to that perspective.
-
-### The Three Perspectives
-
-| Perspective | Role | Creates | Finds |
-|-------------|------|---------|-------|
-| **Tester** | QA Engineer | Test cases / test plan | Missing testability, ambiguous criteria |
-| **Designer** | Architect | High-level design | Incomplete specs, inconsistencies |
-| **User** | End user | User manual / feature list | Usability gaps, missing features |
-
-### How PBR Works
-
-1. **Assign perspectives** — Each reviewer takes one stakeholder role
-2. **Build a model** — Create a work product for that role (e.g., test cases)
-3. **Identify gaps** — Defects emerge when the model can't be built
-4. **Combine results** — Merge findings from all perspectives
-
-{: .important }
-> "Building a model forces reviewers to encounter defects naturally" {% cite shull2000perspective %}
-
-### PBR Effectiveness Data
-
-| Study | Finding | Source |
-|-------|---------|--------|
-| NASA/GSFC | **21-30% improvement** over traditional | {% cite basili1996empirical %} |
-| Team coverage | Significantly better with PBR | {% cite basili1996empirical %} |
-| Unfamiliar domains | PBR especially effective | {% cite shull2000perspective %} |
-
-### Surprising Finding: Experience Doesn't Predict Success
-
-> "There was a weak relationship between a reviewer's years of professional experience and their performance with PBR" {% cite basili1996empirical %}
-
-Less-experienced reviewers who followed PBR procedures closely often outperformed senior developers who reverted to their own heuristics.
-
-### PBR Trade-offs
-
-| Advantage | Disadvantage |
-|-----------|--------------|
-| Higher detection rate | Up to 30% more effort |
-| Produces useful artifacts | Requires training |
-| Great for training novices | Experienced devs may resist |
-| Reduces reviewer overlap | More complex to coordinate |
-
-**Offset:** The "extra" effort produces useful work products (test plans, designs) that would be needed later anyway.
-
----
-
-## Choosing a Technique
-
-| Situation | Recommended Technique |
-|-----------|----------------------|
-| **Critical requirements** | PBR with all three perspectives |
-| **Code inspection** | Checklist + security scenarios |
-| **Time-constrained** | Focused checklist |
-| **Training novices** | PBR (teaches systematic thinking) |
-| **Legacy code** | Scenario-based (target known problem areas) |
-
----
-
-## Implementation Tips
-
-### For Checklists
-
-1. Start with industry standards (OWASP, CERT)
-2. Add organization-specific common defects
-3. Review and prune regularly
-4. Keep under 20 items
-
-### For PBR
-
-1. Train reviewers on perspective requirements
-2. Provide templates for work products
-3. Allow adequate preparation time (up to 30% more)
-4. Rotate perspectives across reviews
-
-### For All Techniques
-
-- **Don't mix techniques** in a single review — stick to one approach
-- **Track metrics** to compare technique effectiveness
-- **Customize** based on defect data from your organization
-
----
-
-## Summary
-
-| Technique | Improvement | Best For |
-|-----------|-------------|----------|
-| Checklist | Baseline+ | Quick reviews, code |
-| Scenario-based | +35% | Known problem areas |
-| **PBR** | **+21-30%** | Requirements, critical artifacts |
+- **Where it comes from.** The PBR experiments at NASA Goddard's Software Engineering Laboratory, Shull's implementation guide, and the inspection surveys {% cite basili1996empirical shull2000perspective laitenberger2000survey aurum2002inspections %}.
+- **What is contested.** Effect sizes vary between experiments, documents and reviewer populations; the 35% and 21–30% figures are single results, not general constants.
 
 ---
 

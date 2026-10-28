@@ -1,263 +1,81 @@
 ---
-title: Defect Estimation
+title: Capture-Recapture Estimation
 parent: Inspection
-nav_order: 3
+nav_order: 5
 layout: default
+math: katex
+page_type: deep-dive  # two worked examples and the model choice belong together; the procedure is on its own page
 ---
 
-# Estimating Remaining Defects
+# Capture-Recapture Estimation
 
-How many defects remain after an inspection? Two statistical methods can estimate total defect content:
+**Capture-recapture** estimates how many defects a document contains, found and not yet found, from how much independent inspectors' findings overlap: the smaller the overlap, the more defects remain {% cite briand2000capture %}. The method comes from ecology, where it estimates the size of an animal population from marked and recaptured animals.
 
-1. **Fault Injection (Error Seeding)** — Seed known defects, measure detection rate
-2. **Capture-Recapture** — Use inspector overlap to estimate population
+## 1. Two inspectors: the Lincoln–Petersen estimate
 
----
+Suppose a document contains *N* defects. Inspector A finds *n*<sub>1</sub> of them and inspector B, working independently, finds *n*<sub>2</sub>; *m*<sub>2</sub> defects are found by both. If B finds A's defects at the same rate as all the others, then the share of A's defects that B also found, *m*<sub>2</sub> / *n*<sub>1</sub>, estimates B's share of all defects, *n*<sub>2</sub> / *N*. Solving for *N* gives the **Lincoln–Petersen estimate**:
 
-## Two Approaches Compared
+$$\hat{N} = \dfrac{n_1 \times n_2}{m_2}$$
 
-| Aspect | Fault Injection | Capture-Recapture |
-|--------|-----------------|-------------------|
-| **Method** | Seed known defects | Compare inspector overlap |
-| **Requirement** | Seeded defects must be representative | ≥4 independent inspectors |
-| **Challenge** | Creating realistic defects | Zero overlap breaks formula |
-| **Best for** | Controlled experiments | Production inspections |
+![Two overlapping sets: inspector A found 20 defects, inspector B 15, both 6, inside a larger unknown population; the estimate is 50, of which 29 were found](capture-overlap.svg)
 
----
+_Two inspectors' findings as overlapping samples of the unknown population._ {% cite briand2000capture %}
 
-## Fault Injection (Error Seeding)
+Biologists do the same with fish: the share of tagged fish in a second catch estimates the share of all fish that the first, tagged catch took.
 
-### Mills' Methodology (1970s)
+**Example.** A finds 20 defects, B finds 15, and 6 are on both lists: $$\hat{N}$$ = 20 × 15 / 6 = 50. Together they found 20 + 15 − 6 = 29 distinct defects, so about 21 are still in the document. A small overlap inflates the estimate: with *m*<sub>2</sub> = 3 instead of 6 it doubles to 100.
 
-Fault injection estimates total defects by measuring how well inspectors detect **intentionally seeded** defects.
+## 2. Defects differ in how hard they are to find
 
-**Process:**
-1. Inject **I** known defects into the artifact
-2. Run the inspection process normally
-3. Count **i** = seeded defects found
-4. Count **n** = original defects found
-5. Estimate total original defects: **N = n × (I / i)**
+Lincoln–Petersen allows the two inspectors to differ in skill (A found 20, B 15): a weaker B finds fewer of A's defects and fewer of all defects in the same proportion, so the ratio still holds. It does assume that, for a given inspector, every defect is equally likely to be found: no defect is harder than another. That is rarely true, and when some defects are harder, both inspectors tend to find the same easy ones, so Lincoln–Petersen underestimates. Briand and colleagues compared four models on requirements inspections at NASA Goddard {% cite briand2000capture %}. The subscripts name what varies: 0 nothing, *t* the inspector (each inspector is one capture occasion), *h* the defect (heterogeneity).
 
-### The Formula
+| Model | Detection probability varies by | Is Lincoln–Petersen valid? |
+|---|---|---|
+| M<sub>0</sub> | nothing | yes |
+| M<sub>t</sub> | inspector | yes: this is its model |
+| M<sub>h</sub> | defect | no, biased low |
+| M<sub>th</sub> | inspector and defect | no, biased low |
 
-$$N = n \times \frac{I}{i}$$
+Differences between defects mattered most; modelling differences between inspectors as well did not help much once M<sub>h</sub> was used. Their recommendation: model M<sub>h</sub> with the **jackknife estimator**, and at least four inspectors, because no model was accurate enough with fewer.
 
-Where:
-- $N$ = estimated total original defects
-- $n$ = original defects found during inspection
-- $I$ = number of seeded (injected) defects
-- $i$ = seeded defects found during inspection
+The jackknife rests on one intuition: many defects found by only one person mean many found by nobody. It needs only *S*, the number of distinct defects found, and *f*<sub>1</sub>, the number found by exactly one of the *k* inspectors. Its simplest, **first-order** form corrects the count with *f*<sub>1</sub> alone {% cite burnham1978estimation %}:
 
-### Worked Example
+$$\hat{N} = S + f_1 \times \dfrac{k-1}{k}$$
 
-| Metric | Value |
-|--------|-------|
-| Seeded defects injected (I) | 12 |
-| Seeded defects found (i) | 4 |
-| Original defects found (n) | 11 |
+## 3. Worked example: four inspectors
 
-$$N = 11 \times \frac{12}{4} = 11 \times 3 = 33 \text{ original defects}$$
+Four inspectors examine a 20-page requirements document (the data are constructed). After the moderator has matched duplicates and the meeting has confirmed which issues are major defects, they have found *S* = 16 distinct major defects:
 
-**Interpretation:** Found 11 original defects, but estimate 33 exist. Approximately **22 defects remain undetected**.
+| Found by | Defects | Count |
+|---|---|---|
+| all four | D1, D2, D3 | 3 |
+| three (ABC, ABD, ACD) | D4, D5, D6 | 3 |
+| two (AB, AC, BD, CD) | D7, D8, D9, D10 | 4 |
+| one (A, A, B, C, D, D) | D11 to D16 | *f*<sub>1</sub> = 6 |
 
-### Assumptions and Limitations
+Individually: A 10, B 8, C 8, D 9. The first-order jackknife gives $$\hat{N}$$ = 16 + 6 × 3/4 = 20.5, so 20.5 − 16 = 4.5 major defects are estimated to remain, 0.225 per page. Whether that is good enough is decided on [Capture-Recapture in Practice](capture-recapture-practice.md).
 
-{: .warning }
-> Seeded defects must have **similar detectability** to real defects — this is difficult to achieve in practice.
+Lincoln–Petersen on single pairs shows why two inspectors are not enough:
 
-| Limitation | Impact |
-|------------|--------|
-| **Representative seeding** | Hard to create defects with same visibility as real ones |
-| **Injection overhead** | Requires effort to seed and track defects |
-| **Removal risk** | Must carefully remove all seeded defects after inspection |
-| **Gaming risk** | If inspectors know about seeding, behavior may change |
+| Pair | AB | AC | AD | BC | BD | CD |
+|---|---|---|---|---|---|---|
+| *n*<sub>1</sub>, *n*<sub>2</sub>, *m*<sub>2</sub> | 10, 8, 6 | 10, 8, 6 | 10, 9, 5 | 8, 8, 4 | 8, 9, 5 | 8, 9, 5 |
+| Estimate | 13.3 | 13.3 | 18.0 | 16.0 | 14.4 | 14.4 |
 
-### When to Use Fault Injection
+Four of the six pairs estimate fewer defects than the 16 the team already found. Pairs overlap mostly on the easy defects, so they underestimate.
 
-- Controlled experiments evaluating inspection effectiveness
-- Training exercises to calibrate inspector performance
-- Research studies comparing techniques
-- When capture-recapture not feasible (< 4 inspectors)
+## When to use it — and when not
 
----
-
-## Capture-Recapture Method
-
-The **capture-recapture method** provides a statistical approach to estimate total defect content based on the overlap between independent inspectors {% cite briand2000capture %}.
-
----
-
-## The Problem
-
-After an inspection finds 50 defects, a critical question remains: **Is the artifact ready for release, or should we reinspect?**
-
-Without knowing the total defect population, teams cannot:
-- Make objective reinspection decisions
-- Calculate remaining risk
-- Plan appropriate testing effort
-
----
-
-## The Intuition: Wildlife Biology Meets Software
-
-The method originates from ecology, where researchers estimate animal populations by:
-1. **Capture** a sample, mark them, release
-2. **Recapture** another sample
-3. **Count the overlap** (marked animals recaptured)
-
-The key insight: **The overlap ratio reveals the population size.**
-
-In software inspection:
-- "Animals" = defects
-- "Capture sessions" = independent inspectors
-- "Marked and recaptured" = defects found by multiple inspectors
-
-### Visual: The Overlap Reveals Total Population
-
-```mermaid
-%%{init: {'theme': 'base', 'themeVariables': { 'fontSize': '14px'}}}%%
-flowchart TB
-    subgraph total["Total Defects (N̂ = 50)"]
-        subgraph i1["Inspector A (n₁ = 20)"]
-            a1["14 unique<br>to A"]
-        end
-        subgraph overlap["Both (m₂ = 6)"]
-            o1["6 found by<br>A and B"]
-        end
-        subgraph i2["Inspector B (n₂ = 15)"]
-            b1["9 unique<br>to B"]
-        end
-        subgraph unfound["Unfound"]
-            u1["~21 defects<br>not detected"]
-        end
-    end
-
-    style total fill:#f9f9f9,stroke:#333
-    style i1 fill:#e3f2fd,stroke:#1976d2
-    style i2 fill:#fff3e0,stroke:#f57c00
-    style overlap fill:#c8e6c9,stroke:#388e3c
-    style unfound fill:#ffcdd2,stroke:#d32f2f
-```
-
-**Key insight:** The smaller the overlap (m₂), the larger the estimated total — because low overlap suggests inspectors are finding different subsets of a larger population.
-
----
-
-## The Lincoln-Petersen Formula
-
-For two independent inspectors, the estimated total defects is:
-
-$$\hat{N} = \frac{n_1 \times n_2}{m_2}$$
-
-Where:
-- $\hat{N}$ = estimated total defects
-- $n_1$ = defects found by inspector 1
-- $n_2$ = defects found by inspector 2
-- $m_2$ = defects found by **both** (the overlap)
-
-### Worked Example
-
-| Inspector | Defects Found |
-|-----------|---------------|
-| Inspector A | 20 |
-| Inspector B | 15 |
-| **Both (overlap)** | **6** |
-
-$$\hat{N} = \frac{20 \times 15}{6} = \frac{300}{6} = 50 \text{ defects}$$
-
-**Interpretation:** We found 29 unique defects (20 + 15 - 6), but estimate 50 total exist. Approximately 21 defects remain undetected.
-
----
-
-## Model Selection
-
-The basic Lincoln-Petersen assumes all defects are equally likely to be found. In practice, some bugs are harder to find than others. Briand et al. {% cite briand2000capture %} evaluated four models:
-
-| Model | Accounts For | Assumption |
-|-------|--------------|------------|
-| **M₀** | Nothing | All defects equal, all inspectors equal |
-| **Mₜ** | Inspector variation | Inspectors have different abilities |
-| **Mₕ** | Defect heterogeneity | Some defects harder to find |
-| **Mₜₕ** | Both | Inspector ability AND defect difficulty vary |
-
-### Recommendation: Model Mₕ with Jackknife Estimator
-
-> "The authors recommend using Model Mₕ with the Jackknife Estimator" {% cite briand2000capture %}
-
-**Why Mₕ?** Defect heterogeneity (easy vs. hard bugs) is the dominant factor in real inspections. The Jackknife estimator has the lowest failure rate and bias.
-
----
-
-## Practical Requirements
-
-### Minimum Inspectors: 4 or More
-
-{: .warning }
-> "No model is sufficiently accurate with fewer than four inspectors" {% cite briand2000capture %}
-
-| Inspectors | Accuracy |
-|------------|----------|
-| 2-3 | **Insufficient** — substantial underestimation |
-| 4+ | Acceptable with proper model selection |
-
-### Key Assumptions
-
-1. **Closure** — The defect population doesn't change during inspection (no new defects introduced)
-2. **Independence** — Inspectors work separately without sharing findings
-3. **Detection probability** — Basic models assume equal; Mₕ/Mₜ relax this
-
----
+Use it with four or more independent inspectors, to decide whether to reinspect or to plan test effort; the steps are on [Capture-Recapture in Practice](capture-recapture-practice.md). Do not use it with two or three inspectors, with inspectors who shared notes before logging, or when nothing overlaps: Lincoln–Petersen divides by zero, and the jackknife (*f*<sub>1</sub> = *S*) returns *S* × (1 + (*k* − 1)/*k*), 1.75 times what four inspectors found, a number with no support: reinspect instead.
 
 ## Limitations
 
-{: .important }
-> "Overall, capture-recapture models and their estimators tend to underestimate the true number of defects" {% cite briand2000capture %}
+- **Underestimation.** All models tend to estimate too few defects; read the result as a lower bound {% cite briand2000capture %}.
+- **Closure and independence.** No defects may be added or fixed during the inspection, and inspectors must not influence each other.
 
-| Limitation | Impact |
-|------------|--------|
-| **Underestimation bias** | Plan for more defects than estimated |
-| **Zero overlap** | Formula fails if m₂ = 0 |
-| **Small teams** | Unreliable with <4 inspectors |
-| **Calibration issues** | Historical adjustment increases variability |
+## How solid is this?
 
----
-
-## Use Cases
-
-### 1. Reinspection Decisions
-
-Calculate estimated remaining defects:
-- **High remaining count** → Schedule reinspection
-- **Low remaining count** → Proceed to testing
-
-### 2. Quality Gates
-
-Set exit criteria based on estimated defect density:
-- Example: Exit when estimated remaining < 0.25 major defects/page {% cite malotaux2008onepage %}
-
-### 3. Resource Planning
-
-Determine optimal inspector count:
-- Fewer inspectors = cheaper but less accurate estimates
-- 4+ inspectors = reliable estimates for critical artifacts
-
-### 4. Process Improvement
-
-Track estimates over time:
-- Compare estimated vs. actual (found later in testing)
-- Calibrate expectations for future projects
-
----
-
-## Summary
-
-| Aspect | Recommendation |
-|--------|----------------|
-| **Formula** | $\hat{N} = (n_1 \times n_2) / m_2$ |
-| **Model** | Mₕ (heterogeneity) |
-| **Estimator** | Jackknife |
-| **Minimum inspectors** | 4 |
-| **Expect** | Underestimation — add safety margin |
+- **Where it comes from.** Briand and colleagues' evaluation of capture-recapture models on NASA requirements inspections, and the jackknife estimator from ecology {% cite briand2000capture burnham1978estimation %}.
 
 ---
 
