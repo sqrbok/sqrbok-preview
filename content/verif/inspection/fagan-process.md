@@ -7,234 +7,57 @@ layout: default
 
 # Fagan Inspection Process
 
-Michael Fagan introduced formal software inspection at IBM in 1976, establishing a rigorous method that became the foundation for all subsequent inspection techniques {% cite fagan1976design %}. The process achieved remarkable results: **90% of lifecycle defects detected** and **23% productivity improvement**.
+A **Fagan inspection** is a formal inspection in six fixed steps, run by a trained moderator with four roles, that only *finds* defects in a design or code module; fixing them happens afterwards {% cite fagan1976design %}. Michael Fagan defined it at IBM in 1976, and every later inspection method starts from it.
 
----
+## 1. Six steps, none skipped
 
-## Historical Context
+![Planning, overview, preparation, meeting, rework and follow-up, with an entry gate before planning, an exit gate after follow-up, and a loop from follow-up back to rework](fagan-steps.svg)
 
-| Year | Milestone |
-|------|-----------|
-| 1976 | Fagan publishes original method at IBM {% cite fagan1976design %} |
-| 1986 | 10-year update: detection → prevention {% cite fagan1986advances %} |
-| 2008 | IEEE 1028 standardizes inspection practices |
+_Fagan's six steps with the rates he recommended; NCSS are non-commentary source statements._ {% cite fagan1976design fagan1986advances %}
 
----
+1. **Planning.** The moderator checks the **entry criteria** (for code: it compiles cleanly; the design it implements is available), forms the team and schedules the meeting.
+2. **Overview.** The author explains the product and its context to the team.
+3. **Preparation.** Each inspector studies the product alone, using a [reading technique](reading-techniques.md), and notes possible defects.
+4. **Meeting.** The reader paraphrases the product piece by piece; the team agrees which issues are defects and the recorder logs them. Nobody discusses solutions.
+5. **Rework.** The author fixes every logged defect.
+6. **Follow-up.** The moderator checks every fix and the **exit criteria**, and decides whether the product passes or is inspected again. An exit criterion can be quantitative: Malotaux allows at most 0.25 **major** defects per page estimated to remain {% cite malotaux2008onepage %}. The held sources do not define "major"; this course uses: a major defect would probably cause a failure or a wrong implementation if left in (a missing error case), a minor one would not (a spelling mistake). With that limit, so a 40-page specification passes with at most 40 × 0.25 = 10; the estimate comes from [capture-recapture](capture-recapture.md) or [defect seeding](defect-seeding.md).
 
-## The Six-Step Process
+Skipping or merging steps lowers effectiveness, and the follow-up matters: about one fix in six is wrong or introduces a new defect {% cite fagan1986advances %}.
 
-{: .important }
-> "All six steps are mandatory; skipping them leads to degraded efficiency" {% cite fagan1986advances %}
+## 2. Four roles
 
-```mermaid
-flowchart LR
-    subgraph prep["Preparation Phase"]
-        P1["Planning<br>📋 Moderator"]
-        P2["Overview<br>👤 Author"]
-        P3["Preparation<br>👥 All"]
-    end
+| Role | Does | Why it is separate |
+|---|---|---|
+| **Moderator** | plans, leads the meeting, follows up | Fagan's "key person": keeps the meeting on detection |
+| **Author** | gives the overview, answers questions, reworks | knows the product best, so must not steer the reading |
+| **Reader** | paraphrases the product in the meeting | a non-author's reading exposes what the text actually says |
+| **Tester** | inspects from the testing viewpoint | asks how each part would be tested |
 
-    subgraph exec["Execution Phase"]
-        P4["Inspection Meeting<br>🔍 Reader leads"]
-    end
+A **recorder** logs each defect the meeting agrees on; Dodd and Wiegers list it as a separate role {% cite dodd2003inspection wiegers2002peer %}, and in a team of four it is an extra duty, for example the moderator's.
 
-    subgraph fix["Correction Phase"]
-        P5["Rework<br>🔧 Author"]
-        P6["Follow-up<br>✅ Moderator"]
-    end
+Fagan recommended four people {% cite fagan1976design %}; Wiegers gives three to seven {% cite wiegers2002peer %}. Fagan's 1986 update extended inspection to requirements, documentation and test plans, and added causal analysis: find out why defects were made so the process stops making them; Wiegers makes causal analysis an optional seventh step {% cite fagan1986advances wiegers2002peer %}.
 
-    P1 --> P2 --> P3 --> P4 --> P5 --> P6
+## 3. Rates and limits
 
-    style P1 fill:#e3f2fd,stroke:#1976d2
-    style P2 fill:#fff3e0,stroke:#f57c00
-    style P3 fill:#f3e5f5,stroke:#7b1fa2
-    style P4 fill:#c8e6c9,stroke:#388e3c
-    style P5 fill:#fff3e0,stroke:#f57c00
-    style P6 fill:#e3f2fd,stroke:#1976d2
-```
+Effectiveness falls when material is covered too fast. For code, Fagan's rates are about 500 NCSS per hour for the overview, 100–125 for preparation, and at most 125 for the meeting, which lasts no more than two hours because participation is "extremely taxing" {% cite fagan1976design fagan1986advances %}. For documents, Malotaux's checking rate is about one page per hour {% cite malotaux2008onepage %}; the held sources give no session size in pages.
 
-### 1. Planning
+**Example.** A team of four inspects a 400-NCSS module. Overview: 400 / 500 = 0.8 h for each of the four people, 3.2 staff-hours. Preparation at Fagan's top rate, 125 NCSS/h: 3.2 h each, 12.8 staff-hours. Meeting at 100 NCSS/h, mid-range, as paraphrasing aloud is slower: 4 h, which the two-hour limit splits into two sessions, 16 staff-hours. Before rework, the inspection costs 3.2 + 12.8 + 16 = 32 staff-hours.
 
-**Owner:** Moderator
+## When to use it — and when not
 
-| Activity | Purpose |
-|----------|---------|
-| Verify entry criteria | Artifact ready for inspection |
-| Form the team | Select 4 participants with appropriate skills |
-| Schedule meeting | 2-hour maximum session |
-| Distribute materials | Allow preparation time |
+Use a Fagan inspection where a missed defect is expensive: requirements, architecture, safety- or security-critical code, interfaces between teams. For small code changes, [modern code review](modern-code-review.md) gives most of the benefit at a fraction of the cost.
 
-**Entry Criteria Example:**
-- Code compiles without errors
-- Design documentation available
-- Unit tests pass
+## Limitations
 
-### 2. Overview
+- **The meeting finds little that preparation missed.** Later studies found 90–95% of defects in individual preparation; the meeting adds only about 5–10% new ones and mainly removes false positives {% cite aurum2002inspections laitenberger2000survey %}. Fagan saw synergy instead, a "phantom inspector" that makes the team more than the sum of its members {% cite fagan1986advances %}.
+- **It is expensive.** Design and code inspections typically cost about 15% of the project {% cite fagan1986advances %}.
+- **It fails when its data is misused.** When a manager counted more than five defects found against the author, Wiegers expects developers to stop submitting work and inspectors to report defects privately {% cite wiegers2002peer %}.
 
-**Owner:** Author
+## How solid is this?
 
-| Activity | Purpose |
-|----------|---------|
-| Present the artifact | Educate team on context and intent |
-| Explain design decisions | Share rationale |
-| Assign roles | Reader, Tester designations |
-
-**Rate:** ~500 NCSS/hour (Non-Commentary Source Statements)
-
-### 3. Preparation
-
-**Owner:** Each participant individually
-
-| Activity | Purpose |
-|----------|---------|
-| Study the artifact | Understand logic and structure |
-| Apply reading technique | Checklist, PBR, or scenario-based |
-| Record potential issues | Prepare for meeting |
-
-**Rate:** 100-125 NCSS/hour
-
-{: .highlight }
-> **Key Finding:** 90-95% of defects are found during preparation, not in the meeting {% cite aurum2002inspections %}
-
-### 4. Inspection Meeting
-
-**Owner:** Moderator leads, Reader presents
-
-| Activity | Purpose |
-|----------|---------|
-| Reader paraphrases | Walk through artifact (NOT the author) |
-| Team identifies defects | Log issues as they arise |
-| Recorder documents | Capture all findings |
-
-**Critical Rules:**
-- **Detection only** — no problem-solving in the meeting
-- **Reader presents** — not the author (prevents bias)
-- **Maximum 2 hours** — fatigue degrades effectiveness
-
-**Rate:** 90-125 NCSS/hour maximum
-
-### 5. Rework
-
-**Owner:** Author
-
-| Activity | Purpose |
-|----------|---------|
-| Correct all defects | Fix every logged issue |
-| Document changes | Track what was modified |
-
-### 6. Follow-up
-
-**Owner:** Moderator
-
-| Activity | Purpose |
-|----------|---------|
-| Verify corrections | Ensure fixes are complete |
-| Check for secondary defects | Fixes may introduce new issues |
-| Confirm exit criteria | Artifact ready for next phase |
-
-{: .warning }
-> "Approximately one in every six fixes is either incorrect or introduces a new defect" {% cite fagan1986advances %}
-
----
-
-## The Four Roles
-
-| Role | Responsibility | Key Activities |
-|------|----------------|----------------|
-| **Moderator** | Process owner | Schedule, lead meeting, follow-up, final report |
-| **Author** | Artifact creator | Overview, clarifications, rework |
-| **Reader** | Presentation lead | Paraphrase artifact in meeting (NOT the author) |
-| **Tester** | Testing perspective | Review from functional coverage viewpoint |
-
-**Recommended team size:** 4 people {% cite fagan1976design %}
-
-### Why the Reader is Not the Author
-
-When authors present their own work:
-- Reviewers get "swayed" by the author's logic
-- Defects that seem obvious in context get missed
-- Author's explanation fills gaps that should be caught
-
----
-
-## Optimal Parameters
-
-### Inspection Rates
-
-| Activity | Rate | Source |
-|----------|------|--------|
-| Overview | 500 NCSS/hour | {% cite fagan1976design %} |
-| Preparation | 100-125 NCSS/hour | {% cite fagan1976design %} |
-| Meeting | 90-125 NCSS/hour | {% cite fagan1976design %} |
-| **Maximum effective rate** | **125 NCSS/hour** | Above this, effectiveness drops |
-
-### Session Duration
-
-| Limit | Reason |
-|-------|--------|
-| **2 hours maximum** | "Participation is extremely taxing" — fatigue degrades detection |
-
-### Team Size
-
-| Size | Guidance |
-|------|----------|
-| **4 people** | Fagan's recommendation |
-| 3-7 | Acceptable range {% cite wiegers2002peer %} |
-| >7 | Diminishing returns, scheduling challenges |
-
----
-
-## Effectiveness Statistics
-
-### IBM Results (1976-1986)
-
-| Metric | Value | Source |
-|--------|-------|--------|
-| Defect detection | **90%** of lifecycle defects | {% cite fagan1976design %} |
-| IBM RESPOND (UK) | **93%** detection rate | {% cite fagan1986advances %} |
-| Productivity gain | **23%** net increase in coding | {% cite fagan1976design %} |
-| Cost reduction | **9%** vs walkthroughs | {% cite fagan1976design %} |
-| Defect comparison | **38% fewer** defects/KLOC than walkthroughs | {% cite fagan1976design %} |
-
-### Industry Results
-
-| Organization | Finding | Source |
-|--------------|---------|--------|
-| Standard Bank (SA) | 95% reduction in maintenance costs | {% cite fagan1986advances %} |
-| AETNA Insurance | 25% reduction in dev resources | {% cite fagan1986advances %} |
-| Hewlett-Packard | $21.4M annual savings | {% cite dodd2003inspection %} |
-
----
-
-## 1986 Advances: Detection → Prevention
-
-Ten years after the original paper, Fagan expanded the method {% cite fagan1986advances %}:
-
-### Key Additions
-
-| Advancement | Description |
-|-------------|-------------|
-| **Expanded scope** | Requirements, docs, test plans — not just code |
-| **Causal analysis** | Ishikawa (Fishbone) diagrams for root cause |
-| **Defect prevention** | Feedback loop so authors learn from errors |
-| **Formalized training** | 1 day (mgmt), 3 days (moderators), 0.5 day (others) |
-
-### The "Phantom Inspector" Effect
-
-> "Trained moderators can create a 'peak of synergy' among the team—a feeling of a 'Phantom Inspector' contributing more than the sum of the individual participants" {% cite fagan1986advances %}
-
----
-
-## Summary
-
-| Aspect | Specification |
-|--------|---------------|
-| **Steps** | Planning → Overview → Preparation → Inspection → Rework → Follow-up |
-| **Roles** | Moderator, Author, Reader, Tester |
-| **Team size** | 4 people |
-| **Meeting duration** | Max 2 hours |
-| **Rate** | 90-125 NCSS/hour |
-| **Expected detection** | 60-90% of defects |
+- **Where it comes from.** Fagan's 1976 paper and his 1986 ten-year update, both from IBM practice {% cite fagan1976design fagan1986advances %}.
+- **What is contested.** The value of the meeting: Fagan's synergy against the later finding that preparation does nearly all the detecting {% cite aurum2002inspections laitenberger2000survey %}.
+- **What we do not hold.** IEEE Std 1028, the inspection standard.
 
 ---
 

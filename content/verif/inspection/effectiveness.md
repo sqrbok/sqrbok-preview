@@ -1,386 +1,92 @@
 ---
 title: Inspection Effectiveness
 parent: Inspection
-nav_order: 4
+nav_order: 7
 layout: default
+vegalite: true
+page_type: deep-dive  # the evidence page: detection rates, effort, cost ratios and company results, each with its source and caveat
 ---
 
-# Inspection Effectiveness Data
+# Inspection Effectiveness
 
-Software inspection is consistently shown to be the **most cost-effective defect removal technique**, with detection rates of 60-90% and cost ratios of 1:10 to 1:34 compared to testing {% cite laitenberger2000survey %} {% cite dodd2003inspection %}.
+**Inspection effectiveness** is the share of a product's defects that an inspection finds; its **efficiency** is measured as the effort spent per defect found, so a higher figure is worse. Surveys report that inspections find 60% to 90% of all defects (the reported range; 57% is the fitted typical value in §1), at a fraction of the effort testing needs per defect {% cite laitenberger2000survey %}.
 
----
+## 1. Detection rates
 
-## Defect Detection Rates
+Single companies report the high end. At IBM, inspections found 90% of all the defects found over a product's life {% cite fagan1976design %}; IBM's RESPOND project in the UK found 93%, and Aetna found 38 of 46, or 83% {% cite fagan1986advances dodd2003inspection %}. A distribution fitted to published results by Briand and colleagues in 1998, as reported by Dodd, is more sober {% cite dodd2003inspection %}:
 
-### Summary Across Studies
+| Inspection type | Minimum | Most likely | Maximum |
+|---|---|---|---|
+| Design | 25% | 57% | 84% |
+| Code | 19% | 57% | 70% |
 
-| Source | Detection Rate | Context |
-|--------|----------------|---------|
-| Fagan 1976 (IBM) | **90%** of lifecycle defects | Formal inspection |
-| Fagan 1986 (IBM RESPOND) | **93%** | Mature process |
-| Laitenberger 2000 survey | **60-90%** | Industry average |
-| Dodd 2003 | 57% most likely (19-84% range) | Code inspections |
-| Aurum 2002 | 60-90% | 25-year synthesis |
+The most likely value, 57%, means that an average inspection still leaves over two fifths of the defects for later activities.
 
-{: .highlight }
-> "Inspections are reported to find 60% to 90% of all defects" {% cite laitenberger2000survey %}
-
-### Design vs. Code Inspections
-
-| Type | Minimum | Most Likely | Maximum |
-|------|---------|-------------|---------|
-| **Design** | 25% | 57% | 84% |
-| **Code** | 19% | 57% | 70% |
-
-Source: {% cite dodd2003inspection %}
-
----
-
-## Cost-Effectiveness
-
-### Cost Ratios: Inspection vs. Testing
-
-| Source | Ratio (Inspection : Testing) |
-|--------|------------------------------|
-| JPL | **1:10 to 1:34** |
-| IBM Santa Teresa | **1:20** |
-| Laitenberger 2000 | 1:10 to 1:34 |
-
-> "The ratio of the cost of fixing a defect during inspection compared to formal testing ranges from 1:10 to 1:34" {% cite dodd2003inspection %}
-
-### Cost Ratios: Development vs. Production
-
-| Timing | Cost Multiplier | Source |
-|--------|-----------------|--------|
-| During review | 1× | Baseline |
-| During testing | **8-12×** | {% cite cohen2006secrets %} |
-| In production | **30-100×** | {% cite cohen2006secrets %} |
-
-```mermaid
-%%{init: {'theme': 'base'}}%%
-flowchart LR
-    subgraph cost["Cost to Fix Defect (Relative)"]
-        R["🔍 Review<br>1×"]
-        T["🧪 Testing<br>8-12×"]
-        P["🚀 Production<br>30-100×"]
-    end
-
-    R -->|"8-12×"| T
-    T -->|"3-10×"| P
-
-    style R fill:#c8e6c9,stroke:#388e3c,stroke-width:3px
-    style T fill:#fff3e0,stroke:#f57c00
-    style P fill:#ffcdd2,stroke:#d32f2f
-```
-
-**Key insight:** Every defect caught in review saves 10-100× the cost of finding it later.
-
----
-
-## Effort per Defect
-
-### Inspection vs. Testing
-
-| Method | Hours per Defect | Source |
-|--------|------------------|--------|
-| Design inspection | 1.4-1.75 | {% cite laitenberger2000survey %} {% cite dodd2003inspection %} |
-| Code inspection | 1.46-1.58 | {% cite dodd2003inspection %} |
-| **Testing** | **6.0-17.0** | {% cite laitenberger2000survey %} {% cite dodd2003inspection %} |
-
-```mermaid
-%%{init: {'theme': 'base'}}%%
-flowchart LR
-    subgraph hours["Hours per Defect Found"]
-        DI["Design<br>Inspection<br>⏱️ 1.5h"]
-        CI["Code<br>Inspection<br>⏱️ 1.5h"]
-        TE["Testing<br>⏱️ 6-17h"]
-    end
-
-    style DI fill:#c8e6c9,stroke:#388e3c
-    style CI fill:#c8e6c9,stroke:#388e3c
-    style TE fill:#ffcdd2,stroke:#d32f2f
-```
-
-{: .important }
-> Inspection finds defects **4-10× faster** than testing.
-
-### Savings Calculation
-
-| Metric | Design | Code |
-|--------|--------|------|
-| Defect cost savings vs. testing | **44%** | **39%** |
-
-Source: {% cite laitenberger2000survey %}
-
----
-
-## Industry ROI Case Studies
-
-### Hewlett-Packard
-
-| Metric | Value |
-|--------|-------|
-| ROI | **10:1** |
-| Annual savings | **$21.4 million** |
-| Source | {% cite dodd2003inspection %} |
-
-### IBM
-
-| Metric | Value |
-|--------|-------|
-| Productivity gain | **23%** net increase |
-| Cost reduction | **9%** vs walkthroughs |
-| Defects (1976-1984) | **Reduced by 2/3** while doubling LOC |
-
-Source: {% cite fagan1976design %} {% cite fagan1986advances %}
-
-### Standard Bank of South Africa
-
-| Metric | Value |
-|--------|-------|
-| Maintenance cost reduction | **95%** |
-| Final quality | **0.15 defects/KLOC** |
-
-Source: {% cite fagan1986advances %}
-
-### AETNA Insurance
-
-| Metric | Value |
-|--------|-------|
-| Development resource reduction | **25%** |
-| Defects found via inspection | **82%** |
-
-Source: {% cite fagan1986advances %}
-
-### Cisco Systems
-
-| Metric | Value |
-|--------|-------|
-| Support calls (before) | 50,000/year |
-| Support calls (after) | 20,000/year |
-| **Savings** | **$2.6 million** |
-
-Source: {% cite cohen2006secrets %}
-
----
-
-## Inspection vs. Walkthrough
-
-| Metric | Inspection | Walkthrough |
-|--------|------------|-------------|
-| Defects/KLOC (telecom study) | **16-20** | 3 |
-| Defects/KLOC (Ford Motor) | **50% more** | Baseline |
-| Defects/hour (industry study) | 1.5× | Baseline |
-| Productivity (IBM Federal) | 2× | Baseline |
-
-Source: {% cite wiegers2002peer %}
-
-{: .highlight }
-> "Inspections detected 16 to 20 defects per kLOC, while informal reviews found only 3 per kLOC" {% cite wiegers2002peer %}
-
----
-
-## Cisco Study: Optimal Review Parameters
-
-The largest empirical study of code review effectiveness was conducted at Cisco Systems, involving **50 programmers** and **3.2 million lines of code** {% cite cohen2006secrets %}.
-
-### Key Finding: Review Size Matters
-
-| LOC Reviewed | Defect Detection |
-|--------------|------------------|
-| < 200 LOC | **Highest** effectiveness |
-| 200-400 LOC | Good effectiveness |
-| > 400 LOC | **Near zero** effectiveness |
-
-{: .warning }
-> "Defect density plummets when more than 200-400 lines are reviewed at once; effectiveness is almost zero after 400 lines" {% cite cohen2006secrets %}
+## 2. Effort per defect
 
 ```vega-lite
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "title": "Defect Density vs. Review Size",
-  "width": 450,
-  "height": 250,
+  "width": 520, "height": 150,
+  "data": {"values": [
+    {"t": "Design inspection", "min": 0.58, "ml": 1.58, "max": 2.9},
+    {"t": "Code inspection", "min": 0.67, "ml": 1.46, "max": 2.7},
+    {"t": "Testing", "min": 4.5, "ml": 6, "max": 17}
+  ]},
+  "encoding": {"y": {"field": "t", "type": "nominal", "title": null, "sort": null, "axis": {"labelFontSize": 14}}},
   "layer": [
-    {
-      "data": {
-        "values": [
-          {"loc": 10, "defects": 200}, {"loc": 20, "defects": 170},
-          {"loc": 30, "defects": 145}, {"loc": 50, "defects": 110},
-          {"loc": 75, "defects": 85}, {"loc": 100, "defects": 65},
-          {"loc": 150, "defects": 45}, {"loc": 200, "defects": 35},
-          {"loc": 300, "defects": 22}, {"loc": 400, "defects": 15},
-          {"loc": 600, "defects": 8}, {"loc": 800, "defects": 5},
-          {"loc": 1000, "defects": 3}
-        ]
-      },
-      "mark": {"type": "line", "color": "#d32f2f", "strokeWidth": 3},
-      "encoding": {
-        "x": {"field": "loc", "type": "quantitative", "title": "LOC under Review", "scale": {"domain": [0, 1000]}},
-        "y": {"field": "defects", "type": "quantitative", "title": "Defects Found / KSLOC", "scale": {"domain": [0, 220]}}
-      }
-    },
-    {
-      "data": {
-        "values": [
-          {"loc": 15, "defects": 200}, {"loc": 25, "defects": 165},
-          {"loc": 40, "defects": 92}, {"loc": 60, "defects": 75},
-          {"loc": 80, "defects": 55}, {"loc": 100, "defects": 100},
-          {"loc": 120, "defects": 25}, {"loc": 140, "defects": 60},
-          {"loc": 180, "defects": 55}, {"loc": 220, "defects": 15},
-          {"loc": 280, "defects": 8}, {"loc": 350, "defects": 10},
-          {"loc": 450, "defects": 8}, {"loc": 550, "defects": 0},
-          {"loc": 700, "defects": 12}, {"loc": 850, "defects": 0},
-          {"loc": 950, "defects": 3}
-        ]
-      },
-      "mark": {"type": "point", "color": "#1976d2", "size": 50, "filled": true},
-      "encoding": {
-        "x": {"field": "loc", "type": "quantitative"},
-        "y": {"field": "defects", "type": "quantitative"}
-      }
-    },
-    {
-      "data": {"values": [{"x": 200}, {"x": 400}]},
-      "mark": {"type": "rule", "color": "#388e3c", "strokeWidth": 2, "strokeDash": [5, 5]},
-      "encoding": {"x": {"field": "x", "type": "quantitative"}}
-    }
-  ]
+    {"mark": {"type": "rule", "strokeWidth": 4, "color": "#9bbf9b"},
+     "encoding": {"x": {"field": "min", "type": "quantitative", "title": "Staff-hours per defect found (minimum, most likely, maximum)", "scale": {"domain": [0, 18]}}, "x2": {"field": "max"}}},
+    {"mark": {"type": "point", "filled": true, "size": 160, "color": "#019546"},
+     "encoding": {"x": {"field": "ml", "type": "quantitative"}, "color": {"condition": {"test": "datum.t === 'Testing'", "value": "#b42318"}, "value": "#019546"}}},
+    {"mark": {"type": "text", "dy": -14, "fontSize": 13},
+     "encoding": {"x": {"field": "ml", "type": "quantitative"}, "text": {"field": "ml", "type": "quantitative"}}}
+  ],
+  "config": {"font": "Tahoma", "axis": {"titleFontSize": 13, "labelFontSize": 12}, "view": {"stroke": null}}
 }
 ```
 
-{: .note }
-> *Chart reconstructed to illustrate trend. See {% cite cohen2006secrets %} for original data.*
+| Staff-hours per defect | Minimum | Most likely | Maximum |
+|---|---|---|---|
+| Design inspection | 0.58 | 1.58 | 2.9 |
+| Code inspection | 0.67 | 1.46 | 2.7 |
+| Testing | 4.5 | 6 | 17 |
 
-The hyperbolic curve shows defect detection drops rapidly beyond 200 LOC. Green dashed lines mark the 200-400 LOC optimal range.
+_Effort to find one defect: the bar runs from minimum to maximum, the dot is the most likely value. Distribution from Briand and colleagues (1998), as reported by Dodd._ {% cite dodd2003inspection %}
 
-### Key Finding: Review Rate Matters
+**Example.** A module has 30 defects that someone will find either way. At the most likely values, finding them by code inspection takes 30 × 1.46 = 43.8 staff-hours, by testing 30 × 6 = 180 staff-hours: about four times as much. The comparison assumes both find the same defects, which they do not: see the limitations.
 
-| Review Rate | Defect Detection |
-|-------------|------------------|
-| < 300 LOC/hour | **Thorough** review |
-| 300-500 LOC/hour | Acceptable |
-| > 500 LOC/hour | **Hasty** — misses defects |
+## 3. Cost ratios
 
-```vega-lite
-{
-  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "title": "Defect Density vs. Review Rate",
-  "width": 450,
-  "height": 250,
-  "layer": [
-    {
-      "data": {
-        "values": [
-          {"rate": 50, "defects": 142}, {"rate": 100, "defects": 100},
-          {"rate": 150, "defects": 48}, {"rate": 200, "defects": 55},
-          {"rate": 250, "defects": 100}, {"rate": 300, "defects": 98},
-          {"rate": 350, "defects": 30}, {"rate": 400, "defects": 50},
-          {"rate": 450, "defects": 30}, {"rate": 550, "defects": 28},
-          {"rate": 650, "defects": 10}, {"rate": 750, "defects": 12},
-          {"rate": 850, "defects": 80}, {"rate": 950, "defects": 10},
-          {"rate": 1100, "defects": 12}, {"rate": 1300, "defects": 8}
-        ]
-      },
-      "mark": {"type": "point", "color": "#1976d2", "size": 50, "filled": true},
-      "encoding": {
-        "x": {"field": "rate", "type": "quantitative", "title": "Review Rate (LOC/hour)", "scale": {"domain": [0, 1400]}},
-        "y": {"field": "defects", "type": "quantitative", "title": "Defects Found / KSLOC", "scale": {"domain": [0, 160]}}
-      }
-    },
-    {
-      "data": {"values": [{"x": 500}]},
-      "mark": {"type": "rule", "color": "#d32f2f", "strokeWidth": 3},
-      "encoding": {"x": {"field": "x", "type": "quantitative"}}
-    }
-  ]
-}
-```
+Later defects cost more to fix as well as to find. At the Jet Propulsion Laboratory, fixing a defect during inspection cost 1/10 to 1/34 of fixing it during formal testing; at IBM's Santa Teresa lab, 1/20 {% cite dodd2003inspection %}. SmartBear's practitioners put fixes during testing at 8 to 12 times the cost of fixes during development, and fixes after release at 30 to 100 times {% cite cohen2006secrets %}. Laitenberger and DeBaud's survey reports that design inspections save 44% and code inspections 39% of total defect costs compared with testing alone {% cite laitenberger2000survey %}.
 
-{: .note }
-> *Chart reconstructed to illustrate trend. See {% cite cohen2006secrets %} for original data.*
+## 4. Inspection against lighter reviews
 
-The red vertical line at 500 LOC/hour marks the threshold above which reviews become hasty and miss defects.
+Inspections find more than informal reviews, at more effort per review {% cite wiegers2002peer %}. At Ford Motor Company, inspections found 50% more defects per thousand lines than walkthroughs; in one industry study, team reviews found two thirds as many defects per hour as inspections; IBM's Federal Systems Division measured about half the coding productivity in projects that used structured walkthroughs instead of inspections. Fagan's IBM samples had 38% fewer defects per thousand lines than those that only had walkthroughs {% cite fagan1976design %}.
 
-### Optimal Parameters Summary
+## 5. Company results
 
-| Parameter | Recommendation | Source |
-|-----------|----------------|--------|
-| Review size | **200-400 LOC max** | Cisco study |
-| Review rate | **< 500 LOC/hour** | Cisco study |
-| Session duration | **60-90 minutes max** | Fatigue degrades performance |
-| Bug detection speed | 1 bug per 10-15 minutes | Efficient teams |
+- **IBM.** In Fagan's first report, inspections raised net coding productivity by 23% and cost 9% less than walkthroughs {% cite fagan1976design %}; the Federal Systems Division figure in §4 compares whole projects, a different measure from a different part of IBM. Between 1976 and 1984 IBM nearly doubled the code shipped for System/370 while reducing defects per thousand lines by two thirds {% cite fagan1986advances %}.
+- **Standard Bank of South Africa and Aetna.** Fagan's 1986 update reports a 95% reduction in corrective maintenance and 0.15 defects per thousand lines at Standard Bank, and a 25% reduction in development resources at Aetna {% cite fagan1986advances %}.
+- **Hewlett-Packard.** Moving rework earlier through inspections was estimated to save USD 21,454,000 a year {% cite dodd2003inspection %}.
+- **A SmartBear customer.** Using review to reduce defects and usability problems, support calls fell from 50,000 to 20,000 a year over a few years while sales doubled, a saving reported as USD 2.6 million {% cite cohen2006secrets %}.
 
-### Cisco ROI
+Against this, design and code inspections typically cost about 15% of the project {% cite fagan1986advances %}.
 
-| Metric | Before | After | Savings |
-|--------|--------|-------|---------|
-| Support calls/year | 50,000 | 20,000 | **$2.6 million** |
+## When to use it — and when not
 
----
+Use these figures to argue for inspecting the products where late defects are expensive, and to set expectations: a team that finds 57% has done an average job, not a bad one. Do not use a single company's figure as a target for your own team; the conditions behind it are rarely reported.
 
-## Modern Code Review Metrics
+## Limitations
 
-### Google (Sadowski 2018)
+- **Inspection and testing find different defects.** Inspection finds omissions, unclear requirements and maintainability problems that tests cannot see; testing finds failures that come from timing, data and the environment. Cost per defect does not compare like with like, and both are needed.
+- **Self-reported success.** Most company figures come from the organizations that ran the programs, and the SmartBear figures from a vendor of review tools.
 
-| Metric | Value |
-|--------|-------|
-| Median review latency | **< 4 hours** |
-| Median change size | **24 lines** |
-| Median reviewers | **1** |
-| Changes needing ≤1 iteration | >80% |
-| Developer time on review | 3.2 hours/week |
+## How solid is this?
 
-Source: {% cite sadowski2018codereview %}
-
-### Microsoft (Bosu 2015)
-
-| Metric | Value |
-|--------|-------|
-| Comments marked useful | **65.5%** |
-| Experienced reviewer usefulness | 65-71% |
-| First-time reviewer usefulness | 32-37% |
-
-Source: {% cite bosu2015codereview %}
-
-### Code Review Coverage Impact (McIntosh 2015)
-
-| Finding | Impact |
-|---------|--------|
-| Review coverage | Negatively associated with post-release defects |
-| Reviews without discussion | **More defect-prone** |
-| Hasty reviews (>200 LOC/hr) | Higher post-release defects |
-
-> "Participation quality matters more than coverage" {% cite mcintosh2015codereview %}
-
----
-
-## Total Cost of Inspection
-
-| Category | Percentage of Project |
-|----------|----------------------|
-| Design + code inspections | **~15%** |
-
-Source: {% cite fagan1986advances %}
-
-{: .important }
-> 15% investment yields 60-90% defect detection and 10-34× cost savings vs. later discovery.
-
----
-
-## Summary: The Business Case
-
-| Metric | Typical Value |
-|--------|---------------|
-| Detection rate | 60-90% |
-| Cost ratio vs. testing | 1:10 to 1:34 |
-| Cost ratio vs. production | 1:30 to 1:100 |
-| Hours per defect | 1.4-1.75 (vs 6-17 for testing) |
-| ROI | 10:1 (HP example) |
-| Productivity impact | +23% (IBM) |
-
-**Bottom line:** Inspection is the most cost-effective quality technique available. Organizations that skip inspection pay 10-100× more to find the same defects later.
+- **Where it comes from.** Fagan's IBM papers, Laitenberger and DeBaud's survey, Dodd's compilation of industrial results, Wiegers' guide and SmartBear's practitioner book {% cite fagan1976design fagan1986advances laitenberger2000survey dodd2003inspection wiegers2002peer cohen2006secrets %}.
+- **What is contested.** Effort per defect for testing varies widely (4.5 to 17 hours, most likely 6), and the cost ratios depend on how cost is counted.
+- **What we do not hold.** The 1998 meta-analysis by Briand and colleagues is known here only through Dodd's report.
 
 ---
 

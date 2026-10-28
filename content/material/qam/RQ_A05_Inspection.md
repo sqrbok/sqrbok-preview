@@ -10,193 +10,149 @@ page_type: question-set
 
 # RQ A05: Software Inspection
 
-**Format:** Explain in your own words, give brief examples
+These questions test [SN A05: Software Inspection](SN_A05_Inspection.md). Explain in your own words and give brief examples; for calculations, show each step.
 
 ---
 
 ## Question 1: Evolution of Inspection
 
-Fagan developed formal inspection at IBM in 1976, and the practice evolved significantly over 50 years.
+Inspection practice changed considerably between Fagan's IBM method of 1976 and the LLM reviewers of 2025.
 
-Trace the evolution from 1976 to 2025 through 4 key milestones. What changed at each stage? What principles remained constant?
+Trace the evolution through its five stages: Fagan's method and the four changes that followed. What changed at each stage? Which principles stayed the same?
 
----
+## Question 2: Review Types
 
-## Question 2: Inspection Types Comparison
+Wiegers orders peer reviews from most to least formal: inspection, team review, walkthrough, pair programming, peer deskcheck, passaround, ad hoc review.
 
-Laitenberger (2002) compares Fagan Inspection, Code Review, Walkthrough, and Audit.
-
-Compare these four types across: purpose, formality, team size, and cost. When would you choose each type?
-
----
+Compare inspection, walkthrough, peer deskcheck and ad hoc review by who leads, whether reviewers prepare, and how formal they are. What do the telecommunications and Ford data say about inspections against lighter reviews? Which type would you choose for a security-critical interface, and which for a one-line fix?
 
 ## Question 3: Cost-Benefit of Inspection
 
-Research shows inspection finds defects at 1.4-1.75 hours per defect, while testing takes 6-17 hours per defect.
+Finding a defect takes a most likely 1.46–1.58 staff-hours by inspection and 6 staff-hours by testing.
 
-Explain why inspection is more cost-effective than testing. What is the cost multiplier for fixing defects at different stages (review, testing, production)?
+Explain why inspection is often cheaper per defect than testing. How does the cost of fixing a defect grow from development to testing to production?
 
----
+## Question 4: Fagan's Six Steps
 
-## Question 4: Fagan's Six Phases
+Fagan defined six steps: planning, overview, preparation, meeting, rework and follow-up.
 
-Fagan (1976) defined 6 phases for formal inspection: Planning, Overview, Preparation, Inspection Meeting, Rework, and Follow-up.
-
-Describe what happens in each phase. Why are entry and exit criteria important for each phase?
-
----
+Describe what happens in each step and who is responsible. Why do entry and exit criteria matter? Why is the follow-up not a formality?
 
 ## Question 5: The Four Roles
 
-Fagan inspection uses four roles: Moderator, Author, Reader, and Inspector.
+Fagan's inspection uses four roles: moderator, author, reader and tester.
 
-Describe the responsibility of each role. Why is it critical that management does NOT participate in inspections?
-
----
+Describe each role's responsibility. Why must the reader not be the author? Why should inspection results never be used to evaluate the author?
 
 ## Question 6: Ground Rules for Effective Meetings
 
-Fagan established ground rules including "Find problems, don't solve them" and "Maximum 2 hours."
+Fagan's meetings follow rules such as "find problems, don't solve them" and "at most two hours".
 
-List at least 4 ground rules for effective inspection meetings. Explain why the "criticize product, not producer" rule is important for psychological safety.
-
----
+List at least four ground rules for an inspection meeting and the reason for each. Why does "criticize the product, not the producer" matter for the team?
 
 ## Question 7: Reading Techniques
 
-Reading techniques range from ad hoc to Perspective-Based Reading (PBR).
+Reading techniques range from ad hoc reading to perspective-based reading (PBR).
 
-Compare ad hoc, checklist-based, and PBR techniques. Which technique showed +21-30% improvement? When does 90-95% of defect detection actually occur?
+Compare ad hoc, checklist-based, scenario-based and perspective-based reading. Which technique improved individual detection by 21–30%? In which part of the inspection are 90–95% of defects found?
 
----
+## Question 8: Perspective-Based Reading
 
-## Question 8: Perspective-Based Reading (PBR)
+PBR assigns the perspectives of tester, designer and user.
 
-PBR assigns stakeholder perspectives: Tester, Designer, and User.
-
-For each perspective, explain the focus and work product created. Why is "If you can't build the work product, there's a defect" a key insight?
-
----
+For each perspective, give the work product the reviewer builds and a kind of defect it exposes. Why does the rule "where the model cannot be built, there is a defect" make PBR work?
 
 ## Question 9: Checklist Design
 
-Cohen (2006) provides best practices for code review checklists.
+Checklists are the most common reading aid for code.
 
-List at least 3 "Do" and 3 "Don't" recommendations for checklist design. Why are checklists most effective at detecting omissions?
+Give three things a good checklist does and three things a bad one does. Why are checklists most effective at finding omissions?
 
----
+## Question 10: Cisco Study: Size
 
-## Question 10: Cisco Study - Size
+A study of 2,500 reviews of 3.2 million lines of code by 50 programmers at Cisco related review size to defects found.
 
-The Cisco study (Cohen 2006) analyzed 3.2 million lines of code reviewed by 50 programmers.
+What happens to the defects found per line when more than 400 lines are reviewed at once? What is the recommended size per sitting, and why?
 
-What happens to defect detection when review size exceeds 400 LOC? What is the optimal review size range and why?
+## Question 11: Review Rate
 
----
+Review speed affects what reviewers find.
 
-## Question 11: Cisco Study - Rate
-
-The Cisco study found that review rate strongly affects effectiveness.
-
-What is the threshold review rate above which reviewers are "rubber stamping"? What correlation exists between rushed reviews and post-release defects?
-
----
+According to the Cisco data, above what rate does a reviewer stop reviewing and start rubber-stamping? McIntosh and colleagues used a stricter threshold, 200 lines per hour: what did they find about changes reviewed faster than that, or approved without discussion?
 
 ## Question 12: The Magic Numbers
 
-Three "magic numbers" summarize optimal code review parameters.
+Three numbers summarize the Cisco recommendations.
 
-State the three optimal parameters (size, rate, duration). How much did Cisco save by implementing these practices?
-
----
+State the limits on size, rate and duration of a review session. What did a SmartBear customer gain by introducing code review, and how was the gain measured?
 
 ## Question 13: Google Modern Code Review
 
-Sadowski (2018) studied code review at Google.
+Sadowski and colleagues studied code review at Google.
 
-What are Google's median values for: change size, number of reviewers, and review latency? How does this compare to Fagan's original parameters?
-
----
+Give Google's median change size, number of reviewers and review time. How do these compare with Fagan's parameters? What do Google's developers see as the main purposes of review?
 
 ## Question 14: Microsoft Findings
 
-Bosu (2015) studied what makes code review comments useful at Microsoft.
+Bosu and colleagues studied 1.5 million review comments at Microsoft.
 
-What percentage of comments are marked useful? How does reviewer experience affect usefulness (first-time vs. experienced)? What correlation exists between "reviews without discussion" and defects?
-
----
+What share of comments was useful? How does a reviewer's previous work on the file change the usefulness of their comments? What does this mean for choosing reviewers?
 
 ## Question 15: Anti-Patterns
 
-Several anti-patterns can destroy inspection effectiveness.
+Some practices destroy the value of reviews.
 
-List at least 4 anti-patterns and explain why each is harmful. Why should review metrics never be used for performance evaluations?
+List at least four anti-patterns and why each is harmful. Why should review metrics never be used in performance evaluations?
 
----
+## Question 16: Defect Seeding
 
-## Question 16: Fault Injection
+Mills' defect seeding estimates the number of real defects from planted ones.
 
-Mills' fault injection (error seeding) method estimates total defects.
+Explain the steps of the method. Given 12 planted defects, 4 planted defects found and 11 real defects found, estimate the total number of real defects and the number still in the product. What assumption does the estimate depend on?
 
-Explain the 5 steps of the fault injection process. Given: 12 seeded defects injected, 4 seeded found, 11 original found. Calculate the estimated total defects.
+## Question 17: The Lincoln–Petersen Estimate
 
----
+Capture-recapture comes from ecology.
 
-## Question 17: Capture-Recapture Formula
-
-The capture-recapture method originates from wildlife biology.
-
-State the Lincoln-Petersen formula. Given: Inspector A finds 20 defects, Inspector B finds 15, both find 6. Calculate the estimated total and remaining defects.
-
----
+State the Lincoln–Petersen formula and explain why it works. Inspector A finds 20 defects, inspector B finds 15, and 6 are found by both. Estimate the total and the remaining defects.
 
 ## Question 18: Capture-Recapture Models
 
-Briand (2000) evaluated four capture-recapture models: M₀, Mₜ, Mₕ, and Mₜₕ.
+Briand and colleagues compared four models: M<sub>0</sub>, M<sub>t</sub>, M<sub>h</sub> and M<sub>th</sub>.
 
-Describe what each model assumes. Which model is recommended and with what estimator? What is the minimum number of inspectors for reliable estimates?
-
----
+What does each model allow to vary? Which model and estimator do they recommend, and with how many inspectors at least?
 
 ## Question 19: Capture-Recapture Limitations
 
-Capture-recapture has several limitations for defect estimation.
+Capture-recapture estimates rest on assumptions.
 
-List at least 3 limitations of the capture-recapture method. What happens when the overlap (R) equals zero? Why does the method tend to underestimate?
-
----
+List at least three limitations. What happens when the overlap *m*<sub>2</sub> is zero? Why do the estimates tend to be too low?
 
 ## Question 20: LLM Code Review
 
-Zeng (2025) evaluated LLM-based code review tools on real pull requests.
+Zeng and colleagues evaluated LLM-based reviewers on SWR-Bench.
 
-What F1 score did the best LLM achieve? What is the main limitation of current LLM code review? Why is human review still essential?
+What F1 score did the best reviewer reach, and what held it back? Why does a person still have to review the change?
 
----
+## Question 21: Improving LLM Review
 
-## Question 21: LLM Capabilities
+LLM reviewers differ in what they find and how reliably.
 
-Current LLM code review has varying capabilities across different task types.
+On which kind of issue did the tools do better, functional errors or documentation and style? What technique raised F1 by up to 43.67%, and how does it resemble using several independent inspectors?
 
-Rate LLM performance (good/moderate/poor) for: functional bugs, style issues, security vulnerabilities. What technique boosted F1 by 43%?
+## Question 22: Inspection versus Testing
 
----
+Inspection and testing are complementary.
 
-## Question 22: Inspection vs Testing
-
-Inspection and testing are complementary verification techniques.
-
-Create a comparison table with: timing, what each finds, cost per defect, and hours per defect. Why should you use both techniques?
+Build a table comparing them by when they can start, what kinds of defects each finds, and effort per defect. Why should a project use both?
 
 ---
 
 ## Practical Problems
 
----
+## Question 23: Capture-Recapture Calculation
 
-## Question 23: Capture-Recapture Calculation (Practical)
-
-An inspection meeting results in the identification of 13 defects by four inspectors:
+Four inspectors log 13 distinct defects in one module, identified by line number:
 
 | Line | Inspector A | Inspector B | Inspector C | Inspector D |
 |------|:-----------:|:-----------:|:-----------:|:-----------:|
@@ -214,50 +170,43 @@ An inspection meeting results in the identification of 13 defects by four inspec
 | 300  | | x | | |
 | 321  | x | | x | |
 
-Using Humphrey's capture-recapture procedure, how many latent defects can you estimate remain unidentified in this code? Show your calculation.
-
----
+a. Count *S* and *f*<sub>1</sub>, then apply the first-order jackknife. How many defects remain?
+b. Treat inspector B as one "inspector" and A, C and D together as the other, and apply Lincoln–Petersen.
+c. Apply Lincoln–Petersen to the pairs A–B and B–D. What goes wrong?
+d. Why do the estimates differ so much, and which would you report? Hint: look at the size of each overlap.
 
 ## Question 24: Inspection Prioritization Under Budget
 
-You need to inspect a large banking system comprising around 20,000 lines of COBOL and 25,000 lines of newly written Java code with regards to vulnerabilities, but only have enough budget to inspect 10,000 lines.
+You must inspect a banking system of about 20,000 lines of COBOL and 25,000 lines of new Java code for vulnerabilities, but the budget covers only 10,000 lines.
 
-How would you prioritize which components to inspect without overrunning the budget? What criteria would you use?
-
----
+How would you choose what to inspect? Which criteria would you use, and why? Hint: apply Howard's criteria (age of the code, privileges, exposure to the network, language, history of vulnerabilities) to the old COBOL and the new Java separately. Note that COBOL and Java are memory-safe in the usual sense, unlike C and C++. State any assumptions you make about the system.
 
 ## Question 25: Egoless Programming
 
-Wiegers references Weinberg's concept of "egoless programming."
+Wiegers builds on Weinberg's idea of "egoless programming".
 
-What does Weinberg mean by this concept? Why is it relevant to peer review? How does this relate to Fagan's rule "criticize product, not producer"?
-
----
+What does it mean? Why does it matter for peer review, and how does it relate to the rule "criticize the product, not the producer"?
 
 ## Question 26: Session Limits
 
-The literature suggests a number of limits on code review sessions.
+The Cisco study sets limits on tool-assisted code review sessions.
 
-For each of the following, state a reasonable guideline with justification:
-a. Number of lines of code inspected in one sitting
-b. Number of lines of code inspected per hour (rate)
-c. Maximum inspection session length
+State a guideline, with its justification, for:
+a. the number of lines inspected in one sitting;
+b. the review rate in lines per hour;
+c. the maximum session length.
 
----
+Why are Fagan's limits for a formal inspection meeting (about 125 statements per hour, two hours) tighter?
 
 ## Question 27: Undesirable Attitudes
 
-Mandatory code reviews can sometimes lead to negative programmer attitudes.
+Mandatory reviews can create negative attitudes.
 
-List two undesirable attitudes that can emerge in an organization with mandatory code reviews. Describe three mechanisms that management, the organization, or programmers can use to prevent such attitudes from developing.
+Describe two undesirable attitudes or behaviours that can appear in an organization with mandatory reviews. Describe three things that management, the organization or the programmers can do to prevent them.
 
----
+## Question 28: Good and Bad Practices
 
-## Question 28: Good vs Bad Practices
-
-Describe, in your own words:
-- Two good inspection practices and why they work
-- Two bad inspection practices and why they should be avoided
+Describe, in your own words, two good inspection practices and why they work, and two bad practices and why they should be avoided.
 
 ---
 
@@ -265,18 +214,16 @@ Describe, in your own words:
 
 | Topic | Questions |
 |-------|-----------|
-| History & evolution | Q1 |
-| Inspection types | Q2, Q3 |
-| Fagan process | Q4, Q5, Q6 |
+| History and review types | Q1, Q2 |
+| Cost and effectiveness | Q3, Q22 |
+| Fagan process | Q4, Q5, Q6, Q25 |
 | Reading techniques | Q7, Q8, Q9 |
-| Cisco study | Q10, Q11, Q12 |
-| Modern practices (Google/Microsoft) | Q13, Q14 |
-| Anti-patterns | Q15, Q27, Q28 |
-| Fault injection | Q16 |
+| Lightweight and modern code review | Q10, Q11, Q12, Q13, Q14, Q26 |
+| Anti-patterns and culture | Q15, Q27, Q28 |
+| Defect seeding | Q16 |
 | Capture-recapture | Q17, Q18, Q19, Q23 |
 | LLM code review | Q20, Q21 |
-| Inspection vs testing | Q22 |
-| Practical application | Q23, Q24, Q25, Q26, Q27, Q28 |
+| Prioritization | Q24 |
 
 ---
 
