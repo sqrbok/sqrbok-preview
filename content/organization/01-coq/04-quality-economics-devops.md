@@ -17,12 +17,12 @@ Applying the categories to these practices gives:
 
 | Practice | Category | Why |
 |---|---|---|
-| Code review, test-driven development, coding standards | prevention | effort to keep defects out |
-| Continuous-integration tests, static analysis, canary monitoring | appraisal | discovering the condition of the product |
-| Investigating and fixing a red pipeline, rolling back a canary | internal failure | spent because a defect exists, before most users see it |
-| Incident response, hot fixes, lost users | external failure | the defect reached customers |
+| Code review, test-driven development, coding standards | prevention | keep defects out before the change is complete (reviews by the handbook's [booking convention](01-cosq-foundations.md#1-four-categories)) |
+| Continuous-integration tests, static analysis, canary monitoring | appraisal | automated checks of the product's condition (a team may book static analysis with reviews if it always does) |
+| Investigating and fixing a red pipeline, fixing a review finding | internal failure | spent because a defect exists, before any user meets it |
+| Incident response, hot fixes, rolling back a canary, lost users | external failure | users met the failure, even if only a few |
 
-A canary release caps the external failure: the same defect reaches 1% of users instead of all of them, and most of its cost becomes the internal cost of rolling back.
+A canary release caps the external failure without changing its category: the canary has shipped to real users, so the rollback and the harm to the 1% who met the defect are external failure, but the same defect no longer reaches all users.
 
 ## 2. Worked example: the price of flaky tests
 
@@ -35,10 +35,12 @@ A **flaky test** passes or fails on unchanged code. Leinen et al. measured the c
 | of which repairing flaky tests | 1.3% |
 | of which building tools to monitor them | 0.1% |
 | Manual investigation of one failed pipeline | USD 5.67 |
-| Automatically rerunning the failed test | USD 0.02 |
+| Automatically rerunning the failed test | 0.02 cents (USD 0.000236) |
 | Test-suite executions with at least one flaky failure, found by the new rerun strategy in five months | 4.8%, about one in 20 |
 
-Investigating a failure costs about 280 times a rerun (5.67 / 0.02 ≈ 283), so the company shifted effort from developers to compute: it raised the number of automatic reruns before a pipeline is declared red. In CoSQ terms, cheap appraisal (reruns) replaced expensive internal failure (investigation).
+The source does not book the three flaky-test costs in CoSQ categories; this handbook does. **Investigating** suspicious failures is internal failure: the effort exists only because a test failed before release. **Repairing** flaky tests is internal failure too: it is rework of a defective test (and, in a quarter of the repairs, of the product code). **Building monitoring tools** is appraisal: the tools discover the condition of the test suite.
+
+Investigating a failure costs about 24,000 times a rerun (5.67 / 0.000236), so the company shifted effort from developers to compute: it raised the number of automatic reruns before a pipeline is declared red. In CoSQ terms, cheap appraisal (reruns) replaced expensive internal failure (investigation).
 
 ## When to use it, and when not
 
@@ -53,7 +55,7 @@ Investigating a failure costs about 280 times a rerun (5.67 / 0.02 ≈ 283), so 
 ## How solid is this?
 
 - **Where it comes from.** The flaky-test case from Leinen et al.; shift-left evidence from Magori's review; shift-right practices from Gottam and Keating {% cite leinen2024flaky magori2024early gottam2025convergent keating2024ai %}.
-- **What is contested.** Leinen et al.'s abstract gives the rerun cost as "0.02 cents" and the introduction as USD 0.02; the ratio above uses the dollar figure. Either way a rerun is hundreds of times cheaper than an investigation.
+- **What is contested.** Leinen et al.'s abstract and calculation give a rerun as 0.02 cents (USD 236 × 10⁻⁶); the introduction says USD 0.02. With the rounded 0.02 cents the ratio is 5.67 / 0.0002 ≈ 28,000; with the introduction's dollar figure it would be 5.67 / 0.02 ≈ 280. The calculation supports the cents.
 - **What we do not hold.** Measured cost data for chaos engineering or canary releases.
 
 ---

@@ -34,7 +34,7 @@ The two are often confused, because both are meetings that end with actions.
 
 ## 3. Example: choosing a method
 
-A team ships every two weeks, but changes wait on average three days for code review while coding takes one. The problem is a bottleneck, not recurring defects or variation, so TOC fits: make review the drum that the rest of the work follows, and limit work in progress so that reviewers are not flooded. If, after that, reviews pass quickly but the same null-pointer defects keep escaping, the problem has changed and DPP's causal analysis becomes the right tool. (A constructed example.)
+A team ships every two weeks, but changes wait on average three days for code review while coding takes one. The problem is a bottleneck, not recurring defects or variation, so TOC fits: treat review as the constraint that sets the pace for the rest of the work (*subordinate*, step 3 of TOC's five focusing steps on [Theory of Constraints](06-theory-of-constraints.md)), and limit work in progress so that reviewers are not flooded. If, after that, reviews pass quickly but the same null-pointer defects keep escaping, the problem has changed and DPP's causal analysis becomes the right tool. (A constructed example.)
 
 ## When to use a method — and when not
 

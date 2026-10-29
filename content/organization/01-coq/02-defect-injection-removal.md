@@ -12,7 +12,7 @@ A **defect injection and removal model** follows defects through a project: each
 
 ## 1. Tank and pipes
 
-Picture a tank. Pipes into it are the phases that create defects (requirements, design, coding); pipes out of it are the activities that remove them (reviews, inspections, tests); what stays in the tank at release are the **residual defects**, the source of external failure costs. Residual defects fall in only two ways: put less in (prevention) or take more out (appraisal).
+Picture a tank. Pipes into it are the phases that create defects (requirements, design, coding); pipes out of it are the activities that remove them (reviews, inspections, tests); what stays in the tank at release are the **residual defects**, the source of external failure costs. Residual defects fall in only two ways: put less in (better methods, training) or take more out (reviews, inspections, tests). In CoSQ terms, putting less in is prevention; of the pipes out, tests are appraisal, while reviews and inspections are booked as prevention by this handbook's [booking convention](01-cosq-foundations.md#1-four-categories).
 
 ![Defects flow from requirements through design and coding into unit, integration and system testing; each test removes half, and 10 of 80 reach the customer](defect-flow.svg)
 

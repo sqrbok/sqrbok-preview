@@ -7,7 +7,7 @@ layout: default
 
 # Change Management
 
-**Change management** in process improvement is the work of getting an organization to adopt a new practice and keep it after the initial enthusiasm fades. Most improvement programs fail here, not in their technical content {% cite repenning2001nobody kuhrmann2016spi %}.
+**Change management** in process improvement is the work of getting an organization to adopt a new practice and keep it after the initial enthusiasm fades. Most improvement programs fail here, not in their technical content {% cite repenning2001nobody kuhrmann2016spi %}. It is organizational change, not ITIL's change management, the process that controls changes to IT services (see [ITIL Framework](../04-standards/03-itil-framework.md)).
 
 ## 1. The one-eighth rule
 
@@ -31,7 +31,7 @@ _The two responses to a performance gap, redrawn from Repenning and Sterman's ca
 
 Under pressure, managers choose work harder; capability then erodes, problems grow, pressure rises and there is even less time to improve. This is the **capability trap**. It is reinforced by a **self-confirming attribution error**: because pressure does produce a short-term gain, managers conclude that the problem was effort, not the system.
 
-**Example.** At BP's Lima refinery, an improvement program that weathered the early dip raised pumps' mean time between failures from 12 to 58 months; one USD 5,000 fix ended a butane flare-off that cost USD 1.5 million a year, and the program created about USD 43 million a year of value at a cost of about USD 320,000 a year {% cite repenning2001nobody %}. The authors' title states the difficulty: nobody gets credit for fixing problems that never happened.
+**Example.** At BP's Lima refinery, an improvement program that was kept running raised pumps' mean time between failures from 12 to 58 months; one USD 5,000 fix ended a butane flare-off that cost USD 1.5 million a year, and the program created about USD 43 million a year of value at a cost of about USD 320,000 a year {% cite repenning2001nobody %}. The paper reports this payoff, not how deep or long the dip was at Lima. The authors' title states the difficulty: nobody gets credit for fixing problems that never happened.
 
 ## 3. Two levels of change
 
@@ -44,7 +44,7 @@ A team that buys a code-review tool and writes a review policy (operational) whi
 
 ## 4. What predicts success
 
-Surveys of Six Sigma, Lean Six Sigma and ITIL adoption all rank **management commitment** first, followed by culture, training and communication {% cite antony2002sixsigma laureani2012leansixsigma iden2013itil %}. In a study of CMMI Level 3 adoption in Bangalore, 42% of interview responses named employee resistance as a major challenge, 29% the tension between standard processes and business needs, and 25% insufficient training {% cite shelat2025cmmi %}. Repenning and Sterman's recommendations follow from their model: change mental models from blaming people to examining the system, protect improvement time, let staff experience the dynamics in simulations, and let early champions spread the change.
+Surveys of Six Sigma, Lean Six Sigma and ITIL adoption all rank **management commitment** first, followed by culture, training and communication {% cite antony2002sixsigma laureani2012leansixsigma iden2013itil %}. In a study of CMMI Level 3 adoption in Bangalore, 42% of interview responses named employee resistance as a major challenge, 29% the tension between standard processes and client-driven flexibility, and 25% insufficient training {% cite shelat2025cmmi %}. Repenning and Sterman's recommendations follow from their model: change mental models from blaming people to examining the system, protect improvement time, let staff experience the dynamics in simulations, and let early champions spread the change.
 
 ## When to use this — and when not
 

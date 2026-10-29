@@ -29,9 +29,9 @@ Mobile apps cannot be updated silently: users must install each version, app sto
 2. A release branch is cut once a week for Android and every two weeks for iOS.
 3. For **five days** the branch is stabilized; only fixes are cherry-picked in, and builds are installed on employees' phones ("dogfooding") three times a day.
 4. The code is frozen for a **three-day soak**, accepting only launch-blocking fixes.
-5. The release goes to the app stores.
+5. The release goes to the app store for review; for iOS this happens on the second Monday after the cut, and users get it later that week.
 
-**Example.** For iOS, the branch is cut every two weeks and released on the second Monday after the cut. A change committed just before a cut reaches users about two weeks later; one committed just after a cut waits up to two weeks for the next cut, so about four. A web change at Facebook could reach production the same day. The difference is the cost of a bad release: on the web it can be replaced in hours; in an app it stays on phones until users update.
+**Example.** For iOS, the branch is cut on a Sunday evening every two weeks. Five days of stabilization and three of soak bring it to the second Monday after the cut, eight days later, when it goes to Apple for review; users get it later that week. A change committed just before a cut therefore reaches users in about one and a half weeks; one committed just after a cut first waits two weeks for the next cut, so about three and a half. A web change at Facebook could reach production the same day. The difference is the cost of a bad release: on the web it can be replaced in hours; in an app it stays on phones until users update.
 
 ## 3. Automated testing at diff time
 

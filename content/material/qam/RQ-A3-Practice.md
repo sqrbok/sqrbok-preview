@@ -98,7 +98,7 @@ Name the four golden signals. Explain the difference between alerting on symptom
 
 ## Question 12: Toil and On-Call
 
-Define toil. Give three examples of toil and three of engineering work that reduces it. Why does Google cap toil at 50% and on-call at two incidents per 12-hour shift?
+Define toil. Give two examples of toil and two of engineering work that reduces it. Why does Google cap toil at 50% and on-call at two incidents per 12-hour shift?
 
 ---
 

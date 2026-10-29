@@ -15,7 +15,7 @@ A review of seven primary studies on combining Agile and CMMI concludes that the
 
 | Maturity level | Fit with Agile alone | Why |
 |---|---|---|
-| 2 Managed | fully compatible, apart from configuration management (below) | its process areas are project management, engineering and support, which Scrum-style practices cover |
+| 2 Managed | fully compatible, apart from configuration management (below) | its process areas work at project level, with no organization-level ones, and Scrum-style practices cover most of them |
 | 3 Defined | partially compatible | organization-wide process areas (standard processes, training) have no Agile counterpart |
 | 4–5 | not achievable with Agile alone | Agile has no equivalent of statistical process management |
 
@@ -29,7 +29,7 @@ A systematic review of 23 studies on CMMI v2.0 with Agile project management rep
 
 Tsai studied a Taiwanese information-service company's project teams as they implemented CMMI Level 3 {% cite tsai2020cmmi %}. Success went with a strong team culture along six dimensions, among them teams oriented toward reform, concentrated decision-making (which suits Level 3's organization-wide processes), shared ownership, and rewards given to the group rather than to individuals, which prevented members from competing. Teams that built their own subculture could overcome obstacles in the wider organization.
 
-A mixed-methods study of 24 practitioners in Bangalore IT companies at Level 3 shows the other side {% cite shelat2025cmmi %}: 42% of interview responses named employee resistance as a major challenge, 29% the tension between standard processes and client-driven flexibility, and 25% insufficient training. At the same time, 37% reported improved software quality and 29% higher employee engagement. The authors recommend combining CMMI with Scrum, SAFe or Lean, rolling it out through pilot groups, and training by role rather than in general.
+A mixed-methods study of 24 practitioners in Bangalore IT companies at Level 3 shows the other side {% cite shelat2025cmmi %}: 42% of interview responses named employee resistance as a major challenge, 29% the tension between standard processes and client-driven flexibility, and 25% insufficient training. At the same time, 37% reported improved software quality and 29% higher employee engagement. The authors recommend combining CMMI with Scrum, SAFe (the Scaled Agile Framework) or Lean, rolling it out through pilot groups, and training by role rather than in general.
 
 ## When to use it — and when not
 

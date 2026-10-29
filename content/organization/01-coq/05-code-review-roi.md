@@ -7,7 +7,7 @@ layout: default
 
 # Value of Code Review
 
-**Code review** is an appraisal activity in which developers other than the author read a proposed change before it is merged; its value in cost-of-quality terms is the defects and future rework it removes, weighed against the reviewing effort it consumes {% cite turzo2023useful %}. The effort is large: developers spend 10–15% of their time on review, and between 20% and 44% of review comments are marked "not useful" by authors, according to the studies Turzo and Bosu cite {% cite turzo2023useful %}. Three studies of open-source communities show where the value lies.
+**Code review** is the practice in which developers other than the author read a proposed change before it is merged; its value in cost-of-quality terms is the defects and future rework it removes, weighed against the reviewing effort it consumes {% cite turzo2023useful %}. This handbook books the reviewing effort as prevention and the rework a review finding causes as internal failure (the [booking convention](01-cosq-foundations.md#1-four-categories)). The effort is large: developers spend 10–15% of their time on review, and between 20% and 44% of review comments are marked "not useful" by authors, according to the studies Turzo and Bosu cite {% cite turzo2023useful %}. Three studies of open-source communities show where the value lies.
 
 ## 1. What makes a comment useful
 

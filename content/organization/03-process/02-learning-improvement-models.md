@@ -30,7 +30,7 @@ IBM's Defect Prevention Process is double-loop learning built into the developme
 3. **Check:** compare the results with the target.
 4. **Act:** keep and standardize the change if it worked; otherwise adjust and run the cycle again.
 
-**Example.** A team finds that 12 of the 40 bugs reported in a quarter were escapes, bugs found by customers rather than by the team. *Plan:* require a test for every bug fix, aiming to halve escapes. *Do:* apply the rule in one team for one quarter. *Check:* count that team's escapes again. *Act:* if they fell, make the rule part of the definition of done for all teams. (A constructed example.)
+**Example.** In a department of four teams, 12 of the 40 bugs reported in a quarter were escapes, bugs found by customers rather than by the teams; the pilot team had 4 of them. *Plan:* require a test for every bug fix, aiming to halve the pilot team's escapes, from 4 to 2. *Do:* apply the rule in the pilot team for one quarter. *Check:* compare the pilot team's escapes with its own baseline of 4, and with the other three teams over the same quarter, which did not change their rule. *Act:* if the pilot team's escapes fell while the others' did not, make the rule part of the definition of done for all teams. (A constructed example.)
 
 A Scrum sprint follows the same shape: planning, the sprint itself, the review, and the retrospective that decides what to change next.
 

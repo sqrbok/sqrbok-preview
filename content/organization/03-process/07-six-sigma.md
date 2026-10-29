@@ -27,7 +27,7 @@ Defining an *opportunity* matters: it is each place where a unit can fail to mee
 
 A team runs 500 CI builds in a month; each build has four checks that can fail (compile, unit tests, linter, packaging), so there are 500 × 4 = 2,000 opportunities. Thirty checks fail for reasons that are not in the code under test: a flaky test, a missing cache, a full disk (a constructed example).
 
-DPMO = 30 / 2,000 × 1,000,000 = **15,000**, far from the six-sigma level of 3.4. In DMAIC terms the team has finished Measure. In Analyze it sorts the 30 failures by cause and finds, say, that 18 are the same flaky test; Improve fixes or quarantines it; Control adds the infrastructure-failure rate to the team's dashboard so that a rise is noticed.
+In *Define*, the team states the problem and its CTQ: developers need a red build to mean a code defect, so the goal is to halve build failures not caused by the code under test. *Measure* gives DPMO = 30 / 2,000 × 1,000,000 = **15,000**, far from the six-sigma level of 3.4. In *Analyze* it sorts the 30 failures by cause and finds, say, that 18 are the same flaky test; Improve fixes or quarantines it; Control adds the infrastructure-failure rate to the team's dashboard so that a rise is noticed.
 
 ## 3. What makes it work
 

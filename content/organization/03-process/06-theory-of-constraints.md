@@ -27,7 +27,7 @@ Production planning under TOC uses **drum–buffer–rope**: the constraint is t
 
 ## 2. Worked example
 
-A team's changes pass through three steps. Per week it can write 12 changes, review 6 and test 10 (a constructed example).
+A team's changes pass through three steps. Per week it can write 12 changes, review 6 (six reviewers, one change each a week) and test 10 (a constructed example).
 
 | Step | Capacity (changes/week) |
 |---|---|
@@ -37,8 +37,8 @@ A team's changes pass through three steps. Per week it can write 12 changes, rev
 | **Whole system** | **6**, the minimum |
 
 1. **Identify:** review, at 6 per week. Adding testers or coders changes nothing: the system still delivers 6.
-2. **Exploit:** reviewers stop spending time on formatting comments that a linter could catch; if that frees a fifth of their time, review rises to 7.5.
-3. **Subordinate:** coders start no more changes than review can take, so the queue in front of review stays short instead of growing by 6 a week.
+2. **Exploit:** reviewers stop spending time on formatting comments that a linter could catch; if that frees a fifth of their time, review rises to 6 / 0.8 = 7.5 (1.25 per reviewer).
+3. **Subordinate:** coders start no more changes than review can take, so the queue in front of review stays short instead of growing by 4.5 a week (12 written, 7.5 reviewed after step 2).
 4. **Elevate:** if six reviewers now manage 1.25 changes a week each, training two more adds 2.5, raising review to 10.
 5. **Repeat:** coding (12), review (10) and testing (10) now give a system output of 10, and testing has become a constraint too; start again at step 1.
 

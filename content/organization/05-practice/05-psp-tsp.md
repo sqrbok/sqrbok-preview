@@ -17,7 +17,7 @@ PSP is taught in a course of programming exercises through levels from PSP0 to P
 - **Defects**: type, the phase where each was injected and the phase where it was removed;
 - **Size** of the product, in lines of code.
 
-With these data the engineer estimates size and effort from past projects (Humphrey's PROBE method), reviews design and code against a personal checklist built from their own most frequent defects, and tracks progress with earned value.
+With these data the engineer estimates size and effort from past projects (Humphrey's PROBE, PRoxy-Based Estimating, which converts the relative size of proxies such as objects or functions into lines of code using the engineer's own history), reviews design and code against a personal checklist built from their own most frequent defects, and tracks progress with earned value: each task earns its planned share of the total effort when it is finished, so progress is the sum of the shares earned.
 
 **Example.** Hayes and Over analyzed 298 engineers in 23 PSP classes {% cite hayes1997psp %}. Median improvements over the course were:
 

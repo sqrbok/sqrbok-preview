@@ -25,11 +25,11 @@ The counts add to 5 + 5 + 3 + 3 = 16. Each process area breaks down into goals a
 
 Van Veenendaal, Garousi and Felderer surveyed the 114 companies and teams formally assessed by the TMMi Foundation; 74 responded (64.9%) {% cite vanveenendaal2022tmmi %}. The most common motives were better software quality (70%), higher test productivity (68%), lower product risk and the certificate itself (62% each). 87% said TMMi met or exceeded their expectations, and 88% saw benefits for product quality.
 
-Respondents gave concrete figures, each from one organization: regression test execution cut from 4 hours to 30 minutes, defect leakage to production down from 10% to 5%, and a **defect detection percentage (DDP)** in system testing up from 60% to 70%. DDP is the number of defects a test phase finds divided by the number found by that phase and by everything afterwards. If system test finds 60 defects and 40 more turn up later, DDP is 60 / (60 + 40) = 60%; finding 70 of the same 100 gives 70%.
+Respondents gave concrete figures, each from one organization: regression test execution cut from 4 hours to 30 minutes, defect leakage to production down from 10% to 5%, and a **defect detection percentage (DDP)** in system testing up from 60% to 70%. DDP is the number of defects a test phase finds divided by the number found by that phase and by everything afterwards. If system test finds 60 defects and 40 more turn up later, DDP is 60 / (60 + 40) = 60%; finding 70 of the same 100 gives 70%. DDP measures a test phase; it is not IBM's Defect Prevention Process (DPP) on [Defect Prevention](../03-process/05-defect-prevention.md).
 
 ## 3. Other maturity models
 
-TMMi is one of many: a review cited in the survey counts 58 models for test maturity and capability alone {% cite vanveenendaal2022tmmi %}. Maturity models also exist for usability, where most are derived from CMMI or ISO/IEC 15504 but few are validated {% cite lacerda2018usability %}, and for universities, where a review of 23 studies found that CMMI-style models dominate but cover isolated areas and say *what* to reach rather than *how* {% cite mikusova2020maturity %}.
+TMMi is one of many: a review cited in the survey counts 58 models for test maturity and capability alone {% cite vanveenendaal2022tmmi %}. Maturity models also exist for usability, where most are derived from CMMI or ISO/IEC 15504 (the process-assessment standard known as SPICE) but few are validated {% cite lacerda2018usability %}, and for universities, where a review of 23 studies found that CMMI-style models dominate but cover isolated areas and say *what* to reach rather than *how* {% cite mikusova2020maturity %}.
 
 | Need | Model |
 |---|---|
