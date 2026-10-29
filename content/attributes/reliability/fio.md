@@ -39,6 +39,8 @@ Cost covers repair, lost business and disruption; its classes differ by a factor
 
 The same kind of failure can land in another class if it hits one customer once: a single lost order costs perhaps USD 100, class 4.
 
+**Defining the classes for your project** takes five steps: list all potential failure impacts; narrow them to factors you can measure; define about four classes on those factors; get the stakeholders to agree; then document the classes and communicate them. For the first step, a failure mode and effects analysis (FMEA) works bottom-up, from each component's failure modes to their effects, and fault tree analysis (FTA) works top-down, from one undesired event to the combinations of causes that produce it; [Worked Case: When to Stop Testing a Module](worked-case.md) shows one line of each. Some factors, such as reputation, need judgement.
+
 ## 2. Three ways to set the FIO
 
 The cost route gives one FIO per severity class; the reliability and availability routes give one FIO for the whole system. Class FIOs add up to a system FIO.

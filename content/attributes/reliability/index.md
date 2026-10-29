@@ -26,6 +26,7 @@ Each page answers one question that a reliability engineer meets, in the order a
 | When can we stop testing? | Reliability growth models predict when λ falls to the FIO | [Reliability Growth Models](growth-models.md) |
 | How do we survive faults that remain? | Recovery blocks, N-version programming, backward and forward recovery | [Fault Tolerance](fault-tolerance.md) |
 | Does redundant software fail independently? | Voting reliability, and the experiment that showed versions fail together | [Design Diversity and Voting](design-diversity.md) |
+| Can we stop testing this module? | A trend test, two fitted models and the FIO, on real failure data | [Worked Case: When to Stop Testing a Module](worked-case.md) |
 | What does this look like today? | The FIO became the service level objective (SLO); error budgets and chaos engineering | [From FIO to SLO](slo-bridge.md) |
 
 ## Reading order
