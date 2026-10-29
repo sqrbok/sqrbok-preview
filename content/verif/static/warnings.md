@@ -83,6 +83,8 @@ A decision for the whole project goes in its configuration instead: `[tool.bandi
 
 The first run on old code rarely finds three warnings; it finds hundreds. Record them as a **baseline** and report only what is new: `bandit -f json -o baseline.json -r .` saves the current findings, and `bandit -b baseline.json -r .` then shows only findings not in it; tested on `users.py`, the baseline hid B608 and a newly added `subprocess` call with `shell=True` was still reported. Then work through the old ones by priority, as eBay did: some must be removed everywhere, some only kept out of new code, some merely counted ([Deploying Static Analysis](deployment.md)) {% cite jaspan2007understanding %}.
 
+**Where the inputs come from.** Warnings come from the tools' JSON or SARIF output in CI rather than from a developer's screen, so they can be counted, baselined and compared between runs. The answer to *can a user control the input?* comes from reading the callers, or from a taint analysis.
+
 ## When to use it — and when not
 
 - Triage every new warning when it first appears, in code review if possible ([Deploying Static Analysis](deployment.md)).

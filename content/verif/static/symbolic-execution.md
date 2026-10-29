@@ -86,6 +86,8 @@ The number of paths grows exponentially with the branches: n independent `if` st
 
 The engines the survey covers include KLEE and SymCC for source code, angr and Triton for binaries, S2E for whole systems including kernels, and Driller, which pairs the widely used AFL fuzzer with angr {% cite bailey2025symexec %}. Constraints the solver handles badly (non-linear arithmetic, floating point) and the program's environment (files, network, libraries) are the other two limits; KLEE models the file system and command line to get around the second, and against path explosion it alternates two search heuristics: random path selection and a search that favours states likely to cover new code {% cite cadar2008klee %}.
 
+**Where the inputs come from.** KLEE runs on LLVM bitcode, so the program is compiled with `clang -emit-llvm`, and a small driver marks which variables are symbolic with `klee_make_symbolic`, much like a fuzzing harness. The output is a set of concrete test inputs, which can seed a fuzzer or become regression tests.
+
 ## When to use it — and when not
 
 - Use it to generate tests for code with narrow conditions: parsers, protocol handlers, command-line tools.

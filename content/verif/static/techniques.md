@@ -119,6 +119,8 @@ Unlike Bandit's pattern, a taint analyzer such as CodeQL reports the injection o
 
 Every warning still needs a decision: fix it, or record why it is a false alarm. [Triaging Static Analysis Warnings](warnings.md) works through both on this file.
 
+**Where the inputs come from.** These tools read the source tree directly; what they need besides it is configuration. mypy needs the project's Python version and the type stubs of every library the code imports, and Bandit a list of checks to skip. For C and C++, analyzers also need the exact compiler flags, which build systems such as CMake export as `compile_commands.json`.
+
 ## When to use them
 
 - Run style, AST and type checks on every commit; they cost seconds.

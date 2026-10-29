@@ -88,6 +88,8 @@ _The CEGAR loop as SLAM implements it: C2bp abstracts, Bebop model-checks, Newto
 
 Starting coarse keeps the first model small and cheap to check; detail is added only where a spurious counterexample shows it is needed. Each turn either proves the property, reports a real bug with a feasible trace, or adds predicates and tries again. Because the question is undecidable in general, the loop is not guaranteed to stop; on the driver properties SLAM checked, it converged {% cite ball2001slam %}. SLAM became Microsoft's Static Driver Verifier, shipped to driver developers {% cite ball2004slam %} and in use for a decade by 2011 {% cite ball2011slam %}.
 
+**Where the inputs come from.** SLAM took two inputs: the driver's C source, and a rule for the correct use of the kernel API, written once by experts in a specification language and reused for every driver. The abstraction and each refinement are computed by the tool, so the team's work is in the rules.
+
 ## When to use it — and when not
 
 - Use it for rules about the order of operations (lock and unlock, open and close, acquire and release) in code with a narrow interface, such as drivers.
