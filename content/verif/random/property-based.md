@@ -65,6 +65,8 @@ Interviews with 30 developers at Jane Street show where PBT pays off {% cite gol
 
 Coverage feedback can also drive PBT generators. Zest, part of the JQF tool for Java, mutates the random choices behind a generator and keeps those that reach new code: on a property about a trie (a prefix tree for string keys), it found a failing input after about 5,000 test executions, where pure random generation found none in over 7 million {% cite padhye2019jqf %}; see [Coverage-Guided Fuzzing](greybox.md).
 
+**Where the inputs come from.** On a real code base, properties come from the specification, the docstrings and the bug tracker: each past bug names a property that should have held. Generator ranges come from the data the system already holds (the smallest and largest values in production tables, the limits in its validation code), and an older or slower implementation, where one exists, serves as the differential oracle. [Worked Case: Properties for a Billing Function](worked-case.md) does this for one function.
+
 ## When to use it — and when not
 
 - **Use it** for round trips (encode/decode), for a fast implementation checked against a slow obvious one, and for invariants such as "the output is sorted".

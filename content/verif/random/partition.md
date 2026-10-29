@@ -35,6 +35,8 @@ Hamlet later named two situations in which systematic partitioning is not a real
 
 A tax function has three brackets. A simplified partition suite picks one income per bracket plus one value at each of the two boundaries: five tests. Random testing draws 100 incomes from last year's distribution of real declarations. If the bug is a wrong rate in the top bracket, which holds 2% of declarations, the 100 random tests miss it with probability 0.98<sup>100</sup> ≈ 13%, while the partition suite catches it every time. If the bug is a rounding error that appears for one income in a thousand, spread evenly over the incomes people actually declare and unrelated to the brackets, the five partition tests, each hitting it with probability 0.001 independently, catch it with probability about 0.5% and the 100 random tests with about 10% (1 − 0.999<sup>100</sup>); to be 95% sure, random testing needs about 3,000 tests (1 − 0.999<sup>3000</sup> ≈ 95%). Which strategy wins depends on where the bug is, which nobody knows in advance.
 
+**Where the inputs come from.** Partitions come from the specification (brackets, limits, input classes) and from the code's branches. A random distribution worth sampling comes from real inputs, such as last year's declarations in the example, or from the [operational profile](../operational-profile/index.md); without usage data, random testing falls back to a uniform distribution, which says nothing about reliability.
+
 ## When to use each — and when not
 
 - **Use partitions** when the specification names the subdomains and the boundaries, and when some failures are much costlier than others.

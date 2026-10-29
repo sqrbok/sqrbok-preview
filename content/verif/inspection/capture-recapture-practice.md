@@ -32,6 +32,8 @@ Under PBR, detection probability varies both by inspector (each perspective has 
 
 With three perspectives and four inspectors, **double one**: two people read from the same perspective, each with an own list, and both count as separate inspectors. Their shared focus restores some overlap, which keeps the estimate from breaking down when the perspectives barely overlap. The course's choice is to double the perspective that matters most for the document; for requirements, the tester.
 
+**Where the inputs come from.** Each inspector's list can be a spreadsheet, a review-tool comment thread or a paper form, as long as it is handed in before the meeting; the moderator merges the lists into one defect log with a *found by* column, as in [the worked case](worked-case.md).
+
 ## When to use it — and when not
 
 Use these steps whenever a capture-recapture estimate will decide whether a document passes. Do not use them for a review where inspectors worked together on one list: there is no overlap to measure.

@@ -8,7 +8,7 @@ layout: default
 
 # Software Inspection
 
-**Inspection** is a structured examination of a work product (requirements, design, code, test plan) by people other than its author, with the single goal of finding defects before the product moves on {% cite fagan1976design %}. It needs no running program, so it can start long before testing. The word has two senses in these pages: the umbrella term for structured peer review, as in this section's title, and the most formal review type in the spectrum below.
+**Inspection** is a structured examination of a work product (requirements, design, code, test plan) by people other than its author, with the single goal of finding defects before the product moves on {% cite fagan1976design %}. It needs no running program, so it can start long before testing. The word means both structured peer review in general and the most formal review type below.
 
 ## The review spectrum
 
@@ -31,8 +31,9 @@ The two types most often confused differ in who leads and why. In a **walkthroug
 | [Capture-Recapture Estimation](capture-recapture.md) | estimating remaining defects from inspector overlap | deciding whether to reinspect | four or more independent inspectors |
 | [Capture-Recapture in Practice](capture-recapture-practice.md) | the steps from preparation lists to an exit decision | any inspection whose exit depends on an estimate | matching and classifying every report |
 | [Inspection Effectiveness](effectiveness.md) | detection rates, effort per defect, cost ratios, company results | arguing for or against inspection | reading the evidence critically |
+| [Worked Case](worked-case.md) | one code inspection, plan to exit decision | a first inspection | five people, about ten staff-hours |
 
-Read the Fagan page first: the other pages refine one of its steps (preparation, the meeting, the exit decision) or replace it with something lighter.
+Read the Fagan page first: the others refine one of its steps or replace it with something lighter.
 
 ## How solid is this?
 

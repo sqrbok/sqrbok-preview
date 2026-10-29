@@ -34,6 +34,8 @@ A study ran 375 sessions per class, 30 minutes each, on 8 classes, 1,500 CPU hou
 - **Most bugs come early.** The number of bugs found rises steeply in the first few minutes of a session.
 - **The seed matters.** For one class, one random seed found 5 bugs and another found 23 in the same 30 minutes, with everything else equal.
 
+**Where the inputs come from.** Randoop needs only the compiled classes under test and a time limit: it finds their public methods by reflection and builds every argument from earlier calls. The oracle comes from the code itself, so the assertions and argument checks the developers already wrote decide what counts as an error and what as illegal input; code with few assertions gets a weak oracle.
+
 ## When to use it — and when not
 
 - **Use it** to stress a library's public API, where valid objects must be built by calling other methods first.

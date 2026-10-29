@@ -35,6 +35,8 @@ A moderator plants 12 major defects in a 40-page design document before an inspe
 
 The inspection found a third of what was planted (4 of 12), so the estimate assumes it also found a third of the real defects. Two thirds are still in the document. On 40 pages, 22 / 40 = 0.55 major defects per page remain, more than twice an exit criterion of 0.25 per page {% cite malotaux2008onepage %}. The product should not pass this inspection.
 
+**Where the inputs come from.** The planted defects are written by someone outside the inspection team, best modelled on the organisation's own defect history so that they are as hard to find as real ones. The counts of planted and real defects found come from the inspection's defect log, with each entry marked planted or real after the meeting.
+
 ## When to use it — and when not
 
 Use seeding to measure how effective a team or a reading technique is (in experiments, in training, or to calibrate a new review process), and when too few independent inspectors are available for [capture-recapture](capture-recapture.md). Do not use it when the planted defects would be noticeably different from real ones: the estimate is only as good as that similarity.

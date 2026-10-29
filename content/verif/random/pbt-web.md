@@ -48,6 +48,8 @@ Good properties for a service come in a few kinds:
 - **Echo**: the response repeats what was sent, for example `data["item"] == body["item"]` and `data["quantity"] == body["quantity"]`.
 - **Round trip**: what you create with `POST` you can read back with `GET`.
 
+**Where the inputs come from.** The shape of each request comes from the service's API description, such as the OpenAPI document many web frameworks generate; tools such as Schemathesis turn it into generators directly (tool documentation). Value ranges come from the validation rules and from anonymised production requests, and the expected status codes from the same API description.
+
 ## When to use it — and when not
 
 - **Use it** to probe an API for inputs that crash it or break its contract, before users find them.
