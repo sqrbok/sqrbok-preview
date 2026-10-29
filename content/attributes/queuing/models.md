@@ -58,6 +58,8 @@ For example, an API server with *S* = 20 ms at ρ = 60% answers in 20 / 0.4 = 50
 
 _Mean response time as each server gets busier. A pool of four servers sharing one queue bends much later than a single server._
 
+On a real system, λ is the request count per second at the resource in a busy window, and *S* = *B*/*C* is its busy time over completions, both measured as on [Operational Laws](operational-laws.md); for a pool, *c* is the configured pool size.
+
 ## 2. The mean hides a long tail
 
 In an M/M/1 queue the response time of a single request is exponentially distributed with mean *R*: a request takes longer than time *t* with probability e<sup>−t/R</sup>. So 37% of requests take longer than the mean, and the p95 is *R* · ln 20 ≈ 3 *R*. At ρ = 90%, where *R* = 10 *S*, one request in twenty takes about 30 service times.
