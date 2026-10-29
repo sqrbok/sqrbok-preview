@@ -56,6 +56,10 @@ A = MTTF / (MTTF + MTTR)
 
 With MTTF = 1,000 hours and MTTR = 1 hour, A = 1,000 / 1,001 ≈ 0.999, "three nines". The formula shows two routes to high availability: fail less often (raise MTTF) or recover faster (cut MTTR). Cloud operators often find the second route cheaper {% cite beyer2016sre %}.
 
+## Where the numbers come from
+
+In operation, failures come from the incident tracker; during testing, from the test log. Each entry needs the time the failure occurred (not when it was reported or fixed) and its severity class, with duplicate reports of one failure merged. The time base is the system's operating hours from monitoring, execution hours, or a natural unit the application already counts, such as transactions processed. MTTR comes from the incident timeline: from the start of the outage, or its detection if the start is unknown, to service restored.
+
 ## When to use it — and when not
 
 Use λ, R(t) and MTTF to state and compare reliability once the software is stable: in acceptance testing, in operation, and when setting a target ([Severity Classes and the FIO](fio.md)). While testing is still removing faults, λ falls over time and a single constant misleads; use a [reliability growth model](growth-models.md) instead.
