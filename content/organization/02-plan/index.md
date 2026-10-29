@@ -14,6 +14,7 @@ has_children: true
 |---|---|---|
 | [The Quality Plan](01-quality-management-planning.md) | what a plan is and the eleven decisions it records | Miranda; Koopman |
 | [V&V Activities by Phase](02-vv-activities-process-models.md) | the minimum V&V tasks per phase and test-process maturity | Wallace and Fujii; Hrabovská |
+| [Verification Methods per Quality Characteristic](02b-methods-per-characteristic.md) | which methods give evidence for which ISO/IEC 25010 characteristic | NASA; ISO/IEC 25010 |
 | [Criticality and Quality Gates](03-quality-gates-criticality.md) | how criticality sets entry and exit criteria | DO-178B; IEEE 829; Uzunova |
 | [Estimating Test Effort](04-test-effort-estimation.md) | how many tests and hours, and how to sanity-check them | Bluemke; Miranda |
 | [Test Documentation (IEEE 829)](05-test-documentation-ieee829.md) | master and level test plans, scaled to integrity | IEEE 829 |

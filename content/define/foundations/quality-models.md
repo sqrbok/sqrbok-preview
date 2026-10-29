@@ -36,6 +36,10 @@ A quality model says *what* quality is; quality management says *who does what a
 
 The common confusion is QA against QC. A code review of one pull request is QC: it checks a work product. An audit showing that every pull request is reviewed before merge is QA: it gives confidence that the process will catch problems in pull requests nobody has seen yet.
 
+## 4. Generic, organisational and project models
+
+Models come in layers. A **generic** model such as ISO/IEC 25010 suits any software product. An **organisational** model tailors it to one organisation's products: the European Space Agency's handbook ECSS-Q-HB-80-04A defines a reference quality model for space software, with characteristics such as reusability and suitability for safety that ISO/IEC 9126, the generic model it builds on, did not have, and a process characteristic, software development effectiveness {% cite ecss2011metrication %}. A **project** model takes one of these for a single product: it keeps the characteristics that matter and sets a measure and threshold for each, as in [A Project Quality Model](project-model.md). A supplier to a space mission therefore starts from the ECSS model rather than from ISO.
+
 ## When to use it — and when not
 
 - **Use** a quality model when stakeholders must agree on what "good enough" means, when writing [quality requirements](requirements.md), and when planning what to test.
@@ -49,6 +53,7 @@ No model is complete: each reflects the concerns of its authors, and characteris
 
 - **Where it comes from.** The hierarchy is common to McCall's model and the ISO/IEC 25000 family {% cite mccall_factors_1977 iso25010_2023 %}. The opening definition paraphrases the SQuaRE vocabulary (ISO/IEC 25000), which we do not hold in full; the activity definitions paraphrase ISO 9000.
 - **What is contested.** Standards and textbooks name the levels differently: factor, criterion and metric in McCall; characteristic, subcharacteristic and measure in ISO. The structure is the same.
+- **What we do not hold.** The full ECSS handbook text (the characteristic names come from its table of contents) and any public document on SAP's internal product standards, another organisational model.
 
 ---
 

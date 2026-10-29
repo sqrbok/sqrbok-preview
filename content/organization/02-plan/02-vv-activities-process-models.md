@@ -45,7 +45,7 @@ A team need not aim for Level 5; the plan should state which level's practices i
 
 ## When to use it, and when not
 
-- **Use the task list** as a checklist when filling in the plan's first decision (activities) for each phase.
+- **Use the task list** as a checklist when filling in the plan's first decision (activities) for each phase; [Verification Methods per Quality Characteristic](02b-methods-per-characteristic.md) gives the same decision per characteristic.
 - **Do not apply it literally** to an iterative project: the tasks remain, but they recur in every iteration instead of happening once per phase.
 
 ## Limitations

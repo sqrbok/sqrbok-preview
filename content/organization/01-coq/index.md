@@ -14,11 +14,13 @@ has_children: true
 |---|---|---|
 | [Cost of Software Quality](01-cosq-foundations.md) | the four cost categories, their size, and how process maturity shifts them | Knox; Houston and Keats |
 | [Defect Injection and Removal](02-defect-injection-removal.md) | how defects flow through phases, and how to compare improvement options | Miranda; COQUALMO |
+| [Choosing Defect-Detection Techniques: Wagner's Model](02b-wagner-model.md) | which techniques to combine, by defect type and cost | Wagner |
 | [Defect Origin and Detection](03-defect-classification.md) | where defects were made and found; removal efficiency per activity | Kan |
 | [Defect Classification Schemes](04-classification-schemes.md) | ODC, HP and LiDeC for richer process feedback | Butcher; Huber; Mellegård |
 | [Quality Costs in Continuous Delivery](04-quality-economics-devops.md) | shift-left and shift-right in cost terms; the price of flaky tests | Leinen; Gottam |
 | [Value of Code Review](05-code-review-roi.md) | which review comments pay off | Turzo; Yu; Fu |
 | [Technical Debt as a Quality Cost](06-technical-debt.md) | which tool to believe, where debt accumulates | Amanatidis; Bhatia |
+| [Kinds of Technical Debt](06b-technical-debt-kinds.md) | intentional or not, short- or long-term, and why take it on | McConnell |
 | [Defect Prediction with Machine Learning](07-defect-prediction-ml.md) | why accuracy misleads, and what to measure instead | Khleel; Bhutamapuram |
 
 [Worked Case: Measuring a Team's Cost of Quality](worked-case.md) applies the section to one team: time reports and tracker fields, the CoQ table over three releases, DRE and a recommendation.
