@@ -1,167 +1,37 @@
 ---
-title: Overview
+title: Verification Overview
 parent: Verification and Validation
 nav_order: 1
 layout: default
 has_children: true
+redirect_from:
+  - /content/verif/overview/inspection.html
 ---
 
-# Verification and Validation Overview
+# Verification Overview
 
-Software verification and validation (V&V) encompasses all activities that help ensure software quality through systematic examination and testing. This section provides a comprehensive overview of V&V techniques, their purposes, and when to apply them.
+**Verification** is the work of showing that a product meets its specified requirements: *did we build the product right?* **Validation** shows that it serves its intended purpose for its users: *did we build the right product?* {% cite nasa2016sehandbook %} Both use the same four methods: inspection, analysis, testing and demonstration. None of them proves software correct in general; each gives evidence of a different kind, and each misses faults that another finds {% cite zheng2006static %}.
 
----
+This section is the map. It says what each method is, where it fits and what it cannot do, and links to the areas that hold the detail.
 
-## V&V Landscape
+| Method | What it finds | Best fit | Main cost | Where to read more |
+|---|---|---|---|---|
+| **Inspection** | faults visible in the text: omissions, wrong logic, unclear design | requirements, designs and code before they run | several people's reading time | [Four Verification Methods](techniques.md), [Inspection](../inspection/index.md) |
+| **Analysis** | violations of a property on every path: type errors, unsafe calls, deadlocks | rules that must hold everywhere; concurrency | false alarms, or building a model | [Verification by Analysis](analysis/index.md) |
+| **Testing** | failures on the inputs that were run | behaviour, interfaces, regressions | writing and maintaining tests and their expected results | [Testing Overview](testing/index.md) |
+| **Demonstration** | whether the product does the job in use | acceptance, usability, operation in the real environment | access to users and a realistic environment | [Four Verification Methods](techniques.md) |
 
-V&V activities can be categorized along multiple dimensions:
+Inspection and analysis do not run the product; testing and demonstration do. Inspection and demonstration rest on what people observe; analysis and testing on calculation or measured data. The [Four Verification Methods](techniques.md) page explains this split with one software example per method.
 
-### Static vs. Dynamic
-- **Static**: Examine software without executing it (code reviews, inspections, static analysis)
-- **Dynamic**: Execute software and observe behavior (testing at all levels)
-
-### Manual vs. Automated
-- **Manual**: Human-driven (code reviews, exploratory testing)
-- **Automated**: Tool-driven (unit tests, static analyzers, linters)
-
-### Black Box vs. White Box
-- **Black box**: Based on specifications, no knowledge of internals
-- **White box**: Based on code structure and implementation
+The detail areas each go deeper into one method: [static analysis](../static/index.md) and [inspection](../inspection/index.md) for the methods that do not run the code; [coverage criteria](../coverage/index.md), [input domain testing](../domain/index.md), [random testing](../random/index.md), [combinatorial testing](../combinatorial/index.md) and [exploratory testing](../exploratory/index.md) for ways of choosing tests.
 
 ---
 
-## Topics in This Section
+### References
 
-### [V&V Techniques](techniques.md)
-Overview of the complete landscape of verification and validation approaches:
-- Classification of techniques
-- Static vs. dynamic methods
-- When to use each approach
-- Combining techniques effectively
-
-### [Testing](testing/)
-Comprehensive guide to software testing:
-- **[Definitions](testing/testing_definitions.md)** - Fundamental testing concepts
-- **[Black Box vs. White Box](testing/testing_bb_wb.md)** - Functional vs. structural testing
-- **[Testing Levels](testing/testing_levels.md)** - Unit, integration, system, acceptance
-- **[Testing Purpose](testing/testing_purpose.md)** - Functional, performance, security, usability
-- **[Testing Target](testing/testing_target.md)** - What aspects of software to test
-
-### [Static Analysis](analysis/)
-Examining code without execution:
-- **[Definitions](analysis/analysis_definitions.md)** - What is static analysis?
-- **[Properties](analysis/analysis_properties.md)** - What can be analyzed statically
-- **[Tools](analysis/tools.md)** - Linters, type checkers, advanced analyzers
-- **[Checking Example](analysis/checking_example.md)** - Practical static analysis examples
-
-### [Inspection](inspection.md)
-Formal review processes:
-- Code reviews and walkthroughs
-- Fagan inspection method
-- Review effectiveness
-- Best practices
-
----
-
-## The V&V Spectrum
-
-Different V&V techniques offer different trade-offs:
-
-| Technique | Cost | Defect Detection | When to Use |
-|-----------|------|------------------|-------------|
-| **Code Review** | Low-Medium | High (design, logic) | Always, especially for critical code |
-| **Static Analysis** | Low | Medium (patterns, bugs) | Continuously, automated in CI/CD |
-| **Unit Testing** | Medium | High (logic, edge cases) | All code, TDD approach |
-| **Integration Testing** | Medium | High (interfaces, interactions) | Component boundaries |
-| **System Testing** | High | Medium-High (end-to-end) | Before release |
-| **Acceptance Testing** | High | High (requirements) | Validate with users |
-
----
-
-## Key Principles
-
-### 1. Defense in Depth
-Use multiple complementary V&V techniques. No single approach catches all defects.
-
-### 2. Shift Left
-Test and verify early in the development lifecycle. Defects are exponentially cheaper to fix when caught early.
-
-### 3. Automate Where Possible
-Automated V&V provides fast feedback and enables continuous quality.
-
-### 4. Focus on Risk
-Allocate V&V effort based on criticality, complexity, and change rate.
-
-### 5. Balance Cost and Benefit
-100% verification is impossible and uneconomical. Optimize for value.
-
----
-
-## When to Use What?
-
-### Use Static Analysis When:
-- You want fast, automated feedback
-- Looking for common bug patterns
-- Enforcing coding standards
-- Checking types and interfaces
-
-### Use Code Reviews When:
-- Design and architecture matter
-- Domain knowledge is critical
-- Catching subtle logic errors
-- Mentoring and knowledge sharing
-
-### Use Testing When:
-- Verifying behavior and requirements
-- Exercising runtime conditions
-- Checking integration and interactions
-- Validating performance and security
-
-### Use Inspection When:
-- Code is critical or complex
-- More thorough review is needed
-- Formal process is required
-- Learning from defects is important
-
----
-
-## Complementary Techniques
-
-The most effective V&V programs combine techniques:
-
-**Example: Critical Safety-Critical Module**
-1. Static analysis for common bugs and standard violations
-2. Code review for design and logic
-3. Unit tests for behavior and edge cases
-4. Integration tests for interactions
-5. Formal inspection for final verification
-
-**Example: Routine Business Logic**
-1. Static analysis in CI/CD
-2. Peer review via pull requests
-3. Unit tests (TDD approach)
-4. Integration tests for key flows
-
----
-
-## Study Materials
-
-### [SN: Verification Methods](../../material/sqr/SN_L03_Verification.md)
-Comprehensive study notes covering V&V fundamentals, inspection techniques and ROI, static analysis (properties, Rice's theorem, tools), testing (levels, black/white box, TDD, test pyramid), and demonstration.
-
-### [RQ: Verification Methods](../../material/sqr/RQ_L03_Verification.md)
-Revision questions for self-study and exam preparation covering four verification techniques, inspection, static analysis, testing fundamentals, and defense in depth.
-
----
-
-## Further Exploration
-
-After understanding V&V techniques, explore:
-- [Coverage Criteria](../coverage/) - Measuring testing thoroughness
-- [Defining Quality](../../define/) - What we're trying to achieve
-- [Quality Attributes](../../attributes/) - Specific quality goals
+{% bibliography --cited %}
 
 ---
 
 {: .highlight }
-**Disclaimer:** AI is used for text polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.

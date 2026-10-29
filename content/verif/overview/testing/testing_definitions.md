@@ -1,149 +1,72 @@
 ---
-parent: Testing
+parent: Testing Overview
 nav_order: 1
-title: Testing Definitions
+title: What Testing Is
 layout: default
 ---
 
+# What Testing Is
 
+**Testing is evaluating software by observing its execution: a test runs the program on chosen inputs and compares what happens with an expected result** {% cite ammann2016introduction %}. A test that exposes a wrong result has done its job; a passing test only shows that this input worked.
 
-# 📘 What Is Testing?
+## 1. Fault, error and failure
 
-### Definitions
+Three words describe what goes wrong, and testing sees only the last {% cite ammann2016introduction %}:
 
-**INCOSE (International Council on Systems Engineering):**
+- A **fault** is a static defect in the code, such as a wrong loop bound.
+- An **error** is an incorrect internal state caused by the fault while the program runs.
+- A **failure** is external behaviour that is wrong with respect to the requirements.
 
-> Testing is a verification method that determines system or component performance by operating it using external tools or instrumentation (not built into the item). Any data analysis involved in testing should not rely on subjective interpretation or extrapolation.
+**Example.** This Python port of Ammann and Offutt's `numZero` example should count the zeros in a list, but its loop starts at index 1 instead of 0:
 
-**Software Engineering Perspective:**
-
-> Testing is the process of executing software—partially or completely—with the goal of detecting faults **before release**, and to ensure that the software behaves **as expected**.
-
-### Purpose of Testing
-
-Testing helps us to:
-
-* **Verify** that functional and performance requirements are met.
-* **Find bugs and faults** early, ideally before software deployment.
-
-### Practical Examples
-
-* ✅ If a correct username and password are entered, the system logs the user in.
-* ✅ The system can process 1,000 transactions per minute under load.
-
----
-
-> 🧠 **Key Idea:** The primary goal of testing is **to make the software fail**.
-> A good test is one that reveals a fault. Proving correctness is hard, but **falsifying a property** (i.e., showing that something doesn't work) is much easier and more practical.
-
----
-
-# 🧪 Test Classification: A Taxonomy
-
-Understanding how testing is classified helps in selecting the right kind of tests for different stages and goals of software development.
-
-## 1. **By Level (Scope of the Test)**
-
-| Level                 | Description                                         |
-| --------------------- | --------------------------------------------------- |
-| **Unit**              | Tests individual functions or methods in isolation. |
-| **Integration**       | Tests how components or systems work together.      |
-| **Thread / Function** | Focuses on execution paths or workflows.            |
-| **System**            | Tests the entire application as a whole.            |
-| **Medium**            | (Intermediate level—between unit and system.)       |
-
----
-
-## 2. **By Purpose or What’s Being Tested**
-
-| Purpose                    | Focus                                                 |
-| -------------------------- | ----------------------------------------------------- |
-| **Functional Correctness** | Does the system do what it’s supposed to?             |
-| **Robustness**             | Does the system handle unexpected input or stress?    |
-| **Performance**            | How well does the system perform under load?          |
-| **Regression**             | Do old features still work after changes?             |
-| **Acceptance**             | Does it meet the end user's or client’s expectations? |
-
----
-
-## 3. **By Source of Test Cases**
-
-| Source                  | Type of Testing                                                                        |
-| ----------------------- | -------------------------------------------------------------------------------------- |
-| **Specification-based** | Also known as **Black-box testing**. Based on requirements.                            |
-| **Structure-based**     | Also known as **White-box testing**. Based on code structure.                          |
-| **Model-based**         | Uses formal or informal models to derive tests.                                        |
-| **Experience-based**    | Also called **Exploratory testing**. Relies on tester intuition and domain experience. |
-
----
-
-## 4. **By Targeted Faults**
-
-| Fault Type                | Description                                                                     |
-| ------------------------- | ------------------------------------------------------------------------------- |
-| **Computational**         | Incorrect logic or math operations.                                             |
-| **Domain**                | Issues when inputs are outside expected domains.                                |
-| **Variable Interactions** | Errors due to interactions between variables.                                   |
-| **Value Propagation**     | Faults in how data flows through the program.                                   |
-| **Variable Usages**       | Mistakes in how variables are declared or used (e.g., uninitialized variables). |
-
----
-
-## 5. **By Execution Mode**
-
-| Mode          | Description                                           |
-| ------------- | ----------------------------------------------------- |
-| **Manual**    | Testers run tests and evaluate results by hand.       |
-| **Automated** | Tests are executed and validated by tools or scripts. |
-
----
-
-
-## Visual summary
-
-{: .highlight }
-Note: Good tests are those that cause the program to FAIL (reveal bugs).
-
-```mermaid
-
-graph LR
-  A[Software Testing] --> B1(Level)
-  B1 --> C1[Unit]
-  B1 --> C2[Integration]
-  B1 --> C3[System]
-  B1 --> C4[Function/Thread]
-  B1 --> C5[Medium]
-
-  A --> B2(Purpose)
-  B2 --> D1[Functional Correctness]
-  B2 --> D2[Robustness]
-  B2 --> D3[Performance]
-  B2 --> D4[Regression]
-  B2 --> D5[Acceptance]
-
-  A --> B3(Source of Test Cases)
-  B3 --> E1[Specification - Black Box]
-  B3 --> E2[Structure - White Box]
-  B3 --> E3[Model-based]
-  B3 --> E4[Experience-based]
-
-  A --> B4(Targeted Faults)
-  B4 --> F1[Computational]
-  B4 --> F2[Domain]
-  B4 --> F3[Variable Interaction]
-  B4 --> F4[Value Propagation]
-  B4 --> F5[Variable Usage]
-
-  A --> B5(Execution Mode)
-  B5 --> G1[Manual]
-  B5 --> G2[Automated]
-
+```python
+def num_zero(xs):
+    """Return the number of zeros in xs."""
+    count = 0
+    for i in range(1, len(xs)):  # fault: the loop should start at 0
+        if xs[i] == 0:
+            count += 1
+    return count
 ```
 
+Two pytest tests run it. `num_zero([2, 7, 0])` returns 1, which is right; `num_zero([0, 7, 2])` returns 0, and pytest reports `assert 0 == 1`. Both runs execute the fault, and both are in an error state from the first iteration, because `i` is 1 where it should be 0. In the first run the error does not reach the output: the skipped element is not a zero, so the count is still correct. Only the second run fails {% cite ammann2016introduction %}.
 
+For a failure to be seen, four things must happen: the test must **reach** the fault, the fault must **infect** the state, and the infected state must **propagate** to the program's output, and the test must check that output, a fourth condition Ammann and Offutt call **revealability** {% cite ammann2016introduction %}. A test that reaches the fault but checks nothing, or checks the wrong output, sees no failure. **Debugging** is the separate work of finding the fault once a failure has been seen.
 
+## 2. What a test needs
+
+A test case has input values and an **expected result**: the output the program should produce if it meets its specification {% cite ammann2016introduction %}. Whatever decides whether the actual output matches is the **oracle**. Writing the expected value by hand is the usual oracle; others are listed here:
+
+- A reference implementation, such as the old system a new one replaces, gives the expected output for any input.
+- A property checks every output without knowing it exactly, for example "a sorted list has the same elements, in order"; see [Property-Based Testing](../../random/property-based.md).
+- A crash detector treats any crash or unhandled exception as a failure, which is all a fuzzer needs; see [Fuzz Testing](../../random/fuzzing.md).
+
+## 3. Why testing cannot show that faults are absent
+
+Dijkstra put it in one line: "Program testing can be used to show the presence of bugs, but never to show their absence!" {% cite dijkstra1970notes %} The reason is the size of the input space. (Constructed example.) A function of two 64-bit integers has 2<sup>128</sup> ≈ 3.4 × 10<sup>38</sup> possible inputs; at a billion tests per second, trying them all would take about 10<sup>22</sup> years. Every real suite is a tiny sample, so the art of testing is choosing that sample: see the [Testing Overview](index.md).
+
+## When to use it — and when not
+
+- Use testing when the expected behaviour is known and the program can be run, including after every change.
+- Do not use a passing suite as evidence that a property holds on every input; use [analysis](../analysis/index.md) for that.
+
+## Limitations
+
+A test is only as good as its oracle. In the example, a test that called `num_zero([0, 7, 2])` but asserted nothing would have run the fault, infected the state and propagated a wrong output, and still passed.
+
+## How solid is this?
+
+- **Where it comes from.** The definitions, the `numZero` example and the reachability–infection–propagation model are from Ammann and Offutt {% cite ammann2016introduction %}; the quotation from Dijkstra's *Notes on Structured Programming* {% cite dijkstra1970notes %}. The Python runs were made for this page (pytest 9.1.1).
+- **What is contested.** Terminology: standards and textbooks use "error", "fault", "defect" and "bug" in different senses; this page follows Ammann and Offutt.
+- **What we do not hold.** No source in the review measures how often real suites have weak oracles.
+
+---
+
+### References
+
+{% bibliography --cited %}
 
 ---
 
 {: .highlight }
-**Disclaimer:** AI is used for text polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.

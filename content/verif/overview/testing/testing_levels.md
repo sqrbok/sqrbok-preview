@@ -1,183 +1,67 @@
 ---
-parent: Testing
+parent: Testing Overview
 nav_order: 2
-title: Levels
+title: Testing Levels
 layout: default
 ---
 
+# Testing Levels
 
-# ✅ Testing Techniques Structured by Levels
+**A testing level is the scope of what a test exercises, from one function (unit testing) to the whole system in use (acceptance testing); each level checks the product against a different development artifact** {% cite ammann2016introduction %}.
 
-Software testing can be classified based on the *scope* or *level* of the system being tested. The goal is to verify software components in increasing scale and complexity—from individual functions to the entire system.
+## 1. Five levels and the V model
 
----
+Ammann and Offutt pair each level with the development activity whose output it checks {% cite ammann2016introduction %}:
 
-### 📋 Summary Table
+![V-shaped diagram: requirements analysis, architectural design, subsystem design, detailed design and implementation down the left; unit, module, integration, system and acceptance test up the right; dashed arrows carry test design information across](v-model.svg)
 
-| **Level**                     | **Description**                                                          |
-| ----------------------------- | ------------------------------------------------------------------------ |
-| **Unit Testing**              | Tests a single unit (e.g., function, method, object) in isolation.       |
-| **Integration Testing**       | Tests interactions between multiple units or components.                 |
-| **Thread / Function Testing** | Tests workflows or execution paths involving multiple interacting units. |
-| **System Testing**            | Tests the complete and integrated system as a whole.                     |
-| **Medium Testing**            | An intermediate testing level between unit and system testing.           |
+_Development activities and testing levels, the "V model", redrawn from Ammann and Offutt. The diagram does not imply a waterfall process._ {% cite ammann2016introduction %}
 
----
+- **Unit testing** assesses the units the implementation produces: functions and methods. Programmers usually do it, and tools such as pytest or JUnit keep the tests next to the code.
+- **Module testing** assesses a module (a file, package or class) in isolation, including how its units work together.
+- **Integration testing** assesses whether the interfaces between modules make consistent assumptions and communicate correctly. It assumes the modules work; developers usually do it.
+- **System testing** assesses whether the assembled system meets its specification, and looks for design and specification problems. A separate test team usually does it; it is an expensive place to find low-level faults.
+- **Acceptance testing** assesses whether the completed software does what the users want, and must involve users or people with strong domain knowledge.
 
-## 🧪 Unit Testing
+**Regression testing** is not a level: it re-runs tests after a change, at any level, to check that what worked still works {% cite ammann2016introduction %}. The arrows across the V carry a further piece of advice: design each level's tests while doing the matching development activity, because writing a test early often exposes a design mistake {% cite ammann2016introduction %}.
 
-* A **unit** is typically a function, method, or class written by a developer.
-* Unit testing focuses on **internal correctness** of that unit.
-* It’s usually done **early** in development, before or after code reviews.
-* **Simulated environment**: Uses *stubs* (dummy functions) and *drivers* (test harnesses).
-* **Common faults**: Incorrect logic, boundary issues, data corruption, etc.
-* **Test adequacy**: Measured using:
+## 2. Example: one shop, five levels
 
-  * **Statement/branch coverage**
-  * **Path coverage**
-  * **MC/DC** (Modified Condition/Decision Coverage)
-  * **Mutation testing**
+(Constructed example.) An online shop has an `Item` class that looks up prices, an `Order` class that adds them up, and a web front end. A price fault could be found at each level, but each level finds a different kind:
 
-### 🛒 Example: Unit Test of `Order` Object
+| Level | Test | Fault it can find |
+|---|---|---|
+| Unit | `Order.total()` with a stub (a stand-in that returns fixed prices; see Test Doubles) | a wrong sum, a discount applied twice |
+| Module | the `Order` class with its own helper methods | a helper that leaves the order in a wrong state |
+| Integration | `Order` with the real `Item` price lookup | `Item` returns cents, `Order` assumes euros: 2.50 becomes 250 |
+| System | the whole shop through its web API on a staging server | the basket page shows the total before tax, against the specification |
+| Acceptance | a customer buys three items | customers wanted the delivery cost shown before the last step |
 
-```mermaid
-sequenceDiagram
-    actor Customer
-    participant SC as ShoppingCart
-    box "Unit Under Test"
-        participant O as Order
-    end
-    participant I as Item
+The integration fault is invisible at unit level: each class is correct on its own assumptions. The acceptance finding is invisible to every other level: the system met its specification, and the specification missed what users needed.
 
-    Customer->>SC: Add items and get total
-    SC->>O: Create order
-    O->>I: Get item prices
-    I-->>O: Return item prices
-    O-->>SC: Return total price
-    SC-->>Customer: Display total price
-```
+## When to use each level — and when not
 
-### 🧪 Mocking in Unit Testing
+- Test at the lowest level that can show the fault: unit tests are fast and point at the faulty line.
+- Do not stop at unit tests when modules come from different people or teams; interface faults appear only when they meet.
+- Do not use system tests to find logic faults in one function: the run is slow and the failure is far from its cause.
 
-Mocking simulates dependencies (like APIs or databases) to isolate the unit being tested.
+## Limitations
 
-```mermaid
-sequenceDiagram
-    actor Developer
-    participant TestFramework
-    participant CodeUnderTest
-    participant MockService
+The levels describe scope, not test size. Google separates the two: a test's **size** is the resources it needs (one process, one machine, or many), its **scope** the code it validates {% cite winters2020swe %}. A narrow unit test can still be slow if it touches a real database; see [The Test Pyramid](test-pyramid.md). Some literature also uses "integration testing" and "system testing" interchangeably {% cite ammann2016introduction %}.
 
-    Developer->>TestFramework: Write test cases
-    TestFramework->>CodeUnderTest: Call functions with inputs
-    CodeUnderTest->>MockService: Send mock API call
-    MockService-->>CodeUnderTest: Return mock response
-    CodeUnderTest-->>TestFramework: Return output
-    TestFramework->>Developer: Compare output with expected results
-    alt Output matches expected
-        TestFramework->>Developer: Test passed
-    else Output does not match expected
-        TestFramework->>Developer: Test failed
-    end
-```
+## How solid is this?
+
+- **Where it comes from.** The levels, the V model and the advice to design tests early are from Ammann and Offutt {% cite ammann2016introduction %}; size and scope from *Software Engineering at Google* {% cite winters2020swe %}.
+- **What is contested.** The number of levels: many sources merge module into unit testing, or add a thread or function level between integration and system testing.
+- **What we do not hold.** No held source measures which level finds which share of faults.
 
 ---
 
-## 🔗 Integration Testing
+### References
 
-* Combines two or more **interacting units** and tests their interaction.
-* **Typical faults**:
-
-  * *Interface misuse*: Incorrect parameter usage or function calls.
-  * *Interface misunderstanding*: Incorrect assumptions about a function’s behavior.
-* Usually performed by developers or a dedicated testing team.
-* **Test environment**: Development or staging.
-* **Adequacy**: Measured via **node/edge coverage** of immediate connections.
-
-### 🧪 Integration Test Example
-
-```mermaid
-sequenceDiagram
-    actor Customer
-    participant SC as ShoppingCart
-    box "Integration Test"
-        participant O as Order
-        participant I as Item
-    end
-
-    Customer->>SC: Add items and get total
-    SC->>O: Create order
-    O->>I: Get item prices
-    I-->>O: Return item prices
-    O-->>SC: Return total price
-    SC-->>Customer: Display total price
-```
-
----
-
-## 🔁 Thread / Function Testing
-
-* Tests **end-to-end workflows** or **execution paths** that span multiple components.
-* Focuses on *functional correctness* of operations from input to output.
-* Runs in a development or pre-production environment.
-* Faults and defects are logged and reported for triaging.
-
-### 🧪 Function Test Example
-
-```mermaid
-sequenceDiagram
-    actor Customer
-    box "Function Test"
-        participant SC as ShoppingCart
-        participant O as Order
-        participant I as Item
-    end
-
-    Customer->>SC: Add items and get total
-    SC->>O: Create order
-    O->>I: Get item prices
-    I-->>O: Return item prices
-    O-->>SC: Return total price
-    SC-->>Customer: Display total price
-```
-
----
-
-## 🖥️ System Testing
-
-* Involves testing the **entire application**, including all subsystems and integrations.
-* **Goal**: Validate that the system meets all **functional and non-functional** requirements.
-* **Environment**: As close as possible to production.
-* Performed by **independent QA** teams, not the developers.
-* **Common issues** found:
-
-  * Faulty interactions between components
-  * Negative test cases (e.g., incorrect user input)
-* **Adequacy** measured using:
-
-  * **Combinatorial coverage**
-  * **Mutation testing**
-
-### 🧪 System Test Example
-
-```mermaid
-sequenceDiagram
-    box "System Test"
-        actor Customer
-        participant SC as ShoppingCart
-        participant O as Order
-        participant I as Item
-    end
-
-    Customer->>SC: Add items and get total
-    SC->>O: Create order
-    O->>I: Get item prices
-    I-->>O: Return item prices
-    O-->>SC: Return total price
-    SC-->>Customer: Display total price
-```
+{% bibliography --cited %}
 
 ---
 
 {: .highlight }
-**Disclaimer:** AI is used for text polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.

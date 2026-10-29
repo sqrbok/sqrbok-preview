@@ -10,516 +10,87 @@ page_type: study-notes
 
 # SN L03: Verification Methods
 
-**Course:** Software Quality and Reliability (SQR)
-**Lecture:** L03 - Verification Methods
-**Purpose:** Exam preparation and revision
+The lecture asks *how do we gain confidence that software meets its requirements, when we cannot prove it?* Its answer is four verification methods (inspection, analysis, testing and demonstration), each with its own evidence and its own blind spots, used together. The lecture takes them in that order and ends with how to combine them. The [revision questions](RQ_L03_Verification.md) test this lecture.
 
----
+## 1. Verification establishes confidence, not proof
 
-## Table of Contents
+Verification shows that a product meets its specified requirements: *did we build the product right?* Validation shows that it serves its intended purpose: *did we build the right product?* {% cite nasa2016sehandbook %} Neither proves a program correct. Verification establishes how much confidence the evidence justifies that the software does what it should and does not do what it should not. It is continuous, not a phase at the end: quality cannot be "tested in" after the fact, only checked. Exhaustive testing is out of reach for any real program; a function of two 64-bit integers already has 2<sup>128</sup> inputs.
 
-1. [Part 1: V&V Fundamentals](#part-1-vv-fundamentals)
-2. [Part 2: Inspection](#part-2-inspection)
-3. [Part 3: Static Analysis](#part-3-static-analysis)
-4. [Part 4: Testing](#part-4-testing)
-5. [Part 5: Demonstration](#part-5-demonstration)
-6. [Part 6: Summary & Defense in Depth](#part-6-summary--defense-in-depth)
+→ [Verification Overview](../../verif/overview/index.md)
 
----
+## 2. Four methods differ in whether the product runs and what evidence they produce
 
-## Part 1: V&V Fundamentals
+**Inspection** is examination by people; **analysis** is calculation or reasoning about a model; **testing** runs the product under controlled conditions and gathers detailed data; **demonstration** uses the product and confirms a capability without detailed data {% cite nasa2016sehandbook %}. Inspection and analysis do not need a running product, so they can start early; testing and demonstration need one. The method follows from what must be shown: a security analyzer checks on every commit that no SQL query is built by concatenation, a unit test checks that a 10% discount turns 40.00 into 36.00, and a demonstration checks that a first-time customer can complete a purchase.
 
-### Learning Objectives
-- Explain verification's contribution to software quality
-- Distinguish between verification and validation
-- List and describe the four verification techniques
+→ [Four Verification Methods](../../verif/overview/techniques.md)
 
-### Purpose of Verification
+## 3. Inspection finds faults directly, and early
 
-Verification establishes **confidence** (not proof!) that software:
-1. **Does what it's supposed to do** under stated conditions
-2. **Doesn't do what it shouldn't do**, even under adverse conditions
+In an inspection, people other than the author examine a work product to find defects; it needs no running code, so it can check requirements and designs. Testing sees a failure and must then trace it back to a fault; inspection sees the fault itself, including omissions that no test would exercise. Reviews range, from most to least formal, through inspection, team review, walkthrough, pair programming, deskcheck and passaround to an ad hoc glance at a colleague's screen. In a walkthrough the author leads and explains the product; in an inspection a trained moderator who is not the author leads, and every participant prepares alone beforehand. In general, the more formal, the more defects found per line and the more effort {% cite wiegers2002peer %}. One telecommunications company found 16 to 20 defects per thousand lines by inspection against 3 with informal review {% cite wiegers2002peer %}.
 
-> "Verification is a continuous process, not something that happens at the end."
+The business case rests on cost: at the Jet Propulsion Laboratory, fixing a defect found in inspection cost 1/10 to 1/34 of fixing it in formal testing, and Hewlett-Packard estimated that inspections saved USD 21,454,000 a year {% cite dodd2003inspection %}. Inspection and testing are complements: in one industrial study about 90% of inspection faults were algorithm, documentation or checking faults, while testing mostly found function and algorithm faults {% cite zheng2006static %}.
 
-**Key insight:** You cannot **test IN** quality — you verify to find exceptions and establish confidence levels.
+→ [Inspection](../../verif/inspection/index.md), [Inspection Effectiveness](../../verif/inspection/effectiveness.md)
 
-### The Four Verification Techniques
+## 4. Analysis covers every path, so it must approximate
 
-| Technique | Definition | Best For |
-|-----------|------------|----------|
-| **Inspection** | Human examination of artifacts | Faults of omission, style, early detection |
-| **Analysis** | Model-based evaluation without execution | Formal properties, concurrency, security |
-| **Testing** | Execution under controlled conditions | Dynamic behavior, integration issues |
-| **Demonstration** | Operation in real/production environment | User acceptance, performance validation |
+Analysis reasons about the code, or a model of it, without running it, and so covers every path at once {% cite chess2007static %}. The lecture names three kinds: **static analysis** of source code or binaries (automated inspection), **model checking** (exhaustive exploration of a model's states) and **theorem proving** (mathematical proof that code meets a specification). Rice's theorem sets the limit: no algorithm decides every non-trivial question about what programs do {% cite rice1953classes %}. An analysis that always terminates must therefore approximate. A **sound** analysis reports every real violation but raises false alarms (false positives); a **complete** one reports only real violations but misses some (false negatives) {% cite chess2007static %}. Here "positive" means "the tool reported something", not "good news". Practical bug finders are neither sound nor complete: they accept some false alarms and some missed bugs to keep their warnings useful.
 
-**Defense in Depth:** No single technique finds all defects. Combine them!
+→ [Verification by Analysis](../../verif/overview/analysis/index.md), [Soundness and Completeness](../../verif/static/limits.md)
 
-### INCOSE Definitions
+## 5. Analysis proves properties: safety, liveness, fairness, temporal
 
-| Technique | INCOSE Definition |
-|-----------|-------------------|
-| **Inspection** | Determining performance by examining engineering documentation or the item itself using visual means or simple measurements |
-| **Analysis** | Verification method of determining performance or other properties from analytical evidence |
-| **Testing** | Verification by operating the system under controlled conditions and analyzing results |
-| **Demonstration** | Verification by observing the item's operation under natural or production-like conditions |
+A property is a precise condition on a state or a sequence of states {% cite mansourisamani2008program %}. A **safety** property says nothing bad ever happens (no deadlock, no order shipped twice); a **liveness** property says something good eventually happens (every request is eventually answered); a **fairness** property is a liveness property whose good thing happens again and again, not just once (each process gets a turn again and again); a **temporal** property relates states along a path (every message sent is later received). In the linear temporal logic (LTL) notation of the SPIN model checker, `[]` means always, `<>` eventually and `U` until, so "every request is eventually granted" is `[](request -> <>granted)` {% cite mansourisamani2008program %}. A safety violation has a finite counterexample; a liveness violation is an infinite run that never reaches the good state, which a model checker shows as a cycle of states {% cite benari2010model %}. So a safety violation is easier to show: a finite prefix of steps is enough. An analysis proves only the properties someone wrote down, and it says nothing about response time under real load, usability or a wrong requirement.
 
----
+→ [What Analysis Can Prove](../../verif/overview/analysis/analysis_properties.md)
 
-## Part 2: Inspection
+## 6. Model checking explores every state of a model
 
-### Learning Objectives
-- Define inspection and its role in verification
-- Explain the ROI of inspections with empirical evidence
-- Describe the spectrum of inspection techniques from formal to informal
-- Compare inspection vs testing
+A model checker takes a finite model and a property, explores every reachable state and either confirms the property for the model or returns a counterexample, the exact sequence of steps that breaks it {% cite benari2010model %}. It is strong on concurrency: two processes that each add 1 to a shared counter ten times through a local copy can end with the value 2, lower than random simulations had shown, and the checker finds it directly with the steps that lead to it. Each increment is `tmp = counter` then `counter = tmp + 1`. P reads 0; Q runs nine full increments (counter = 9); P writes 1; Q reads 1; P runs its last nine increments (counter = 10); Q writes 2. Its limit is **state explosion**: each added process multiplies the states, a problem that can be managed but not removed {% cite mansourisamani2008program %}. Tools fall into families with different guarantees: linters and type checkers (pylint, mypy) prove nothing when silent; sound analyzers (Polyspace, Astrée) rule out a class of runtime error; model checkers (SPIN, Java PathFinder) prove properties of a model; program verifiers (Dafny, KeY) prove that code meets its specification.
 
-### What is Inspection?
+→ [Model Checking](../../verif/static/model-checking.md), [Analysis Tools by Family](../../verif/overview/analysis/tools.md)
 
-**INCOSE Definition:**
-> Determining performance by examining engineering documentation or the item itself using visual means or simple measurements.
+## 7. Testing shows failures by running the program
 
-**Practitioner Definition:**
-> Scrutiny by people other than the producer, based on the premise that individuals might be blind to trouble spots in their own work.
+Testing evaluates software by observing its execution {% cite ammann2016introduction %}. A **fault** is a static defect in the code, an **error** the wrong internal state it causes, a **failure** the wrong external behaviour. A failure is seen only if the test reaches the fault, the fault infects the state, and the infected state propagates to an output the test checks {% cite ammann2016introduction %}. In Ammann and Offutt's `num_zero` example the loop that counts zeros starts at index 1 instead of 0. For `[2, 7, 0]` the run reaches the fault and the wrong index is already an error state, but the skipped element is not a zero, so the count is right and nothing fails; for `[0, 7, 2]` the error propagates and the function returns 0 instead of 1. Deciding whether an output is right needs an **oracle**, and it must come from the requirement, not from the code under test: an expected value, a reference implementation, a property, or simply "no crash". And testing "can be used to show the presence of bugs, but never to show their absence" {% cite dijkstra1970notes %}. Tests can be classified by level, source (black or white box), purpose, targeted faults and execution (manual or automated).
 
-### Uses of Inspection
+→ [What Testing Is](../../verif/overview/testing/testing_definitions.md)
 
-- **Complements testing** (comes earlier in process)
-- Finds faults of omission, design problems, style issues
-- Catches defects **before** they become failures
-- **Key insight:** Inspection finds faults **directly**; Testing observes failures → traces to faults
+## 8. Each testing level checks against a different artifact
 
-### Inspection ROI — Empirical Evidence
+Unit tests are designed from the implementation, one function at a time, though their expected values must still come from what each function should do; module tests a class or file in isolation, integration tests the interfaces between modules, system tests the assembled system against its specification, and acceptance tests the finished product against what users want {% cite ammann2016introduction %}. In the V model, which draws development activities down the left side and the matching test levels up the right, each level's tests are designed alongside the matching development activity. Each level finds faults the others cannot. For example, an `Item` class returning cents to an `Order` expecting euros passes both unit tests and fails integration. Unit tests isolate the unit with **test doubles**: a stub returns canned answers, a fake is a lightweight working implementation, and a mock checks how a dependency was called {% cite winters2020swe %}. Google prefers real implementations, because a test is only as faithful as what it runs against, then fakes, and warns against overused stubs and **interaction tests** (tests that use a mock to check how a dependency was called): they are brittle, failing after a refactoring that left the behaviour unchanged.
 
-| Organization | Result | Source |
-|--------------|--------|--------|
-| **Hewlett-Packard** | ROI 10:1, $21.4M/year savings | Grady & Van Slack 1994 {% cite grady1994key %} |
-| **AT&T Bell Labs** | 10× quality improvement, 14% productivity increase | Humphrey 1989 {% cite humphrey1989managing %} |
-| **Bell Northern** | 33 hours maintenance saved per defect found | Russell 1991 {% cite russell1991bell %} |
-| **Cisco** | Results match established literature | Cohen 2006 {% cite cohen2006code %} |
+→ [Testing Levels](../../verif/overview/testing/testing_levels.md), [Test Doubles](../../verif/overview/testing/test-doubles.md)
 
-**Why so effective?**
-- Find defects early (cheaper to fix)
-- Knowledge transfer within team
-- Prevent defects from propagating
+## 9. Black-box and white-box tests see different gaps
 
-### Inspection Techniques — From Formal to Informal
+Black-box tests come from the specification; white-box tests from the code's statements and branches {% cite ammann2016introduction %}. Boundary-value testing is a typical black-box technique, branch coverage a typical white-box one; the next lectures teach both. Black-box tests show which requirements were tested but miss code the specification never mentions; white-box tests show which code ran but miss requirements that were never coded. Tests can also be classified by purpose: functional, regression (re-running tests after a change), performance (load and stress) and robustness. **Exploratory testing** designs tests while running them, guided by the tester's learning; it needs no written specification but is hard to repeat.
 
-| Technique | Description | Overhead |
-|-----------|-------------|----------|
-| **Fagan Inspections** | Well-defined entry/exit conditions. Presenter ≠ author. | High |
-| **Team Review** | Formal meeting with project personnel, managers, stakeholders. | Medium-High |
-| **Walkthrough** | Author leads team through artifact. Questions encouraged. | Medium |
-| **Tool-Assisted Code Review** | Line-by-line critique via diff, annotations, GitHub PRs. | Low-Medium |
-| **Pair Programming** | Real-time review. Two developers at one workstation. | Built-in |
-| **Ad-hoc Review** | Unstructured, spontaneous. Least formal. | Lowest |
+→ [Black-Box and White-Box Testing](../../verif/overview/testing/testing_bb_wb.md), [Testing by Purpose](../../verif/overview/testing/testing_purpose.md), [Exploratory Testing](../../verif/exploratory/index.md)
 
-### Matching Inspection to Context
+## 10. Most tests should be small, and TDD helps experienced teams on new code
 
-| Technique | When to Use | Example |
-|-----------|-------------|---------|
-| **Fagan** | Safety-critical, contractual requirements | Avionics software |
-| **Team Review** | Design decisions, architecture | System design docs |
-| **Walkthrough** | Teaching, knowledge sharing | Onboarding new devs |
-| **Tool-Assisted** | Daily code changes, PRs | GitHub/GitLab workflow |
-| **Pair Programming** | Complex features, onboarding | Feature development |
-| **Ad-hoc** | Quick questions, sanity checks | "Can you check this?" |
+Google's test pyramid recommends about 80% unit, 15% integration and 5% end-to-end tests, by test count; the inverted "ice cream cone" of mostly end-to-end tests is slow, unreliable and hard to work with {% cite winters2020swe %}. The ratio often quoted as 70/20/10 comes from an earlier Google blog post; both are rules of thumb. Speed matters at scale: Google's continuous integration makes 150 million test runs a day {% cite memon2017testing %}.
 
-**Key Insight:** Even informal review catches significant defects. Don't skip review because Fagan is "too heavy."
+Test-driven development writes a failing test first (red), then the code to pass it (green), then refactors: red–green–refactor {% cite beck2003tdd %}. At Microsoft and IBM, teams using TDD saw 40% to 90% lower pre-release defect density, at an estimated 15% to 35% more initial development time {% cite nagappan2008tdd %}. Controlled experiments with TDD newcomers found no quality gain {% cite santos2021tdd %}, and in one industrial experiment TDD did well on a simple new task and poorly on a complex change to existing code {% cite tosun2017tdd %}.
 
-### Inspection vs Testing — Complementary Techniques
+→ [The Test Pyramid](../../verif/overview/testing/test-pyramid.md), [Test-Driven Development](../../verif/overview/testing/tdd.md)
 
-| Aspect | Inspection | Testing |
-|--------|------------|---------|
-| **Finds** | Static, localized faults | Dynamic, interaction faults |
-| **Detection** | Direct observation | Failure → trace to fault |
-| **Timing** | Early (requirements, design) | Later (code exists) |
-| **Hidden faults** | Can find (e.g., platform issues) | Won't trigger if untested |
-| **Cost** | Higher per-session | Higher for test creation |
+## 11. Demonstration verifies use under real conditions
 
-**Empirical guidance:** Use both! Studies show they find different defect populations.
+Demonstration shows that using the product achieves a requirement, without detailed data gathering {% cite nasa2016sehandbook %}. In software it covers user acceptance sessions, beta tests and trial operation in the target environment. Some properties can only be shown this way: whether a new customer can complete a purchase, or whether the system works with the real network and hardware. "It works on my machine" is not a demonstration.
 
----
+→ [Four Verification Methods](../../verif/overview/techniques.md)
 
-## Part 3: Static Analysis
+## 12. Combine methods, because each misses what another finds
 
-### Learning Objectives
-- Explain static analysis and its types
-- Describe safety, liveness, fairness, and temporal properties
-- Understand Rice's Theorem and sound vs complete analysis
-- List common fault categories detected by analysis tools
+No method finds every fault, and different methods find different kinds {% cite zheng2006static %}. The lecture's mapping puts maintainability with inspection and analysis, usability with demonstration and reliability with analysis and testing; it is a judgement, not a measured result. What reaches users shows why combining matters: across 109 projects, mean post-release defect density was 7.47 defects per thousand lines and the median 4.3, ranging from 0.05 to about 50 {% cite shah2012defect %}.
 
-### What is Static Analysis?
+→ [Four Verification Methods](../../verif/overview/techniques.md)
 
-**INCOSE Definition:**
-> Verification method of determining performance or other properties from analytical evidence.
+## Where this goes next
 
-**Types of Analysis:**
-- **Static Analysis:** Examining source code, bytecode, or binaries without execution
-- **Model Checking:** Exploring all states of a formal model exhaustively
-- **Theorem Proving:** Mathematical proof of properties
-
-**Key Insight:** Static analysis is **automated inspection**. Model checking is **exhaustive exploration**.
-
-### Properties Verified by Analysis
-
-| Property | Meaning | Example |
-|----------|---------|---------|
-| **Safety** | Nothing bad happens | No deadlock, no null dereference |
-| **Liveness** | Something good eventually happens | Response always returned |
-| **Fairness** | Every process gets fair share | No starvation in scheduler |
-| **Temporal** | Correct ordering over time | Login before access |
-
-**Memory aid:**
-- Safety = absence of bad
-- Liveness = presence of good
-
-**Safety Property Example:**
-> "The temperature should never exceed 100 degrees" — if violated once, fails forever.
-
-### Model Checking
-
-**Process:**
-1. Model the system as finite state machine
-2. Express property as temporal logic formula
-3. Tool explores ALL reachable states
-4. Returns counterexample if property violated
-
-**Limitation:** State explosion for large systems
-
-**Tools:**
-
-| Tool | Language | Domain |
-|------|----------|--------|
-| **SPIN** | Promela | Concurrent systems |
-| **Java PathFinder** | Java bytecode | Concurrent Java |
-| **TLA+** | TLA+ spec | Distributed systems |
-| **Alloy** | Alloy | Structural properties |
-
-### Rice's Theorem — Why No Tool Is Perfect
-
-**Terminology (confusion matrix):** In analysis tools, *positive* = "the tool reports a defect"; *negative* = "the tool says nothing to flag." Therefore:
-- **False positive (FP):** tool fires → no real bug (false alarm, noise)
-- **False negative (FN):** tool is silent → real bug exists (missed bug)
-
-Note: "positive" here does **not** mean "good outcome" — it simply means "the tool flagged something."
-
-**The Theorem:**
-> No analysis can be sound, complete, AND terminate on all programs.
-
-**The Trade-off:**
-
-| Property | Description | Consequence |
-|----------|-------------|-------------|
-| **Sound** | Finds ALL bugs of a type (FN = 0) | May report false positives (FP > 0) |
-| **Complete** | All reports are real bugs (FP = 0) | May miss some real bugs (FN > 0) |
-
-**Practical Implications:**
-
-| Tool Strategy | Focus |
-|---------------|-------|
-| Academic tools | Soundness (catch all) |
-| Commercial tools | Low false positives (usability) |
-
-**Commercial tools prioritize usability over soundness** — they accept some missed bugs to avoid overwhelming developers with false alarms.
-
-### Fault Taxonomy — What Analysis Detects
-
-| Category | Examples |
-|----------|----------|
-| **Resource Errors** | Memory leaks, file handle leaks, deadlocks |
-| **Protocol Errors** | API misuse, wrong call sequences |
-| **Concurrency** | Race conditions, atomicity violations |
-| **Security** | Buffer overflow, SQL injection, XSS |
-| **Memory** | Null dereference, use-after-free |
-| **Exceptional** | Unchecked exceptions, error handling |
-
-**Note:** Different tools specialize in different categories. No single tool catches everything.
-
-### Modern Tool Ecosystem
-
-| Category | Tools |
-|----------|-------|
-| **Linters** | ESLint, Pylint, RuboCop, Checkstyle |
-| **Bug Finders** | SpotBugs, Infer, Coverity, CodeQL |
-| **Security (SAST)** | Semgrep, Fortify, SonarQube, Snyk |
-| **Type Checkers** | TypeScript, mypy, Flow |
-
-**Integration Points:**
-- **IDE** — Real-time feedback
-- **Pre-commit hooks** — Local gate
-- **CI/CD pipeline** — Quality gate
-- **PR review** — Automated comments
-
-### Limitations of Analysis
-
-**Cannot reliably detect:**
-- Business logic errors
-- Usability problems
-- Performance issues (usually)
-- Integration failures
-- Requirements misunderstandings
-
-**Practical wisdom:** Use analysis as a filter, not a guarantee. It catches mechanical bugs, not logical ones.
-
----
-
-## Part 4: Testing
-
-### Learning Objectives
-- Define testing and explain Oracle problem
-- Describe test levels (Unit, Integration, System)
-- Compare black box vs white box testing
-- Explain test pyramid and Google's 70/20/10 ratio
-- Summarize TDD empirical evidence
-
-### What is Testing?
-
-**INCOSE Definition:**
-> Verification method by which a system or component is executed under specified conditions, outputs are observed, and evaluation is made.
-
-**Testing involves:**
-1. **Inputs:** Prepared test data
-2. **Execution:** Running the system
-3. **Observation:** Recording actual outputs
-4. **Evaluation:** Comparing to expected results (oracle)
-
-> "Testing can show the presence of bugs, but never their absence."
-> — Edsger Dijkstra
-
-**Key distinction:** Testing requires execution. Analysis does not.
-
-### Multiple Dimensions of Testing
-
-| Dimension | Categories |
-|-----------|------------|
-| **Level** | Unit → Integration → Thread/Function → System |
-| **Purpose** | Functional, Robustness, Performance, Regression |
-| **Source** | Black Box (spec), White Box (structure), Model-based |
-| **Execution** | Manual, Automated |
-
-### Test Levels
-
-| Level | Scope | Owner | Adequacy Criteria |
-|-------|-------|-------|-------------------|
-| **Unit** | Single function/method | Developer | Statement/branch coverage |
-| **Integration** | Component interactions | Dev/QA | Interface coverage |
-| **Thread/Function** | End-to-end workflow | QA | Path coverage |
-| **System** | Complete integrated system | QA/UAT | Requirements coverage |
-
-**V-Model alignment:** Unit ↔ Design, Integration ↔ Architecture, System ↔ Requirements
-
-### Test Doubles — Isolation for Unit Testing
-
-| Type | Purpose |
-|------|---------|
-| **Stub** | Returns canned answers |
-| **Mock** | Verifies interactions |
-| **Fake** | Simplified implementation |
-| **Spy** | Records calls for later verification |
-
-**Why isolate?**
-- Fast execution (milliseconds)
-- Deterministic results
-- Test single unit of behavior
-- Pinpoint failures precisely
-
-**Key Insight:** Mocking isolates the unit under test. Otherwise you're doing integration testing.
-
-### Black Box vs White Box Testing
-
-| Aspect | Black Box | White Box |
-|--------|-----------|-----------|
-| **Knowledge** | Specification only | Source code visible |
-| **Focus** | What it does | How it does it |
-| **Techniques** | Equivalence classes, boundary values | Statement, branch, path coverage |
-| **Who** | Tester (any) | Developer (code access) |
-| **Finds** | Missing features, wrong behavior | Dead code, untested paths |
-
-**Key Insight:** Black box tests the **contract**. White box tests the **implementation**. Both are needed.
-
-### Testing by Purpose
-
-| Purpose | Focus | Example |
-|---------|-------|---------|
-| **Functional** | Correct behavior for valid inputs | "Login with valid credentials succeeds" |
-| **Robustness** | Handling of invalid/extreme inputs | "System recovers from network failure" |
-| **Performance** | Response time, throughput, scalability | "Page loads in < 2 seconds" |
-| **Regression** | Unchanged behavior after modifications | "Bug fix doesn't break other features" |
-
-> **Regression testing is critical:** "The most dangerous code is the code you just changed."
-
-### Exploratory Testing
-
-**Definition:** Simultaneous learning, test design, and execution.
-
-| Style | Structure |
-|-------|-----------|
-| **Ad-hoc** | None, minimal docs |
-| **Session-based** | Time-boxed, chartered |
-| **Whittaker's Tours** | District metaphor |
-
-**Whittaker's Tours (2009):**
-- **Money** — Features customers pay for
-- **FedEx** — Track data through system
-- **Bad Neighborhood** — Historically buggy areas
-- **Saboteur** — Deny resources, break things
-
-> **James Bach:** "Exploratory testing is not a technique; it's an approach."
-
-### Google's Test Pyramid — 70/20/10
-
-| Level | Name | Scope | Speed | Ratio |
-|-------|------|-------|-------|-------|
-| Base | Small (Unit) | Single function/class | Milliseconds | **70%** |
-| Middle | Medium (Integration) | 2+ modules | Seconds | **20%** |
-| Top | Large (E2E) | Entire system | Minutes | **10%** |
-
-**Google Scale:** 150M tests/day, 5.5M test targets, 1 commit/sec
-
-**Anti-pattern:** Ice cream cone (many UI tests, few unit tests) → slow, flaky, expensive
-
-### TDD — Empirical Evidence
-
-**TDD Cycle:**
-1. **Red:** Write failing test
-2. **Green:** Write minimal code to pass
-3. **Refactor:** Improve design
-
-| Context | Finding | Source |
-|---------|---------|--------|
-| **Experienced teams** | 40-90% fewer defects | Nagappan 2008 {% cite nagappan2008tdd %} |
-| **TDD novices** | Slight disadvantage vs test-last | Santos 2021 {% cite santos2021tdd %} |
-| **Greenfield tasks** | TDD productivity higher | Tosun 2017 {% cite tosun2017tdd %} |
-| **Brownfield tasks** | TDD performance collapses | Tosun 2017 {% cite tosun2017tdd %} |
-
-**Balanced conclusion:** TDD benefits require both (1) training/experience AND (2) appropriate task type (greenfield).
-
-| Aspect | TDD | Test-After |
-|--------|-----|------------|
-| Design influence | Tests drive design | Code drives tests |
-| Coverage | High by construction | Varies, often gaps |
-| Feedback loop | Immediate | Delayed |
-
----
-
-## Part 5: Demonstration
-
-### Learning Objectives
-- Define demonstration as a verification technique
-- Identify when demonstration is essential
-- List types of demonstration activities
-
-### What is Demonstration?
-
-**INCOSE Definition:**
-> Verification method by which the system is observed during operation in its intended environment.
-
-**Key Insight:** Some properties can **only** be verified by demonstration. "Works on my machine" isn't sufficient.
-
-### Uses of Demonstration
-
-- User Acceptance Testing (UAT)
-- Beta testing with real users
-- A/B testing in production
-- Canary deployments
-- Performance validation under real load
-
-### When Demonstration is Essential
-
-- Environment interactions (hardware, network)
-- Real-world data patterns
-- User behavior validation
-- Regulatory compliance evidence
-
----
-
-## Part 6: Summary & Defense in Depth
-
-### Learning Objectives
-- Map verification techniques to quality characteristics
-- Apply "defense in depth" principle
-- Understand industry quality benchmarks
-
-### Technique-to-Quality Mapping
-
-| Quality Characteristic | Inspection | Analysis | Testing | Demo |
-|----------------------|:----------:|:--------:|:-------:|:----:|
-| Functionality | ○ | ○ | ● | ● |
-| Reliability | ○ | ● | ● | ○ |
-| Usability | ○ | ○ | ○ | ● |
-| Efficiency | ○ | ○ | ● | ● |
-| Maintainability | ● | ● | ○ | ○ |
-| Security | ○ | ● | ● | ○ |
-
-● = Strong fit | ○ = Partial fit
-
-**Best practice:** Use multiple techniques. Each finds different defect types.
-
-### Industry Quality Benchmarks
-
-**Empirical data (Shah 2012 {% cite shah2012defect %}, 109 projects):**
-- Mean: **7.47** defects/KLOC (post-release)
-- Median: **4.3** defects/KLOC
-- Range: 0.05 – 50 defects/KLOC
-
-**By language:** Java 5.9, C 10.0, C++ 8.7
-**By type:** Open source 4.7, Closed 8.6
-
-**Industry targets:**
-
-| Domain | Target | Source |
-|--------|--------|--------|
-| Safety-critical | < 0.1/KLOC | DO-178C Level A |
-| High-quality | 1-3/KLOC | Jones 2017 {% cite jones2017quantifying %} |
-| Typical business | 5-10/KLOC | Shah 2012 {% cite shah2012defect %} |
-
-### Six Key Takeaways
-
-1. **Four V&V techniques:** Inspection, Analysis, Testing, Demonstration
-2. **Inspection ROI:** 10:1 return, catches defects early
-3. **Analysis limits:** Sound OR complete, not both (Rice's Theorem)
-4. **Testing levels:** Unit → Integration → System, each has its role
-5. **Test pyramid:** 70% Unit, 20% Integration, 10% E2E (Google)
-6. **Defense in depth:** No single technique finds all bugs — combine them!
-
----
-
-## References
-
-**Primary Sources:**
-- Software Inspection {% cite gilb1993software %}
-- Software Testing Techniques {% cite beizer2003testing %}
-- Managing the Software Process {% cite humphrey1989managing %}
-- Google Testing Practices {% cite memon2017testing %} {% cite winters2020swe %}
-
-**Empirical Studies:**
-- TDD at Microsoft/IBM {% cite nagappan2008tdd %}
-- TDD Meta-Analysis {% cite santos2021tdd %}
-- TDD Industry Experiment {% cite tosun2017tdd %}
-- Defect Density Benchmarks {% cite shah2012defect %}
-- Software Quality Metrics {% cite jones2017quantifying %}
-
-**Further Reading:**
-
-For more details on specific topics covered in these study notes:
-
-*V&V Overview*
-- [V&V Techniques](techniques.md) — Classification and when to use each approach
-
-*Inspection*
-- [Inspection](inspection.md) — Code reviews, walkthroughs, and Fagan method
-
-*Static Analysis*
-- [Analysis Definitions](analysis/analysis_definitions.md) — What is static analysis?
-- [Analysis Properties](analysis/analysis_properties.md) — Safety, liveness, and temporal properties
-- [Analysis Tools](analysis/tools.md) — Linters, type checkers, and advanced analyzers
-
-*Testing*
-- [Testing Definitions](testing/testing_definitions.md) — Fundamental testing concepts
-- [Testing Levels](testing/testing_levels.md) — Unit, integration, system, acceptance
-- [Black Box vs White Box](testing/testing_bb_wb.md) — Functional vs structural testing
-- [Testing Purpose](testing/testing_purpose.md) — Functional, performance, security testing
+The next lecture asks how much testing is enough: [SN L04: Adequacy Criteria](SN_L04_Coverage.md) measures a suite by the code and inputs it exercises, building on the black-box and white-box split above. The testing lab applies this lecture: unit tests with mocks for a small banking application, one end-to-end scenario, and a CI workflow that runs them on every commit.
 
 ---
 
@@ -531,7 +102,3 @@ For more details on specific topics covered in these study notes:
 
 {: .highlight }
 **Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.
-
----
-
-**Next Lecture:** Test Adequacy Criteria — how much testing is enough?
