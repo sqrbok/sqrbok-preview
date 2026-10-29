@@ -61,7 +61,7 @@ Assertions check one state. Properties over whole runs are written in **linear t
 | **X** p | next | p holds in the next state |
 | p **U** q | until | p holds in every state until q holds |
 
-The counter's claim was checked as an assertion; written in LTL it would be G(finish = 2 → n > 2): whenever both workers have finished, n exceeds 2. A **safety** property says nothing bad ever happens: G ¬deadlock, "the system never deadlocks". A **liveness** property says something good eventually happens: G(request → F granted), "every request is eventually granted". A safety violation has a finite counterexample; a liveness violation is a run that loops forever without the good event.
+The counter's claim was checked as an assertion; written in LTL it would be G(finish = 2 → n > 2): whenever both workers have finished, n exceeds 2. A **safety** property says nothing bad ever happens: G ¬deadlock, "the system never deadlocks". A **liveness** property says something good eventually happens: G(request → F granted), "every request is eventually granted". A safety violation has a finite counterexample; a liveness violation is a run that loops forever without the good event. [Kripke Structures and LTL](kripke-ltl.md) defines the structure these formulas are checked on and checks one property per operator on a small example.
 
 ## 4. State explosion
 

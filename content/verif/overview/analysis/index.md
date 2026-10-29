@@ -20,11 +20,11 @@ That breadth comes at a price. Rice's theorem shows that no algorithm can decide
 | Bug finders: style, pattern, type and taint checks | none of the checked patterns was found; nothing is proved | pylint, mypy, Bandit, SpotBugs, CodeQL | noise if not tuned; misses what has no rule | [Pattern, Type and Taint Checks](../../static/techniques.md) |
 | Sound analysis of one property | that kind of error cannot occur on any path, for example no division by zero | Polyspace, Astrée | false alarms that a person must clear | [Soundness and Completeness](../../static/limits.md) |
 | Model checking | the property holds in every reachable state *of the model* | SPIN, Java PathFinder, CBMC | building the model; state explosion | [Model Checking](../../static/model-checking.md) |
-| Program verification (theorem proving) | the code implements its formal specification | Dafny, Frama-C, KeY, Isabelle | writing the specification can take more work than the code | [Analysis Tools by Family](tools.md) |
+| Program verification (theorem proving) | the code implements its formal specification | Dafny, Frama-C, KeY, Isabelle | writing the specification can take more work than the code | [Hoare Logic](../../static/program-verification.md), [Analysis Tools by Family](tools.md) |
 
 Three terms in the table: **taint** checks follow untrusted input to a dangerous call; a **sound** analysis never misses a violation of its property; **state explosion** is the growth in states a model checker must visit as the model grows. The rows run from cheap and shallow to costly and deep: Chess and West place style checking at the cheap end and program verification at the costly one, which is rare in practice because detailed specifications rarely exist {% cite chess2007static %}.
 
-Two pages in this section complete the map. [What Analysis Can Prove](analysis_properties.md) names the kinds of property (safety, liveness, fairness, temporal) and what no analysis can show. [Analysis Tools by Family](tools.md) lists current tools for each approach.
+Three pages in this section complete the map. [What Analysis Can Prove](analysis_properties.md) names the kinds of property (safety, liveness, fairness, temporal) and what no analysis can show. [Analysis Tools by Family](tools.md) lists current tools for each approach. [Dynamic Analysis and the Probe Effect](dynamic-analysis.md) covers the opposite approach, learning from executions, and how observing a run can change it.
 
 A worked example of checking a lock discipline, in which a model checker's two counterexamples turn out to be false alarms, is on the [Abstraction Refinement (CEGAR)](../../static/cegar.md) page.
 
