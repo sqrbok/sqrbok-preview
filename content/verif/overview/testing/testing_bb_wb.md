@@ -1,171 +1,66 @@
 ---
-parent: Testing
-nav_order: 3
-title: White and Black
+parent: Testing Overview
+nav_order: 5
+title: Black-Box and White-Box Testing
 layout: default
 ---
 
+# Black-Box and White-Box Testing
 
-# White Box vs. Black Box Testing
+**Black-box testing derives tests from external descriptions of the software (specifications, requirements, design); white-box testing derives them from the source code, its statements, branches and conditions** {% cite ammann2016introduction %}. The two differ in where the tests come from, not in how they are run.
 
-## What Is White Box Testing?
+## 1. What each can tell you
 
-White box testing (also known as structural or glass-box testing) involves examining the internal structure or workings of an application. The tester has knowledge of the source code and uses this to design test cases.
+![Black-box tests come from the specification, white-box tests from the source code; both run the same function. Black-box shows which requirements are tested, white-box which code is tested](black-white-box.svg)
 
-### Key Points:
+_Two sources of tests for one function. (Constructed example.)_
 
-* **Focus**: What is written (the code), not just what was intended (the specification).
-* **Advantage**: Allows testers to design inputs that execute specific code paths, helping to discover hidden issues.
-* **Purpose**:
+A black-box suite can show which requirements have a test, but not which code ran: code that the specification never mentions stays untested. A white-box suite can show which code ran, measured as [coverage](../../coverage/index.md), but not which requirements were checked: a requirement that was never implemented has no code to cover. Black-box techniques include [equivalence partitioning and boundary values](../../domain/index.md); white-box techniques are the [coverage criteria](../../coverage/code.md). Ammann and Offutt treat both as ways to build a model of the software, a graph or an input domain, and call the distinction dated {% cite ammann2016introduction %}; it remains useful for asking what a suite cannot see.
 
-  * Ensure all code paths are tested.
-  * Discover unreachable or redundant code.
-  * Find logic errors early in development.
+## 2. Example: a shipping fee
 
-### Characteristics:
+(Constructed example.) The specification says: orders under 50 € pay 5 € shipping, orders from 50 € ship free, and express delivery adds 10 €. The code has a rule the specification does not mention:
 
-* Can assess untested code features.
-* Doesn't tell how well requirements are tested.
-* Effective in early development stages.
-* Typically performed by developers.
-
-### Example (Fortran-style pseudocode):
-
-```fortran
-IF A THEN
-    S1
-ELSE
-    S2
-ENDIF
-
-IF B THEN
-    S3
-ELSE
-    S4
-ENDIF
+```python
+def shipping_fee(total, express):
+    """Return the shipping fee in euros for an order."""
+    fee = 0 if total >= 50 else 5
+    if total > 1000:
+        fee = 20             # freight surcharge, not in the specification
+    if express:
+        fee += 10
+    return fee
 ```
 
-#### Diagram – White Box Testing Logic Flow
+**Black box.** Four tests from the specification, with boundary values: `(20, False)` gives 5, `(50, False)` gives 0, `(49.99, False)` gives 5, and `(20, True)` gives 15. All pass. Measured with pytest-cov (coverage.py, branch mode), they cover 6 of 7 statements and 3 of 4 branches. A **branch** is one way out of a decision: each `if` has two, taken when the condition is true and when it is false. The seven statements include the `def` line, which runs when the module is imported; the docstring does not count. coverage.py adds statements and branches together, so the total is (6 + 3) / (7 + 4) = 9/11, or 82%. The surcharge line never runs, because nothing in the specification leads to an order above 1,000 €.
 
-```mermaid
-flowchart LR
-    subgraph WhiteBox["White Box"]
-        direction TB
-        
-        A{Decision: A?} -->|True| S1[Statement S1]
-        A -->|False| S2[Statement S2]
-        S2 -->B
-        S1-->B
-        B{Decision: B?} -->|True| S3[Statement S3]
-        B -->|False| S4[Statement S4]
-    end
+**White box.** Reading the code, a tester writes `(60, True)` expecting 10 and `(1200, False)` expecting 20. These two tests reach 100% statement and branch coverage. But where did 20 come from? From the code itself: the specification is silent, so the test checks that the code does what the code does. If the surcharge is a mistake, this test protects it. The suite also never tries an order under 50 €, because coverage.py does not count the two sides of `0 if ... else 5` as separate branches.
 
-    Input1["Input A"] --> WhiteBox
-    Input2["Input B"] --> WhiteBox
+Together the six tests cover all the code and every rule in the specification, and they raise a question for the product owner: is the surcharge a requirement?
 
-    WhiteBox --> Output1["Output X"]
-    WhiteBox --> Output2["Output Y"]
-```
+## When to use each — and when not
 
-### White Box Testing Strategies:
+- Use black-box tests first: they check what the user was promised, and can be written before the code exists.
+- Add white-box tests to reach code the specification does not explain, and then ask whether that code should exist.
+- Do not treat 100% coverage as proof of correct behaviour: coverage counts code that ran, not results that were checked.
 
-* Execute **all code statements** at least once.
-* Execute **both true and false paths** of each decision.
-* Traverse all **independent execution paths**.
+## Limitations
 
-{: .highlight }
-To test effectively, inputs must be crafted to trigger specific code paths. If inputs are chosen only based on requirements, some code might go untested. If chosen only based on code, some requirements might not be validated.
+Neither source finds a requirement that nobody wrote down. Had the product owner wanted free shipping for members and forgotten to say so, there would be no specification for a black-box test and no code for a white-box test; only review of the requirements, or [exploratory testing](../../exploratory/index.md) by someone who knows the domain, can find it.
+
+## How solid is this?
+
+- **Where it comes from.** The definitions from Ammann and Offutt {% cite ammann2016introduction %}; the example was run for this page with pytest 9.1.1 and coverage.py in branch mode.
+- **What is contested.** Whether the distinction is still useful: Ammann and Offutt build both kinds of test from the same graph and input-domain models.
+- **What we do not hold.** Studies comparing the fault detection of black-box and white-box suites are covered in the [coverage](../../coverage/discussion.md) area.
 
 ---
 
-## What Is Black Box Testing?
+### References
 
-Black box testing focuses on verifying the software’s functionality based on its specifications, without considering the internal code structure.
-
-### Key Points:
-
-* **Focus**: What the system is supposed to do, based on specifications.
-* **Advantage**: Doesn't require knowledge of the internal code.
-* **Purpose**:
-
-  * Ensure the system meets the stated requirements.
-  * Detect missing or incorrect functionality.
-
-### Characteristics:
-
-* Anyone (testers, users, domain experts) can design test cases.
-* Code coverage isn't visible from the tests.
-* Effective in system and acceptance testing.
-
-#### Diagram – Black Box Testing Concept
-
-```mermaid
-flowchart LR
-    subgraph BlackBox["Black Box"]
-        direction TB
-        Spec["Specification f(x, y, ...)"]
-    end
-
-    Input1["Input 1"] --> BlackBox
-    Input2["Input 2"] --> BlackBox
-    Input3["Input 3"] --> BlackBox
-
-    BlackBox --> Output1["Output 1"]
-    BlackBox --> Output2["Output 2"]
-    BlackBox --> Output3["Output 3"]
-```
-
-### Black Box Testing Strategies:
-
-* Test based on:
-
-  * **Typical values**
-  * **Boundary values**
-  * **Invalid inputs**
-  * **Combinations of data**
-* Each function should:
-
-  * Do what it’s supposed to.
-  * Not do what it shouldn’t.
-
----
-
-## Comparison Table
-
-| **White Box Testing**                                   | **Black Box Testing**                                  |
-| ------------------------------------------------------- | ------------------------------------------------------ |
-| Tests internal structure and code logic                 | Tests system behavior and functionality                |
-| Performed with full knowledge of code                   | Performed without code knowledge                       |
-| Helps discover logic errors, unreachable code           | Helps discover missing or misimplemented functionality |
-| Can assess which parts of code remain untested          | Can assess whether all requirements are tested         |
-| Doesn’t indicate how thoroughly requirements are tested | Doesn’t indicate how thoroughly code is tested         |
-
----
-
-## More Black Box Techniques
-
-### Exploratory Testing
-
-An unscripted approach where testers explore the software based on their intuition, experience, and understanding of the application.
-
-#### Useful When:
-
-* Formal specifications are missing or incomplete.
-* The system is evolving and testers need to adapt quickly.
-
-#### Limitations:
-
-* **Lack of repeatability**: Different testers may explore different paths.
-* **Risk of missed coverage**: Without structure, some features may be left untested.
-
-#### Types:
-
-* **Ad-hoc Testing**: Informal, based purely on experience.
-* **Session-Based Testing**: Structured sessions with specific goals, followed by debriefing.
-
-
+{% bibliography --cited %}
 
 ---
 
 {: .highlight }
-**Disclaimer:** AI is used for text polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.
+**Disclaimer:** AI is used for text summarization, polishing and explaining. Authors have verified all facts and claims. In case of an error, feel free to file an issue.
