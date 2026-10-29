@@ -23,7 +23,7 @@ Williams' study of teams after adoption describes the same shift in practice: si
 
 ## 2. The technical enablers
 
-- **Continuous integration (CI):** every change is merged into the main line and built and tested automatically, many times a day.
+- **Continuous integration (CI):** every change is merged into the main line and built and tested automatically, many times a day; see [Continuous Integration](13-continuous-integration.md).
 - **Continuous delivery or deployment (CD):** every change that passes the pipeline can be, or is, released to production automatically.
 - **Infrastructure as code (IaC):** servers and environments are described in version-controlled files, so environments can be rebuilt and reviewed like code.
 - **Monitoring and telemetry:** the team running the service sees how it behaves in production and learns from it.

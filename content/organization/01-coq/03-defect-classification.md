@@ -43,7 +43,7 @@ The **defect removal efficiency (DRE)** of an activity is the share of the defec
 
 DRE = 729 / ((122 + 859 + 939) − 730) = 729 / 1,190 = 61.3%
 
-For the tests, count the 8 bad fixes in when they were made: 2 during unit test, 4 during integration test, 1 during system test and 1 after it. Unit test then sees 3,457 − 2,554 + 2 = 905, integration test 905 − 332 + 4 = 577 and system test 577 − 387 + 1 = 191. The same rule gives every activity:
+For the tests, count the 8 bad fixes in when they were made. The margins above do not show this; the split comes from the bad-fix columns of Kan's full matrix (column totals): 2 made during unit test, 4 during integration test, 1 during system test, and 1 in a column the matrix labels "field", a fix made after system test that only the field could find. Unit test then sees 3,457 − 2,554 + 2 = 905, integration test 905 − 332 + 4 = 577 and system test 577 − 387 + 1 = 191. The same rule gives every activity:
 
 | Activity | Present | Found | DRE |
 |---|---:|---:|---:|

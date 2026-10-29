@@ -46,7 +46,7 @@ Argyris and Schön distinguish **single-loop learning**, which corrects an error
 
 Two routines make the second loop a habit. **PDCA** (Plan, Do, Check, Act) tests one change at a time: plan a measurable change, try it small, check the result against the target, then standardize it or adjust {% cite shewhart1931economic deming1986crisis %}.
 
-**Example.** Applied to bug escapes: *plan* to require a test for every bug fix and halve escapes; *do* it in one team for a quarter; *check* that team's escape count; *act* by adding the rule to every team's definition of done if escapes fell.
+**Example.** Applied to bug escapes: *plan* to require a test for every bug fix and halve escapes; *do* it in one pilot team for a quarter; *check* that team's escapes against its own previous quarter and against the teams that did not change; *act* by adding the rule to every team's definition of done if the pilot team's escapes fell and the others' did not.
 
 **Kaizen** is continuous improvement by everyone, on four principles: change is incremental, everyone takes part, ideas come from the bottom up, and it never stops. Retrospectives and continuous delivery with small, frequent changes are Kaizen in software.
 
@@ -56,7 +56,7 @@ Two routines make the second loop a habit. **PDCA** (Plan, Do, Check, Act) tests
 
 Repenning and Sterman studied improvement programs in a dozen companies {% cite repenning2001nobody %}. Facing a performance gap, a manager can make people **work harder** (overtime, shortcuts), which raises output at once, or **work smarter** (time for improvement), which lowers output first because the time comes from production and raises capability only later. Under pressure managers choose the first; capability erodes, problems grow and there is even less time to improve: the **capability trap**. A **self-confirming attribution error** keeps them there: pressure does give a short-term gain, so managers conclude that the problem was effort, not the system.
 
-Programs that survive the dip pay off. At BP's Lima refinery, pumps' mean time between failures rose from 12 to 58 months, and the program created about USD 43 million a year of value for about USD 320,000 a year. Hence the paper's title: nobody ever gets credit for fixing problems that never happened.
+Programs that survive the dip can pay off; the paper reports the payoff, not the size of the dip. At BP's Lima refinery, pumps' mean time between failures rose from 12 to 58 months, and the program created about USD 43 million a year of value for about USD 320,000 a year. Hence the paper's title: nobody ever gets credit for fixing problems that never happened.
 
 → [Change Management](../../organization/03-process/04-change-management.md)
 
@@ -73,9 +73,9 @@ Programs that survive the dip pay off. At BP's Lima refinery, pumps' mean time b
 
 **TOC** says every system has a constraint and improving anything else does not help. Its five focusing steps are *identify* the constraint, *exploit* it (never let it idle or do the wrong work), *subordinate* everything else to its pace, *elevate* it (add capacity) and *repeat* once it moves, watching that inertia does not become the new constraint. If review is the bottleneck: make sure reviewers only review, let a linter catch formatting, start no more changes than review can absorb, train more reviewers, then look for the next constraint.
 
-**Six Sigma** improves a process by measuring its variation, aiming at 3.4 defects per million opportunities, through **DMAIC**: *Define* the problem and what is critical to quality (CTQ), *Measure* the baseline, *Analyze* the causes with data, *Improve*, and *Control* to keep the gain.
+**Six Sigma** improves a process by measuring its variation, aiming at 3.4 defects per million opportunities, through **DMAIC**: *Define* the problem and what is critical to quality (CTQ), *Measure* the baseline, *Analyze* the causes with data, *Improve*, and *Control* to keep the gain. Because it counts defects per opportunity and measures variation, it needs a process that repeats many times with comparable outcomes, such as a CI build that runs on every change; the design of a new feature happens once, so there is no distribution to measure.
 
-DPP and retrospectives are often confused: DPP is triggered by defects and asks what in the process caused them, with an action team of cross-project authority; a retrospective is triggered by the end of an iteration and asks what the team itself should change.
+DPP and retrospectives are often confused: DPP is triggered by defects, takes the stage's defect records as input and asks what in the process caused them, with an action team of cross-project authority; a retrospective is triggered by the end of an iteration, takes the team's experience of that iteration as input, ideally plus repository data, and asks what the team itself should change.
 
 → [Improvement Methods](../../organization/03-process/03-improvement-methods.md), [Defect Prevention Process](../../organization/03-process/05-defect-prevention.md), [Theory of Constraints](../../organization/03-process/06-theory-of-constraints.md), [Six Sigma](../../organization/03-process/07-six-sigma.md)
 
@@ -91,6 +91,8 @@ DPP and retrospectives are often confused: DPP is triggered by defects and asks 
 | 4 | Quantitatively Managed | process and quality managed with statistics | OPP, QPM (2) |
 | 5 | Optimizing | continuous improvement from understanding variation | OPM, CAR (2) |
 
+The abbreviations: REQM Requirements Management, PP Project Planning, PMC Project Monitoring and Control, SAM Supplier Agreement Management, MA Measurement and Analysis, PPQA Process and Product Quality Assurance, CM Configuration Management; RD Requirements Development, TS Technical Solution, PI Product Integration, VER Verification, VAL Validation, OPF Organizational Process Focus, OPD Organizational Process Definition, OT Organizational Training, IPM Integrated Project Management, RSKM Risk Management, DAR Decision Analysis and Resolution; OPP Organizational Process Performance, QPM Quantitative Project Management; OPM Organizational Performance Management, CAR Causal Analysis and Resolution.
+
 7 + 11 + 2 + 2 = 22 PAs. Each PA also has one of four categories: Process Management, Project Management, Engineering or Support. The transitions read: from chaos to project discipline (1→2), from project-specific to organization-wide (2→3), from qualitative to quantitative (3→4), from control to continuous improvement (4→5). CMMI v2.0 speaks of practice areas and merges the development, acquisition and services models into one {% cite astridita2024cmmi %}.
 
 → [CMMI Overview](../../organization/04-standards/01-cmmi-overview.md)
@@ -105,7 +107,7 @@ Agile practices cover most of Level 2's project-level PAs, but not the organizat
 
 Andrews and Stalick separate **operational changes** (structure, process, technology, rewards), which are visible and comparatively easy, from **cultural changes** (mental models, power structures, tolerance of dissent), which decide whether the operational ones last {% cite andrews1994street %}. A new review policy fails if managers still reward whoever ships fastest.
 
-Surveys of Six Sigma, Lean Six Sigma and ITIL adoption all rank **management commitment** first, then culture, training and communication {% cite antony2002sixsigma laureani2012leansixsigma iden2013itil %}: without it, improvement time is lost to firefighting. In a study of 24 practitioners adopting CMMI Level 3 in Bangalore, 42% of interview responses named employee resistance, 29% the tension between standard processes and business flexibility, and 25% insufficient training; the authors recommend pilot groups, role-based training and combining CMMI with Scrum or SAFe {% cite shelat2025cmmi %}. Repenning and Sterman add: protect improvement time, let staff experience the dynamics in simulations, and let early champions spread the change.
+Surveys of Six Sigma, Lean Six Sigma and ITIL adoption all rank **management commitment** first, then culture, training and communication {% cite antony2002sixsigma laureani2012leansixsigma iden2013itil %}: without it, improvement time is lost to firefighting. In a study of 24 practitioners adopting CMMI Level 3 in Bangalore, 42% of interview responses named employee resistance, 29% the tension between standard processes and client-driven flexibility, and 25% insufficient training; the authors recommend pilot groups, role-based training and combining CMMI with Scrum or SAFe (the Scaled Agile Framework) {% cite shelat2025cmmi %}. Repenning and Sterman add: protect improvement time, let staff experience the dynamics in simulations, and let early champions spread the change.
 
 → [Change Management](../../organization/03-process/04-change-management.md)
 

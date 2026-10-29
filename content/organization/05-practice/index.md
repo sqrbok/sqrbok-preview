@@ -24,8 +24,9 @@ has_children: true
 | [Google Engineering Practices](08-google-engineering-practices.md) | test sizes, testing at scale, code review, static analysis | teams sharing one code base | tooling |
 | [Microsoft Quality Practices](09-microsoft-quality-practices.md) | milestones, bug bars, ship room; review and refactoring research | scheduled releases of installed products | test roles and triage meetings |
 | [Quality Gates & CI/CD](10-quality-gates-cicd.md) | gates by stage, canary, feature flags, rollback | continuous delivery | pipeline engineering |
-| [Continuous Deployment at Facebook](11-facebook-continuous-deployment.md) | daily web deployment, mobile release trains, Sapienz | high-change products | about 5–15% of engineers on tooling |
+| [Continuous Deployment at Facebook](11-facebook-continuous-deployment.md) | daily web deployment, mobile release trains, Sapienz | high-change products | engineers on tooling: about 5% at Facebook, 15% at OANDA |
 | [Chaos Engineering](12-chaos-engineering.md) | fault-injection experiments and safeguards | distributed systems with monitoring | risk of causing an outage |
+| [Continuous Integration](13-continuous-integration.md) | daily merges, a self-testing build on every push, red builds fixed first | any code changed by more than one person | a fast, trustworthy test suite |
 
 Process-improvement methods (DPP, Six Sigma, Theory of Constraints) are in [Process Improvement](../03-process/index.md); maturity frameworks in [Quality Standards](../04-standards/index.md).
 

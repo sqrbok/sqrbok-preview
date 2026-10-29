@@ -31,11 +31,11 @@ Three processes do most of the quality work, and students often mix them up:
 
 **Example.** An online shop's checkout fails three evenings in a row. Each evening the on-call engineer restarts the payment service: three *incidents*, each closed within minutes. The repetition opens a *problem*; the analysis finds a connection pool that runs out under evening load, and a workaround (restart at 18:00) is recorded as a known error. The permanent fix, a larger pool and a timeout, goes through *change management*, which schedules it for a quiet hour and prepares a rollback. (A constructed example.)
 
-Incident management is ITIL's single-loop learning and problem management its double loop (see [Learning & Improvement Models](../03-process/02-learning-improvement-models.md)).
+Restarting the service is single-loop learning, and so is the larger pool: both correct this error under the same rules. Problem management reaches the double loop only when it also changes a rule that let the error through, for example adding an evening-load test of every connection pool to the release checklist (see [Learning & Improvement Models](../03-process/02-learning-improvement-models.md)).
 
 ## 3. Why organizations adopt it
 
-A systematic review of 37 ITSM studies found three main motives (more efficient operations, lower IT costs and better customer service) and similar success factors to other improvement programs: senior management involvement, training, communication and a process-oriented culture {% cite iden2013itil %}. Reported benefits include better service quality, higher customer satisfaction and standardized processes. Certification is possible for the organization against ISO/IEC 20000, and for individuals through ITIL's own qualification scheme.
+A systematic review of 37 ITSM studies found three main motives (more efficient operations, lower IT costs and better customer service) and similar success factors to other improvement programs: senior management involvement, training, communication and a process-oriented culture {% cite iden2013itil %}. Reported benefits include better service quality, higher customer satisfaction and standardized processes. Certification is possible for the organization against ISO/IEC 20000, the international standard for IT service management, and for individuals through ITIL's own qualification scheme.
 
 ## When to use it — and when not
 

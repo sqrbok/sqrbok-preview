@@ -3,6 +3,7 @@ title: Defect Prediction with Machine Learning
 parent: Cost of Quality
 nav_order: 8
 layout: default
+math: katex
 ---
 
 # Defect Prediction with Machine Learning
@@ -11,7 +12,7 @@ layout: default
 
 ## 1. Accuracy misleads on imbalanced data
 
-Defect datasets are imbalanced: most modules are clean. A model that predicts "clean" for everything scores high accuracy and finds nothing. Khleel and Nehéz trained a bidirectional LSTM (a neural network that reads a sequence in both directions) on six Java projects. On the original data, accuracy averaged 0.88 but the **F-measure** (the harmonic mean of precision and recall on the defective class) only 0.51. On the jEdit dataset the model reached 0.97 accuracy with precision and recall of 0.00: it never flagged a single defective module correctly {% cite khleel2023bilstm %}.
+Defect datasets are imbalanced: most modules are clean. A model that predicts "clean" for everything scores high accuracy and finds nothing. Khleel and Nehéz trained a bidirectional LSTM (a neural network that reads a sequence in both directions) on six Java projects. On the original data, accuracy averaged 0.88 but the **F-measure** (the harmonic mean of precision and recall on the defective class; **precision** is the share of flagged modules that are really defective, **recall** the share of defective modules that get flagged) only 0.51. On the jEdit dataset the model reached 0.97 accuracy with precision and recall of 0.00: it never flagged a single defective module correctly {% cite khleel2023bilstm %}.
 
 **Oversampling** adds copies or synthetic examples of the rare class before training. With random oversampling the averages rose to 0.94 accuracy, 0.94 F-measure and 0.96 AUC; with SMOTE, which synthesizes new minority examples, to 0.92, 0.92 and 0.95 {% cite khleel2023bilstm %}.
 
@@ -35,7 +36,26 @@ By the traditional measures the model got slightly worse; by the project measure
 
 ## Example: choosing between two models
 
-A release has 100 modules, 10 of them defective. Model A flags 5 modules, 3 of them defective; model B flags 25, 9 of them defective. Accuracy, the share of modules classified correctly, is (3 + 88) / 100 = 0.91 for A and (9 + 74) / 100 = 0.83 for B, so accuracy favors A. Now price the errors as the two service-time measures do. Say a defective module the model misses costs 20 hours later, and examining a wrongly flagged clean module wastes 4 hours. A misses 7 defective modules (140 hours remaining) and wastes 2 inspections (8 hours): 148 hours. B misses 1 (20 hours) and wastes 16 inspections (64 hours): 84 hours. For the test manager, B is the better model. _(Constructed example.)_
+A release has 100 modules, 10 of them defective. Model A flags 5 modules, 3 of them defective; model B flags 25, 9 of them defective. Counting true positives (TP, defective and flagged), false positives (FP, clean but flagged), false negatives (FN, defective but missed) and true negatives (TN):
+
+| Model | TP | FP | FN | TN |
+|---|---:|---:|---:|---:|
+| A | 3 | 2 | 7 | 88 |
+| B | 9 | 16 | 1 | 74 |
+
+Accuracy, the share of modules classified correctly, favors A:
+
+$$
+\text{accuracy} = \frac{\mathrm{TP} + \mathrm{TN}}{100}: \qquad A = \frac{3 + 88}{100} = 0.91, \qquad B = \frac{9 + 74}{100} = 0.83
+$$
+
+Price the errors as the service-time measures do: say a defective module the model misses costs 20 hours later, and examining a wrongly flagged clean module wastes 4 hours:
+
+$$
+\text{cost} = 20 \cdot \mathrm{FN} + 4 \cdot \mathrm{FP}: \qquad A = 20 \cdot 7 + 4 \cdot 2 = 148\ \text{h}, \qquad B = 20 \cdot 1 + 4 \cdot 16 = 84\ \text{h}
+$$
+
+For the test manager, B is the better model. Examining the correctly flagged modules too, at 4 hours each, adds 12 hours to A (160) and 36 to B (120), so B stays ahead. _(Constructed example.)_
 
 ## When to use it, and when not
 

@@ -28,7 +28,7 @@ Classify each item as prevention, appraisal, internal failure or external failur
 2. running the regression suite;
 3. debugging a failure the regression suite found;
 4. a hot fix after a customer complaint;
-5. a code inspection.
+5. a code inspection (use the course convention stated in SN A01 §2).
 
 Then explain why items 2 and 3 belong to different categories although one engineer may do both in an afternoon.
 
@@ -56,7 +56,7 @@ Describe the tank-and-pipes model. What are residual defects, and what are the o
 
 ### Question 6: Process signature
 
-In a project, 60 defects reach testing and each of three test levels removes 40% of the defects present.
+In a project, requirements, high-level design, low-level design and code inject 5, 10, 15 and 30 defects, so 60 reach testing; each of three test levels removes 40% of the defects present.
 
 1. How many defects ship?
 2. Sketch the process signature (cumulative injected and removed by phase).

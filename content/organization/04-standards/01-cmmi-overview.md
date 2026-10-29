@@ -52,7 +52,7 @@ Each PA also belongs to one of four **categories**, independently of its level: 
 
 ## 3. Example: from Level 1 to Level 2
 
-A team at Level 1 estimates from memory, keeps requirements in e-mail and builds releases from a developer's machine. To reach Level 2 it does not need a new methodology but evidence of seven practices: requirements tracked to the work (REQM), a written plan with estimates (PP) checked against progress (PMC), measures collected (MA), an independent check that the process was followed (PPQA), baselines under version control (CM), and supplier management where suppliers exist (SAM). Scrum covers much of PP and PMC; CM and PPQA usually need explicit additions. (A constructed example.)
+A team at Level 1 estimates from memory, keeps requirements in e-mail and builds releases from a developer's machine. To reach Level 2 it does not need a new methodology but evidence of seven practices: requirements tracked to the work (REQM), a written plan with estimates (PP) checked against progress (PMC), measures collected (MA), an independent check that the process was followed (PPQA), baselines under version control (CM), and supplier management where suppliers exist (SAM). Scrum covers much of PP and PMC; CM, the gap an Agile–CMMI review names, needs adding {% cite ferdinansyah2021cmmi %}. (A constructed example.)
 
 ## 4. Version 2.0
 
@@ -60,7 +60,7 @@ CMMI v2.0 (2018) comes from the CMMI Institute. It speaks of *practice areas* in
 
 ## When to use it — and when not
 
-Use CMMI when an organization needs a recognized roadmap or an appraisal (often required in government and defense contracts). It is a poor fit for a single small team that only wants to improve one practice; a retrospective or a targeted method is cheaper.
+Use CMMI when an organization needs a recognized roadmap or an appraisal (often required in government and defense contracts). It is a poor fit for a small team that wants to improve one practice; a retrospective is cheaper.
 
 ## Limitations
 

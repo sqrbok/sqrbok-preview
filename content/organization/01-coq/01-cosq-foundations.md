@@ -18,14 +18,16 @@ The model comes from manufacturing and was adapted to software by Knox and by Ho
 |---|---|---|
 | Prevention | efforts to ensure product quality | SQA administration, inspections, process studies and improvement, metrics collection |
 | Appraisal | discovering the condition of the product | testing and related activities, product quality audits |
-| Internal failure | quality failures detected before shipment | defect management, rework, retesting |
-| External failure | quality failures detected after shipment | technical support, complaint investigation, fixes and upgrades |
+| Internal failure | quality failures found before any user meets them | defect management, rework, retesting |
+| External failure | quality failures users meet | technical support, complaint investigation, fixes and upgrades |
 
 ![Four cost of quality categories in two groups; spending on prevention and appraisal is meant to reduce internal and external failure costs](coq-categories.svg)
 
 _The four CoSQ categories and their typical costs, after Houston and Keats' Table 1._ {% cite houston1999cost %}
 
-The categories separate activities that are easy to confuse. **Running a test** is appraisal: it discovers the condition of the product. **Debugging the failure** that the test exposes, fixing it and running the test again is internal failure: that effort is spent only because a defect exists. The same engineer may do both in one afternoon, but the second cost disappears if the defect is never made.
+The categories separate activities that are easy to confuse. **Running a test** is appraisal: it discovers the condition of the product. **Debugging the failure** that the test exposes, fixing it and running the test again is internal failure: that effort is spent only because a defect exists. The same engineer may do both in one afternoon, but the second cost disappears if the defect is never made. The line between the two failure categories is **the user**: a failure cost is external when users met the failure or were harmed by it (support, incidents, rolling back shipped code, harm to customers), internal when the team found the problem before any user met it. So refactoring live code that no user has seen fail is internal.
+
+**A booking convention for reviews.** The categories are a booking convention, not a law of nature. This handbook, following Houston and Keats and Knox, books **reviews and inspections as prevention**, because they stop defects before testing: a document or a change is not complete until it has been reviewed {% cite houston1999cost knox1993modeling %}. Many other CoQ texts book them as **appraisal**, because a review examines the product; Houston and Keats call the choice "a matter of interpretation" and ask only for consistency {% cite houston1999cost %}. Either is fine if a team applies one rule to every release. Two rules follow. The rework an inspection finding causes is **internal failure**, like rework after a test: Houston and Keats book defect fixing, and even inspecting the fix, under internal failure. Automated checks of the product, such as static analysis in the pipeline, are appraisal here; a team that prefers to book them with reviews may, as long as it always does.
 
 ## 2. How large it is
 
@@ -33,7 +35,7 @@ In manufacturing, quality-related costs ran at 10 to 30 percent of sales, far mo
 
 ## 3. Maturity shifts the mix
 
-Knox mapped the categories onto the five levels of the SEI Capability Maturity Model (CMM). His model predicts that total CoSQ falls by about two-thirds, from about 60 percent of development cost at Level 1 to about 20 percent at Level 5, as spending moves from failure to prevention {% cite knox1993modeling %}. Houston and Keats compare the model with measured data: Raytheon's software organization cut its rework fourfold, from about half of development effort to under 10 percent, in a process improvement programme that began in 1988 {% cite houston1999cost %}.
+Knox mapped the categories onto the five levels of the SEI Capability Maturity Model (CMM). His model predicts that total CoSQ falls by about two-thirds, from about 60 percent of development cost at Level 1 to about 20 percent at Level 5, as spending moves from failure to prevention {% cite knox1993modeling %}. Houston and Keats compare the model with measured data: Raytheon's software organization, which started a process improvement programme in 1988, saw its total CoSQ fall from 55–67 percent of development cost at Level 1 to about 40 percent at Level 3 and about 15 percent later; rework from internal and external failures fell to under 10 percent of development cost, a reduction the authors call fourfold {% cite houston1999cost %}.
 
 ## 4. Where is the optimum?
 
@@ -41,7 +43,9 @@ The **traditional** model assumes an optimum short of perfection: past some poin
 
 ## Example: reading a CoSQ split
 
-A team logs 1,000 hours in a release: 60 on code reviews and coding-standard training, 200 on writing and running tests, 150 on debugging and fixing test failures, and 90 on fixing defects that customers reported. Prevention is 60 hours, appraisal 200, internal failure 150 and external failure 90, so CoSQ is 500 hours, half of the release. Failure costs (240 hours) are four times prevention (60 hours): by Knox's reasoning, the next hour is best spent preventing the defects that tests and customers now find. _(Constructed example.)_
+A team logs 1,000 hours in a release: 40 on code reviews, 20 on coding-standard training, 200 on writing and running tests, 150 on debugging and fixing test failures, and 90 on fixing defects that customers reported. Prevention is 60 hours, appraisal 200, internal failure 150 and external failure 90, so CoSQ is 500 hours, half of the release. Failure costs (240 hours) are four times prevention (60 hours): by Knox's reasoning, the next hour is best spent preventing the defects that tests and customers now find. _(Constructed example.)_
+
+Booked the other way, the 40 review hours move to appraisal: prevention 20, appraisal 240. CoSQ (500) and failure (240) do not change, but failure is now twelve times prevention. A team that switches rule between releases would read that jump as a change in its process.
 
 ## When to use it, and when not
 
@@ -50,7 +54,7 @@ A team logs 1,000 hours in a release: 60 on code reviews and coding-standard tra
 
 ## Limitations
 
-- **Category boundaries are judgements.** Houston and Keats list inspections under prevention, while many teams book reviews as appraisal. Pick one rule and keep it.
+- **Category boundaries are judgements.** Reviews are the best-known case (see the booking convention in section 1); whichever rule a team picks, it must keep it, or the trend between releases means nothing.
 - **External failure is undercounted.** Lost customers and reputation rarely appear in any ledger.
 - **The CMM figures are a model plus one company.** Knox's curve is theoretical, and Raytheon is a single, self-reported case.
 

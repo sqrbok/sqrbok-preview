@@ -26,18 +26,20 @@ CoSQ has four categories {% cite houston1999cost knox1993modeling %}:
 |---|---|---|
 | Prevention | efforts to ensure product quality | SQA administration, inspections, process improvement, metrics |
 | Appraisal | discovering the condition of the product | testing, product quality audits |
-| Internal failure | failures detected before shipment | defect management, rework, retesting |
-| External failure | failures detected after shipment | support, complaints, fixes, lost sales |
+| Internal failure | failures found before any user meets them | defect management, rework, retesting |
+| External failure | failures users meet | support, complaints, fixes, lost sales |
 
-Prevention and appraisal are the **cost of achieving quality** (also called conformance); the two failure categories are the **cost of failing** (nonconformance). The categories separate activities that look alike. Running a test is appraisal: it discovers the product's condition. Debugging the failure it exposes, fixing it and retesting is internal failure: that effort exists only because a defect does. "Testing takes too long" often means "fixing takes too long".
+Prevention and appraisal are the **cost of achieving quality** (also called conformance); the two failure categories are the **cost of failing** (nonconformance). The categories separate activities that look alike. Running a test is appraisal: it discovers the product's condition. Debugging the failure it exposes, fixing it and retesting is internal failure: that effort exists only because a defect does. "Testing takes too long" often means "fixing takes too long". A cost is **external** when it arises after release to users (support, incidents, rollback of shipped code, customer harm), **internal** when it arises before.
 
-**Example.** A release of 1,000 hours has 60 hours of reviews and training (prevention), 200 of testing (appraisal), 150 of debugging and fixing (internal failure) and 90 of fixing customer-reported defects (external failure). CoSQ is 500 hours, half the release, and failure (240) is four times prevention (60).
+The categories are a **booking convention**. This course, following Houston and Keats and Knox, books reviews and inspections as **prevention**: they stop defects before testing, and a work product is not complete until reviewed. Many other CoQ texts book them as appraisal, because a review examines the product; either is fine if a team applies one rule consistently {% cite houston1999cost knox1993modeling %}. Rework caused by an inspection finding is internal failure. Automated checks such as static analysis are appraisal here, or booked with reviews if a team always does so.
+
+**Example.** A release of 1,000 hours has 40 hours of reviews and 20 of training (prevention 60), 200 of testing (appraisal), 150 of debugging and fixing (internal failure) and 90 of fixing customer-reported defects (external failure). CoSQ is 500 hours, half the release, and failure (240) is four times prevention (60). Booking the reviews as appraisal leaves CoSQ and failure unchanged but makes failure twelve times prevention (240 / 20): mixing rules between releases fakes a trend.
 
 → [Cost of Software Quality](../../organization/01-coq/01-cosq-foundations.md)
 
 ## 3. Process maturity moves effort from failure to prevention
 
-Knox mapped the categories onto the five levels of the Capability Maturity Model. His model predicts total CoSQ falling by about two-thirds, from about 60 percent of development cost at Level 1 to about 20 percent at Level 5 {% cite knox1993modeling %}. Measured data point the same way: Raytheon cut rework fourfold, from about half of development effort to under 10 percent, after a process improvement programme started in 1988 {% cite houston1999cost %}.
+Knox mapped the categories onto the five levels of the Capability Maturity Model. His model predicts total CoSQ falling by about two-thirds, from about 60 percent of development cost at Level 1 to about 20 percent at Level 5 {% cite knox1993modeling %}. Measured data point the same way: after a process improvement programme started in 1988, Raytheon's total CoSQ fell from 55–67 percent of development cost at Level 1 to about 15 percent, and rework fell fourfold, to under 10 percent of development cost {% cite houston1999cost %}.
 
 The **traditional** cost-of-quality model puts an optimum short of perfection: past some point, preventing the last defects costs more than the failures they avoid; in manufacturing it lies at 95–100% conformance. Knox's **emerging** model argues that software shows no point of diminishing returns yet {% cite knox1993modeling %}. Houston and Keats simulated an 80,000-line project: adding inspections lowered the minimum total CoSQ from 3,500 to 2,900 hours and moved it from 2.7 to 1.6 defects per thousand lines {% cite houston1999cost %}. A better process does not just save money at the same quality; it moves the cheapest point towards higher quality.
 
@@ -77,13 +79,13 @@ In Kan's project, requirements, high-level design and low-level design introduce
 
 ## 7. Richer schemes add triggers, types and cost weights
 
-**Orthogonal Defect Classification (ODC)** records non-overlapping attributes: activity, trigger and impact when a defect is found; target, defect type, qualifier, source and age when it is fixed. At one IBM product, ODC showed most field escapes coming from function verification test, mostly with the *variation* trigger, so the team added variation test cases {% cite butcher2002improving %}. HP's scheme records where a defect **could have been prevented** and weights defects by origin: specification 14.25, design 6.25, code 2.5, because a specification defect forces changes to the specification, the design and the code {% cite huber1999comparison %}.
+**Orthogonal Defect Classification (ODC)** records non-overlapping attributes: activity, trigger and impact when a defect is found; target, defect type, qualifier, source and age when it is fixed. At one IBM product, ODC showed most field escapes coming from function verification test, mostly with the *variation* trigger, so the team added variation test cases {% cite butcher2002improving %}. HP's scheme records where a defect **could have been prevented**. Huber classified the same high-priority defects with both: HP attributed 63% to design, while ODC's *target*, the work product that was changed, pointed mostly at code; the difference is where a defect was fixed against where it could have been prevented. HP also weights defects by origin: specification 14.25, design 6.25, code 2.5, because a specification defect forces changes to the specification, the design and the code {% cite huber1999comparison %}.
 
 → [Defect Classification Schemes](../../organization/01-coq/04-classification-schemes.md)
 
 ## 8. Continuous delivery prices quality in new places
 
-The same four categories apply to pipelines: tests in continuous integration are appraisal, investigating a red pipeline is internal failure. Leinen et al. measured flaky tests (tests that pass or fail on unchanged code) in a project of about 30 developers: at least 2.5% of developer time went on them, and investigating one failed pipeline cost USD 5.67 against USD 0.02 for an automatic rerun, so the company raised the number of reruns {% cite leinen2024flaky %}.
+The same four categories apply to pipelines: tests in continuous integration are appraisal, investigating a red pipeline is internal failure. Leinen et al. measured flaky tests (tests that pass or fail on unchanged code) in a project of about 30 developers: at least 2.5% of developer time went on them, and investigating one failed pipeline cost USD 5.67 against 0.02 cents for an automatic rerun, so the company raised the number of reruns {% cite leinen2024flaky %}. The risk: a test that fails intermittently because of a real defect, such as a race condition, is not flaky, and rerunning it until green hides that defect.
 
 → [Quality Costs in Continuous Delivery](../../organization/01-coq/04-quality-economics-devops.md)
 
@@ -95,7 +97,7 @@ In the OpenDev community, comments that find functional defects were rated most 
 
 ## 10. Debt tools disagree, and accuracy misleads
 
-Technical debt's **principal** is the effort to remove the inefficiencies; its **interest** is the extra maintenance paid while they stay {% cite amanatidis2020td %}. Three debt tools agreed strongly on Java projects (Kendall's W = 0.777) and only moderately on JavaScript (0.647), so the classes all tools rank high are the safest place to start repayment {% cite amanatidis2020td %}. **Defect prediction** flags modules likely to be defective; on imbalanced data, accuracy misleads: on jEdit a model reached 0.97 accuracy while finding no defective module at all (precision and recall 0.00) {% cite khleel2023bilstm %}.
+Technical debt's **principal** is the effort to remove the inefficiencies; its **interest** is the extra maintenance paid while they stay {% cite amanatidis2020td %}. The source does not assign these to CoSQ categories; this course books both as internal failure, since both are development effort spent only because a flaw is in the code, and no user has met a failure; the test is whether users met the failure, not whether the code has shipped. An incident the debt causes in production is external failure; keeping new debt out in review is prevention. Three debt tools agreed strongly on Java projects (Kendall's W = 0.777) and only moderately on JavaScript (0.647), so the classes all tools rank high are the safest place to start repayment {% cite amanatidis2020td %}. **Defect prediction** flags modules likely to be defective; on imbalanced data, accuracy misleads: on jEdit a model reached 0.97 accuracy while finding no defective module at all (precision, the share of flagged modules that are defective, and recall, the share of defective modules flagged, both 0.00) {% cite khleel2023bilstm %}.
 
 → [Technical Debt as a Quality Cost](../../organization/01-coq/06-technical-debt.md) · [Defect Prediction with Machine Learning](../../organization/01-coq/07-defect-prediction-ml.md)
 
