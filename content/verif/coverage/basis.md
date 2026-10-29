@@ -17,7 +17,7 @@ $$
 V(G) = e - n + 2
 $$
 
-where *e* is the number of edges and *n* the number of nodes. The counts depend on how the graph is drawn (Start and End nodes or not, statements merged or not), but *V(G)* does not, provided the graph has one exit. For code built only from two-way decisions there is a shortcut: *V(G)* = number of decisions + 1.
+where *e* is the number of edges and *n* the number of nodes. The counts depend on how the graph is drawn, but *V(G)* does not, provided the graph has one exit. For code built only from two-way decisions there is a shortcut: *V(G)* = number of decisions + 1.
 
 Because a basis set reaches every edge when all its paths are feasible, basis path coverage **subsumes branch coverage**.
 
