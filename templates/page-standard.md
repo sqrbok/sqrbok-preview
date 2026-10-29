@@ -39,6 +39,23 @@ method, and all three **must be declared** in the front matter (`page_type:`).
 Body words exclude front matter, code fences, the References block, Acknowledgments and the
 Disclaimer.
 
+**Worked case.** Each area may have **one** declared `page_type: worked-case` page, 1,200–2,000
+body words. Method pages explain one method on a given input; the worked case shows how to *apply*
+the area to a real system, end to end. It must contain:
+
+1. **One case, start to finish:** a named system or function, from the raw input a team really has
+   (a spec, a repo, an access log, a failure log, time reports) to a **decision** (ship, refactor here,
+   stop testing, raise the gate).
+2. **A numbered procedure**, with the commands, configuration and real output of each step, run for
+   the page (say which version).
+3. **The decision points** and the criterion used at each one.
+4. **A finished artifact** the reader can copy: a filled template, checklist, table or config.
+5. **Three to five common mistakes**, each with how to spot it.
+6. Links to the method pages for the theory; the worked case does not re-explain it.
+
+Label constructed material "(Constructed example.)". Checklists, tables and code are the content
+here, so the bullet cap does not apply.
+
 **Claiming the deep-dive budget is a deliberate act.** Put `page_type: deep-dive` in the front
 matter with a short comment saying why. **Prefer splitting to declaring.** If a page is over budget
 because it covers two topics, it is two pages (§2).
@@ -62,9 +79,12 @@ Splitting is preferred to cutting: the material is usually fine, it is the packa
 2. **When to use it — and when not.** Two short lists, or two sentences.
 3. **At least one concrete example, in software.** A worked instance with real nouns: a function, a
    test suite, a defect count, a coverage number. A page without one is incomplete.
-4. **At least one limitation or pitfall.** What the method does *not* do, or where it misleads.
-5. **A source.** A `{% cite %}` from the area's review (§5c). If nothing is held, say so plainly.
-6. **The standard footer** (§6).
+4. **Where the inputs come from on a real system.** One short paragraph: how a team obtains the
+   numbers or artefacts the method needs (which tool, log or measurement), so the reader is not
+   left with a method that works only on the page's example.
+5. **At least one limitation or pitfall.** What the method does *not* do, or where it misleads.
+6. **A source.** A `{% cite %}` from the area's review (§5c). If nothing is held, say so plainly.
+7. **The standard footer** (§6).
 
 ---
 
@@ -100,8 +120,10 @@ one short sentence where it appears and put the detail below.
 
 ## 5a. No course mechanics on a handbook page
 
-A handbook page must not mention **assignments, labs, quizzes, lecture codes or dates**. That
-belongs in the slides, Moodle and the study notes. **The test:** would the sentence make sense to a
+A handbook page must not mention **course logistics**: assignments, labs, quizzes, grades, team
+allocations, lecture codes or dates. That belongs in the slides, Moodle and the study notes.
+Practitioner content is not course mechanics: tool commands, CI configuration, coverage floors,
+triage rules, templates and checklists stay on the page. **The test:** would the sentence make sense to a
 practitioner who found the page through a search engine?
 
 ## 5b. A page that is mostly pointers is not a page
@@ -121,6 +143,11 @@ themes), `summaries/` (one per paper) and `references.bib`.
 - **Numbers are checked against the summary** (and the paper when the summary is unclear). A
   figure that cannot be traced is removed or flagged, not kept "because the slide had it".
 - New keys go into `_bibliography/references.bib` only — never a local `references.bib`.
+- **Practical knowledge may come from beyond the review.** Tool documentation, a run made for the
+  page, and established practitioner heuristics are valid sources for procedures and examples when
+  labelled as such ("(Constructed example.)", "practitioner rule of thumb", "tool documentation").
+  Do not cut a correct, useful heuristic only because no reviewed paper states it; cut it when it is
+  wrong or presented as measured fact.
 
 ---
 
@@ -237,6 +264,7 @@ when a cluster is shared by several areas (for example, a case library).
 
 - [ ] Definition in the first 40 words
 - [ ] At least one concrete software example
+- [ ] Where the inputs come from on a real system (one paragraph)
 - [ ] At least one limitation or pitfall
 - [ ] Claims and numbers traced to the area's review (§5c)
 - [ ] Word count inside the budget for its type

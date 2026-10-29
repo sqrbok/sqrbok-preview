@@ -17,6 +17,7 @@ as {% cite %}, and kramdown {: .class } attribute lists. Captions are counted):
     topic-hub     250-500    framing + comparison table + links to detail pages
     method        400-800    the default
     deep-dive       <=1200   evidence-carrying, must be marked
+    worked-case  1200-2000   one real case from raw input to decision, must be marked
     study-notes   800-2200   one lecture summarised for revision (SN)
     question-set  200-2200   revision questions (RQ); the prose rules do not apply
     case          300-1600   a case description or assignment brief
@@ -50,6 +51,9 @@ BUDGETS = {             # type: (min, max, hard_split)
     'topic-hub':    (250, 500, 1500),
     'method':       (400, 800, 1500),
     'deep-dive':    (400, 1200, 1500),
+    # One per area at most: a real case from raw input to decision (commands, output,
+    # decision points, common mistakes). Checklists and config are the content here.
+    'worked-case':  (1200, 2000, 2500),
     # Materials pages are not method pages, and judging them as one made all six
     # report as broken - which is the same as having no check at all.
     'study-notes':  (800, 2200, 3000),   # SN: one lecture, summarised for revision
@@ -231,10 +235,10 @@ def problems(r: dict) -> list[str]:
         out.append(f"{r['words']} words - under the {r['type']} budget ({lo}-{hi}); "
                    f"likely missing example or explanation")
 
-    if r['type'] in ('method', 'deep-dive', 'study-notes'):
+    if r['type'] in ('method', 'deep-dive', 'study-notes', 'worked-case'):
         if r['examples'] == 0:
             out.append('no concrete example')
-        if r['bullet_pct'] > 60:
+        if r['bullet_pct'] > 60 and r['type'] != 'worked-case':
             out.append(f"{r['bullet_pct']}% bullets - explain, do not list")
         if not r['lead']:
             out.append('no lead sentence after the H1')
