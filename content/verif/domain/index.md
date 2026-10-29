@@ -22,6 +22,7 @@ Exhaustive testing is impossible even for small functions: two 32-bit integer ar
 | Boundary strategies | how many points per boundary, several inputs, text and decimals | boundaries over several inputs | [Boundary Testing Strategies](boundary-strategies.md) |
 | Classification tree | a visual model of aspects, classes and constraints | many interacting aspects | [Classification Tree Method](classification-tree.md), [in practice](classification-tree-practice.md) |
 | Combination strategies | how many class combinations to test | many parameters | [Combining Techniques](integration.md) |
+| Worked case | all of the above on one fare function, from spec to a fix-or-stop decision | applying the techniques to your own code | [Worked Case](worked-case.md) |
 
 ![Specification feeds equivalence partitioning, which feeds boundary values, decision tables and classification trees; combination strategies select the final test cases](technique-flow.svg)
 
@@ -29,7 +30,7 @@ _How the techniques build on each other: equivalence classes come first, the oth
 
 ## Reading order
 
-Start with [Equivalence Partitioning](equivalence.md), [Boundary Value Analysis](boundary.md) and [Boundary Testing Strategies](boundary-strategies.md), which every other technique uses. [Decision Tables](decision-tables.md) handle conditions that combine; the [Classification Tree Method](classification-tree.md) and [Classification Trees in Practice](classification-tree-practice.md) model larger input spaces; [Combining Techniques](integration.md) shows how many combinations are worth testing.
+Start with [Equivalence Partitioning](equivalence.md), [Boundary Value Analysis](boundary.md) and [Boundary Testing Strategies](boundary-strategies.md), which every other technique uses. [Decision Tables](decision-tables.md) handle conditions that combine; the [Classification Tree Method](classification-tree.md) and [Classification Trees in Practice](classification-tree-practice.md) model larger input spaces; [Combining Techniques](integration.md) shows how many combinations are worth testing. The [Worked Case](worked-case.md) then applies them end to end.
 
 ## How solid is this?
 
