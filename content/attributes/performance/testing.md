@@ -11,28 +11,37 @@ layout: default
 
 ## 1. Six test types, six questions
 
-Molyneaux distinguishes six types of performance test, each answering a different question {% cite molyneaux2014art %}.
+Molyneaux distinguishes six types of performance test {% cite molyneaux2014art %}.
 
 ![Baseline feeds load; load is pushed into stress, held for soak, or narrowed to isolation; smoke gates each build](test-types.svg)
 
-_How the six test types relate: run a smoke test first on each build; if it passes, run the load test, then push it into stress, hold it for a soak, or narrow it to an isolation test._ {% cite molyneaux2014art %}
+_How the six test types relate: a smoke test gates each build; the load test is then pushed into stress, held for a soak, or narrowed to isolation._ {% cite molyneaux2014art %}
 
 | Type | Load | Question |
 |---|---|---|
 | Baseline | one user, best case | What is the response time with no contention? |
 | Load | the expected peak | Does the system meet its targets at that peak? |
-| Stress | beyond the expected peak | Where does it break, and how does it fail? |
+| Stress | past the expected peak | Where does it break, and how does it fail? |
 | Soak | the expected load for hours | Do memory leaks or slow drift appear over time? |
 | Smoke | the changed code only | Did this build make a known path slower? |
 | Isolation | one transaction, repeated | Which step of a slow transaction is slow? |
 
 ## 2. Write the target as a percentile under a stated load
 
-A target needs a measure, a threshold and a load. "Average response time under 2 s" fails twice: an average hides slow requests, and no load is named. Everett recommends stating the *maximum* acceptable time per transaction group {% cite everett2007performance %}; in practice the maximum is stated at a percentile, such as "no slower than 3 s for 95% of requests", because the absolute maximum of a long run is one outlier. For example, "with 500 active users, 95% of searches complete within 3 s and no request fails" names all three.
+A target needs a measure, a threshold and a load. "Average response time under 2 s" fails twice: an average hides slow requests, and no load is named. Everett states a *maximum* time per transaction group {% cite everett2007performance %}; in practice it is set at a percentile, such as "no slower than 3 s for 95% of requests", because a long run's absolute maximum is one outlier. For example, "with 500 active users, 95% of searches complete within 3 s and no request fails" names all three.
 
 ## 3. Make the test environment and workload like production
 
-Results transfer to production only when the test matches it: the same hardware class and configuration, realistic data volumes (not an empty database), and a **workload model** with the right transaction mix, think times between requests and number of active users. The number of key transactions to script rarely exceeds 20 {% cite molyneaux2014art %}. The model's numbers come from production: the access log gives the mix and the peak request rate, gaps between one client's requests give the think time, and the interactive response time law turns those into active users ([Worked Case: Load Testing a Catalogue Service](worked-case.md)). Liu's process puts most of the effort before the first run: design the workload, write the scripts, choose the hardware, set up the environment, fix a repeatable procedure, establish a baseline, then analyze bottlenecks and tune {% cite liu2011performance %}.
+Results transfer only when the test matches production: the same hardware class and configuration, realistic data, and a **workload model**. A practitioner checklist characterises the workload in six items, each from production data:
+
+- **Variation over time:** find the daily, weekly and seasonal peaks and how far they sit above the mean. Everett's shop has two: 2,000 active users browsing at weekday lunchtime and 500 buying on Saturday morning, so it needs two workload plans {% cite everett2007performance %}.
+- **Mix:** list transaction types, rates and shares; each peak plan adds the other peak's groups at about 10% of their peak users, and key transactions rarely exceed 20 {% cite everett2007performance molyneaux2014art %}.
+- **Behaviour:** measure think time between a user's requests and pacing, the interval between a scripted user's iterations.
+- **Users:** count active users with open sessions; truly simultaneous requests are rare {% cite everett2007performance %}.
+- **Data volumes:** size inputs and the database as in production, never empty.
+- **Background load:** include batch jobs, other applications and network traffic.
+
+The access log gives the mix, peak rate and think times; the interactive response time law, users = throughput × (response time + think time), turns them into users ([Worked Case: Load Testing a Catalogue Service](worked-case.md)).
 
 ## 4. Run each test in three phases
 
@@ -48,17 +57,17 @@ The shape of the response-time curve during a run points to a cause.
 | Keeps rising at constant load | a leak: memory, connections, file handles |
 | Becomes erratic | contention or garbage-collection pauses |
 
-Large tests record thousands of counters. Malik and colleagues reduced them automatically to 5–20 "performance signature" counters and detected deviations from a baseline with 95% average precision, so a pipeline can flag regressions without a person reading every graph {% cite malik2013automatic %}.
+Malik and colleagues automatically reduced thousands of counters to 5–20 "performance signature" counters and flagged deviations from a baseline with 95% average precision {% cite malik2013automatic %}.
 
 ## When to use it — and when not
 
 - Run a load test before every release that changes a hot path (code that runs on most requests), and a smoke test on every build.
 - Run stress and soak tests before launches and capacity changes.
-- Do not trust results from an environment that differs from production in hardware, data size or configuration.
+- Do not trust results from an environment unlike production.
 
 ## Limitations
 
-A test shows behavior only for the workload it models: an unmodeled transaction mix or traffic spike remains untested. Few coverage measures exist for load tests; the main one counts only the share of likely workload states that a test visits {% cite jiang2015survey %}. Deciding when a system has been tested enough is therefore a judgement.
+A test shows behavior only for the workload it models: an unmodeled transaction mix or traffic spike remains untested. Few coverage measures exist for load tests; the main one counts only the share of likely workload states that a test visits {% cite jiang2015survey %}.
 
 ## How solid is this?
 

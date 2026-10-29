@@ -22,6 +22,8 @@ A voter compares the outputs of N versions. Three schemes are common {% cite pul
 
 For numeric outputs that differ slightly, a **median** voter takes the middle value.
 
+**N self-checking programming** (NSCP) needs no central voter {% cite laprie1990architectures pullum2001fault %}. Each self-checking component is either one variant with an acceptance test or two variants whose outputs are compared. The components run in parallel: one is active and delivers results, the others are hot spares, and when the active component's check fails, a spare takes over at once, with no rollback. For example, two channels of a brake controller each compute the command from different code; when they disagree, the pair switches itself off and a second pair takes control. (Constructed example.) The weak points are those of its parts: the acceptance test, or two variants that fail the same way.
+
 ## 2. Reliability of a majority system
 
 Assume a perfect voter, versions that fail **independently**, each working with probability R<sub>c</sub>, and wrong outputs that never agree with each other. Then a majority system works when at least m of the N versions work:

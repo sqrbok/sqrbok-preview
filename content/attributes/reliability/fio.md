@@ -67,7 +67,7 @@ That is why dollars become hours: the rule keeps the expected failure cost at ab
 
 ## 3. From the system's FIO to the developed software's
 
-Steps 3 and 4 of the figure turn a system target into one for the team's own code {% cite musa2004sre %}. Express every component's failure intensity in one common unit; in a system where every component must work (a serial system), intensities add, so:
+Steps 3 and 4 of the figure turn a system target into one for the team's own code {% cite musa2004sre %}. Express every component's failure intensity in one common unit; in [a serial system](block-diagrams.md) (every component must work), intensities add, so:
 
 FIO of developed software = system FIO − expected failure intensities of the acquired components
 
