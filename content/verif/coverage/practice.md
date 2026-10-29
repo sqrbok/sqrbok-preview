@@ -37,7 +37,7 @@ Better uses of the number, in order of value:
 
 ## 4. Strengthen the checks, not only the reach
 
-Because assertions explain most of what coverage seems to explain {% cite zhang2015assertions %}, every coverage review should also ask what the covering test *asserts*. For code where a missed fault is expensive, run [mutation testing](mutation.md) on the changed files: a surviving mutant names a specific missing check.
+Because assertions explain most of what coverage seems to explain {% cite zhang2015assertions %}, every coverage review should also ask what the covering test *asserts*. When the suite grows too slow, [Updating and Reducing a Test Suite](suite-maintenance.md) shows which tests can go and what reduction risks. For code where a missed fault is expensive, run [mutation testing](mutation.md) on the changed files: a surviving mutant names a specific missing check.
 
 ## When to use these rules — and when not
 

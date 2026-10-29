@@ -49,7 +49,7 @@ Each two-way decision adds one basis path, nested or not; the saving shows with 
 
 ## 3. Building a basis
 
-Pick a typical first path, then derive each next path by **flipping one decision** of a path already in the set and keeping the earlier decisions. Each flip adds **at least one** new edge: in the example, flipping `x < 10` adds both the false edge and the edge from `y = 2` to `print`. Decisions after the flipped one may change or disappear: once `x > 0` is false, `x < 10` is never reached. Loops get the boundary treatment (a loop's graph is drawn on [Measuring Coverage in Python](python.md)): a `while` or `for` loop is run zero times and once; a `do … while` loop, which always runs once, is run once and twice.
+Pick a typical first path, then derive each next path by **flipping one decision** of a path already in the set and keeping the earlier decisions. Each flip adds **at least one** new edge: in the example, flipping `x < 10` adds both the false edge and the edge from `y = 2` to `print`. Decisions after the flipped one may change or disappear: once `x > 0` is false, `x < 10` is never reached. Loops get the boundary treatment (loop graphs: [Measuring Coverage in Python](python.md), [Basis Paths for Binary Search](basis-binary-search.md)): a `while` or `for` loop is run zero times and once; a `do … while` loop, which always runs once, is run once and twice.
 
 ## 4. All paths, and paths that cannot run
 
