@@ -28,6 +28,8 @@ has_children: true
 | [Chaos Engineering](12-chaos-engineering.md) | fault-injection experiments and safeguards | distributed systems with monitoring | risk of causing an outage |
 | [Continuous Integration](13-continuous-integration.md) | daily merges, a self-testing build on every push, red builds fixed first | any code changed by more than one person | a fast, trustworthy test suite |
 
+[Worked Case: Releasing and Operating a Service](worked-case.md) applies the section to one release: readiness review, blue-green deployment, rollback preconditions, an error budget policy and an incident with its blameless postmortem.
+
 Process-improvement methods (DPP, Six Sigma, Theory of Constraints) are in [Process Improvement](../03-process/index.md); maturity frameworks in [Quality Standards](../04-standards/index.md).
 
 ## How solid is this?

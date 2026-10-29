@@ -42,6 +42,10 @@ A team's changes pass through three steps. Per week it can write 12 changes, rev
 4. **Elevate:** if six reviewers now manage 1.25 changes a week each, training two more adds 2.5, raising review to 10.
 5. **Repeat:** coding (12), review (10) and testing (10) now give a system output of 10, and testing has become a constraint too; start again at step 1.
 
+## Where the inputs come from
+
+Capacities and queues come from timestamps the team already has: when a pull request was opened, first reviewed and merged (the GitHub or GitLab API), when CI jobs started and ended, and when tickets changed status. Counting the items waiting in front of each stage at the same time every day for two weeks shows which queue keeps growing; that stage is the candidate constraint.
+
 ## When to use it — and when not
 
 Use TOC when work flows through stages and one of them visibly has the longest queue: code review, a shared test environment, a release approval. It fits less well when the problem is quality rather than flow, or when the "constraint" is a rule (for example a weekly release window) that needs a policy change rather than capacity.

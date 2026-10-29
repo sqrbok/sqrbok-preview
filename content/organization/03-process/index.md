@@ -26,6 +26,8 @@ Most improvement programs do not last. Jeff Pfeffer's "one-eighth rule" estimate
 | [Six Sigma](07-six-sigma.md) | DMAIC, variation, 3.4 defects per million | measurable, repetitive processes | statistics skills, trained roles |
 | [Change Management](04-change-management.md) | worse-before-better, capability trap, two levels of change | keeping an improvement alive | management attention for months |
 
+[Worked Case: An Improvement Proposal with a Pilot](worked-case.md) takes one improvement from baseline data through a piloted DPP with a control team to the decision to institutionalize it.
+
 Maturity frameworks such as CMMI, which define *what* a mature process contains, are in [Quality Standards](../04-standards/index.md); team-level practices such as retrospectives and DevOps are in [Industry Practices](../05-practice/index.md).
 
 ## How solid is this?

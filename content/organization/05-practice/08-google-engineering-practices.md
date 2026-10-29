@@ -39,6 +39,22 @@ The original reason for review at Google was not finding bugs but **education**:
 
 **Tricorder** runs analyzers on every change sent for review and posts findings as review comments; reviewers can click NOT USEFUL. An analyzer whose not-useful rate reaches **10%** is put on probation until its authors fix it, because developers ignore tools that cry wolf {% cite sadowski2015tricorder %}. Details are on [Deploying Static Analysis](../../verif/static/deployment.md).
 
+## 5. The eleven decisions at Google
+
+These practices answer most of a plan's [eleven decisions](../02-plan/01-quality-management-planning.md) {% cite winters2020swe sadowski2018codereview sadowski2015tricorder %}:
+
+| Decision | Google's answer |
+|---|---|
+| Activities and artifacts | review and tests for every change |
+| When | before merge, on the main line, at release ([gates by stage](10-quality-gates-cicd.md)) |
+| By whom | one reviewer per change (median) |
+| Extent | a test mix of roughly 80/15/5 |
+| Tools | Critique, Tricorder, TAP |
+| Defects | flaky tests quarantined, then fixed or deleted |
+| Measurements | each analyzer's not-useful rate, probation at 10% |
+
+The sources held do not cover training, interactions or cost.
+
 ## When to use these practices — and when not
 
 Small changes, single expert reviewers, fast mostly-small tests and a false-alarm budget for analyzers transfer to teams of any size. TAP's scale problems (deciding which of millions of tests to run) do not; a small project can simply run all its tests.

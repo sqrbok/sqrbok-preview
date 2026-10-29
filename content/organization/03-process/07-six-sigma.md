@@ -33,6 +33,10 @@ In *Define*, the team states the problem and its CTQ: developers need a red buil
 
 In a survey of UK companies, Banuelas Coronado and Antony ranked twelve critical success factors; **management commitment and involvement** came first, followed by cultural change and linking Six Sigma to business strategy, and incentive programs came last {% cite antony2002sixsigma %}. A survey of 101 companies using **Lean Six Sigma**, which combines Six Sigma's variation reduction with Lean's removal of waste, also put management commitment first and organizational culture second; 46% of the companies used it mainly for cost savings or cost avoidance {% cite laureani2012leansixsigma %}.
 
+## Where the inputs come from
+
+Opportunities and defects come from the CI server's build history: GitHub Actions, GitLab CI and Jenkins keep every job's result and log and export them through their APIs. The hard part is the cause. Classing a failure as code or infrastructure needs a label on each failed job, set by the person who looked at it, or a rule that matches known log messages.
+
 ## When to use it — and when not
 
 Use Six Sigma for processes that run often enough to measure, such as builds, deployments, incident handling or support tickets, where variation itself is the problem. It suits creative design work poorly: a feature is designed once, so there is no population of repetitions to analyze. It also needs people trained in its statistics, which is why companies appoint dedicated roles.
