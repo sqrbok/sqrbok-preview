@@ -52,6 +52,8 @@ _Cumulative arrivals (green line) and completions (red line) of one server over 
 
 For example, for this window: *X* = 10/50 = 0.2 req/s, *U* = 38/50 = 76%, *S* = 38/10 = 3.8 s, *N* = 60/50 = 1.2 and *R* = 60/10 = 6 s.
 
+**Where the counters come from.** On a running service they already exist. *A* and *C* are request counts from the access log or a metrics counter such as Prometheus's `http_requests_total`. *B* for a CPU is the process's CPU time in the window, from `ps -o time`, `/proc/<pid>/stat` or `psutil`; for a Linux disk, `iostat -x` reports %util = *B*/*T*. *W* is the sum of the logged response times. Take all four over one window and one system boundary.
+
 ## 2. The laws
 
 Each law combines derived metrics. The examples use a submission service whose database is queried four times per request, each query taking 8 ms of database time.

@@ -25,6 +25,7 @@ Each page answers one question a team asks about speed under load.
 | [Load Testing with Locust](load-testing.md) | How do we generate realistic load and read the result? | A scripted user model | Script upkeep |
 | [Performance Bugs and Anti-Patterns](bugs.md) | Where do slowdowns come from, and why are they found late? | Empirical studies | Design reviews |
 | [Tail Latency at Scale](cloud-bridge.md) | Why are distributed systems slow at the 99th percentile? | Fan-out arithmetic, hedging | Extra requests |
+| [Worked Case: Load Testing a Catalogue Service](worked-case.md) | How do we go from an access log to a ship decision? | Step load plus counters | One afternoon |
 | [Queuing Theory](../queuing/index.md) (separate section) | Why does response time explode near full utilization, and how much capacity is needed? | Operational laws, queuing models | Measured service demands |
 
 The last row is a section of its own, holding the models behind these pages.

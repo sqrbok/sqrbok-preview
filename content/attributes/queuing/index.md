@@ -45,7 +45,7 @@ Each page adds one step.
 
 ## Reading order
 
-Read the pages in table order; each builds on the one before. [Performance Measurement](../performance/measurement.md) covers the metrics these pages assume.
+Read the pages in table order, then the [worked case](worked-case.md). [Performance Measurement](../performance/measurement.md) covers their metrics.
 
 ## How solid is this?
 

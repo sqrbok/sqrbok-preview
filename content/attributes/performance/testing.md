@@ -32,7 +32,7 @@ A target needs a measure, a threshold and a load. "Average response time under 2
 
 ## 3. Make the test environment and workload like production
 
-Results transfer to production only when the test matches it: the same hardware class and configuration, realistic data volumes (not an empty database), and a **workload model** with the right transaction mix, think times between requests and number of active users. The number of key transactions to script rarely exceeds 20 {% cite molyneaux2014art %}. Liu's process puts most of the effort before the first run: design the workload, write the scripts, choose the hardware, set up the environment, fix a repeatable procedure, establish a baseline, then analyze bottlenecks and tune {% cite liu2011performance %}.
+Results transfer to production only when the test matches it: the same hardware class and configuration, realistic data volumes (not an empty database), and a **workload model** with the right transaction mix, think times between requests and number of active users. The number of key transactions to script rarely exceeds 20 {% cite molyneaux2014art %}. The model's numbers come from production: the access log gives the mix and the peak request rate, gaps between one client's requests give the think time, and the interactive response time law turns those into active users ([Worked Case: Load Testing a Catalogue Service](worked-case.md)). Liu's process puts most of the effort before the first run: design the workload, write the scripts, choose the hardware, set up the environment, fix a repeatable procedure, establish a baseline, then analyze bottlenecks and tune {% cite liu2011performance %}.
 
 ## 4. Run each test in three phases
 
