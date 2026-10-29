@@ -198,7 +198,7 @@ tests/test_shop.py:13 B101 LOW HIGH
 |---|---|---|
 | `shop.py:12` B608, `shop.py:17` B307 | Real: T1, T2 | Fix (blocks) |
 | `shop.py:4` B105 | Real: T5. Bandit severity Low; the key signs sessions, so it is CVSS 8.1 (High) | Fix (blocks) |
-| `shop.py:8` B324 MD5 | Real (part of T1: injected reads expose the hashes) | Fixed with T1 (salted slow hash) |
+| `shop.py:8` B324 MD5 | Real (part of T1) | Fixed with T1 (salted slow hash) |
 | `web.py:57` B201, B104 | Hardening: the debugger allows code execution, but this block runs only under `python app/web.py`, never when gunicorn imports the module in production | `app.run()` with defaults |
 | `reports.py:5` B608 | False positive: constant table name | `# nosec B608` |
 | `web.py:53` B311 | False positive: an order number, not a secret | `# nosec B311` |
