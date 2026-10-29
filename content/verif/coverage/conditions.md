@@ -58,6 +58,8 @@ The table puts the decision-level and condition-level criteria side by side for 
 | MC/DC | *c* + 1 | yes, for each condition |
 | Multiple condition | 2<sup>*c*</sup> | yes |
 
+**Where the numbers come from.** Common coverage tools stop at branches: coverage.py, for example, counts `if a and b:` as one decision. MC/DC needs a tool that instruments each condition, such as Clang's `-fcoverage-mcdc` or GCC 14's `-fcondition-coverage` for C and C++, or the qualified tools (LDRA, VectorCAST) used under DO-178C; elsewhere the tests are designed by hand from a truth table like the one above.
+
 ## When to use it — and when not
 
 - **Use MC/DC** where a standard demands it: DO-178C, the standard for airborne software, requires it for the most critical (Level A) airborne software {% cite hayhurst2001practical %}.
