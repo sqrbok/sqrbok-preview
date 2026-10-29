@@ -55,6 +55,8 @@ The merge is not unique: (–, N, –) for every wrong password, plus (N, Y, –
 
 A careless merge is the classic error. Writing R2 as (Y, –, N) would cover (Y, N, N) too, a wrong password on an inactive account, and give it the "inactive" message that R3 says it must not get. The check in step 7 catches this: R2 would then cover 2 combinations, and the total would be 9.
 
+**Where the rules come from.** Real conditions and actions sit in business-rule documents, permission matrices or configuration files; the code's `if` chain shows what was implemented, not what was specified.
+
 ## When to use it — and when not
 
 - **Use it** for business rules, permissions, pricing and configuration logic, where several conditions together decide the outcome.
