@@ -26,7 +26,7 @@ Three LTP entries carry most of the decisions: **features not to be tested** (wi
 
 ## 2. Scaling to integrity
 
-The standard maps documents to its four integrity levels. At level 4 (catastrophic) and level 3 (critical), a project writes a master test plan, plans, designs, cases, procedures, logs and reports for every level, and a master test report. At level 2 (marginal) the master documents drop out. At level 1 (negligible) only integration and system testing are documented {% cite ieee829-2008 %}.
+The standard maps documents to its four integrity levels. At level 4 (catastrophic) and level 3 (critical), a project writes a master test plan, plans, designs, cases, procedures, logs and reports for every level, and a master test report. At level 2 (marginal) the master documents drop out. At level 1 (negligible) only integration and system testing are documented {% cite ieee829-2008 %}. Within a level, a practitioner rule decides how many documents to write: combine them when the project is small, has a single test level or few resources; keep them separate when it is complex, involves several teams or is regulated.
 
 ## 3. "Addressed", not "filled in"
 

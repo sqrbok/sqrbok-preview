@@ -37,6 +37,10 @@ Fu et al. call a sub-optimal solution spotted during review **potential technica
 
 A team's reviews produce mostly documentation and naming remarks. From these findings, three changes follow: assign reviewers with experience in the changed code, rotate reviewer pairs rather than letting the same two people swap reviews, and when a reviewer spots a defect, ask them to propose the fix, the condition under which Yu et al. saw the highest resolution rate. _(Constructed example.)_
 
+## Where the inputs come from
+
+The comments are in the review tool: GitHub and GitLab export every comment with its file and line, and show whether the commented lines changed in a later revision, a common proxy for a comment that mattered. A team can export a month of comments and label a sample of about fifty by category, as in the table above, to see where its review time goes.
+
 ## When to use it, and when not
 
 - **Use these findings** to set review guidelines and to decide which review comments to track as defects or debt.

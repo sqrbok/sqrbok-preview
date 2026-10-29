@@ -21,6 +21,8 @@ has_children: true
 | [Technical Debt as a Quality Cost](06-technical-debt.md) | which tool to believe, where debt accumulates | Amanatidis; Bhatia |
 | [Defect Prediction with Machine Learning](07-defect-prediction-ml.md) | why accuracy misleads, and what to measure instead | Khleel; Bhutamapuram |
 
+[Worked Case: Measuring a Team's Cost of Quality](worked-case.md) applies the section to one team: time reports and tracker fields, the CoQ table over three releases, DRE and a recommendation.
+
 The study notes and revision questions for this section are [SN A01: Cost of Quality](../../material/qam/SN-A1-CoSQ.md) and [RQ A01: Cost of Quality](../../material/qam/RQ-A1-CoSQ.md). Quality planning, which turns these costs into decisions for one project, is the next section, [Quality Planning](../02-plan/index.md).
 
 ---
