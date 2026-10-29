@@ -28,10 +28,11 @@ _The section in one picture: why software decays, where the decay shows in the c
 | How do we improve the structure? | Partitioning, clustering, tearing and banding reorder the DSM | [DSM Operations](dsm-operations.md) |
 | How far does a change reach? | Propagation cost: the share of the system a change can touch | [Propagation Cost](propagation-cost.md) |
 | Does restructuring pay? | Mozilla, Windows 7, ABB and automatic refactoring at four companies | [Refactoring Case Studies](cases.md) |
+| Where do I refactor my repository? | Complexity × churn hotspots, a DSM of the modules, then one target | [Worked Case: Where to Refactor Click](worked-case.md) |
 
 ## Reading order
 
-Read top to bottom. The evolution page explains why maintenance never stops, the next three pages measure the code, and the four after them measure and improve the structure. The case studies show the effect of both. Code metrics that maintainability models reuse, such as cyclomatic complexity, are defined in [Measurement](../../define/measurement/index.md); the Maintainability Index formula, as radon computes it, is on [Rating Python Code with Radon](radon.md).
+Read top to bottom. The evolution page explains why maintenance never stops, the next three pages measure the code, and the four after them measure and improve the structure. The case studies show the effect of both, and the worked case applies all of them to one repository. Code metrics that maintainability models reuse, such as cyclomatic complexity, are defined in [Measurement](../../define/measurement/index.md); the Maintainability Index formula, as radon computes it, is on [Rating Python Code with Radon](radon.md).
 
 ## How solid is this?
 

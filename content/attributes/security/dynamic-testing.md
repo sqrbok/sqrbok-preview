@@ -16,7 +16,7 @@ The OWASP Web Security Testing Guide splits black-box testing into two modes {% 
 
 ## 2. Example: a white-box exploit test
 
-DAST sends attack payloads over HTTP to a deployed system. A **white-box exploit test** complements DAST and is not part of it: a unit test sends the same payload straight to the function behind the endpoint. It needs no deployment and runs every build, but skips the HTTP layer. For the shop's login ([Vulnerabilities, Bugs and Flaws](vulnerabilities.md)), the tests below, in `test_login_injection.py`, expect that a quote-and-comment payload does not bypass the password. The security lab's `test/hack.py` is a separate file of white-box exploit tests of the same kind, run with `poetry run pytest test/hack.py`:
+DAST sends attack payloads over HTTP to a deployed system. A **white-box exploit test** complements DAST and is not part of it: a unit test sends the same payload straight to the function behind the endpoint. It needs no deployment and runs every build, but skips the HTTP layer. For the shop's login ([Vulnerabilities, Bugs and Flaws](vulnerabilities.md)), the tests below, in `test_login_injection.py`, expect that a quote-and-comment payload does not bypass the password:
 
 ```python
 def test_correct_password_logs_in(db):

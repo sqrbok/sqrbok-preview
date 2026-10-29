@@ -41,6 +41,8 @@ The four Bandit findings on the shop module in [Static Security Analysis](static
 
 For `eval`, Bandit reports CWE-78 (OS command injection) because the evaluated code can reach the operating system as the application's user; **CWE-95** (eval injection) is the closer fit. Both are mapped to Injection, so the category does not change. The four findings fall into three categories: input interpreted as code, a fast unsalted hash that lets a stolen table be cracked, and a key that anyone reading the source holds. *Hypothetically*, if the shop also depended on a library with a known vulnerability, such as Log4j before its fix, that would be a **Software Supply Chain Failure** (A03 in 2025).
 
+**Where the inputs come from on a real system.** The CWE of each finding is in the scanner's report: Bandit's JSON output (`bandit -r app -f json`) carries an `issue_cwe` id for every result, and dependency scanners and NVD entries list CWEs for published CVEs. Look the id up in OWASP's mapping list for the edition you report against; a finding without a CWE, such as a missing authorization check found in review, is classified by hand.
+
 The mapping tells the team which checklist items and tests to add: an injection test for every input that reaches a query, a review rule against fast hashes, and a dependency scan in the build.
 
 ## When to use it — and when not
