@@ -30,6 +30,10 @@ The actions IBM's teams took were small and concrete: a new item on the common-e
 
 The reported results for one product line were a **54% reduction in defects** during development compared with its history, and field defects **60% below** the rate of the eight previous releases. The cost was small: a product area of 150 to 200 people could expect to spend less than one person-year per year on DPP, about **0.5% of its resources** {% cite mays1990defect %}.
 
+## Where the inputs come from
+
+The meeting needs, for each defect, its description, where it was found and the fix (the commit or pull request linked to the ticket); it adds the cause category and the stage the error was made in. In a modern tracker these are fields on the defect ticket, and the action database can be a board column or label for actions, so open actions stay visible.
+
 ## When to use it — and when not
 
 Use DPP when the same kinds of defects recur and the team has a defect record to analyze. It needs a team willing to discuss its own errors openly, and an action team with real authority; without the second, causal analysis produces lists that nobody acts on. Do not run it on every defect in a large backlog: IBM's teams analyzed a sample, at times only about a third of the defects.

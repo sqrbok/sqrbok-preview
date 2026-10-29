@@ -33,6 +33,10 @@ Lehtinen, Itkonen and Lassenius followed 37 retrospectives of seven Scrum teams 
 
 The team said "low bug count" whenever the number of open bugs was roughly 90 or less, but nobody showed the actual count in the meeting: the discussion ran on impressions. Matthies and colleagues propose closing that gap with **data-informed retrospectives**: a health check that pulls measures such as test coverage, commit patterns or build failures from the repository before the meeting, and a **remedy appraisal** that measures whether a past action item changed the metric it targeted {% cite matthies2020mining %}.
 
+## Where the inputs come from
+
+A data-informed retrospective gathers its numbers before the meeting: open and escaped bugs from the tracker, build failures and their causes from the CI server, coverage from the last pipeline run, and the state of the previous sprint's action items from the team board. One person exports them the day before, so the meeting discusses numbers rather than impressions.
+
 ## When to use it — and when not
 
 Hold one at the end of every iteration, short and with the whole team. It is the right tool for how the team itself works. It is the wrong tool for problems owned outside the team (a slow approval board, another team's API), which the Lehtinen data show retrospectives rarely touch; those need [change management](../03-process/04-change-management.md) at the organization's level.
