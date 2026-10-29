@@ -66,6 +66,10 @@ Miranda's example assumes that every development phase **doubles** the defects i
 
 Both options cut the shipped defects roughly in half. They differ in **where** the work happens. Option 1 removes 74 defects, all in testing. Option 2's inspections remove 2 + 3.2 + 10.24 = 15.44 defects early, and because each removed defect no longer doubles, only 56.4 defects are ever created instead of 80; testing then has 35.84 to remove instead of 70. Which option is cheaper depends on what an inspection hour and a test-and-fix hour cost in your organization, and on how likely each improvement is to deliver its assumed efficiency {% cite miranda2013coq %}.
 
+## Where the inputs come from
+
+Removal counts per activity come from the bug tracker's *where found* field; injection counts need an *origin* field on each defect (see [Defect Origin and Detection](03-defect-classification.md)) and a size measure, such as thousands of lines counted with `cloc`, to turn counts into rates. Until a team has a few releases of its own data, the published rates above are its only option, and they are rough.
+
 ## When to use it, and when not
 
 - **Use it** to compare process changes, to set removal targets per activity, and to explain to managers why late testing alone cannot reach a low residual count.

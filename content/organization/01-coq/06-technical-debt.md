@@ -37,6 +37,10 @@ Two kinds of debt specific to ML stood out in their sample: configuration debt (
 
 A team has one sprint to reduce debt in a Java service that also trains its own recommendation model. SonarQube alone flags 120 classes. The team also runs a second tool and starts with the classes both rank in their top group, where the evidence is strongest; then it greps comments for "TODO" and "hack" in the model-training code, the stage where Bhatia et al. found most admitted debt in ML projects. _(Constructed example.)_
 
+## Where the inputs come from
+
+Tool-reported debt comes from running the analyzers in the pipeline and exporting their findings per file (SonarQube's issues and remediation estimates, plus a second tool to compare). Self-admitted debt comes from the code itself: `grep -rniE "TODO|FIXME|HACK" src/` lists candidate comments, which a person then confirms, because many TODOs describe missing features rather than debt.
+
 ## When to use it, and when not
 
 - **Use multi-tool agreement** to rank where to repay first, and SATD comments as a cheap signal that developers themselves know about.

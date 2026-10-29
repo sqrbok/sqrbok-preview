@@ -36,6 +36,10 @@ In continuous integration and delivery, Ahmad et al. collected **39 information 
 
 A release is a week away. The **developers** see the dashboard: 4 failing tests, each with its owner and a link to the log. The **test lead** sees agreement and risk: 85 of 100 planned scenarios run, payment and refunds still untested, the staging database down for two days (an obstacle). The **project manager** gets one paragraph: two risk areas remain, about four days of work, release on time if staging is restored by Tuesday. _(Constructed example.)_
 
+## Where the inputs come from
+
+Each dimension has a source the team already runs: coverage from the test runner (pytest-cov, JaCoCo), agreement from the list of planned scenarios marked as run, risk from the plan's risk list, effort from time reports, obstacles from blocked tickets in the tracker, and the pipeline's state from the CI server's API. A dashboard joins these sources; it does not create the data.
+
 ## When to use it, and when not
 
 - **Decide the measures in the plan**, before testing starts, so that nobody chooses the flattering one at the end.

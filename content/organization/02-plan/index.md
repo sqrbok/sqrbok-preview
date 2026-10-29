@@ -20,6 +20,8 @@ has_children: true
 | [Test Status Reporting](06-metrics-dashboards-reporting.md) | what "30% done" means, and what pipelines need to show | Kaner; Ahmad |
 | [Domain-Specific V&V](07-domain-specific-vv.md) | how robotics, IoT, automotive and model-based projects differ | four systematic reviews |
 
+[Worked Case: A Quality Plan for a Booking Service](worked-case.md) applies the section end to end: criticality classes, gate criteria with Python tool commands, triage rules, roles, an effort estimate and a one-page plan to copy.
+
 The study notes and revision questions are [SN A04: Quality Planning](../../material/qam/SN-A4-QualityPlan.md) and [RQ A04: Quality Planning](../../material/qam/RQ-A4-QualityPlan.md). The costs that a plan balances are in [Cost of Quality](../01-coq/index.md).
 
 ---
