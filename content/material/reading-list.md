@@ -8,7 +8,7 @@ page_type: deep-dive   # annotated bibliography: one line per book or paper, not
 
 # Reading List
 
-A curated selection of books and papers behind the SQR and QAM courses. Each entry is chosen for its foundational or canonical contribution, with one line on what it contributes and why it is here.
+A curated selection of books and papers behind the SQR and QAM courses. Each entry is chosen for its foundational or canonical contribution, with one line on what it contributes and why it is here. For example, before the coverage lecture, read the coverage chapters of Ammann and Offutt's textbook, then one paper from *Coverage Criteria (L4)* below for the evidence on whether coverage predicts fault detection.
 
 ---
 
