@@ -8,10 +8,11 @@ layout: default
 
 # SQR Study Materials
 
-Study Notes (SN) and Revision Questions (RQ) for the Software Quality and Reliability (SQR, bachelor-track) lectures, L01–L10.
+Study Notes (SN) and Revision Questions (RQ) for the Software Quality and Reliability (SQR, bachelor-track) lectures, L00–L10.
 
 | Lecture | Topic | Study Notes | Revision Questions |
 |---------|-------|--------------|---------------------|
+| L00 | Course Introduction and CI | [SN](SN_L00_Intro_CICD.md) | [RQ](RQ_L00_Intro_CICD.md) |
 | L01 | Quality Models | [SN](SN-L1-QM.md) | [RQ](RQ-L1-QM.md) |
 | L02 | Quality Measurement | [SN](SN_L2_Metrics.md) | [RQ](RQ_L2_Metrics.md) |
 | L03 | Verification Methods | [SN](SN_L03_Verification.md) | [RQ](RQ_L03_Verification.md) |

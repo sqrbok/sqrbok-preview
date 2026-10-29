@@ -7,7 +7,7 @@ layout: default
 
 # Combinatorial Input Models
 
-An **input model** lists the parameters of the system under test and, for each, a small set of values, usually one representative per equivalence class (see [Input Domain Testing](../domain/index.md)); a generator then combines the values into tests {% cite grindal2005survey %}. The model decides what combinatorial testing can find: a failure whose triggering value is not in the model will not be found at any strength.
+An **input model** lists the parameters of the system under test and, for each, a small set of values, usually one representative per equivalence class (see [Input Domain Testing](../domain/index.md)); a generator then combines the values into tests that cover every combination of values of any *t* parameters, where *t*, the **interaction strength**, is usually 2 (pairwise) {% cite grindal2005survey %}. The model decides what combinatorial testing can find: a failure whose triggering value is not in the model will not be found at any strength.
 
 ## 1. Worked example: a Find dialog
 
@@ -43,7 +43,7 @@ long	Yes	Down	None
 MixedCase	No	Up	None
 ```
 
-The full output has 24 rows. That is the minimum, because FindWhat and File alone have 8 · 3 = 24 pairs. The model has 72 pairs in all (8·2 + 8·2 + 8·3 + 2·2 + 2·3 + 2·3), and the check script on [Combinatorial Testing Tools](tools.md) confirms that all 72 appear. `pict find.txt /o:3` gives 49 rows for all 140 triples, one more than the lower bound of 8 · 2 · 3 = 48.
+The full output has 24 rows. That is the minimum, because FindWhat and File alone have 8 · 3 = 24 pairs. The model has 72 pairs in all (8·2 + 8·2 + 8·3 + 2·2 + 2·3 + 2·3), and the check script on [Combinatorial Testing Tools](tools.md) confirms that all 72 appear. `pict find.txt /o:3` gives 49 rows for all 140 triples, one more than the lower bound of 8 · 3 · 2 = 48: an array of strength *t* needs at least as many rows as the product of the *t* largest value counts, here FindWhat, File and one of the two-valued parameters.
 
 | Strategy | Tests | What it guarantees |
 |---|---|---|

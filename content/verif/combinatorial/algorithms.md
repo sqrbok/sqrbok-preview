@@ -7,7 +7,7 @@ layout: default
 
 # Covering Array Generation
 
-**Covering array generation** is the task of building a small table of tests that covers every *t*-way combination of an input model. Tools do not search for the smallest array; they use heuristics that build a good one quickly: greedy algorithms such as AETG and IPOG, and search algorithms such as simulated annealing {% cite grindal2005survey zeb2025systematic %}.
+**Covering array generation** is the task of building a small table of tests that covers every *t*-way combination of an input model. The **input model** lists the parameters and a few values for each; *t*, the **interaction strength**, is how many parameters' value combinations must all appear (pairwise when *t* = 2). Tools do not search for the smallest array; they use heuristics that build a good one quickly: greedy algorithms such as AETG and IPOG, and search algorithms such as simulated annealing {% cite grindal2005survey zeb2025systematic %}.
 
 ## 1. AETG builds one test at a time
 
@@ -17,7 +17,7 @@ AETG, from Bellcore, adds tests one by one, each covering as many still-uncovere
 2. puts the remaining parameters in a random order;
 3. gives each parameter in turn the value that covers the most new pairs with the values already chosen.
 
-It repeats this to make M = 50 candidate tests and keeps the best. Raising M barely helped; running the whole generator with 50 different random-number seeds and keeping the best suite sometimes saved 10% to 20% of the tests. At Bellcore, AETG covered all pairs of a telephone-switch model with 336 valid scenarios, each taking a few hours to run, in 30 tests; on the Unix `sort` command, 29 pairwise tests reached 90% block coverage (they executed 90% of the program's basic blocks, the straight-line stretches of code) {% cite cohen1997aetg %}.
+It makes M = 50 candidate tests this way and keeps the best. Raising M barely helped; running the whole generator with 50 different random-number seeds and keeping the best suite sometimes saved 10% to 20% of the tests. At Bellcore, AETG covered all pairs of a telephone-switch model with 336 valid scenarios, each taking hours to run, in 30 tests; on the Unix `sort` command, 29 pairwise tests reached 90% block coverage (90% of its basic blocks, the straight-line stretches of code, ran) {% cite cohen1997aetg %}.
 
 ## 2. IPOG covers one parameter at a time
 
@@ -36,7 +36,7 @@ Lei et al.'s IPOG tool, FireEye, beat four other generators (ITCH, Jenny, TConfi
 
 ## 3. Search algorithms trade time for size
 
-Search algorithms start from a whole array and change it step by step to remove uncovered combinations. Simulated annealing, which sometimes accepts a worse step to escape a dead end, is the best known; CASA adds a SAT solver for constraints and is covered on [Constraints and Invalid Values](advanced.md) {% cite garvin2011casa %}. Zeb et al. reviewed 91 studies (2003 to 2025) and sorted search-based strategies into five kinds: standard (one search algorithm), mix (a search algorithm plus a greedy, exact or algebraic method), adaptive (tuning its own settings), hybrid (several search algorithms together) and hyper-heuristics that choose among algorithms while running. Simulated annealing stood out: it was the one search algorithm used in the best-performing strategies of four of the five kinds. The same search methods could build related structures that remain largely open, such as error-locating arrays, which also point to the failing combination {% cite zeb2025systematic %}.
+Search algorithms change a whole array step by step to remove uncovered combinations. Simulated annealing, which sometimes accepts a worse step to escape a dead end, is the best known; CASA adds a SAT solver for constraints and is covered on [Constraints and Invalid Values](advanced.md) {% cite garvin2011casa %}. Zeb et al. reviewed 91 studies (2003 to 2025) and sorted search-based strategies into five kinds: standard (one search algorithm), mix (search plus a greedy, exact or algebraic method), adaptive (self-tuning), hybrid (several search algorithms) and hyper-heuristics (choosing among algorithms while running). Simulated annealing stood out: it was the only search algorithm in the best-performing strategies of four of the five kinds. Related structures such as error-locating arrays, which also point to the failing combination, remain largely open {% cite zeb2025systematic %}.
 
 ## When to use it — and when not
 
@@ -45,7 +45,7 @@ Search algorithms start from a whole array and change it step by step to remove 
 
 ## Limitations
 
-Every generator returns an upper bound. Two tools, or one tool with two random seeds, can return arrays of different sizes for the same model.
+Every generator returns an upper bound; two tools, or two random seeds, can return arrays of different sizes for the same model.
 
 ## How solid is this?
 

@@ -38,7 +38,7 @@ d) Name two reasons to be careful before applying these numbers to your own syst
 
 Three parameters A, B and C each take the values 0 and 1.
 
-a) How many pairs of values must a pairwise array cover? Use C(*k*, *t*) · *v*<sup>*t*</sup>.
+a) How many pairs of values must a pairwise array cover? Use C(*k*, *t*) · *v*<sup>*t*</sup>, where *k* is the number of parameters, *t* the interaction strength (2 for pairwise) and *v* the number of values per parameter.
 
 b) What is the lower bound on the number of rows? Construct an array that reaches it.
 
