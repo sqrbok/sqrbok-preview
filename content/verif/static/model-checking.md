@@ -105,6 +105,8 @@ Chiari and colleagues interviewed seven engineers at ASML, Philips and Thermo Fi
 | Scale | millions of lines | a model of a component |
 | Result | warnings with a location | proof, or a counterexample trace |
 
+**Where the inputs come from.** The model is written by hand, in Promela for SPIN, from the design or the protocol specification, usually for one critical part such as a locking protocol; the properties come from the requirements (no deadlock, mutual exclusion). Tools that extract the model from code, such as SLAM for C drivers, exist for narrow domains ([Abstraction Refinement](cegar.md)).
+
 ## When to use it — and when not
 
 - Use it for concurrency and protocols: deadlocks, races, ordering rules, where one rare interleaving matters and testing will not find it.

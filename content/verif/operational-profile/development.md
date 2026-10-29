@@ -52,6 +52,8 @@ _The billing profile as a tree; each operation's probability is the product alon
 
 The most frequent operation has probability 0.594 and the rarest 0.0001, a ratio of almost 6,000 to 1. Such skew is typical, and it is the reason to allocate tests by profile.
 
+**Where the inputs come from.** Rates come from server or gateway logs, analytics, or call records of this or a similar system; [the worked case](worked-case.md) derives a profile from an access log.
+
 ## When to use it — and when not
 
 Build a profile when:

@@ -63,6 +63,8 @@ Taint analyzers miss vulnerabilities when they lack specifications for library c
 
 IRIS also found four previously unknown vulnerabilities in 30 projects. Even so, more than eight of ten alarms were false by the benchmark's measure; the authors' manual check of 50 alarms suggests about 46% in practice {% cite li2024iris %}. A survey of LLM-assisted program analysis lists the limits: non-deterministic answers, hallucinated findings, token limits on large code, and dependence on prompt engineering {% cite wang2025llmpa %}. The pattern that works is LLM plus a conventional analyzer, not an LLM alone.
 
+**Where the inputs come from.** To compare tools on your own code, run each on the same commit, export the warnings (most tools write SARIF or JSON), and have two developers judge a random sample of each tool's warnings as real or false; that gives each tool's precision on that code base, the measure used in the study above.
+
 ## When to compare tools — and how
 
 - Run two or three candidate tools on your own code and sample their warnings; published precision is for other code bases and other rule sets.

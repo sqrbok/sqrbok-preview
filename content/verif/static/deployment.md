@@ -49,6 +49,8 @@ Both experiences, with Chess and West's review cycle (set goals, run the tool, r
 4. Show results where developers already work (code review, the build) and only for changed code.
 5. Measure how often developers act on findings, and retire analyzers they keep rejecting.
 
+**Where the inputs come from.** The not-useful rate needs a record of what developers do with each finding: Tricorder took it from clicks in the review tool. Without such a tool, a team can count, per analyzer, the findings fixed and the findings suppressed, from its version history and suppression comments.
+
 ## When to use this — and when not
 
 - Use this order for any new analyzer, from a linter to a commercial security scanner.

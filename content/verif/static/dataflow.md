@@ -86,6 +86,8 @@ Type checkers apply exactly this refinement to `Optional` values: run on this co
 
 Zero, null and taint analysis are **forward** analyses: facts flow from definitions toward uses. **Backward** analyses run the other way. **Live-variable analysis** asks, at each point, which variables will still be read later; an assignment to a variable that is not live after it is a **dead store**, the fault flake8 reports as "assigned to but never used". **Reaching definitions**, a forward analysis, asks which assignments can reach each use of a variable without being overwritten. Compilers use the same facts for constant propagation and dead-code removal.
 
+**Where the inputs come from.** Nobody draws the control flow graph by hand: the analyzer builds it from the source or the compiler's intermediate code while the project builds, which is why industrial tools such as Coverity and Infer wrap the build command. What a team supplies is a working build, and models of library functions whose code the analyzer cannot see.
+
 ## When to use it — and when not
 
 - Use it for value properties along paths: division by zero, null use, uninitialised or unused variables, resource leaks.

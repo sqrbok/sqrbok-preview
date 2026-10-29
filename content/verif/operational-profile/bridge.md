@@ -32,6 +32,8 @@ Exploratory charters in the second phase aim at two targets: the high-usage feat
 
 The numbers are constructed for illustration. A web-shop team runs profile-based tests in batches of 500. The first batch finds 12 failures, the second 5, the third 1, the fourth none. The failures found per batch have flattened: the frequent paths are clean. The team stops adding usage-based tests and plans three exploratory sessions instead: *explore checkout using interrupted payments to discover lost or double charges*, *explore coupons using unusual combinations to discover pricing errors*, *explore the admin report using a year of data to discover wrong totals*. The second session finds the coupon bugs; each becomes a regression test.
 
+**Where the inputs come from.** The failures per batch come from the test driver's own log or the bug tracker, counted per batch of profile-based tests. The charter targets come from the profile's most used operations and from what it leaves out, such as the rare critical operations listed beside it.
+
 ## When to use it — and when not
 
 Use the strategy when a profile exists and testing time is limited. When safety-critical operations are rare, do not wait for saturation: test them from the start, by risk.
