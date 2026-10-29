@@ -52,7 +52,7 @@ print(f"{len(rows)} tests, {len(required)} required pairs, "
       f"{len(required - found)} missing, {bad} invalid tests")
 ```
 
-Run it as `python3 check_pairs.py find.txt find.tsv`. It enumerates every full combination, so it suits models of up to about a million combinations. Results on this section's models:
+Run it as `python3 check_pairs.py find.txt find.tsv`. It enumerates every full combination, so it suits models of up to about a million combinations. The three models are listed in full elsewhere in this section: the Find dialog (four parameters with 8, 2, 2 and 3 values) in [Combinatorial Input Models](practice.md#1-worked-example-a-find-dialog); OS (Windows, macOS, Linux), Browser (Chrome, Firefox, Safari) and Language (EN, DE), with the rule that Safari runs only on macOS, and an order model of Quantity (1, 5, ~0, ~-1), Coupon (none, SAVE10, ~EXPIRED) and Payment (card, invoice), both in [Constraints and Invalid Values](advanced.md). Results:
 
 | Model | Output | Printed |
 |---|---|---|
