@@ -58,6 +58,8 @@ print Z
 
 The suite *{(A = T, B = T), (A = F, B = F)}* takes all four branches and passes: it prints 2 and 0, as specified. The fault shows only for *(A = T, B = F)*, which prints 1. [Data-flow coverage](data-flow.md), which follows each assigned value to the places that read it, forces that test: the value assigned by `Z = Z + 1` reaches `print Z` without being overwritten only when B is false, and All-Uses requires every assignment to reach every use it can reach without being reassigned. [Basis paths](basis.md) may or may not include it: the program has V(G) = 3 (2 decisions + 1, see Basis Path), and whether *(T, F)* is among the three independent paths depends on which are chosen.
 
+**Where the numbers come from.** Every mainstream language has a tool that reports both measures from an instrumented test run: coverage.py with `--branch` (or pytest-cov) for Python, JaCoCo for Java, gcov or llvm-cov for C and C++, c8 or Vitest for JavaScript, `go test -cover` for Go. CI usually writes the report as XML on each run; see [Measuring Coverage in Python](python.md).
+
 ## When to use them — and when not
 
 - **Use** statement coverage as a floor: code that no test executes is untested, whatever else is true.
