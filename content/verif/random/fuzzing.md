@@ -80,6 +80,8 @@ _Each generation adds knowledge of the program to reach code that blind bytes do
 
 Whitebox and greybox fuzzing are covered on [Coverage-Guided Fuzzing](greybox.md).
 
+**Where the inputs come from.** A fuzzer needs an entry point and seeds. The entry point is code that parses untrusted bytes, such as a file reader or a network message handler; the seeds are a few valid files or captured messages from the test suite or real traffic, which the fuzzer then mutates.
+
 ## When to use it — and when not
 
 - **Use it** on anything that parses untrusted input: file formats, network protocols, command lines.

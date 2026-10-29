@@ -39,6 +39,8 @@ Klees et al. reran published fuzzer comparisons and found the methods weaker tha
 - **One run is not a result.** Performance varies widely between runs, yet nearly two thirds of the papers they examined appeared to compare single runs. Use many trials and a statistical test such as Mann–Whitney U, which checks whether one fuzzer's results tend to be larger than the other's without assuming a distribution.
 - **Short runs mislead.** On one program AFL beat AFLFast, a variant of AFL that schedules seed inputs differently, after 6 hours and lost to it after 24. They recommend campaigns of at least 24 hours and evaluating with different seed inputs.
 
+**Where the inputs come from.** A greybox fuzzer needs three things from the team: a harness, a small function that passes the fuzzer's bytes to the code under test; a build with coverage instrumentation (AFL's compiler wrapper `afl-clang-fast`, or `-fsanitize=fuzzer` for libFuzzer); and a seed corpus of valid inputs taken from tests or real traffic.
+
 ## When to use it — and when not
 
 - **Use it** continuously on parsers and protocol handlers; services such as OSS-Fuzz run it for open-source projects.

@@ -64,6 +64,8 @@ Lincoln–Petersen on single pairs shows why two inspectors are not enough:
 
 Four of the six pairs estimate fewer defects than the 16 the team already found. Pairs overlap mostly on the easy defects, so they underestimate.
 
+**Where the inputs come from.** *S* and *f*<sub>1</sub> come from the inspectors' individual preparation logs after the moderator has matched duplicates: a defect log with a *found by* column holds everything the estimate needs. [Worked Case: Inspecting a Refund Change](worked-case.md) computes it from such a log.
+
 ## When to use it — and when not
 
 Use it with four or more independent inspectors, to decide whether to reinspect or to plan test effort; the steps are on [Capture-Recapture in Practice](capture-recapture-practice.md). Do not use it with two or three inspectors, with inspectors who shared notes before logging, or when nothing overlaps: Lincoln–Petersen divides by zero, and the jackknife (*f*<sub>1</sub> = *S*) returns *S* × (1 + (*k* − 1)/*k*), 1.75 times what four inspectors found, a number with no support: reinspect instead.

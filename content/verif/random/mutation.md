@@ -91,6 +91,8 @@ A program with *n* statements and *k* operators yields on the order of *n × k* 
 
 An **equivalent mutant** changes the code but not its behaviour, so no test can kill it; a person must judge each suspect survivor, for example by reading it with `mutmut show`, and remove it from the score. Empirical studies put 10% to 40% of mutants in this category {% cite jia2011mutation %}, and deciding equivalence in general is undecidable. Recent work uses language models, judged by **F1-score**, which balances finding equivalent mutants against false alarms: on 3,302 Java mutant pairs, LLM-based techniques beat the earlier detection tools by 35.69% in F1-score on average (the paper does not say whether this is relative or in percentage points), and the best of them was a fine-tuned code model (UniXCoder) at 86.58% F1, ahead of prompting large general models such as GPT-4 {% cite tian2024llm_emd %}.
 
+**Where the inputs come from.** Mutation needs the source, a test command that passes, and time: mutmut reads the paths to mutate from `pyproject.toml` and reruns the tests for each mutant. On a real code base, limit a run to the files a change touched, or to critical modules, and run the full set nightly.
+
 ## When to use it — and when not
 
 - **Use it** on critical modules, to find the tests a high coverage figure hides, as in the example.
