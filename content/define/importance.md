@@ -30,7 +30,11 @@ For example, the Knight Capital loss was not a programming error in the new code
 
 Failures that kill no one still cost money. A 2024 survey of executives at 2,000 of the world's largest companies put the cost of unplanned downtime at about US$400 billion a year, about 9% of their profits {% cite splunk2024downtime %}. The figure is self-reported by a vendor's survey, so read it as an order of magnitude, not a measurement.
 
-## 3. From incident to requirement
+## 3. Late fixes usually cost more
+
+A defect that survives into operation costs more to fix than one caught in requirements, though by how much depends on the system; [Cost of Late Fixes](cost-of-late-fixes.md) gives the measured figures and the counter-evidence.
+
+## 4. From incident to requirement
 
 A failure list is useful only if it changes what a team specifies. Ask of each incident: which characteristic failed, and what measurable requirement would have caught it? For the Boeing 787 the answer is a reliability requirement on continuous operation, tested by running the counter past its limit. The pages on [quality models](foundations/quality-models.md) and [quality requirements](foundations/requirements.md) show how to write such a requirement.
 
@@ -42,7 +46,7 @@ A failure list is useful only if it changes what a team specifies. Ask of each i
 ## How solid is this?
 
 - **Where it comes from.** Each row cites one source: an official inquiry or regulator (Ariane 5, Mars Climate Orbiter, Knight Capital, Boeing 787), the academic investigation by Leveson and Turner (Therac-25), Microsoft's statement (CrowdStrike), NASA's mission page (Mariner 1) or the public vulnerability record (Heartbleed).
-- **What is contested.** The claim that a defect costs 100 times more to fix in production than in requirements is widely repeated; a study of 171 projects found no such delayed-issue effect {% cite menzies2017delayed %}. The cost of late fixes depends on the project, not on a fixed multiplier.
+- **What is contested.** Whether the famous incidents are representative: they are remembered because they were dramatic, and none gives a failure rate.
 - **What we do not hold.** Downtime costs per company or per hour come from vendor surveys; we hold no independent estimate.
 
 ---
