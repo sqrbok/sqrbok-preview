@@ -29,6 +29,7 @@ Read the pages in the order of the table, from vulnerabilities to case studies.
 | [Security Requirements](security-requirements.md) | prevent | How do we state and check what "secure" means? | Elicitation is still manual |
 | [DevSecOps and Supply Chain Security](devsecops.md) | both | Where does each activity run in delivery? | Scan time against deploy speed |
 | [Security Breach Case Studies](case-studies.md) | both | What did real breaches teach? | Hindsight makes causes look obvious |
+| [Worked Case: Threat Model and SAST Triage for a Web Shop](worked-case.md) | both | What blocks this release? | One small app |
 
 The dependability chain of faults, errors and failures that this section builds on is introduced under [Reliability](../reliability/index.md). Fuzzing has its own page, [Fuzz Testing](../../verif/random/fuzzing.md).
 

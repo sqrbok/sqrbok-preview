@@ -42,9 +42,11 @@ $$
 \text{MISS} = \min\bigl(1 - (1 - CR \cdot MC)(1 - IR \cdot MI)(1 - AR \cdot MA),\ 0.915\bigr), \quad \text{Modified Impact} = 6.42 \times \text{MISS}
 $$
 
-**Modified Exploitability** = 8.22 × MAV × MAC × MPR × MUI, the base exploitability with any modified values put in. The environmental score is roundup(roundup(min(Modified Impact + Modified Exploitability, 10)) × the three temporal weights). With scope changed (not needed for the shop or the lab) it follows the base pattern: Modified Impact = 7.52 × (MISS − 0.029) − 3.25 × (MISS × 0.9731 − 0.02)^13 (as the 3.1 specification states), and the sum is multiplied by 1.08 before the cap. A requirement left Not Defined (X) counts as 1, the same as Medium, whereas a temporal X counts as the highest value; a modified base metric left X keeps its base value.
+**Modified Exploitability** = 8.22 × MAV × MAC × MPR × MUI, the base exploitability with any modified values put in. The environmental score is roundup(roundup(min(Modified Impact + Modified Exploitability, 10)) × the three temporal weights). With scope changed (not needed for the shop) it follows the base pattern: Modified Impact = 7.52 × (MISS − 0.029) − 3.25 × (MISS × 0.9731 − 0.02)^13 (as the 3.1 specification states), and the sum is multiplied by 1.08 before the cap. A requirement left Not Defined (X) counts as 1, the same as Medium, whereas a temporal X counts as the highest value; a modified base metric left X keeps its base value.
 
 **Example (a hypothetical demo shop).** The shop's SQL injection, `AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N`, base 9.1, no temporal metrics (weights 1). A demo shop whose user table holds only nicknames sets CR:L, with IR and AR Medium (1): MISS = 1 − (1 − 0.5 × 0.56)(1 − 1 × 0.56)(1 − 1 × 0) = 0.6832, Modified Impact = 4.386, and roundup(min(4.386 + 3.887, 10)) = roundup(8.273) = **8.3**, High rather than Critical. The full vector is `AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N/CR:L/IR:M/AR:M`.
+
+**Where the inputs come from on a real system.** Temporal values change with the outside world: the vendor advisory gives remediation level and confirmation; exploit status comes from public exploit databases and CISA's Known Exploited Vulnerabilities catalogue. CR, IR and AR come from the organisation's data classification, set once per system, not per finding.
 
 ## 4. Example: ranking the shop's findings
 
@@ -57,7 +59,7 @@ The Bandit findings from [Static Security Analysis](static-analysis.md). Two are
 
 Two findings are not scored, because the vulnerability they enable depends on events outside the code shown. The **hardcoded password (B105)**, the shop's `SECRET_KEY`, is never used in that code, and its impact depends on how the key leaks and what it signs. **Unsalted MD5 (B324)** only raises the impact of another breach that leaks the user table, since cracked passwords are reused elsewhere.
 
-**The order.** All findings go into one list sorted by score: the environmental score when requirements are set (it already includes the temporal weights), otherwise temporal for published CVEs and base for in-house findings; ties are broken by exposure (who can reach it now); unscored hardening items (changes that remove a weakness before any attack uses it) come last, ordered by who can reach them. Here: the injection (9.1, anyone), then `eval` (8.8). Then the key, moved out of the code and rotated, before MD5, because the key is exposed to anyone who reads the source while MD5 matters only after another breach; in the lab, both are hardening, fixed after the scored findings.
+**The order.** All findings go into one list sorted by score: the environmental score when requirements are set (it already includes the temporal weights), otherwise temporal for published CVEs and base for in-house findings; ties are broken by exposure (who can reach it now); unscored hardening items (changes that remove a weakness before any attack uses it) come last, ordered by who can reach them. Here: the injection (9.1, anyone), then `eval` (8.8). Then the key, moved out of the code and rotated, before MD5, because the key is exposed to anyone who reads the source while MD5 matters only after another breach; both are hardening, fixed after the scored findings.
 
 ## When to use it — and when not
 

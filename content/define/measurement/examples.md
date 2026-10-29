@@ -93,10 +93,20 @@ The 12 distinct operands are `weight_kg`, `0`, `10`, `fee`, `2.0`, `1.5`, `expre
 
 Halstead gave no thresholds. Use the values to compare functions within one code base, measured by one tool.
 
+## 4. Over a whole repository, and as a CI gate
+
+On a real system every command takes the package folder, such as `radon cc -a src/pkg`. The average it prints is a poor gate: on the Click library (version 8.6.0.dev, `src/click`) it is A (3.24) over 643 blocks, while 29 blocks score above 10. Gate on the worst block instead. Both commands below exit non-zero on a breach, so the CI step fails (tested with flake8 7.5.0 and xenon 0.9.3):
+
+```bash
+flake8 --select C901 --max-complexity 10 src/click    # 19 reports, exit 1
+xenon --max-absolute E --max-modules B --max-average A src/click   # exit 0
+```
+
+Xenon's three limits are radon letters: worst block, each file's average, overall average. flake8 uses the mccabe package, which does not count Boolean operators: it rates `Option.get_help_extra` 22 where radon says 35, so use one tool, with the same settings, for every value you compare. On existing code, start each threshold at today's worst value, then lower it one letter per refactoring: a ratchet. [Worked Case: Where to Refactor Click](../../attributes/maintainability/worked-case.md) shows where to start.
+
 ## When to use them — and when not
 
 - **Use** cyclomatic complexity to find the functions that need the most tests and the closest review.
-- **Use** the same tool, with the same settings, for every value you compare.
 - **Do not** compare LOC across languages or styles, or use it to judge productivity.
 
 ## How solid is this?

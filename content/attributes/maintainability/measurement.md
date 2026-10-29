@@ -44,6 +44,8 @@ Units with CC 1–10 are low risk and fill the rest. Suppose a system's code spl
 
 The ratings predict maintenance work: in SIG's validation, issues in 4-star systems were resolved 3 times faster than in 2-star systems {% cite baggen2012standardized %}.
 
+**Where the inputs come from on a real system.** For Python, `radon cc -j` gives each unit's complexity and line span (the recipe on [Rating Python Code with Radon](radon.md) turns them into profiles), pylint's duplicate-code check gives duplication, and `pydeps --show-deps` gives each module's imports, from which incoming dependencies are counted. SQALE's remediation costs come from the static-analysis server that applies its rules, such as SonarQube.
+
 ## 3. SQALE: pricing the debt
 
 SQALE turns each rule violation found by static analysis into a remediation cost, and rates the code by the **technical debt ratio**, remediation cost divided by development cost {% cite letouzey2012sqale %}. Costs are in **work units**, an effort unit the user chooses, such as hours; the method's example assumes 1,000 lines cost 100 work units to develop {% cite letouzey2012sqale %}. So 5,000 lines cost 500 work units, and if fixing their violations costs 15, the ratio is 3%. The rating grid is a choice. On the grid in the SQALE method (A up to 1%, B 2%, C 4%, D 8%, E above) the code is rated C {% cite letouzey2012sqale %}. Applied to the same 3% ratio, SonarQube's default grid (A up to 5%, B under 10%, C under 20%, D under 50%) rates the code A {% cite sonarsource_metrics molnar2020study %}.

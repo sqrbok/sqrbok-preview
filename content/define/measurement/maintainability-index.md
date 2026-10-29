@@ -110,6 +110,8 @@ $$
 
 `radon mi -s shop.py` prints `A (71.74)`. Without the comment line the same code scores 57.66: **one comment line adds 14 points**. A tool without the comment term would report the lower value.
 
+**Where the inputs come from on a real system.** `radon mi -s src/pkg` scores every file of a package in one run; no input has to be counted by hand. Read it per file and with the size in view: on the Click library's 4,038-line `core.py` radon prints `C (0.00)`, because the line and volume terms push the index below zero and radon clamps it. For such files, use the per-function measures instead.
+
 ## When to use it — and when not
 
 - **Use** MI to spot files that dropped a band between releases, with the same tool.

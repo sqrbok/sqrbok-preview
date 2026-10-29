@@ -54,30 +54,7 @@ $$MI_{\text{radon}} = \Big(171 - 5.2 \ln V - 0.23\,G - 16.2 \ln L + 50 \sin\sqrt
 
 Each term takes one of the counts above. $$L$$ is LLOC (16); LOC (21) feeds nothing; SIG's unit size uses SLOC. $$G$$ is one complexity for the whole file, 1 plus every decision point in it: in radon's code, the sum of each function's CC minus 1, plus 1. $$perCM$$ is the comment lines (plus multi-line strings) as a percentage of SLOC.
 
-**Example.** Radon counts Halstead operators and operands only inside five kinds of expression: binary operations (`*`, `-`), augmented assignments (`+=`, `*=`), Boolean operations (`and`), comparisons and unary operations. Assignments, calls, `return`, `raise` and bare conditions such as `elif express:` add nothing. The two sides of each operation are its operands; a nested sub-expression is one operand of the operation around it, and, in radon's implementation (checked in its code), operands are told apart per function while operators are pooled across the file. For `shop.py` radon sees:
-
-| Operator (7 distinct) | Count |
-|---|:-:|
-| `<=` | 1 |
-| `>` | 2 |
-| `+=` (Add) | 1 |
-| `*`, `*=` (Mult) | 3 |
-| `-` (Sub) | 2 |
-| `and` | 1 |
-| `==` | 1 |
-| **Total N₁** | **11** |
-
-| Operand (14 distinct) | Count |
-|---|:-:|
-| `weight_kg` | 3 |
-| `fee` | 3 |
-| `10`, `2.0` | 2 each |
-| `0`, `1.5`, `express`, `country`, `"RU"` | 1 each |
-| sub-expressions `2.0 * (…)`, `weight_kg - 10`, `country == "RU"` | 1 each |
-| `coupon`, `subtotal` (in `total`) | 2 each |
-| **Total N₂** | **22** |
-
-So $$N = 11 + 22 = 33$$ and $$n = 7 + 14 = 21$$, and $$V = 33 \log_2 21 = 144.9$$. $$G = (6 - 1) + (2 - 1) + 1 = 7$$. $$L = 16$$ and $$perCM = 1/17 = 5.88\%$$. The three main terms give $$171 - 25.88 - 1.61 - 44.92 = 98.6$$, above Coleman's 85. The comment term takes the percentage 5.88 as if it were degrees: radians(5.88) = 0.1027, 2.46 × 0.1027 = 0.2526, √0.2526 = 0.5026, sin 0.5026 = 0.4817, × 50 = 24.08. Feeding a percentage into radians() has no meaning in the units; it is an empirical fit, so $$(98.6 + 24.08) \cdot 100/171 = 71.74$$, which `radon mi -s shop.py` prints as A (71.74). Without the comment line the file scores 57.66. The published four-metric form adds $$50\sin\sqrt{2.4 \cdot perCM}$$ {% cite ardito2020maintainability %} (−28.88 with the percentage 5.88), so tools' MI values differ.
+**Example.** For `shop.py` radon takes one Halstead volume over the whole file, $$V = 144.9$$ (11 operator and 22 operand occurrences), $$G = (6 - 1) + (2 - 1) + 1 = 7$$, $$L = 16$$ and $$perCM = 1/17 = 5.88\%$$, and `radon mi -s shop.py` prints `A (71.74)`; without the comment line the file scores 57.66. The Halstead counting rules are on [Size and Complexity Metrics](../../define/measurement/examples.md), and the computation, term by term, is on [Maintainability Index](../../define/measurement/maintainability-index.md). Two radon details matter when reading the result. The comment term takes the percentage 5.88 as if it were degrees, an empirical fit with no meaning in the units, and adds 24.08 points here. And operands are told apart per function while operators are pooled across the file (checked in radon's code), so a file's volume is not the sum of its functions' volumes. The published four-metric form adds $$50\sin\sqrt{2.4 \cdot perCM}$$ {% cite ardito2020maintainability %} (−28.88 with the percentage 5.88), so tools' MI values differ.
 
 Radon grades MI A above 19, B above 9 up to 19, C at 9 or less {% cite radon_docs %}; so 19.5 is an A. Coleman's 85 and 65 become 49.7 and 38.0 on radon's scale, and radon's A boundary is 32.5 on the 0–171 scale. The comparison is loose: radon's value includes the comment term, Coleman's cut-offs do not.
 
@@ -113,6 +90,8 @@ Tested on `shop.py` and a file with a class:
 
 2. Put each function into SIG's band by its CC (1–10, 11–20, 21–50, above 50) and add up its SLOC per band. Here all 17 lines are low risk, so unit complexity gets 5 stars. Do not use radon's own letters for this: radon grades CC A for 1–5, B 6–10, C 11–20, D 21–30, E 31–40 and F 41 or more, so `delivery_fee` is a B in radon but low risk for SIG. The same SLOC give a unit-size profile; our sources do not publish SIG's unit-size bands, so report shares of SLOC in bins of your own choice, such as 1–15, 16–30, 31–60 and over 60 lines.
 3. `radon mi -s` gives one score per file. No published threshold says what share of files may be B or C: report the shares and name the worst files, not a project average.
+
+**Where the inputs come from on a real system.** Every radon command takes a folder as well as a file. Point it at the package in the repository (`radon cc -s -j src/pkg > cc.json`) and leave out tests, generated and vendored code with comma-separated glob patterns, such as `-e 'tests/*,*/migrations/*'`. Pin radon's version in the development dependencies: counting rules change between releases, so a profile is comparable only with profiles from the same version. A run over a whole repository, with hotspots and a CI gate, is on [Worked Case: Where to Refactor Click](worked-case.md).
 
 Radon has no cognitive complexity, duplication, interfacing, coupling or component measures; tested Python tools are on [Cognitive Complexity](cognitive-complexity.md) (next page), [Measuring Maintainability](measurement.md) and [Propagation Cost](propagation-cost.md). A pydeps module is a file; SIG's modules are classes or files rated by incoming dependencies; a design module may span many files.
 

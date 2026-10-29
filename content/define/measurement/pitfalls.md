@@ -44,7 +44,7 @@ People respond to what is measured. Goodhart's law, in its usual phrasing, says 
 
 ## How solid is this?
 
-- **Where it comes from.** The pill figures are those used by Gigerenzer to teach risk literacy; later studies put the relative risk between about 1.7 and 2.3, and some disputed any increase. The three-way grouping follows the course lecture, which draws on Hoffman's talk *The Darker Side of Metrics* {% cite hoffman_darker_2000 %}.
+- **Where it comes from.** The pill figures are those used by Gigerenzer to teach risk literacy; later studies put the relative risk between about 1.7 and 2.3, and some disputed any increase. The three-way grouping draws on Hoffman's talk *The Darker Side of Metrics* {% cite hoffman_darker_2000 %}.
 - **What we do not hold.** We have not been able to check Hoffman's text or the exact wording of the Forrester passage, so both are paraphrased here, not quoted. The four steps of the McNamara fallacy are usually credited to the sociologist Daniel Yankelovich (1972).
 
 ---

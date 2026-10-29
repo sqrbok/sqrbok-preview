@@ -17,7 +17,7 @@ This handbook uses the convention of MacCormack et al.: a mark in **row i, colum
 
 ## 2. Worked example: from graph to matrix
 
-In this graph (the lecture example), B, C and D depend on A, F depends on B, G and H depend on D, and H also depends on G. E is unconnected.
+In this graph, B, C and D depend on A, F depends on B, G and H depend on D, and H also depends on G. E is unconnected.
 
 ![Dependency graph: B, C and D point to A; F to B; G and H to D; H to G; E stands alone](dependency-graph.svg)
 
@@ -56,7 +56,7 @@ _Vertical and horizontal buses in graph form; in the DSM they are a full column 
 
 ## When to use it — and when not
 
-Use a DSM to check an architecture against its intended layers, find cycles and find hidden coupling in systems with hundreds of elements. Tools that extract one from code include Lattix, Structure101 and NDepend. Do not use a DSM alone to judge how hard a change is; it shows which dependencies exist, not how often they carry changes ([Propagation Cost](propagation-cost.md)).
+Use a DSM to check an architecture against its intended layers, find cycles and find hidden coupling in systems with hundreds of elements. Tools that extract one from code include Lattix, Structure101 and NDepend; for Python, [Worked Case: Where to Refactor Click](worked-case.md) builds one from `pydeps` output. Do not use a DSM alone to judge how hard a change is; it shows which dependencies exist, not how often they carry changes ([Propagation Cost](propagation-cost.md)).
 
 ## Limitations
 
