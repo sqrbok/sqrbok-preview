@@ -1,26 +1,22 @@
 ---
 title: Quality Attributes
 layout: default
+page_type: hub
 nav_order: 5
 has_children: true
 ---
 
 # Quality Attributes
 
-Dive into key software quality attributes and how to measure, achieve, and maintain them.
+A **quality attribute** is one measurable characteristic of a system, such as how fast it responds or how easily it can be changed; the [ISO/IEC 25010](../define/foundations/iso25010.md) model names them. Each area below defines one attribute, shows how to measure it and how to improve it.
 
-## Topics Covered
-
-- **Maintainability** - Code quality and evolvability
-- **Performance** - Timeliness, throughput, and scalability
-- **Queuing Theory** - Mathematical foundations for performance modeling and capacity planning
-- **Reliability** - Fault tolerance and dependability
-- **Security** - Protecting against threats and vulnerabilities
-- **Usability** - User experience and accessibility
-
----
-
-Browse the topics above for detailed coverage of each attribute, including measurement techniques, industry standards, and real-world examples.
+| Area | The question it answers |
+|---|---|
+| [Reliability](reliability/) | How likely is the system to run without failure, and how do we estimate it from test data? |
+| [Performance](performance/) | How fast does it respond, how much load does it take, and where is the bottleneck? |
+| [Queuing Theory](queuing/) | How do waiting time and utilization follow from arrival and service rates? |
+| [Security](security/) | How do we find and rate the ways an attacker can break confidentiality, integrity or availability? |
+| [Maintainability](maintainability/) | How costly is it to change the code, and which structure keeps changes local? |
 
 ---
 

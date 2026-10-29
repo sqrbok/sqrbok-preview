@@ -4,6 +4,7 @@ parent: Selected Materials
 nav_order: 2
 has_children: true
 layout: default
+page_type: hub
 ---
 
 # QAM Study Materials

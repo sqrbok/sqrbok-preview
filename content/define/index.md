@@ -13,6 +13,8 @@ page_type: hub
 | Page | Question it answers |
 |---|---|
 | [Why Software Quality Matters](importance.md) | What happens when quality fails, and what it costs |
+| [Cost of Late Fixes](cost-of-late-fixes.md) | How much more a defect costs the later it is found, and how far the "100 times" claim holds |
+| [Cost of Poor Software Quality](cost-of-poor-quality.md) | What poor quality costs a whole economy, and how far to trust that estimate |
 | [Foundations](foundations/) | What quality means, and how quality models make it specific: Garvin's views, McCall, ISO/IEC 25010, Kano, quality requirements, the quality pioneers |
 | [Measurement](measurement/) | How to put numbers on quality attributes without fooling yourself |
 

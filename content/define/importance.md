@@ -28,7 +28,7 @@ For example, the Knight Capital loss was not a programming error in the new code
 
 ## 2. Downtime is a business cost
 
-Failures that kill no one still cost money. A 2024 survey of executives at 2,000 of the world's largest companies put the cost of unplanned downtime at about US$400 billion a year, about 9% of their profits {% cite splunk2024downtime %}. The figure is self-reported by a vendor's survey, so read it as an order of magnitude, not a measurement.
+Failures that kill no one still cost money. A 2024 survey of executives at 2,000 of the world's largest companies put the cost of unplanned downtime at about US$400 billion a year, about 9% of their profits {% cite splunk2024downtime %}. The figure is self-reported by a vendor's survey, so read it as an order of magnitude, not a measurement. For a whole economy, see the national estimate in [Cost of Poor Software Quality](cost-of-poor-quality.md).
 
 ## 3. Late fixes usually cost more
 

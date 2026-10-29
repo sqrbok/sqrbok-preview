@@ -23,6 +23,7 @@ The pages follow the order in which the questions come up when a team introduces
 | [Maintainability Index](maintainability-index.md) | How do the three combine into one score? | A regression formula; per file; the comment term |
 | [Object-Oriented Metrics](oo-metrics.md) | What do the class-level CK metrics measure? | Six metrics, and why fixed thresholds fail |
 | [Do Code Metrics Predict Quality?](evidence.md) | How far can these numbers be trusted? | Size confounding, accuracy on rare defects |
+| [Defect Density Benchmarks](defect-density-benchmarks.md) | How many post-release defects per KLOC is typical? | Median 4.3 across 109 projects; open source, language and size move it |
 
 Metrics for specific quality attributes live with those attributes: [Measuring Maintainability](../../attributes/maintainability/measurement.md), [Reliability Measurement](../../attributes/reliability/measurement.md) and [Performance Measurement](../../attributes/performance/measurement.md). Test coverage, the most common test metric, has its own section: [Coverage](../../verif/coverage/index.md).
 

@@ -14,7 +14,7 @@ The **cost of a late fix** is the extra effort needed to remove a defect found l
 
 The longer a defect survives, the more work it takes to remove: a wrong requirement found in operation means changing the requirement, the design, the code, the tests and the deployed system. Boehm's 1981 data, as NASA's authors reproduce them, put the cost of fixing a requirements error in operation at 40 to 1,000 times the cost of fixing it during requirements {% cite boehm1981economics stecklein2004costs %}. Twenty years later Boehm and Basili restated the rule carefully: a problem found after delivery is *often* 100 times more expensive to fix than one found in requirements and design, but for small, non-critical systems the ratio is "more like 5:1 than 100:1" {% cite boehm2001top10 %}.
 
-NASA measured the effect on its own projects. On a major aircraft programme, Stecklein et al. traced 231 true errors and costed each fix by the phase in which it was found {% cite stecklein2004costs %}:
+NASA measured the effect on its own projects. On a major aircraft programme, Haskins, Stecklein and colleagues reduced more than 3,300 change records to 231 true errors that affected the hardware, and costed the fix of a requirements error by the phase in which it was found {% cite stecklein2004costs %}. The paper calls this its second method, the *total cost breakdown*: average the actual cost of the fixes in each phase and compare the averages:
 
 ```vega-lite
 {
@@ -40,7 +40,7 @@ NASA measured the effect on its own projects. On a major aircraft programme, Ste
 }
 ```
 
-_Average cost to fix one requirements error on an aircraft programme, by the phase in which it was found; values as printed in the paper (method 2). On the log scale the points lie close to a straight line: the cost grows by a roughly constant factor per phase._ {% cite stecklein2004costs %}
+_Average cost to fix one requirements error on an aircraft programme, by the phase in which it was found; values as printed in the paper for its total cost breakdown method (method 2). On the log scale the points lie close to a straight line: the cost grows about fourfold per phase up to test, and by 2.6 times from test to operations._ {% cite stecklein2004costs %}
 
 From requirements to operations the cost rises 3,558,215 / 22,632 ≈ 157 times. The same study found about 29 times on spacecraft, so the multiplier depends on the kind of system; the authors limit their results to hardware-software projects of this character {% cite stecklein2004costs %}.
 
