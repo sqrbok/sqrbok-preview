@@ -29,7 +29,7 @@ The family names in brief:
 - **Abstract interpretation** computes with abstract values such as "zero, not zero, maybe zero" instead of numbers, covering every path ([Dataflow Analysis](../../static/dataflow.md)).
 - **Taint** analysis follows untrusted input to dangerous calls ([Pattern, Type and Taint Checks](../../static/techniques.md)).
 - **Symbolic execution** runs the code on unknowns and asks a solver for an input that reaches each path ([Symbolic Execution](../../static/symbolic-execution.md)).
-- A **contract** is a function's precondition (what callers must supply) and postcondition (what it promises).
+- A **contract** is a function's precondition (what callers must supply) and postcondition (what it promises); program verifiers prove contracts with [Hoare Logic](../../static/program-verification.md).
 - **State explosion** is the growth of reachable states with each added process or variable ([Model Checking](../../static/model-checking.md)).
 
 Verifiers such as Dafny hand their proof obligations to an SMT solver, Z3, a program that decides whether a logical formula over numbers and arrays can be satisfied. KLEE is described on [Symbolic Execution](../../static/symbolic-execution.md) {% cite cadar2008klee %}; SPIN and Java PathFinder on [Model Checking](../../static/model-checking.md).

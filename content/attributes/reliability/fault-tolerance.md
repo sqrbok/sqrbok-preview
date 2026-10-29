@@ -70,7 +70,7 @@ _N-version programming with three versions and a majority voter._
 
 ## When to use it — and when not
 
-Use fault tolerance when failures are costly and fault removal cannot reach the FIO alone, as in flight control, rail signalling or medical devices. Do not count on it for ordinary business software: the cost of extra versions and acceptance tests is better spent on removal, and simpler resilience patterns, such as timeouts, retries and circuit breakers, cover most outages ([From FIO to SLO](slo-bridge.md)).
+Use fault tolerance when failures are costly and fault removal cannot reach the FIO alone, as in flight control, rail signalling or medical devices. Do not count on it for ordinary business software: the cost of extra versions and acceptance tests is better spent on removal, and simpler resilience patterns, such as timeouts, retries and circuit breakers, cover most outages ([From FIO to SLO](slo-bridge.md)). To find where tolerance is needed, look for single points of failure in a [reliability block diagram](block-diagrams.md).
 
 ## Limitations
 

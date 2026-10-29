@@ -14,7 +14,7 @@ A criterion is used in two ways {% cite ammann2016introduction %}. As a **genera
 
 ## The criteria at a glance
 
-The table compares what each criterion demands and what drives its number of tests; each page works the counts out on an example.
+The table compares what each criterion demands and what drives its number of tests.
 
 | Criterion | A test suite must… | The number of tests grows with… | Page |
 |---|---|---|---|
@@ -36,7 +36,7 @@ Subsumption is about *requirements*, not bugs: a suite built for a weaker criter
 
 ## Reading order
 
-Start with [Terminology](terminology.md), then the criteria from statement to mutation. [Coverage and Fault Detection](discussion.md) summarises how well coverage predicts found faults, [Using Coverage in Practice](practice.md) turns it into rules for a team, [Measuring Coverage in Python](python.md) reads a real pytest-cov report, and the [Worked Case](worked-case.md) takes one pull request from basis paths to a CI gate.
+Start with [Terminology](terminology.md), then the criteria from statement to mutation; [Basis Paths for Binary Search](basis-binary-search.md) adds a loop. [Coverage and Fault Detection](discussion.md) shows how well coverage predicts faults, [Using Coverage in Practice](practice.md) gives team rules, [Updating and Reducing a Test Suite](suite-maintenance.md) prunes the suite, [Measuring Coverage in Python](python.md) reads pytest-cov output, and the [Worked Case](worked-case.md) takes a pull request to a CI gate.
 
 ## How solid is this?
 

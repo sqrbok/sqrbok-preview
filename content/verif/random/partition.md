@@ -22,7 +22,9 @@ Hamlet's survey of the comparisons gives the rule of thumb: partition testing ca
 Two later results moved the balance back.
 
 - **Cost of failure.** If failures in some subdomains are far more expensive than in others, partition testing can put more tests where failures matter; random testing "has no way to tune itself to the cost factors" {% cite tsoukalas1993reliability %}.
-- **Proportional allocation.** Ntafos showed that allocating partition tests in proportion to subdomain size guarantees partition testing is never worse than random, but the guaranteed margin is tiny: starting from 500 tests, the relative advantage was below 0.05% and quickly became insignificant {% cite ntafos2001comparisons %}.
+- **Proportional allocation.** Allocating partition tests in proportion to subdomain size guarantees that partition testing is never worse than random {% cite chen1994relationship %}, but Ntafos showed the guaranteed margin is tiny: starting from 500 tests, the relative advantage was below 0.05% and quickly became insignificant {% cite ntafos2001comparisons %}.
+
+The measures behind these results, and the exact conditions, are worked out on [E-measure and P-measure](measures.md).
 
 ## 4. When only random will do
 

@@ -25,7 +25,8 @@ _The technique spectrum, from cheap and shallow (top left) to costly and deep (b
 | Dataflow analysis | values that may be zero or null where they are used | compilers, bug finders | false alarms where paths merge | [Dataflow Analysis](dataflow.md) |
 | Taint analysis | untrusted input reaching a query or a shell | web and security code | specifying sources and sanitizers | [Pattern, Type and Taint Checks](techniques.md) |
 | Symbolic execution | inputs that reach a given branch or crash | parsers, command-line tools | path explosion | [Symbolic Execution](symbolic-execution.md) |
-| Model checking | deadlocks, races, protocol violations | concurrent and safety-critical parts | state explosion; building the model | [Model Checking](model-checking.md), [Abstraction Refinement](cegar.md) |
+| Model checking | deadlocks, races, protocol violations | concurrent and safety-critical parts | state explosion; building the model | [Model Checking](model-checking.md), [Kripke Structures and LTL](kripke-ltl.md), [Abstraction Refinement](cegar.md) |
+| Program verification | a function that does not meet its contract | small safety-critical functions | writing specifications and loop invariants | [Hoare Logic](program-verification.md) |
 
 Before the techniques, [Soundness and Completeness](limits.md) explains why every tool must approximate. After them, four pages look at practice: how to [triage warnings](warnings.md), how real [tools compare](tools.md), how Google and eBay [deployed](deployment.md) them, and how [effective](effectiveness.md) static analysis is next to inspection and testing. [The worked case](worked-case.md) wires these tools into one repository's CI gates.
 

@@ -26,9 +26,9 @@ If the failure rate is *F*, *N* independent tests reveal a failure with probabil
 
 ## 3. Random testing misses rare inputs, but partitions gain less than expected
 
-A uniform sample almost never hits one exact boundary value, which is what partition testing aims at. Yet the comparisons since 1984, summarised by Hamlet, found the gap small: Duran and Ntafos found random testing often more cost-effective {% cite duran1984evaluation %}, and roughly 20% more random tests wipe out any advantage of partition testing {% cite hamlet1984random %}. Partitions win when some subdomains carry much costlier failures {% cite tsoukalas1993reliability %}; random sampling is the only principled choice for large unstructured domains and for programs with state, where a test is a sequence of inputs from reset {% cite hamlet2006random %}.
+A uniform sample almost never hits one exact boundary value, which is what partition testing aims at. Yet the comparisons since 1984, summarised by Hamlet, found the gap small: Duran and Ntafos found random testing often more cost-effective {% cite duran1984evaluation %}, and roughly 20% more random tests wipe out any advantage of partition testing {% cite hamlet1984random %}. Partitions win when some subdomains carry much costlier failures {% cite tsoukalas1993reliability %}; random sampling is the only principled choice for large unstructured domains and for programs with state, where a test is a sequence of inputs from reset {% cite hamlet2006random %}. The comparisons use two measures: the **P-measure**, the probability of finding at least one failure, and the **E-measure**, the expected number of failures found. Allocating tests in proportion to subdomain size guarantees partition testing at least the P-measure of random testing, and gives exactly the same E-measure {% cite chen1994relationship ntafos2001comparisons %}.
 
-→ [Random versus Partition Testing](../../verif/random/partition.md)
+→ [Random versus Partition Testing](../../verif/random/partition.md) · [E-measure and P-measure](../../verif/random/measures.md)
 
 ## 4. Feedback makes random generation productive
 

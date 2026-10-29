@@ -30,7 +30,7 @@ _How the techniques build on each other: equivalence classes come first, the oth
 
 ## Reading order
 
-Start with [Equivalence Partitioning](equivalence.md), [Boundary Value Analysis](boundary.md) and [Boundary Testing Strategies](boundary-strategies.md), which every other technique uses. [Decision Tables](decision-tables.md) handle conditions that combine; the [Classification Tree Method](classification-tree.md) and [Classification Trees in Practice](classification-tree-practice.md) model larger input spaces; [Combining Techniques](integration.md) shows how many combinations are worth testing. The [Worked Case](worked-case.md) then applies them end to end.
+Start with [Equivalence Partitioning](equivalence.md), [Boundary Value Analysis](boundary.md) and [Boundary Testing Strategies](boundary-strategies.md), which every other technique uses. [Decision Tables](decision-tables.md) handle conditions that combine; the [Classification Tree Method](classification-tree.md), [Classification Trees in Practice](classification-tree-practice.md) and the [machine-vision example](machine-vision-tree.md) model larger input spaces; [Combining Techniques](integration.md) shows how many combinations are worth testing. The [Worked Case](worked-case.md) then applies them end to end.
 
 ## How solid is this?
 

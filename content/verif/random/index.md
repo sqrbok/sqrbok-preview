@@ -35,7 +35,7 @@ _A crash oracle needs no human effort but sees only crashes; a property or a sec
 
 ## Reading order
 
-[Fundamentals](fundamentals.md) covers what makes testing random and what it lets you claim about reliability; [Random versus Partition Testing](partition.md) weighs it against systematic test design. The tool pages follow: [Feedback-Directed Random Testing](feedback.md), [Fuzz Testing](fuzzing.md), [Coverage-Guided Fuzzing](greybox.md), [Property-Based Testing](property-based.md) and [Property-Based Testing of Web Services](pbt-web.md). [Mutation Testing](mutation.md) closes the section, and [the worked case](worked-case.md) applies PBT and mutation to one function.
+[Fundamentals](fundamentals.md) covers what random testing lets you claim about reliability; [Random versus Partition Testing](partition.md) and [E-measure and P-measure](measures.md) weigh it against systematic test design. The tool pages follow: [Feedback-Directed Random Testing](feedback.md), [Fuzz Testing](fuzzing.md), [Coverage-Guided Fuzzing](greybox.md), [Property-Based Testing](property-based.md) and [Property-Based Testing of Web Services](pbt-web.md). [Mutation Testing](mutation.md) closes the section, and [the worked case](worked-case.md) applies both to one function.
 
 ## How solid is this?
 

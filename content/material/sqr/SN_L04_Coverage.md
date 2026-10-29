@@ -44,9 +44,9 @@ Statement coverage asks that every statement runs; branch coverage asks that eve
 
 ## 4. Basis paths cover decisions in combination, at linear cost
 
-McCabe's cyclomatic complexity *V(G) = e − n + 2* (for two-way decisions, simply decisions + 1) is the number of linearly independent paths through the graph {% cite mccabe1976complexity %}. Running a basis set of *V(G)* paths subsumes branch coverage, and each new path is built by flipping one decision of an earlier one. A basis is not unique, and some of its paths may be infeasible when decisions share data.
+McCabe's cyclomatic complexity *V(G) = e − n + 2* (for two-way decisions, simply decisions + 1) is the number of linearly independent paths through the graph {% cite mccabe1976complexity %}. Running a basis set of *V(G)* paths subsumes branch coverage, and each new path is built by flipping one decision of an earlier one. A basis is not unique, and some of its paths may be infeasible when decisions share data. In the lecture's binary search, three decisions give *V(G)* = 4 and four basis tests, one of them on an empty list; none searches a non-empty list for a missing value, so that test must come from the specification.
 
-→ [Basis Path Coverage](../../verif/coverage/basis.md)
+→ [Basis Path Coverage](../../verif/coverage/basis.md) · [Basis Paths for Binary Search](../../verif/coverage/basis-binary-search.md)
 
 ## 5. MC/DC looks inside a decision
 
@@ -64,7 +64,9 @@ Data-flow criteria require that each definition of a variable reaches its uses a
 
 For many inputs, exhaustive combinations explode: four parameters with three values each give 81 combinations. Pairwise testing covers every pair of values in far fewer tests, and NIST's fault studies found most failures triggered by one or two parameters {% cite kuhn2004fault %}. For state machines, N-switch coverage asks for every sequence of N + 1 transitions: 0-switch covers every transition, 1-switch every pair of consecutive transitions. For a door with states *open* and *closed*, 0-switch needs `open→closed` and `closed→open`; 1-switch adds the sequences `open→closed→open` and `closed→open→closed`.
 
-→ [Combinatorial Testing](../../verif/combinatorial/index.md)
+Node and edge coverage are not tied to control flow: they apply to any graph, and what an edge represents decides what they test {% cite ammann2016introduction %}. In a **call graph**, nodes are functions and edges are calls, so edge coverage asks that every call is made at least once; a polymorphic call such as `shape.draw()` from a window counts once for each class that can receive it, `Circle` and `Rectangle`. In a **message sequence**, such as a sequence diagram, edges are messages between objects; in a **state machine**, edges are transitions, and edge coverage is the 0-switch coverage above. Inheritance, composition and interface relations give further graphs for integration testing.
+
+→ [Combinatorial Testing](../../verif/combinatorial/index.md) · [Test Coverage Criteria](../../verif/coverage/index.md)
 
 ## 8. Coverage predicts fault detection only weakly
 

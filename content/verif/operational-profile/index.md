@@ -25,6 +25,7 @@ A **run** is one execution of a task started from outside, such as one search; a
 | [Operational Coverage](modern.md) | Coverage weighted by use, a stopping rule | deciding when usage-based testing is enough | code-level usage data |
 | [From Profile to Exploration](bridge.md) | Saturation; switching from profile-based to exploratory testing | planning the end of a test phase | judging when to switch |
 | [Worked Case: A Profile from an Access Log](worked-case.md) | Log to profile, weighted driver, failure intensity, release decision | a first profile for a web system | a day of logs and a test driver |
+| [Operational Profile Case: UAV Mission Planning](uav-case.md) | Modes, prototype usage data, merging operations | a new interactive application | instrumenting a prototype |
 
 A profile directs effort to what users do most, so it underweights rare operations, which may be the critical ones, and it cannot model events users do not initiate {% cite koziolek2005operational %}. [Exploratory Testing](../exploratory/index.md) covers that gap.
 
