@@ -28,7 +28,7 @@ When would random testing be a poor choice compared to partition testing?
 
 ## Question 3: Statistical Confidence Limits
 
-A colleague says "we ran 10,000 random tests with no failures, so the software is bug-free." What is wrong with this claim? Use the formula $C = 1-(1-F)^N$ with a true failure rate of $F = 1/10{,}000$.
+A colleague says "we ran 10,000 random tests with no failures, so the software is bug-free." What is wrong with this claim? Use the formula $$C = 1-(1-F)^N$$ with a true failure rate of $F = 1/10{,}000$.
 
 ---
 
