@@ -115,6 +115,7 @@ Bandit exits 1 when it reports anything at or above the chosen level; after the 
 ## Go deeper
 
 - [Static Security Analysis](../../attributes/security/static-analysis.md) and [DevSecOps and Supply Chain Security](../../attributes/security/devsecops.md): where each tool fits.
+- [Trivy](trivy.md): the same question for the container image around the code.
 - [Worked Case: Threat Model and SAST Triage for a Web Shop](../../attributes/security/worked-case.md): Bandit findings triaged into a fix order.
 
 ---

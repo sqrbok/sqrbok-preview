@@ -19,27 +19,30 @@ The **Practice Toolkit** is a set of tool cards: one page per command-line tool 
 | | [Coverage.py and pytest-cov](coverage.md) | Which lines and branches did the tests execute? |
 | | [Hypothesis](hypothesis.md) | Does a rule hold for inputs I did not think of? |
 | | [mutmut](mutmut.md) | Would my tests notice if the code were wrong? |
-| Static checks | [flake8 and Ruff](flake8-ruff.md) | Does the code follow the style rules, and is any function too complex? |
+| Static and security checks | [flake8 and Ruff](flake8-ruff.md) | Does the code follow the style rules, and is any function too complex? |
 | | [Radon](radon.md) | How complex and how maintainable is each function and file? |
 | | [mypy](mypy.md) | Do the types fit together? |
 | | [Bandit and pip-audit](bandit.md) | Does the code or one of its dependencies contain a known security weakness? |
+| | [Trivy](trivy.md) | Does the container image carry known vulnerabilities or an unsafe configuration? |
 | Performance | [Locust](locust.md) | How do response time and failures behave under load? |
+| | [Prometheus](prometheus.md) | What did the service itself measure while under load? |
 | Combinatorial | [PICT](pict.md) | Which few tests cover every pair of input values? |
 | | [ACTS](acts.md) | The same, with NIST's generator and its higher strengths |
 
-The table follows the tools' place in a project, not a reading order: GitHub Actions needs the tools from the testing and static-check cards, and the container card needs the service printed on the Locust card, so come back to those two later.
+The table follows the tools' place in a project, not a reading order: GitHub Actions needs the tools from the testing and static-check cards, and the container, Trivy and Prometheus cards need the service printed on the Locust card, so come back to those later.
 
 Every card uses one small example project: a parking-fee calculator in Python. (Constructed example.) Each card prints the files it adds, so the project grows as you go; counts such as "files checked" change with it.
 
 ```text
 parking/
 ├── pyproject.toml   poetry.lock   .flake8   .github/workflows/ci.yml
-├── locustfile.py    Containerfile   machine.txt   machine_acts.txt
-├── src/parking/     fee.py   receipt.py   lookup.py   export.py   app.py
+├── locustfile.py    machine.txt   machine_acts.txt   prometheus.yml
+├── Containerfile    Containerfile.fixed   Containerfile.monitor
+├── src/parking/     fee.py   receipt.py   lookup.py   export.py   app.py   monitored.py
 └── tests/           test_fee.py   test_fee_props.py
 ```
 
-The tools also create files of their own (`poetry.lock`, `mutants/`, `.hypothesis/`, `htmlcov/`, `results_*.csv`, `machine.tsv`, `machine.csv`); keep them out of version control except the lock file.
+The tools also create files of their own (`poetry.lock`, `mutants/`, `.hypothesis/`, `htmlcov/`, `results_*.csv`, `machine.tsv`, `machine.csv`, saved images such as `parking.tar`); keep them out of version control except the lock file.
 
 Each card states the tool version it was run with, and the output on the card comes from that run; the ACTS card's run is still to be added. Tools change between versions, so check the card's version against yours before trusting a flag or a configuration key.
 
