@@ -44,7 +44,8 @@ For example, the formula gives these shares:
   "encoding": {
     "x": {"field": "n", "type": "quantitative", "title": "leaf servers per request", "scale": {"domain": [0, 2000]}},
     "y": {"field": "slow", "type": "quantitative", "title": "share of slow user requests", "axis": {"format": "%"}, "scale": {"domain": [0, 1]}},
-    "color": {"field": "leaf", "type": "nominal", "title": "each leaf slow", "scale": {"domain": ["1 in 100", "1 in 1,000", "1 in 10,000"], "range": ["#b42318", "#c99700", "#019546"]}, "legend": {"orient": "right"}}},
+    "color": {"field": "leaf", "type": "nominal", "title": "each leaf slow", "scale": {"domain": ["1 in 100", "1 in 1,000", "1 in 10,000"], "range": ["#b42318", "#c99700", "#019546"]}, "legend": {"orient": "right", "symbolStrokeWidth": 3}},
+    "strokeDash": {"field": "leaf", "type": "nominal", "title": "each leaf slow", "scale": {"domain": ["1 in 100", "1 in 1,000", "1 in 10,000"], "range": [[1, 0], [8, 4], [2, 3]]}}},
   "config": {"font": "Tahoma, sans-serif", "view": {"stroke": null}}
 }
 ```

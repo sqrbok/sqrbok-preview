@@ -190,13 +190,13 @@ The two log-likelihoods differ by 0.4: the data are only e<sup>0.4</sup> ≈ 1.5
      "encoding": {
        "x": {"field": "t", "type": "quantitative", "title": "test time (days)", "scale": {"domain": [0, 400]}},
        "y": {"field": "m", "type": "quantitative", "title": "cumulative failures", "scale": {"domain": [0, 36]}},
-       "color": {"field": "model", "type": "nominal", "title": null, "scale": {"range": ["#019546", "#b42318"]}, "legend": {"orient": "top"}},
-       "strokeDash": {"field": "model", "type": "nominal", "legend": null, "scale": {"range": [[1, 0], [6, 3]]}}}},
+       "color": {"field": "model", "type": "nominal", "title": null, "scale": {"domain": ["Goel–Okumoto fit", "log-Poisson fit"], "range": ["#019546", "#1f5fa8"]}, "legend": {"orient": "top", "symbolStrokeWidth": 3}},
+       "strokeDash": {"field": "model", "type": "nominal", "title": null, "scale": {"domain": ["Goel–Okumoto fit", "log-Poisson fit"], "range": [[1, 0], [6, 3]]}}}},
     {"data": {"values": [
       {"t":9,"n":1},{"t":21,"n":2},{"t":32,"n":3},{"t":36,"n":4},{"t":43,"n":5},{"t":45,"n":6},{"t":50,"n":7},{"t":58,"n":8},{"t":63,"n":9},
       {"t":70,"n":10},{"t":71,"n":11},{"t":77,"n":12},{"t":78,"n":13},{"t":87,"n":14},{"t":91,"n":15},{"t":92,"n":16},{"t":95,"n":17},
       {"t":98,"n":18},{"t":104,"n":19},{"t":105,"n":20},{"t":116,"n":21},{"t":149,"n":22},{"t":156,"n":23},{"t":247,"n":24},{"t":249,"n":25},{"t":250,"n":26}]},
-     "mark": {"type": "point", "filled": true, "size": 40, "color": "#2D6E2A"},
+     "mark": {"type": "point", "filled": true, "size": 40, "color": "#282828"},
      "encoding": {"x": {"field": "t", "type": "quantitative"}, "y": {"field": "n", "type": "quantitative"}}}
   ],
   "config": {"font": "Tahoma, sans-serif", "view": {"stroke": null}}

@@ -39,11 +39,12 @@ Plotting cumulative injected and removed defects by phase gives the project's **
     {"p": "LLD", "o": 3, "s": "Removed", "v": 0}, {"p": "Code", "o": 4, "s": "Removed", "v": 0},
     {"p": "UT", "o": 5, "s": "Removed", "v": 40}, {"p": "IT", "o": 6, "s": "Removed", "v": 60},
     {"p": "ST", "o": 7, "s": "Removed", "v": 70}]},
-  "mark": {"type": "line", "point": true, "strokeWidth": 3},
+  "mark": {"type": "line", "point": {"filled": true, "size": 70}, "strokeWidth": 3},
   "encoding": {
     "x": {"field": "p", "type": "ordinal", "sort": {"field": "o"}, "title": "Phase", "axis": {"labelAngle": 0}},
     "y": {"field": "v", "type": "quantitative", "title": "Cumulative defects"},
-    "color": {"field": "s", "type": "nominal", "scale": {"range": ["#b42318", "#019546"]}, "title": null}},
+    "color": {"field": "s", "type": "nominal", "scale": {"domain": ["Injected", "Removed"], "range": ["#b42318", "#019546"]}, "title": null},
+    "shape": {"field": "s", "type": "nominal", "scale": {"domain": ["Injected", "Removed"], "range": ["triangle-up", "circle"]}, "title": null}},
   "config": {"font": "Tahoma, sans-serif", "axis": {"labelFontSize": 13, "titleFontSize": 13}, "legend": {"labelFontSize": 13}, "view": {"stroke": null}}
 }
 ```

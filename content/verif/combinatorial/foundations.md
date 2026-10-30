@@ -54,8 +54,8 @@ Cohen and colleagues proved that a greedy generator, which always picks the test
   "encoding": {
     "x": {"field": "k", "type": "quantitative", "title": "Number of parameters k (3 values each)"},
     "y": {"field": "n", "type": "quantitative", "title": "Pairwise tests", "scale": {"domain": [0, 40]}},
-    "color": {"field": "s", "type": "nominal", "title": null, "scale": {"range": ["#019546", "#c99700"]}, "legend": {"orient": "bottom", "labelFontSize": 13}},
-    "shape": {"field": "s", "type": "nominal", "scale": {"range": ["circle", "square"]}}
+    "color": {"field": "s", "type": "nominal", "title": null, "scale": {"domain": ["PICT 3.7.4 (measured)", "AETG (Cohen et al.)"], "range": ["#019546", "#c99700"]}, "legend": {"orient": "bottom", "labelFontSize": 13}},
+    "shape": {"field": "s", "type": "nominal", "title": null, "scale": {"domain": ["PICT 3.7.4 (measured)", "AETG (Cohen et al.)"], "range": ["circle", "square"]}}
   },
   "config": {"font": "Tahoma", "axis": {"labelFontSize": 13, "titleFontSize": 13}, "view": {"stroke": null}}
 }

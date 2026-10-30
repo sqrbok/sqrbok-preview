@@ -50,7 +50,7 @@ The study compared groups of projects {% cite shah2012defect %}:
     {"mark": {"type": "bar", "height": 20},
      "encoding": {
        "x": {"field": "median", "type": "quantitative", "axis": {"title": "Post-release defects per KLOC (bar = median, black tick = mean)"}},
-       "color": {"field": "factor", "type": "nominal", "scale": {"domain": ["All", "Development mode", "Language", "Size"], "range": ["#2D6E2A", "#019546", "#7fbf8f", "#c99700"]}, "legend": {"title": null, "orient": "bottom"}}}},
+       "color": {"field": "factor", "type": "nominal", "scale": {"domain": ["All", "Development mode", "Language", "Size"], "range": ["#6b7280", "#019546", "#1f5fa8", "#c99700"]}, "legend": {"title": null, "orient": "bottom"}}}},
     {"mark": {"type": "tick", "color": "#282828", "thickness": 3, "size": 22},
      "encoding": {"x": {"field": "mean", "type": "quantitative"}}}
   ],

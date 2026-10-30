@@ -55,11 +55,12 @@ where α is **contention** (waiting for a shared resource such as a database loc
     {"n":64,"law":"Amdahl (f = 0.03)","C":22.15},{"n":64,"law":"USL (α = 0.03, β = 0.0005)","C":13.05},
     {"n":80,"law":"Amdahl (f = 0.03)","C":23.74},{"n":80,"law":"USL (α = 0.03, β = 0.0005)","C":12.25},
     {"n":96,"law":"Amdahl (f = 0.03)","C":24.94},{"n":96,"law":"USL (α = 0.03, β = 0.0005)","C":11.41}]},
-  "mark": {"type": "line", "point": true, "strokeWidth": 3},
+  "mark": {"type": "line", "point": {"filled": true, "size": 60}, "strokeWidth": 3},
   "encoding": {
     "x": {"field": "n", "type": "quantitative", "title": "nodes N", "scale": {"domain": [0, 100]}},
     "y": {"field": "C", "type": "quantitative", "title": "relative capacity C(N)", "scale": {"domain": [0, 26]}},
-    "color": {"field": "law", "type": "nominal", "title": null, "scale": {"range": ["#019546", "#b42318"]}, "legend": {"orient": "top"}}},
+    "color": {"field": "law", "type": "nominal", "title": null, "scale": {"domain": ["Amdahl (f = 0.03)", "USL (α = 0.03, β = 0.0005)"], "range": ["#019546", "#1f5fa8"]}, "legend": {"orient": "top"}},
+    "shape": {"field": "law", "type": "nominal", "title": null, "scale": {"domain": ["Amdahl (f = 0.03)", "USL (α = 0.03, β = 0.0005)"], "range": ["circle", "square"]}}},
   "config": {"font": "Tahoma, sans-serif", "view": {"stroke": null}}
 }
 ```

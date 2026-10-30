@@ -97,7 +97,7 @@ Appraisal is close to the plan's estimate: in 1.0 the tester logged 110 of the 1
     {"r": "1.1", "c": "Internal failure", "o": 3, "h": 75}, {"r": "1.1", "c": "External failure", "o": 4, "h": 30},
     {"r": "1.2", "c": "Prevention", "o": 1, "h": 65}, {"r": "1.2", "c": "Appraisal", "o": 2, "h": 165},
     {"r": "1.2", "c": "Internal failure", "o": 3, "h": 60}, {"r": "1.2", "c": "External failure", "o": 4, "h": 15}]},
-  "mark": {"type": "bar"},
+  "mark": {"type": "bar", "stroke": "#ffffff", "strokeWidth": 1},
   "encoding": {
     "x": {"field": "r", "type": "ordinal", "title": "Release", "axis": {"labelAngle": 0}},
     "y": {"field": "h", "type": "quantitative", "title": "Hours", "stack": "zero"},
@@ -105,7 +105,7 @@ Appraisal is close to the plan's estimate: in 1.0 the tester logged 110 of the 1
     "color": {"field": "c", "type": "nominal", "title": null,
       "sort": ["Prevention", "Appraisal", "Internal failure", "External failure"],
       "scale": {"domain": ["Prevention", "Appraisal", "Internal failure", "External failure"],
-                "range": ["#019546", "#8cc63f", "#f0a202", "#b42318"]}},
+                "range": ["#019546", "#1f5fa8", "#c99700", "#b42318"]}},
     "tooltip": [{"field": "r", "title": "Release"}, {"field": "c", "title": "Category"}, {"field": "h", "title": "Hours"}]},
   "config": {"font": "Tahoma, sans-serif", "axis": {"labelFontSize": 13, "titleFontSize": 13}, "legend": {"labelFontSize": 13}, "view": {"stroke": null}}
 }

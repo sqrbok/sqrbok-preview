@@ -51,7 +51,8 @@ For example, an API server with *S* = 20 ms at ρ = 60% answers in 20 / 0.4 = 50
   "encoding": {
     "x": {"field": "u", "type": "quantitative", "title": "utilization of each server", "axis": {"format": "%"}, "scale": {"domain": [0, 1]}},
     "y": {"field": "R", "type": "quantitative", "title": "response time (× service time)", "scale": {"domain": [0, 21]}},
-    "color": {"field": "c", "type": "nominal", "title": null, "scale": {"range": ["#b42318", "#019546"]}, "legend": {"orient": "top"}}},
+    "color": {"field": "c", "type": "nominal", "title": null, "scale": {"domain": ["1 server (M/M/1)", "4 servers (M/M/4)"], "range": ["#b42318", "#019546"]}, "legend": {"orient": "top", "symbolStrokeWidth": 3}},
+    "strokeDash": {"field": "c", "type": "nominal", "title": null, "scale": {"domain": ["1 server (M/M/1)", "4 servers (M/M/4)"], "range": [[6, 4], [1, 0]]}}},
   "config": {"font": "Tahoma, sans-serif", "view": {"stroke": null}}
 }
 ```

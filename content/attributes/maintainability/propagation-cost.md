@@ -117,7 +117,7 @@ print("PC =", sum(map(sum, reach)), "/", n * n)
     "y": {"field": "p", "type": "nominal", "title": null, "sort": null},
     "yOffset": {"field": "s"},
     "x": {"field": "v", "type": "quantitative", "title": "Share of co-changes carried by the most active 10% of dependencies (%)", "scale": {"domain": [0, 80]}},
-    "color": {"field": "s", "type": "nominal", "scale": {"domain": ["Observed", "Age-only reference"], "range": ["#014d24", "#c8e6c9"]}, "legend": {"title": null, "orient": "bottom"}}},
+    "color": {"field": "s", "type": "nominal", "scale": {"domain": ["Observed", "Age-only reference"], "range": ["#1f5fa8", "#c99700"]}, "legend": {"title": null, "orient": "bottom"}}},
   "config": {"font": "Tahoma, sans-serif", "axis": {"labelFontSize": 12, "titleFontSize": 12}, "view": {"stroke": null}}
 }
 ```

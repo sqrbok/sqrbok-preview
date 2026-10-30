@@ -62,7 +62,7 @@ KLEE, a symbolic execution tool for C, was run for about an hour on each of the 
     "yOffset": {"field": "s", "sort": ["KLEE tests", "Developer tests"]},
     "x": {"field": "v", "type": "quantitative", "title": "Line coverage (%)", "scale": {"domain": [0, 100]}},
     "color": {"field": "s", "type": "nominal", "title": null, "sort": ["KLEE tests", "Developer tests"],
-              "scale": {"range": ["#019546", "#9bbf9b"]}, "legend": {"orient": "bottom", "labelFontSize": 13}}
+              "scale": {"domain": ["KLEE tests", "Developer tests"], "range": ["#019546", "#1f5fa8"]}, "legend": {"orient": "bottom", "labelFontSize": 13}}
   },
   "layer": [
     {"mark": {"type": "bar"}},

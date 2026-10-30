@@ -55,7 +55,7 @@ Scale type is not printed on a measure; it depends on how the values were produc
   "layer": [
     {"mark": {"type": "rule", "strokeWidth": 3, "color": "#c8e6c9"},
      "encoding": {"y": {"field": "lo", "type": "quantitative", "title": "Hours spent", "scale": {"domain": [0, 180]}}, "y2": {"field": "hi"}}},
-    {"mark": {"type": "line", "strokeDash": [6, 4], "color": "#b42318", "point": {"color": "#b42318"}},
+    {"mark": {"type": "line", "strokeDash": [6, 4], "color": "#1f5fa8", "point": {"color": "#1f5fa8", "shape": "square", "size": 50}},
      "encoding": {"y": {"field": "ratio", "type": "quantitative"}}},
     {"mark": {"type": "point", "filled": true, "size": 90, "color": "#019546"},
      "encoding": {"y": {"field": "median", "type": "quantitative"}}}
@@ -64,7 +64,7 @@ Scale type is not printed on a measure; it depends on how the values were produc
 }
 ```
 
-_Green dots: median hours; bars: range from shortest to longest story; red dashes: 21 hours × points, what a ratio scale predicts from the 1-point median. Data from one company._ {% cite cohn_storypoints %}
+_Green dots: median hours; bars: range from shortest to longest story; blue dashes: 21 hours × points, what a ratio scale predicts from the 1-point median. Data from one company._ {% cite cohn_storypoints %}
 
 At 3 and 5 points the medians sit on the line: 64 against 63, 100 against 105. At 2 points the median is 52 against 42, about 24% higher. At 8 points the median is 111 hours, not 168. And the ranges overlap so much that a 3-point story took anything from 11 to 117 hours. Two readings are defensible. Treat points as **ratio** and sum them, accepting a planning error that grows with story size; or treat them as **ordinal** and plan from counts of stories of each size. Decide which you assume, write it down, and check it against hours spent.
 

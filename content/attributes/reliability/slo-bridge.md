@@ -60,7 +60,8 @@ A burn rate of 1 uses the whole budget in 30 days; 10 uses it in 3 days. Take th
   "encoding": {
     "x": {"field": "d", "type": "quantitative", "title": "Day of the 30-day window", "scale": {"domain": [0, 30]}},
     "y": {"field": "b", "type": "quantitative", "title": "Error budget left (%)", "scale": {"domain": [0, 100]}},
-    "color": {"field": "s", "type": "nominal", "title": null, "scale": {"range": ["#019546", "#c99700", "#b42318"]}}
+    "color": {"field": "s", "type": "nominal", "title": null, "scale": {"domain": ["burn rate 0.5", "burn rate 1", "burn rate 10"], "range": ["#019546", "#c99700", "#b42318"]}, "legend": {"symbolStrokeWidth": 3}},
+    "strokeDash": {"field": "s", "type": "nominal", "title": null, "scale": {"domain": ["burn rate 0.5", "burn rate 1", "burn rate 10"], "range": [[1, 0], [8, 4], [2, 3]]}}
   },
   "config": {"font": "Tahoma, sans-serif", "axis": {"labelFontSize": 12, "titleFontSize": 13}, "legend": {"labelFontSize": 12}, "view": {"stroke": null}}
 }
