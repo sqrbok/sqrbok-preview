@@ -81,7 +81,7 @@ Without the timeout it printed `No differences found. (attempted 22 iterations)`
 
 `cover` prints tests that record what the code does now (its two import lines trimmed here; `> tests/test_fee_cover.py` saves the whole output, imports included):
 
-```text
+```python
 def test_fee():
     assert fee(16, member=True) == 1
 

@@ -47,7 +47,7 @@ On the fee function from the [pytest card](pytest.md), with its six tests plus `
 
 24 mutants: 🎉 17 killed and 🙁 7 survived. The others are no tests, timeout, suspicious, skipped, and caught by a type check. `mutmut show` prints a survivor as a diff:
 
-```text
+```diff
 -    return min(total, 20)
 +    return min(total, 21)
 ```
