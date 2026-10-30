@@ -81,6 +81,8 @@ Corrections and additions are welcome, from students and practitioners alike.
 
 Every page is held to [the page standard](https://github.com/sqrbok/sqrbok.github.io/blob/main/templates/page-standard.md).
 
+What changed since the S26 edition: [Changes since S26](changelog/). The S26 edition stays readable in the [archive](https://sqrbok.github.io/sqrbok-s26/).
+
 ---
 
 ## Acknowledgements
