@@ -49,6 +49,10 @@ Start with [Terminology](terminology.md), then the criteria from statement to mu
 
 {% bibliography --cited %}
 
+### Acknowledgments
+
+The lectures behind this area took early inspiration from the *Analysis of Software Artifacts* course of Eduardo Miranda and Claire Le Goues (Carnegie Mellon University). The pages here are original, written from the literature review; any errors are ours.
+
 ---
 
 {: .highlight }

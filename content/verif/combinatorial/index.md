@@ -41,6 +41,10 @@ Read Interaction Faults first: it gives the evidence for the strength *t* that e
 
 {% bibliography --cited %}
 
+### Acknowledgments
+
+The lectures behind this area took early inspiration from the *Analysis of Software Artifacts* course of Eduardo Miranda and Claire Le Goues (Carnegie Mellon University). The original lectures thanked Rick Kuhn (NIST) for the combinatorial testing material. The pages here are original, written from the literature review; any errors are ours.
+
 ---
 
 {: .highlight }

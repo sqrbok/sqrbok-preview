@@ -45,6 +45,7 @@ Every S27 page passes the page standard (`scripts/check_pages.py`), and every ci
   - Single `$` is no longer a math delimiter; it had turned dollar amounts into math. Inline math is written `$$…$$`.
   - All charts use colour-blind-safe palettes, with shapes or dashes as a second cue.
   - Every page title is unique, and sibling navigation orders are fixed.
+- **Acknowledgments:** the home page and each area hub now name where the lectures took early inspiration: the *Analysis of Software Artifacts* course (Miranda and Le Goues, CMU, with Aldrich and Bocchino for static analysis), and Far's software reliability engineering lectures (Calgary) for reliability and operational profile. The pages themselves are original, and industry practice has no external inspiration.
 
 ## What changed, by area
 
