@@ -76,6 +76,7 @@ GitHub's Ubuntu runners have both tools installed, so `podman build` and `podman
 
 - [Load Testing with Locust](../../attributes/performance/load-testing.md): a containerised service under load.
 - [Secure Design Principles](../../attributes/security/secure-design.md): least privilege, which rootless containers apply.
+- [Trivy](trivy.md): scanning the image and the Containerfile.
 
 ---
 

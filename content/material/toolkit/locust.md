@@ -2,7 +2,7 @@
 title: Locust
 parent: Practice Toolkit
 grand_parent: Selected Materials
-nav_order: 12
+nav_order: 13
 layout: default
 page_type: tool-card
 tested_with: Locust 2.47.0, Flask 3.1.3
@@ -111,6 +111,7 @@ In a workflow, start the service in the background first (for example `podman ru
 - [Load Testing with Locust](../../attributes/performance/load-testing.md): designing the load, and what to measure.
 - [Worked Case: Load Testing a Catalogue Service](../../attributes/performance/worked-case.md): a load test from plan to verdict.
 - [Worked Case: From Counters to Capacity](../../attributes/queuing/worked-case.md): why throughput levels off as users grow.
+- [Prometheus](prometheus.md): the server's side of the same run.
 
 ---
 
