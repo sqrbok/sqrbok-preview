@@ -1,7 +1,7 @@
 // Copied from https://docs.mathjax.org/en/latest/upgrading/v2.html#changes-in-the-mathjax-api
 MathJax = {
   tex: {
-    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    inlineMath: [['\\(', '\\)']],   // no single $: prose uses $ for money
     displayMath: [['$$', '$$'], ['\\[', '\\]']],
     processEscapes: true
   },

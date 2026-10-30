@@ -68,7 +68,7 @@ For `if (A && B)`, branch coverage requires only 2 tests. What combination is ne
 
 ## Question 7: Cyclomatic Complexity Calculation
 
-A control flow graph has 10 edges and 8 nodes. Calculate $V(G)$.
+A control flow graph has 10 edges and 8 nodes. Calculate $$V(G)$$.
 
 ---
 
@@ -115,7 +115,7 @@ What are the three requirements for MC/DC coverage?
 
 ## Question 13: MC/DC Test Count
 
-How many tests are needed for MC/DC coverage of a predicate with 5 conditions? Compare to Multiple Condition coverage ($2^5$).
+How many tests are needed for MC/DC coverage of a predicate with 5 conditions? Compare to Multiple Condition coverage ($$2^5$$).
 
 ---
 
