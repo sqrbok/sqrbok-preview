@@ -43,11 +43,15 @@ Kuhn, Wallace and Gallo counted the FTFI number of real failures in four systems
     {"s": "Browser (Mozilla)", "n": 1, "p": 29}, {"s": "Browser (Mozilla)", "n": 2, "p": 76}, {"s": "Browser (Mozilla)", "n": 3, "p": 95}, {"s": "Browser (Mozilla)", "n": 4, "p": 97}, {"s": "Browser (Mozilla)", "n": 5, "p": 99}, {"s": "Browser (Mozilla)", "n": 6, "p": 100},
     {"s": "Server (Apache)", "n": 1, "p": 42}, {"s": "Server (Apache)", "n": 2, "p": 70}, {"s": "Server (Apache)", "n": 3, "p": 89}, {"s": "Server (Apache)", "n": 4, "p": 96}, {"s": "Server (Apache)", "n": 5, "p": 96}, {"s": "Server (Apache)", "n": 6, "p": 100}
   ]},
-  "mark": {"type": "line", "point": {"size": 70, "filled": true}, "strokeWidth": 3},
+  "mark": {"type": "line", "point": {"size": 90, "filled": true}, "strokeWidth": 2.5},
   "encoding": {
     "x": {"field": "n", "type": "ordinal", "title": "Number of interacting conditions (FTFI number)", "axis": {"labelAngle": 0}},
     "y": {"field": "p", "type": "quantitative", "title": "Cumulative % of failures", "scale": {"domain": [0, 100]}},
-    "color": {"field": "s", "type": "nominal", "title": null, "scale": {"range": ["#2D6E2A", "#019546", "#c99700", "#b42318"]}, "legend": {"orient": "bottom", "columns": 2, "labelFontSize": 13}}
+    "color": {"field": "s", "type": "nominal", "title": null,
+      "scale": {"domain": ["Medical devices", "NASA system", "Browser (Mozilla)", "Server (Apache)"], "range": ["#019546", "#c99700", "#1f5fa8", "#b42318"]},
+      "legend": {"orient": "bottom", "columns": 2, "labelFontSize": 13, "symbolSize": 120}},
+    "shape": {"field": "s", "type": "nominal",
+      "scale": {"domain": ["Medical devices", "NASA system", "Browser (Mozilla)", "Server (Apache)"], "range": ["circle", "square", "triangle-up", "diamond"]}}
   },
   "config": {"font": "Tahoma", "axis": {"labelFontSize": 13, "titleFontSize": 13}, "view": {"stroke": null}}
 }
