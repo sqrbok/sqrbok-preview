@@ -21,6 +21,7 @@ as {% cite %}, and kramdown {: .class } attribute lists. Captions are counted):
     study-notes   800-2200   one lecture summarised for revision (SN)
     question-set  200-2200   revision questions (RQ); the prose rules do not apply
     case          300-1600   a case description or assignment brief
+    tool-card     300-600    one tool as a quick reference; code and output not counted
     any             >1500    must be split (>3000 for the three Materials types)
 
 Page type is inferred: `index.md` is a hub (topic-hub if it holds a table and links),
@@ -59,6 +60,9 @@ BUDGETS = {             # type: (min, max, hard_split)
     'study-notes':  (800, 2200, 3000),   # SN: one lecture, summarised for revision
     'question-set': (200, 2200, 3000),   # RQ: questions, so the prose rules do not apply
     'case':         (300, 1600, 2500),   # a case description or assignment brief
+    # Practice Toolkit: one tool as a quick reference. Its code and output are the
+    # content and are not counted, so the prose budget is small. Added 2026-10-30.
+    'tool-card':    (300, 600, 1000),
     # The site index. Wider than a hub because it orients a first-time reader as
     # well as linking, but it is still a front door, not a page that teaches.
     'home':         (300, 700, 1000),
@@ -242,6 +246,8 @@ def problems(r: dict) -> list[str]:
             out.append(f"{r['bullet_pct']}% bullets - explain, do not list")
         if not r['lead']:
             out.append('no lead sentence after the H1')
+    if r['type'] == 'tool-card' and not r['lead']:
+        out.append('no lead sentence after the H1')
 
     if r['type'] not in NON_PROSE and r['n_bullets'] >= 5 and r['fragment_pct'] > 60:
         out.append(f"{r['fragment_pct']}% of bullets are bare labels - make them statements")

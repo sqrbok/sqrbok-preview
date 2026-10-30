@@ -52,7 +52,7 @@ The full range of V&V methods and when to apply each:
 Maintainability, reliability, performance and queuing theory, and security — each treated as an engineering property with models, metrics, and design implications. Usability is planned.
 
 ### 5. [Selected Materials](/sqrbok-preview/content/material/)
-A study note and revision questions for each lecture (SQR L00–L10, QAM A01–A10), and an annotated reading list.
+A study note and revision questions for each lecture (SQR L00–L10, QAM A01–A10), tool cards for the practice tools, and an annotated reading list.
 
 ---
 
