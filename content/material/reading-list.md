@@ -1,7 +1,7 @@
 ---
 title: Reading List
 parent: Selected Materials
-nav_order: 3
+nav_order: 4
 layout: default
 page_type: deep-dive   # annotated bibliography: one line per book or paper, not teaching text
 ---

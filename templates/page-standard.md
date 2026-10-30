@@ -35,6 +35,7 @@ method, and all three **must be declared** in the front matter (`page_type:`).
 | **Study notes** | `study-notes` | 800–2,200 | One lecture summarised for revision (SN). Prose; the style caps in §4 apply |
 | **Question set** | `question-set` | 200–2,200 | Revision questions (RQ). Lists are the content, so the bullet, example and lead-in rules do not apply |
 | **Case material** | `case` | 300–1,600 | A case description or assignment brief |
+| **Tool card** | `tool-card` | 300–600 | One tool as a quick reference (Practice Toolkit). Code and output are the content and are not counted |
 
 Body words exclude front matter, code fences, the References block, Acknowledgments and the
 Disclaimer.
@@ -55,6 +56,22 @@ the area to a real system, end to end. It must contain:
 
 Label constructed material "(Constructed example.)". Checklists, tables and code are the content
 here, so the bullet cap does not apply.
+
+**Tool card.** A tool card is a quick reference for one tool, read with a terminal open. In this order:
+
+1. **What it is for:** one sentence, and the quality question it answers.
+2. **Install and quick start:** the install command and the smallest useful run, on a small
+   constructed example that is not a course exercise.
+3. **Reading the output:** real output from a run made for the card, trimmed, with each column or
+   flag explained.
+4. **Common mistakes:** three to five, each one seen in a run where possible.
+5. **In CI:** the step that runs the tool as a gate.
+6. **Go deeper:** the handbook method pages and worked cases that use the tool, and its official
+   documentation.
+
+The front matter names the version the card was run with (`tested_with:`), and the card is rerun
+whenever that version changes. A card teaches the tool, never a method: the method lives on its own
+page, and the card links to it.
 
 **Claiming the deep-dive budget is a deliberate act.** Put `page_type: deep-dive` in the front
 matter with a short comment saying why. **Prefer splitting to declaring.** If a page is over budget

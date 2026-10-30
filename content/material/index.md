@@ -14,6 +14,7 @@ Material for revising the SQR and QAM lectures, and the reading behind them.
 |---|---|
 | [SQR Study Materials](sqr/index.md) | A study note (SN) and revision questions (RQ) for each bachelor lecture, L01–L10 |
 | [QAM Study Materials](qam/index.md) | The same for each master lecture, A01–A10 |
+| [Practice Toolkit](toolkit/index.md) | One quick-reference card per tool: install, run, read the output, avoid the common mistakes |
 | [Reading List](reading-list.md) | Textbooks and key papers, one annotation per entry |
 
 A study note follows its lecture in order and links to the handbook pages that hold the detail. The revision questions test understanding rather than recall; answers are folded under each question. Read the study note the evening after the lecture, then try the questions without opening it.

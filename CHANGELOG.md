@@ -19,12 +19,12 @@ claim removed with its reason) is in the area's `status.md` log in the companion
 
 | | S26 | S27 |
 |---|---:|---:|
-| Content pages | 179 | 270 |
+| Content pages | 179 | 285 |
 | Defining Quality | 12 | 26 |
 | Organizing Quality | 40 | 54 |
 | Verification and Validation | 62 | 93 |
 | Quality Attributes | 22 | 50 |
-| Selected Materials (study notes, questions) | 43 | 46 |
+| Selected Materials (study notes, questions, tool cards) | 43 | 61 |
 | Commits between the two | | 53 |
 
 Every S27 page passes the page standard (`scripts/check_pages.py`), and every citation resolves
@@ -82,6 +82,7 @@ rounds; most areas also had a Gemini cross-check.
     - security: a threat model and Bandit triage;
     - maintainability: refactoring the Click repository.
 - **Selected Materials.**
+  - New **Practice Toolkit**: 14 tool cards (Poetry and uv, GitHub Actions, Podman and Docker, pytest, Coverage.py, Hypothesis, mutmut, flake8 and Ruff, Radon, mypy, Bandit and pip-audit, Locust, PICT, ACTS), each run for the card with its version stated; new page type `tool-card` (300–600 words).
   - Study notes and revision questions are rewritten for L01–L10 and A01–A10, and added for L00.
   - Each study note follows its lecture and links to the handbook.
   - The reading list is updated.
