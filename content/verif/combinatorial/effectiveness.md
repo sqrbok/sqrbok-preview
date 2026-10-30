@@ -29,7 +29,7 @@ Hu, Wong, Kuhn and Kacker tested five industrial systems with pairwise suites fr
     "y": {"field": "kind", "type": "nominal", "title": null, "axis": {"labelLimit": 260}},
     "yOffset": {"field": "who"},
     "x": {"field": "n", "type": "quantitative", "title": "Faults found", "scale": {"domain": [0, 32]}},
-    "color": {"field": "who", "type": "nominal", "title": null, "scale": {"range": ["#019546", "#b42318"]}, "legend": {"orient": "bottom", "labelFontSize": 13}}
+    "color": {"field": "who", "type": "nominal", "title": null, "scale": {"range": ["#019546", "#1f5fa8"]}, "legend": {"orient": "bottom", "labelFontSize": 13}}
   },
   "layer": [
     {"mark": {"type": "bar", "cornerRadiusEnd": 3}},
