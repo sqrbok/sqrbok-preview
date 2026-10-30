@@ -38,17 +38,17 @@ Over a window of length *T*, record four counters: the arrivals *A*, the complet
                   "y": {"field": "a", "type": "quantitative", "title": "cumulative count", "scale": {"domain": [0, 11]}},
                   "y2": {"field": "d"}}},
     {"data": {"values": [{"t":0,"v":1},{"t":3,"v":2},{"t":5,"v":3},{"t":18,"v":4},{"t":19,"v":5},{"t":27,"v":6},{"t":30,"v":7},{"t":33,"v":8},{"t":35,"v":9},{"t":40,"v":10},{"t":50,"v":10}]},
-     "mark": {"type": "line", "interpolate": "step-after", "strokeWidth": 2.5, "color": "#2D6E2A"},
+     "mark": {"type": "line", "interpolate": "step-after", "strokeWidth": 2.5, "color": "#1f5fa8"},
      "encoding": {"x": {"field": "t", "type": "quantitative"}, "y": {"field": "v", "type": "quantitative"}}},
     {"data": {"values": [{"t":0,"v":0},{"t":8,"v":1},{"t":11,"v":2},{"t":12,"v":3},{"t":23,"v":4},{"t":26,"v":5},{"t":30,"v":6},{"t":36,"v":7},{"t":38,"v":8},{"t":41,"v":9},{"t":45,"v":10},{"t":50,"v":10}]},
-     "mark": {"type": "line", "interpolate": "step-after", "strokeWidth": 2.5, "color": "#b42318"},
+     "mark": {"type": "line", "interpolate": "step-after", "strokeWidth": 2.5, "strokeDash": [6, 3], "color": "#c99700"},
      "encoding": {"x": {"field": "t", "type": "quantitative"}, "y": {"field": "v", "type": "quantitative"}}}
   ],
   "config": {"font": "Tahoma, sans-serif", "view": {"stroke": null}}
 }
 ```
 
-_Cumulative arrivals (green line) and completions (red line) of one server over T = 50 s. Requests arrive at 0, 3, 5, 18, 19, 27, 30, 33, 35 and 40 s and complete, in the same order, at 8, 11, 12, 23, 26, 30, 36, 38, 41 and 45 s. The shaded area between them is W = 60 request-seconds; the server is busy whenever the lines differ, from 0 to 12, 18 to 26 and 27 to 45 s, so B = 12 + 8 + 18 = 38 s. After Denning and Buzen._ {% cite denning1978operational %}
+_Cumulative arrivals (solid blue line) and completions (dashed gold line) of one server over T = 50 s. Requests arrive at 0, 3, 5, 18, 19, 27, 30, 33, 35 and 40 s and complete, in the same order, at 8, 11, 12, 23, 26, 30, 36, 38, 41 and 45 s. The shaded area between them is W = 60 request-seconds; the server is busy whenever the lines differ, from 0 to 12, 18 to 26 and 27 to 45 s, so B = 12 + 8 + 18 = 38 s. After Denning and Buzen._ {% cite denning1978operational %}
 
 For example, for this window: *X* = 10/50 = 0.2 req/s, *U* = 38/50 = 76%, *S* = 38/10 = 3.8 s, *N* = 60/50 = 1.2 and *R* = 60/10 = 6 s.
 

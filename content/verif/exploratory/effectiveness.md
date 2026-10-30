@@ -29,12 +29,12 @@ A replication with 51 students removed the fixed session length {% cite itkonen2
     {"row": "Itkonen 2014 · TCT", "part": "Testing", "hours": 5.35},
     {"row": "Itkonen 2014 · TCT", "part": "Test case design", "hours": 14.12}
   ]},
-  "mark": {"type": "bar"},
+  "mark": {"type": "bar", "stroke": "#ffffff", "strokeWidth": 1},
   "encoding": {
     "y": {"field": "row", "type": "nominal", "title": null, "sort": null},
     "x": {"field": "hours", "type": "quantitative", "title": "Mean hours per subject", "stack": "zero", "scale": {"domain": [0, 20]}},
     "color": {"field": "part", "type": "nominal", "title": null,
-              "scale": {"domain": ["Testing", "Test case design"], "range": ["#019546", "#c99700"]}, "legend": {"orient": "bottom"}},
+              "scale": {"domain": ["Testing", "Test case design"], "range": ["#1f5fa8", "#c99700"]}, "legend": {"orient": "bottom"}},
     "order": {"field": "part", "sort": "descending"}
   },
   "config": {"font": "Tahoma", "axis": {"labelFontSize": 13, "titleFontSize": 13}, "legend": {"labelFontSize": 13}}

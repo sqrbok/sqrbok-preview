@@ -41,10 +41,10 @@ A team estimates a = 50 faults and b = 0.05 per week; the FIO is 0.5 failures pe
                   "y": {"field": "l", "type": "quantitative", "title": "Failure intensity λ(t), failures per week", "scale": {"domain": [0, 2.6]}}}},
     {"data": {"values": [{"y": 0.5}]}, "mark": {"type": "rule", "strokeDash": [6, 3], "strokeWidth": 2, "color": "#019546"},
      "encoding": {"y": {"field": "y", "type": "quantitative"}}},
-    {"data": {"values": [{"x": 32.2}]}, "mark": {"type": "rule", "strokeDash": [3, 3], "color": "#2D6E2A"},
+    {"data": {"values": [{"x": 32.2}]}, "mark": {"type": "rule", "strokeDash": [3, 3], "color": "#6b7280"},
      "encoding": {"x": {"field": "x", "type": "quantitative"}}},
     {"data": {"values": [{"x": 34, "y": 1.2, "t": "release at 32.2 weeks"}, {"x": 60, "y": 0.62, "t": "FIO = 0.5"}]},
-     "mark": {"type": "text", "align": "left", "fontSize": 13, "color": "#2D6E2A"},
+     "mark": {"type": "text", "align": "left", "fontSize": 13, "color": "#282828"},
      "encoding": {"x": {"field": "x", "type": "quantitative"}, "y": {"field": "y", "type": "quantitative"}, "text": {"field": "t"}}}
   ],
   "config": {"font": "Tahoma, sans-serif", "axis": {"labelFontSize": 12, "titleFontSize": 13}, "view": {"stroke": null}}

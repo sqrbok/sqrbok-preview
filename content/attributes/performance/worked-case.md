@@ -288,12 +288,13 @@ users    X/s  p50_book p95_book p50_srch p95_srch err     U   machine% load/core
     {"u":1,"run":"after fix","p":2},{"u":25,"run":"after fix","p":4},{"u":50,"run":"after fix","p":3},{"u":100,"run":"after fix","p":3},
     {"u":150,"run":"after fix","p":3},{"u":200,"run":"after fix","p":2},{"u":250,"run":"after fix","p":2},{"u":300,"run":"after fix","p":1}]},
   "layer": [
-    {"mark": {"type": "line", "point": true, "strokeWidth": 3},
+    {"mark": {"type": "line", "point": {"filled": true, "size": 70}, "strokeWidth": 3},
      "encoding": {
        "x": {"field": "u", "type": "quantitative", "title": "active users", "scale": {"domain": [0, 300]}},
        "y": {"field": "p", "type": "quantitative", "title": "p95 of /books/[id] (ms)", "scale": {"domain": [0, 500]}},
-       "color": {"field": "run", "type": "nominal", "title": null, "scale": {"domain": ["before fix", "after fix"], "range": ["#b42318", "#019546"]}, "legend": {"orient": "top"}}}},
-    {"data": {"values": [{"y": 100}]}, "mark": {"type": "rule", "strokeDash": [6, 3], "color": "#2D6E2A"},
+       "color": {"field": "run", "type": "nominal", "title": null, "scale": {"domain": ["before fix", "after fix"], "range": ["#b42318", "#019546"]}, "legend": {"orient": "top"}},
+       "shape": {"field": "run", "type": "nominal", "title": null, "scale": {"domain": ["before fix", "after fix"], "range": ["triangle-up", "circle"]}}}},
+    {"data": {"values": [{"y": 100}]}, "mark": {"type": "rule", "strokeDash": [6, 3], "color": "#6b7280"},
      "encoding": {"y": {"field": "y", "type": "quantitative"}}}
   ],
   "config": {"font": "Tahoma, sans-serif", "view": {"stroke": null}}

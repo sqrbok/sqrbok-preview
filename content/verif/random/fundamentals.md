@@ -51,12 +51,13 @@ $$
      "mark": {"type": "line", "strokeWidth": 3},
      "encoding": {"x": {"field": "N", "type": "quantitative", "title": "Passing random tests (N)"},
                   "y": {"field": "C", "type": "quantitative", "title": "Confidence C", "scale": {"domain": [0, 1]}},
-                  "color": {"field": "F", "type": "nominal", "title": "Failure rate", "scale": {"domain": ["F = 0.001", "F = 0.0001"], "range": ["#019546", "#b42318"]}}}},
+                  "color": {"field": "F", "type": "nominal", "title": "Failure rate", "scale": {"domain": ["F = 0.001", "F = 0.0001"], "range": ["#019546", "#1f5fa8"]}, "legend": {"symbolStrokeWidth": 3}},
+                  "strokeDash": {"field": "F", "type": "nominal", "title": "Failure rate", "scale": {"domain": ["F = 0.001", "F = 0.0001"], "range": [[1, 0], [8, 4]]}}}},
     {"data": {"sequence": {"start": 0, "stop": 30001, "step": 250, "as": "N"}},
      "transform": [{"calculate": "1 - pow(0.9999, datum.N)", "as": "C"}, {"calculate": "'F = 0.0001'", "as": "F"}],
      "mark": {"type": "line", "strokeWidth": 3},
      "encoding": {"x": {"field": "N", "type": "quantitative"}, "y": {"field": "C", "type": "quantitative"},
-                  "color": {"field": "F", "type": "nominal"}}},
+                  "color": {"field": "F", "type": "nominal"}, "strokeDash": {"field": "F", "type": "nominal"}}},
     {"data": {"values": [{"y": 0.9}]}, "mark": {"type": "rule", "strokeDash": [4, 4], "color": "#757575"},
      "encoding": {"y": {"field": "y", "type": "quantitative"}}}
   ],
@@ -64,7 +65,7 @@ $$
 }
 ```
 
-_Confidence after N passing tests; dashed line at 90%. The red curve reaches 90% about ten times later than the green one: a ten times rarer failure needs about ten times more tests, as the table shows._
+_Confidence after N passing tests; dashed line at 90%. The dashed blue curve reaches 90% about ten times later than the solid green one: a ten times rarer failure needs about ten times more tests, as the table shows._
 
 ## 3. Worked example
 

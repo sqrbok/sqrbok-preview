@@ -35,18 +35,18 @@ Kano and colleagues named three main categories and two minor ones {% cite kano1
        "x": {"field": "x", "type": "quantitative", "title": "Attribute absent  ←  →  fully present", "scale": {"domain": [-1, 1]}, "axis": {"labels": false, "ticks": false}},
        "y": {"field": "y", "type": "quantitative", "title": "Dissatisfied  ←  →  satisfied", "scale": {"domain": [-1.1, 1.1]}, "axis": {"labels": false, "ticks": false}},
        "color": {"field": "c", "type": "nominal", "legend": null,
-         "scale": {"domain": ["must-be", "one-dimensional", "attractive"], "range": ["#b42318", "#2D6E2A", "#019546"]}},
+         "scale": {"domain": ["must-be", "one-dimensional", "attractive"], "range": ["#b42318", "#1f5fa8", "#019546"]}},
        "strokeDash": {"field": "c", "type": "nominal", "legend": null,
-         "scale": {"domain": ["must-be", "one-dimensional", "attractive"], "range": [[1, 0], [6, 4], [1, 0]]}}}},
+         "scale": {"domain": ["must-be", "one-dimensional", "attractive"], "range": [[2, 3], [6, 4], [1, 0]]}}}},
     {"data": {"values": [{"x": -0.12, "y": -0.04, "t": "one-dimensional"}]},
-     "mark": {"type": "text", "fontSize": 14, "fontWeight": "bold", "align": "right", "angle": 0, "color": "#2D6E2A"},
+     "mark": {"type": "text", "fontSize": 14, "fontWeight": "bold", "align": "right", "angle": 0, "color": "#1f5fa8"},
      "encoding": {"x": {"field": "x", "type": "quantitative"}, "y": {"field": "y", "type": "quantitative"}, "text": {"field": "t"}}},
     {"data": {"values": [
        {"x": 0.35, "y": -0.3, "t": "must-be", "c": "must-be"},
        {"x": -0.6, "y": 0.22, "t": "attractive", "c": "attractive"}]},
      "mark": {"type": "text", "fontSize": 14, "fontWeight": "bold", "align": "left"},
      "encoding": {"x": {"field": "x", "type": "quantitative"}, "y": {"field": "y", "type": "quantitative"}, "text": {"field": "t"},
-       "color": {"field": "c", "type": "nominal", "legend": null, "scale": {"domain": ["must-be", "one-dimensional", "attractive"], "range": ["#b42318", "#2D6E2A", "#019546"]}}}}
+       "color": {"field": "c", "type": "nominal", "legend": null, "scale": {"domain": ["must-be", "one-dimensional", "attractive"], "range": ["#b42318", "#1f5fa8", "#019546"]}}}}
   ],
   "config": {"font": "Tahoma", "axis": {"titleFontSize": 13}}
 }

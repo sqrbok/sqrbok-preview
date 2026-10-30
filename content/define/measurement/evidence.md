@@ -48,7 +48,7 @@ The same trap appears in fault prediction. Aziz and colleagues tested whether ad
     "yOffset": {"field": "m", "sort": ["Accuracy", "F1", "TNR"]},
     "x": {"field": "v", "type": "quantitative", "title": "%", "scale": {"domain": [0, 100]}},
     "color": {"field": "m", "type": "nominal", "title": null, "sort": ["Accuracy", "F1", "TNR"],
-              "scale": {"range": ["#019546", "#b42318", "#81c784"]}, "legend": {"orient": "bottom"}}
+              "scale": {"domain": ["Accuracy", "F1", "TNR"], "range": ["#019546", "#1f5fa8", "#c99700"]}, "legend": {"orient": "bottom"}}
   },
   "config": {"font": "Tahoma", "axis": {"labelFontSize": 12, "titleFontSize": 13}, "legend": {"labelFontSize": 13}}
 }

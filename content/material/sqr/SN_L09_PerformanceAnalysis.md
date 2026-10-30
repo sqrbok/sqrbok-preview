@@ -52,14 +52,17 @@ Plotted against utilization, response time stays nearly flat and then bends shar
                   "x2": {"field": "b"},
                   "color": {"field": "z", "type": "nominal", "title": null, "scale": {"domain": ["light load","heavy load","buckle zone"], "range": ["#019546","#c99700","#b42318"]}, "legend": {"orient": "top"}}}},
     {"data": {"values": [{"x":0,"y":0},{"x":5,"y":5.5},{"x":6,"y":6},{"x":8,"y":6},{"x":10,"y":3.5}]},
-     "mark": {"type": "line", "strokeWidth": 3, "color": "#2D6E2A", "interpolate": "monotone"},
+     "mark": {"type": "line", "strokeWidth": 3, "color": "#1f5fa8", "interpolate": "monotone"},
      "encoding": {"x": {"field": "x", "type": "quantitative"}, "y": {"field": "y", "type": "quantitative", "title": "relative value (schematic)", "scale": {"domain": [0, 10]}, "axis": {"labels": false, "ticks": false}}}},
     {"data": {"values": [{"x":0,"y":1},{"x":5,"y":1.4},{"x":6.5,"y":2.5},{"x":8,"y":4.5},{"x":9,"y":7},{"x":10,"y":10}]},
      "mark": {"type": "line", "strokeWidth": 3, "color": "#b42318", "strokeDash": [6,3], "interpolate": "monotone"},
      "encoding": {"x": {"field": "x", "type": "quantitative"}, "y": {"field": "y", "type": "quantitative"}}},
     {"data": {"values": [{"x":3.2,"y":4.4,"t":"throughput X"},{"x":7.6,"y":3.3,"t":"response time R (dashed)"}]},
      "mark": {"type": "text", "fontSize": 12, "align": "left"},
-     "encoding": {"x": {"field": "x", "type": "quantitative"}, "y": {"field": "y", "type": "quantitative"}, "text": {"field": "t"}}}
+     "encoding": {"x": {"field": "x", "type": "quantitative"}, "y": {"field": "y", "type": "quantitative"}, "text": {"field": "t"}}},
+    {"data": {"values": [{"x":2.5,"t":"light load"},{"x":6.5,"t":"heavy load"},{"x":9,"t":"buckle zone"}]},
+     "mark": {"type": "text", "fontSize": 11, "fontStyle": "italic", "color": "#6b7280"},
+     "encoding": {"x": {"field": "x", "type": "quantitative"}, "y": {"datum": 9.5}, "text": {"field": "t"}}}
   ],
   "config": {"font": "Tahoma, sans-serif", "view": {"stroke": null}}
 }

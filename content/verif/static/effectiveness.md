@@ -34,7 +34,7 @@ The usual order is inspection, then testing, then customers. Static analysis was
     "xOffset": {"field": "t", "sort": ["ASA", "Inspection", "Testing"]},
     "y": {"field": "y", "type": "quantitative", "title": "Fault-detection yield (%)", "scale": {"domain": [0, 100]}},
     "color": {"field": "t", "type": "nominal", "title": null, "sort": ["ASA", "Inspection", "Testing"],
-              "scale": {"range": ["#019546", "#c99700", "#9bbf9b"]}, "legend": {"orient": "bottom", "labelFontSize": 13}}
+              "scale": {"domain": ["ASA", "Inspection", "Testing"], "range": ["#019546", "#c99700", "#1f5fa8"]}, "legend": {"orient": "bottom", "labelFontSize": 13}}
   },
   "layer": [
     {"mark": {"type": "bar"}},

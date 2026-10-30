@@ -27,12 +27,14 @@ Wei, Oriol and Meyer ran random testing on 14 classes of a widely used library i
     {"min": 30, "measure": "Faults found", "pct": 70},
     {"min": 60, "measure": "Faults found", "pct": 78}
   ]},
-  "mark": {"type": "line", "point": {"size": 70}, "strokeWidth": 3},
+  "mark": {"type": "line", "point": {"size": 70, "filled": true}, "strokeWidth": 3},
   "encoding": {
     "x": {"field": "min", "type": "quantitative", "title": "Minutes into a 6-hour run (first data point at 10)", "scale": {"domain": [0, 60]}},
     "y": {"field": "pct", "type": "quantitative", "title": "% of the run's final total", "scale": {"domain": [0, 100]}},
     "color": {"field": "measure", "type": "nominal", "title": null,
-              "scale": {"range": ["#019546", "#b42318"]}, "legend": {"orient": "bottom"}}
+              "scale": {"domain": ["Branches exercised", "Faults found"], "range": ["#019546", "#b42318"]}, "legend": {"orient": "bottom"}},
+    "shape": {"field": "measure", "type": "nominal", "title": null,
+              "scale": {"domain": ["Branches exercised", "Faults found"], "range": ["circle", "square"]}}
   },
   "config": {"font": "Tahoma", "axis": {"labelFontSize": 13, "titleFontSize": 13}, "legend": {"labelFontSize": 13}}
 }
