@@ -31,6 +31,10 @@ The study notes and revision questions are [SN A04: Quality Planning](../../mate
 
 {% bibliography --cited %}
 
+### Acknowledgments
+
+The lectures behind this area took early inspiration from the *Analysis of Software Artifacts* course of Eduardo Miranda and Claire Le Goues (Carnegie Mellon University). The pages here are original, written from the literature review; any errors are ours.
+
 ---
 
 {: .highlight }

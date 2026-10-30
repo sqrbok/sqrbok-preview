@@ -24,11 +24,11 @@ These notes cover the full arc from quality theory and measurement through verif
 
 **Course topic map** covers the full scope of both courses across four areas: defining quality, organizing quality assurance, verification methods, and quality attributes. Topics marked in yellow are planned for future editions.
 
-![Software Quality Topic Map](images/overview-asa.png)
+![Course topic map: four columns for the areas Defining Quality, Organizing Quality, Verification and Validation, and Quality Attributes, each listing its topics; metamorphic testing, model-based testing and usability are marked as planned](images/overview-topic-map.svg)
 
 **Quality assurance in the development lifecycle** maps course topics onto a modern CI-based development process. Static analysis and unit tests run on every commit, code reviews and integration tests gate the build, and the quality attributes are checked before release.
 
-![Quality Assurance in Development Lifecycle](images/overview-sqr.png)
+![Quality assurance in a CI development lifecycle: a quality model and quality plan in Plan; static analysis, unit tests and end-to-end tests on the dev branch in Code; code reviews and integration tests in Build; quality control of maintainability, reliability, performance, security and usability (planned) in Release](images/overview-lifecycle.svg)
 
 ---
 
@@ -87,7 +87,7 @@ Every page is held to [the page standard](https://github.com/sqrbok/sqrbok.githu
 
 ## Acknowledgements
 
-The material and structure of these courses are inspired by the lectures of **Prof. Claire Le Goues** (Carnegie Mellon University) and **Prof. Eduardo Miranda** (Carnegie Mellon University). Their work laid the conceptual foundations on which these notes are built.
+The pages of this handbook are original, written from the literature review. The courses behind them took early inspiration from the *Analysis of Software Artifacts* course of **Prof. Eduardo Miranda** and **Prof. Claire Le Goues** (Carnegie Mellon University), with the static analysis lectures drawing on **Jonathan Aldrich** and **Robert Bocchino**, and from the software reliability engineering lectures of **Prof. Behrouz Homayoun Far** (University of Calgary). Each area hub names its inspiration in an **Acknowledgments** section; the industry-practice material has none, as it is entirely our own.
 
 ---
 

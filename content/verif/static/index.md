@@ -40,6 +40,10 @@ Static analysis sits between [inspection](../inspection/), where people read the
 
 {% bibliography --cited %}
 
+### Acknowledgments
+
+The lectures behind this area took early inspiration from the *Analysis of Software Artifacts* course of Eduardo Miranda and Claire Le Goues (Carnegie Mellon University). Its static analysis and model checking lectures also drew on Jonathan Aldrich and Robert Bocchino. The pages here are original, written from the literature review; any errors are ours.
+
 ---
 
 {: .highlight }

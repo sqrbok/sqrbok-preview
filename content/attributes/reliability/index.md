@@ -45,6 +45,10 @@ Read the pages top to bottom: the chain gives the vocabulary, measurement gives 
 
 {% bibliography --cited %}
 
+### Acknowledgments
+
+The lectures behind this area took early inspiration from the software reliability engineering lectures of Behrouz Homayoun Far (University of Calgary). The pages here are original, written from the literature review; any errors are ours.
+
 ---
 
 {: .highlight }
